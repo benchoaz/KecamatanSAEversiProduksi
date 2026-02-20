@@ -45,7 +45,7 @@ class IntentHandler
         }
 
         // --- NUMERIC SELECTION (Top Level) ---
-        if ($messageLower === '1') {
+        if ($this->isSelection($messageLower, '1')) {
             return [
                 'success' => true,
                 'intent' => 'menu_admin',
@@ -58,7 +58,7 @@ class IntentHandler
             ];
         }
 
-        if ($messageLower === '2') {
+        if ($this->isSelection($messageLower, '2')) {
             return [
                 'success' => true,
                 'intent' => 'menu_ekonomi',
@@ -71,7 +71,7 @@ class IntentHandler
             ];
         }
 
-        if ($messageLower === '3') {
+        if ($this->isSelection($messageLower, '3')) {
             return [
                 'success' => true,
                 'intent' => 'jasa_prompt',
@@ -83,11 +83,11 @@ class IntentHandler
             ];
         }
 
-        if ($messageLower === '4') {
+        if ($this->isSelection($messageLower, '4')) {
             return $this->complaintHandler->initiate($phone);
         }
 
-        if ($messageLower === '5') {
+        if ($this->isSelection($messageLower, '5')) {
             return $this->ownerHandler->initiate($phone);
         }
 
@@ -180,6 +180,29 @@ class IntentHandler
             'reply' => $menu,
             'state_update' => null,
         ];
+    }
+
+    /**
+     * Map basic numeric strings to technical emojis often sent by WA
+     */
+    protected function isSelection(string $message, string $number): bool
+    {
+        $message = trim($message);
+
+        // Pure numeric match
+        if ($message === $number)
+            return true;
+
+        // Emoji match mapping
+        $emojis = [
+            '1' => '1️⃣',
+            '2' => '2️⃣',
+            '3' => '3️⃣',
+            '4' => '4️⃣',
+            '5' => '5️⃣',
+        ];
+
+        return isset($emojis[$number]) && $message === $emojis[$number];
     }
 
     /**

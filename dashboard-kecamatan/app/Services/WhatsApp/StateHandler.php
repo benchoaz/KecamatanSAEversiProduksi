@@ -6,6 +6,7 @@ use App\Models\WhatsappSession;
 
 class StateHandler
 {
+    protected IntentHandler $intentHandler;
     protected ComplaintHandler $complaintHandler;
     protected OwnerHandler $ownerHandler;
     protected StatusHandler $statusHandler;
@@ -15,6 +16,7 @@ class StateHandler
     protected JasaHandler $jasaHandler;
 
     public function __construct(
+        IntentHandler $intentHandler,
         ComplaintHandler $complaintHandler,
         OwnerHandler $ownerHandler,
         StatusHandler $statusHandler,
@@ -23,6 +25,7 @@ class StateHandler
         LokerHandler $lokerHandler,
         JasaHandler $jasaHandler
     ) {
+        $this->intentHandler = $intentHandler;
         $this->complaintHandler = $complaintHandler;
         $this->ownerHandler = $ownerHandler;
         $this->statusHandler = $statusHandler;
@@ -42,15 +45,7 @@ class StateHandler
         // Global commands
         if ($messageLower === 'menu') {
             $session->clear();
-            return (new IntentHandler(
-                $this->statusHandler,
-                $this->syaratHandler,
-                $this->umkmHandler,
-                $this->jasaHandler,
-                $this->lokerHandler,
-                $this->complaintHandler,
-                $this->ownerHandler
-            ))->handle($session->phone, 'menu');
+            return $this->intentHandler->handle($session->phone, 'menu');
         }
 
         return match ($session->state) {
@@ -75,11 +70,11 @@ class StateHandler
      */
     protected function handleMenuAdmin(WhatsappSession $session, string $message): array
     {
-        if ($message === '1') {
+        if ($this->isSelection($message, '1')) {
             return $this->syaratHandler->search(''); // Show category list
         }
 
-        if ($message === '2') {
+        if ($this->isSelection($message, '2')) {
             return $this->statusHandler->handle($session->phone);
         }
 
@@ -96,7 +91,7 @@ class StateHandler
      */
     protected function handleMenuEkonomi(WhatsappSession $session, string $message): array
     {
-        if ($message === '1') {
+        if ($this->isSelection($message, '1')) {
             return [
                 'success' => true,
                 'intent' => 'umkm_prompt',
@@ -105,7 +100,7 @@ class StateHandler
             ];
         }
 
-        if ($message === '2') {
+        if ($this->isSelection($message, '2')) {
             return $this->lokerHandler->search(''); // Show latest jobs
         }
 
@@ -120,5 +115,28 @@ class StateHandler
             'reply' => "Pilihan tidak valid. Silakan pilih:\n1️⃣ *UMKM*\n2️⃣ *Loker*\n\nAtau ketik *MENU* untuk kembali.",
             'state_update' => 'MENU_EKONOMI',
         ];
+    }
+
+    /**
+     * Map basic numeric strings to technical emojis often sent by WA
+     */
+    protected function isSelection(string $message, string $number): bool
+    {
+        $message = trim($message);
+
+        // Pure numeric match
+        if ($message === $number)
+            return true;
+
+        // Emoji match mapping
+        $emojis = [
+            '1' => '1️⃣',
+            '2' => '2️⃣',
+            '3' => '3️⃣',
+            '4' => '4️⃣',
+            '5' => '5️⃣',
+        ];
+
+        return isset($emojis[$number]) && $message === $emojis[$number];
     }
 }

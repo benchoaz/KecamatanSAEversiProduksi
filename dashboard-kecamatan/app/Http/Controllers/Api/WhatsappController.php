@@ -179,11 +179,24 @@ class WhatsappController extends Controller
             }
 
             // Route to state handler or intent detector
+            \Log::info('Bot Routing Path', [
+                'phone' => $phone,
+                'state' => $session->state,
+                'is_active' => $session->isActive(),
+                'message' => $message
+            ]);
+
             if ($session->isActive()) {
                 $response = $this->stateHandler->handle($session, $message);
             } else {
                 $response = $this->intentHandler->handle($phone, $message);
             }
+
+            \Log::info('Bot Handler Response', [
+                'intent' => $response['intent'] ?? 'N/A',
+                'state_update' => $response['state_update'] ?? 'N/A',
+                'reply_preview' => isset($response['reply']) ? substr($response['reply'], 0, 50) . '...' : 'NULL'
+            ]);
 
             // =====================================================
             // CRITICAL FIX: Save state_update to database
@@ -193,9 +206,11 @@ class WhatsappController extends Controller
                 if ($response['state_update'] === null) {
                     // Clear session if state_update is null
                     $session->clear();
+                    \Log::info('Session cleared as per state_update');
                 } else {
                     // Update session state
                     $session->updateState($response['state_update']);
+                    \Log::info('Session state updated to: ' . $response['state_update']);
                 }
             }
 

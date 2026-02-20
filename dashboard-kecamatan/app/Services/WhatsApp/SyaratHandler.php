@@ -15,7 +15,12 @@ class SyaratHandler
 
         // If empty query, show available categories
         if (empty($query)) {
-            return $this->getCategoriesList();
+            return [
+                'success' => true,
+                'intent' => 'syarat_list',
+                'reply' => $this->getCategoriesList(),
+                'state_update' => null,
+            ];
         }
 
         // Search FAQ for matching keywords
@@ -103,6 +108,11 @@ class SyaratHandler
             ->get();
 
         $grouped = $faqs->groupBy('category');
+
+        \Log::info('Generating Syarat Category List', [
+            'total_faqs' => $faqs->count(),
+            'total_categories' => $grouped->count()
+        ]);
 
         foreach ($grouped as $category => $items) {
             $reply .= "*{$category}:*\n";
