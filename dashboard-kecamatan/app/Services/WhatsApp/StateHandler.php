@@ -62,6 +62,8 @@ class StateHandler
             'MENU_ADMIN' => $this->handleMenuAdmin($session, $messageLower),
             'MENU_EKONOMI' => $this->handleMenuEkonomi($session, $messageLower),
             'MENU_JASA' => $this->jasaHandler->search($message),
+            'WAITING_UMKM_SEARCH' => $this->umkmHandler->search($message),
+            'WAITING_LOKER_SEARCH' => $this->lokerHandler->search($message),
             'WAITING_COMPLAINT_MESSAGE' => $this->complaintHandler->handleMessage($session, $message),
             'WAITING_COMPLAINT_CONFIRM' => $this->complaintHandler->handleConfirmation($session, $message),
             'WAITING_OWNER_PIN' => $this->ownerHandler->handlePin($session, $message),
