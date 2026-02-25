@@ -49,12 +49,12 @@ class IntentHandler
             return [
                 'success' => true,
                 'intent' => 'menu_admin',
-                'reply' => "📄 *LAYANAN ADMINISTRASI*\n\n" .
+                'reply' => "📄 LAYANAN ADMINISTRASI\n\n" .
                     "Silakan pilih:\n" .
-                    "1️⃣ *Syarat* - Info syarat pembuatan berkas\n" .
-                    "2️⃣ *Status* - Cek status berkas Anda\n" .
-                    "3️⃣ *Permohonan* - Kirim permohonan berkas baru\n\n" .
-                    "Ketik *MENU* untuk kembali.",
+                    "1️⃣ Syarat - Info syarat pembuatan berkas\n" .
+                    "2️⃣ Status - Cek status berkas Anda\n" .
+                    "3️⃣ Permohonan - Kirim permohonan berkas baru\n\n" .
+                    "Ketik MENU untuk kembali.",
                 'state_update' => 'MENU_ADMIN',
             ];
         }
@@ -63,11 +63,11 @@ class IntentHandler
             return [
                 'success' => true,
                 'intent' => 'menu_ekonomi',
-                'reply' => "💰 *LOKER & UMKM*\n\n" .
+                'reply' => "💰 LOKER & UMKM\n\n" .
                     "Silakan pilih:\n" .
-                    "1️⃣ *UMKM* - Cari produk unggulan desa\n" .
-                    "2️⃣ *Loker* - Cari lowongan kerja\n\n" .
-                    "Ketik *MENU* untuk kembali.",
+                    "1️⃣ UMKM - Cari produk unggulan desa\n" .
+                    "2️⃣ Loker - Cari lowongan kerja\n\n" .
+                    "Ketik MENU untuk kembali.",
                 'state_update' => 'MENU_EKONOMI',
             ];
         }
@@ -76,10 +76,10 @@ class IntentHandler
             return [
                 'success' => true,
                 'intent' => 'jasa_prompt',
-                'reply' => "🔧 *LAYANAN JASA*\n\n" .
+                'reply' => "🔧 LAYANAN JASA\n\n" .
                     "Ketik jasa yang Anda butuhkan.\n" .
-                    "Contoh: _jasa tukang_, _jasa pijat_\n\n" .
-                    "Ketik *MENU* untuk kembali.",
+                    "Contoh: jasa tukang, jasa pijat\n\n" .
+                    "Ketik MENU untuk kembali.",
                 'state_update' => 'MENU_JASA',
             ];
         }
@@ -182,14 +182,15 @@ class IntentHandler
      */
     protected function menuIntent(): array
     {
-        $menu = "🏛️ *MENU LAYANAN KECAMATAN BESUK*\n\n";
+        $regionName = strtoupper(appProfile()->region_name);
+        $menu = "MENU LAYANAN KECAMATAN {$regionName}\n\n";
         $menu .= "Silakan pilih layanan (Ketik angka):\n\n";
-        $menu .= "1️⃣ *Administrasi* (Syarat & Status Berkas)\n";
-        $menu .= "2️⃣ *Loker & UMKM* (Kerja & Produk Desa)\n";
-        $menu .= "3️⃣ *Jasa* (Cari Tukang/Servis)\n";
-        $menu .= "4️⃣ *Pengaduan* (Aspirasi Warga)\n";
-        $menu .= "5️⃣ *Kelola Data* (Aktif/Nonaktifkan Data Anda)\n\n";
-        $menu .= "Ketik *MENU* kapan saja untuk kembali.";
+        $menu .= "1️⃣ Administrasi (Syarat & Status Berkas)\n";
+        $menu .= "2️⃣ Loker & UMKM (Kerja & Produk Desa)\n";
+        $menu .= "3️⃣ Jasa (Cari Tukang/Servis)\n";
+        $menu .= "4️⃣ Pengaduan (Aspirasi Warga)\n";
+        $menu .= "5️⃣ Kelola Data (Aktif/Nonaktifkan Data Anda)\n\n";
+        $menu .= "Ketik MENU kapan saja untuk kembali.";
 
         // Clear any active session
         WhatsappSession::where('phone', request()->input('phone'))

@@ -272,6 +272,40 @@
                                     </div>
                                 </div>
 
+                                <!-- Konfigurasi Koordinat Peta (NEW) -->
+                                <div class="col-md-12 mt-4">
+                                    <div class="p-4 border border-blue-100 bg-blue-50 bg-opacity-30 rounded-4">
+                                        <div class="d-flex align-items-center gap-2 mb-4">
+                                            <i class="fas fa-map-marker-alt text-blue-600"></i>
+                                            <h6 class="mb-0 fw-bold text-blue-900 border-bottom border-blue-200 pb-1">
+                                                Konfigurasi Koordinat Peta (Pusat Wilayah)</h6>
+                                        </div>
+
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-slate-700 small fw-bold">Latitude (Garis
+                                                    Lintang)</label>
+                                                <input type="number" step="any" name="map_latitude"
+                                                    value="{{ old('map_latitude', $profile->map_latitude ?? -7.78) }}"
+                                                    class="form-control bg-white border-slate-200 rounded-3 text-sm"
+                                                    placeholder="Contoh: -7.78000000">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-slate-700 small fw-bold">Longitude (Garis
+                                                    Bujur)</label>
+                                                <input type="number" step="any" name="map_longitude"
+                                                    value="{{ old('map_longitude', $profile->map_longitude ?? 113.47) }}"
+                                                    class="form-control bg-white border-slate-200 rounded-3 text-sm"
+                                                    placeholder="Contoh: 113.47000000">
+                                            </div>
+                                        </div>
+                                        <p class="text-[10px] text-blue-700 mt-3 mb-0">
+                                            <i class="fas fa-info-circle me-1"></i> Koordinat ini digunakan untuk menentukan
+                                            titik pusat peta saat pertama kali dibuka di halaman depan.
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <!-- Konfigurasi Hero Section (Beranda) - GABUNGAN -->
                                 <div class="col-md-12 mt-5">
                                     <div class="card border-0 shadow-premium rounded-4 overflow-hidden">

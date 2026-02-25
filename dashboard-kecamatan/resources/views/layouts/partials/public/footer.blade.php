@@ -113,7 +113,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('kerja.index') }}"
+                        <a href="{{ route('economy.index', ['tab' => 'jasa']) }}"
                             class="text-slate-400 hover:text-white transition-all flex items-center gap-3 group">
                             <i
                                 class="fas fa-chevron-right text-[10px] text-teal-500 group-hover:translate-x-1 transition-transform"></i>

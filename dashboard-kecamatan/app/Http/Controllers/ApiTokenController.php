@@ -61,6 +61,7 @@ class ApiTokenController extends Controller
             'user_id' => auth()->id(),
             'name' => $validated['name'],
             'token' => $hashedToken,
+            'plain_token' => $plainToken,
             'abilities' => $validated['abilities'] ?? null,
             'expires_at' => $validated['expires_at'] ?? null,
         ]);
@@ -77,7 +78,7 @@ class ApiTokenController extends Controller
      */
     public function show(ApiToken $apiToken)
     {
-        $plainToken = session('plain_token');
+        $plainToken = session('plain_token') ?? $apiToken->plain_token;
         return view('kecamatan.settings.api-tokens.show', compact('apiToken', 'plainToken'));
     }
 

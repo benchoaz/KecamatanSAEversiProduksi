@@ -52,6 +52,8 @@ class ApplicationProfileController extends Controller
             'x_url' => 'nullable|url|max:255',
             'office_hours_mon_thu' => 'nullable|string|max:100',
             'office_hours_fri' => 'nullable|string|max:100',
+            'map_latitude' => 'nullable|numeric|between:-90,90',
+            'map_longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         $profile = AppProfile::first() ?? new AppProfile();
@@ -74,7 +76,9 @@ class ApplicationProfileController extends Controller
             'youtube_url',
             'x_url',
             'office_hours_mon_thu',
-            'office_hours_fri'
+            'office_hours_fri',
+            'map_latitude',
+            'map_longitude'
         ]);
         $data['hero_image_active'] = $request->has('hero_image_active') ? true : false;
         $data['is_menu_pengaduan_active'] = $request->has('is_menu_pengaduan_active') ? true : false;

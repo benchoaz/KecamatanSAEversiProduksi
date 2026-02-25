@@ -8,10 +8,10 @@
 @endsection
 
 @section('content')
-    <div class="min-h-screen bg-slate-50" x-data="{ activeTab: 'jasa' }">
+    <div class="min-h-screen bg-slate-50" x-data="{ activeTab: '{{ $defaultTab }}' }">
 
-        {{-- Header Section --}}
-        <div class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white pt-16 pb-24 relative overflow-hidden">
+        {{-- Header Section - Scaled down --}}
+        <div class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white pt-10 pb-16 relative overflow-hidden">
             {{-- Background Patterns --}}
             <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2">
             </div>
@@ -20,29 +20,29 @@
             </div>
 
             <div class="container mx-auto px-6 relative z-10">
-                <div class="max-w-4xl">
-                    <h1 class="text-4xl md:text-5xl font-black mb-4 tracking-tight">
+                <div class="max-w-3xl">
+                    <h1 class="text-3xl md:text-4xl font-black mb-3 tracking-tight">
                         Pusat Ekonomi & Kreatif
                     </h1>
-                    <p class="text-xl text-teal-50 mb-8 leading-relaxed max-w-2xl opacity-90">
+                    <p class="text-base text-teal-50 mb-8 leading-relaxed max-w-2xl opacity-90">
                         Platform terintegrasi untuk mendukung ekonomi warga <strong>{{ appProfile()->region_level }}
                             {{ appProfile()->region_name }}</strong>.
                         Temukan produk lokal unggulan, jasa keahlian, dan peluang karier dalam satu pintu.
                     </p>
 
                     {{-- Tab Navigation --}}
-                    <div class="flex flex-wrap gap-3">
+                    <div class="flex flex-wrap gap-2.5">
                         <button @click="activeTab = 'jasa'"
-                            :class="activeTab === 'jasa' ? 'bg-white text-teal-700 shadow-xl scale-105' : 'bg-teal-800/40 text-teal-100 hover:bg-teal-800/60 border-teal-500/30'"
-                            class="px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 flex items-center gap-2.5 border backdrop-blur-sm">
-                            <i class="fas fa-briefcase text-lg"
+                            :class="activeTab === 'jasa' ? 'bg-white text-teal-700 shadow-lg scale-105' : 'bg-teal-800/40 text-teal-100 hover:bg-teal-800/60 border-teal-500/30'"
+                            class="px-5 py-2.5 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 border backdrop-blur-sm text-sm">
+                            <i class="fas fa-briefcase text-base"
                                 :class="activeTab === 'jasa' ? 'text-teal-600' : 'text-teal-200'"></i>
                             <span>Pekerjaan & Jasa</span>
                         </button>
                         <button @click="activeTab = 'produk'"
-                            :class="activeTab === 'produk' ? 'bg-white text-teal-700 shadow-xl scale-105' : 'bg-teal-800/40 text-teal-100 hover:bg-teal-800/60 border-teal-500/30'"
-                            class="px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 flex items-center gap-2.5 border backdrop-blur-sm">
-                            <i class="fas fa-store text-lg"
+                            :class="activeTab === 'produk' ? 'bg-white text-teal-700 shadow-lg scale-105' : 'bg-teal-800/40 text-teal-100 hover:bg-teal-800/60 border-teal-500/30'"
+                            class="px-5 py-2.5 rounded-xl font-bold transition-all duration-300 flex items-center gap-2 border backdrop-blur-sm text-sm">
+                            <i class="fas fa-store text-base"
                                 :class="activeTab === 'produk' ? 'text-teal-600' : 'text-teal-200'"></i>
                             <span>Etalase Produk UMKM</span>
                         </button>
@@ -58,33 +58,33 @@
 
             {{-- Filter Section --}}
             <div class="container mx-auto px-6">
-                <div class="bg-white rounded-3xl shadow-xl p-6 border border-slate-100">
+                <div class="bg-white rounded-2xl shadow-lg p-5 border border-slate-100">
                     {{-- Search & Filter Row --}}
                     <div class="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center mb-6">
                         {{-- Quick Filters --}}
                         <div class="flex flex-wrap gap-2">
-                            <a href="{{ route('kerja.index') }}"
-                                class="px-5 py-2.5 rounded-xl font-bold text-sm transition-all {{ !request('kategori') ? 'bg-teal-50 text-teal-700 border border-teal-100' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-100' }}">
+                            <a href="{{ route('economy.index') }}"
+                                class="px-4 py-2 rounded-xl font-bold text-xs transition-all {{ !request('kategori') ? 'bg-teal-50 text-teal-700 border border-teal-100' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-100' }}">
                                 Semua
                             </a>
                             @foreach($categories as $cat)
-                                <a href="{{ route('kerja.index', ['kategori' => $cat]) }}"
-                                    class="px-5 py-2.5 rounded-xl font-bold text-sm transition-all {{ request('kategori') == $cat ? 'bg-teal-50 text-teal-700 border border-teal-100' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-100' }}">
+                                <a href="{{ route('economy.index', ['kategori' => $cat]) }}"
+                                    class="px-4 py-2 rounded-xl font-bold text-xs transition-all {{ request('kategori') == $cat ? 'bg-teal-50 text-teal-700 border border-teal-100' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-100' }}">
                                     {{ $cat }}
                                 </a>
                             @endforeach
                         </div>
 
                         {{-- Search --}}
-                        <form method="GET" action="{{ route('kerja.index') }}" class="w-full lg:w-80 relative">
+                        <form method="GET" action="{{ route('economy.index') }}" class="w-full lg:w-72 relative">
                             @if(request('kategori'))
                                 <input type="hidden" name="kategori" value="{{ request('kategori') }}">
                             @endif
                             <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari jasa..."
-                                class="w-full pl-5 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all">
+                                class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-medium focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all">
                             <button type="submit"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-600">
-                                <i class="fas fa-search"></i>
+                                <i class="fas fa-search text-xs"></i>
                             </button>
                         </form>
                     </div>
@@ -132,11 +132,17 @@
                                         </span>
                                     </div>
 
-                                    <h3
-                                        class="text-lg font-black text-slate-800 mb-1 leading-tight group-hover:text-teal-700 transition-colors">
+                                    <h3 class="text-lg font-black text-slate-800 mb-1 leading-tight group-hover:text-teal-700 transition-colors">
                                         {{ $item->job_title }}
                                     </h3>
-                                    <p class="text-sm font-medium text-slate-500 mb-4">{{ $item->display_name }}</p>
+                                    <div class="flex items-center justify-between mb-4">
+                                        <p class="text-xs font-medium text-slate-500">{{ $item->display_name }}</p>
+                                        @if($item->price)
+                                            <span class="text-xs font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
+                                                Rp {{ number_format($item->price, 0, ',', '.') }}
+                                            </span>
+                                        @endif
+                                    </div>
 
                                     <div class="space-y-2 mb-6 text-xs text-slate-500">
                                         @if($item->service_area)
@@ -158,7 +164,7 @@
                                             class="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-center text-xs transition-colors flex items-center justify-center gap-2">
                                             <i class="fab fa-whatsapp"></i> Chat
                                         </a>
-                                        <a href="{{ route('kerja.show', $item->id) }}"
+                                        <a href="{{ route('economy.show', $item->id) }}"
                                             class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-colors">
                                             <i class="fas fa-arrow-right"></i>
                                         </a>
@@ -254,10 +260,10 @@
             </div>
 
             <div class="mt-12 text-center">
-                <a href="{{ route('public.umkm.index') }}"
-                    class="btn bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl px-8 font-bold shadow-sm transition-all hover:shadow-md animate-bounce">
+                <button @click="activeTab = 'produk'; window.scrollTo({top: 0, behavior: 'smooth'})"
+                    class="btn bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl px-8 font-bold shadow-sm transition-all hover:shadow-md">
                     <i class="fas fa-th-large mr-2"></i> Lihat Semua Produk
-                </a>
+                </button>
             </div>
         </div>
     </div>

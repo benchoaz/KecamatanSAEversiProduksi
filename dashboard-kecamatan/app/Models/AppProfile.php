@@ -37,6 +37,8 @@ class AppProfile extends Model
         'x_url',
         'office_hours_mon_thu',
         'office_hours_fri',
+        'map_latitude',
+        'map_longitude',
         'updated_by'
     ];
 

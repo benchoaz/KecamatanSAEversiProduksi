@@ -33,6 +33,7 @@ class ApiToken extends Model
         'user_id',
         'name',
         'token',
+        'plain_token',
         'abilities',
         'last_used_at',
         'expires_at',

@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
-require __DIR__ . '/debug.php';
+// DISABLED: Debug route removed for security - 2026-02-22
+// require __DIR__ . '/debug.php';
 
 use App\Http\Controllers\AuthController;
 
@@ -21,8 +22,18 @@ use App\Http\Controllers\FileController;
 Route::get('/', [\App\Http\Controllers\LandingController::class, 'index']);
 Route::get('/wilayah', [\App\Http\Controllers\LandingController::class, 'wilayah'])->name('landing.wilayah');
 
-// Public UMKM Etalase (Redirect to unified Economy page)
-Route::get('/umkm', [\App\Http\Controllers\PublicUmkmController::class, 'index'])->name('public.umkm.index');
+// Public Economy Hub (Unidentified UMKM & Jasa)
+Route::get('/ekonomi', [\App\Http\Controllers\EconomyController::class, 'index'])->name('economy.index');
+Route::get('/ekonomi/{id}', [\App\Http\Controllers\EconomyController::class, 'show'])->name('economy.show');
+
+// Redirects for backward compatibility
+Route::get('/umkm', function () {
+    return redirect()->route('economy.index', ['tab' => 'produk']);
+})->name('public.umkm.index');
+Route::get('/kerja', function () {
+    return redirect()->route('economy.index', ['tab' => 'jasa']);
+});
+
 Route::get('/umkm/{id}', [\App\Http\Controllers\PublicUmkmController::class, 'show'])->name('public.umkm.show');
 
 // UMKM Rakyat (Self-Service)
@@ -81,13 +92,6 @@ Route::get('/robots.txt', [SitemapController::class, 'robots']);
 Route::prefix('berita')->name('public.berita.')->group(function () {
     Route::get('/', [\App\Http\Controllers\PublicBeritaController::class, 'index'])->name('index');
     Route::get('/{slug}', [\App\Http\Controllers\PublicBeritaController::class, 'show'])->name('show');
-});
-
-// Public Work Directory Routes (Direktori Kerja & Jasa Warga)
-use App\Http\Controllers\WorkDirectoryController;
-Route::prefix('kerja')->name('kerja.')->group(function () {
-    Route::get('/', [WorkDirectoryController::class, 'index'])->name('index');
-    Route::get('/{id}', [WorkDirectoryController::class, 'show'])->name('show');
 });
 
 // Auth Routes

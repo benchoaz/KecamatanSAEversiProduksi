@@ -6,7 +6,7 @@
     <section class="py-20 bg-white min-h-screen">
         <div class="container max-w-7xl mx-auto px-6">
             <div class="mb-10">
-                <a href="{{ route('public.umkm.index') }}"
+                <a href="{{ route('economy.index', ['tab' => 'produk']) }}"
                     class="inline-flex items-center gap-2 text-slate-500 hover:text-teal-600 font-bold transition-colors">
                     <i class="fas fa-arrow-left"></i> Kembali ke Etalase
                 </a>

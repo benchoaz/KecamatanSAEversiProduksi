@@ -5,19 +5,11 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
 
-                @if($plainToken)
-                    {{-- ════════════════════════════════════════════════════
-                    SEKALI TAMPIL: Token berhasil dibuat
-                    ════════════════════════════════════════════════════ --}}
-
-                    {{-- Alert: berhasil --}}
-                    <div class="alert alert-success d-flex align-items-start gap-3 mb-4 border-0 shadow-sm">
-                        <div class="fs-3">✅</div>
+                    <div class="alert alert-info d-flex align-items-start gap-3 mb-4 border-0 shadow-sm" style="background: #e7f5ff; border-left: 5px solid #007bff !important;">
+                        <div class="fs-3">🔑</div>
                         <div>
-                            <h5 class="alert-heading fw-bold mb-1">Token Berhasil Dibuat!</h5>
-                            <p class="mb-0">Salin token di bawah <strong>sekarang juga</strong>. Token ini <strong
-                                    class="text-danger">tidak akan ditampilkan lagi</strong> setelah Anda meninggalkan halaman
-                                ini.</p>
+                            <h5 class="alert-heading fw-bold mb-1 text-primary">Detail API Token</h5>
+                            <p class="mb-0 text-muted">Token ini digunakan untuk autentikasi sistem eksternal. Simpan dan jaga kerahasiaannya.</p>
                         </div>
                     </div>
 
@@ -78,19 +70,6 @@
                         </div>
                     </div>
 
-                    {{-- ⚠️ Peringatan penting --}}
-                    <div class="alert alert-warning border-0 shadow-sm mb-4">
-                        <h6 class="fw-bold mb-2"><i class="fas fa-exclamation-triangle me-2"></i>Peringatan Penting</h6>
-                        <ul class="mb-0 small">
-                            <li>Token <strong>hanya ditampilkan sekali ini saja</strong> — setelah meninggalkan halaman ini,
-                                token tidak bisa dilihat lagi</li>
-                            <li>Jika token hilang atau lupa, Anda harus <strong>membuat token baru</strong></li>
-                            <li>Simpan token di tempat aman (password manager, .env file)</li>
-                            <li>Jangan bagikan token kepada siapapun</li>
-                        </ul>
-                    </div>
-
-                @endif {{-- end if $plainToken --}}
 
                 {{-- ─── DETAIL TOKEN ─── --}}
                 <div class="card shadow-sm border-0">
@@ -158,13 +137,13 @@
                         <a href="{{ route('kecamatan.settings.api-tokens.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i>Kembali ke Daftar
                         </a>
-                        @if($plainToken)
+                        @if(session('plain_token'))
                             <a href="{{ route('kecamatan.settings.api-tokens.create') }}" class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Buat Token Lain
                             </a>
                         @else
-                            <a href="{{ route('kecamatan.settings.api-tokens.create') }}" class="btn btn-warning">
-                                <i class="fas fa-redo me-2"></i>Buat Token Baru (Token Lama Hilang?)
+                            <a href="{{ route('kecamatan.settings.api-tokens.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Buat Token Baru
                             </a>
                         @endif
                     </div>

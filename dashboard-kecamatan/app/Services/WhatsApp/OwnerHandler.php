@@ -44,10 +44,10 @@ class OwnerHandler
         return [
             'success' => true,
             'intent' => 'owner_request_pin',
-            'reply' => "🔐 *KELOLA DATA ANDA*\n\n" .
+            'reply' => "🔐 KELOLA DATA ANDA\n\n" .
                 "Ditemukan data terdaftar untuk nomor ini.\n" .
                 "Silakan masukkan PIN Anda untuk melanjutkan.\n\n" .
-                "Ketik *BATAL* untuk membatalkan.",
+                "Ketik BATAL untuk membatalkan.",
             'state_update' => 'WAITING_OWNER_PIN',
         ];
     }
@@ -62,7 +62,7 @@ class OwnerHandler
             return [
                 'success' => true,
                 'intent' => 'owner_cancelled',
-                'reply' => "Dibatalkan. Ketik *MENU* untuk kembali.",
+                'reply' => "Dibatalkan. Ketik MENU untuk kembali.",
                 'state_update' => null,
             ];
         }
@@ -77,7 +77,7 @@ class OwnerHandler
             return [
                 'success' => true,
                 'intent' => 'owner_pin_invalid',
-                'reply' => "❌ PIN salah. Silakan coba lagi atau ketik *BATAL*.",
+                'reply' => "❌ PIN salah. Silakan coba lagi atau ketik BATAL.",
                 'state_update' => 'WAITING_OWNER_PIN',
             ];
         }
@@ -104,9 +104,9 @@ class OwnerHandler
         }
 
         $reply .= "\nPilih aksi:\n";
-        $reply .= "1️⃣ Ketik *AKTIF* untuk mengaktifkan\n";
-        $reply .= "2️⃣ Ketik *NONAKTIF* untuk mematikan (tidak bisa dicari)\n";
-        $reply .= "3️⃣ Ketik *BATAL* untuk keluar";
+        $reply .= "1️⃣ Ketik AKTIF untuk mengaktifkan\n";
+        $reply .= "2️⃣ Ketik NONAKTIF untuk mematikan (tidak bisa dicari)\n";
+        $reply .= "3️⃣ Ketik BATAL untuk keluar";
 
         return [
             'success' => true,
@@ -128,7 +128,7 @@ class OwnerHandler
             return [
                 'success' => true,
                 'intent' => 'owner_cancelled',
-                'reply' => "Dibatalkan. Ketik *MENU* untuk kembali.",
+                'reply' => "Dibatalkan. Ketik MENU untuk kembali.",
                 'state_update' => null,
             ];
         }
@@ -139,7 +139,7 @@ class OwnerHandler
         $action = ($messageLower === 'aktif');
         $newStatus = $action ? 'AKTIF' : 'NONAKTIF';
 
-        $summary = "✅ *STATUS DIPERBARUI*\n\n";
+        $summary = "✅ STATUS DIPERBARUI\n\n";
 
         if ($umkmId) {
             $umkm = UmkmLocal::find($umkmId);

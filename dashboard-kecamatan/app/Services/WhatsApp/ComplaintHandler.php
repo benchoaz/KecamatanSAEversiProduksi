@@ -19,7 +19,7 @@ class ComplaintHandler
         }
 
         $isPelayanan = $category === 'pelayanan';
-        $title = $isPelayanan ? "📄 *PERMOHONAN LAYANAN*" : "📢 *PENGADUAN MASYARAKAT*";
+        $title = $isPelayanan ? "📄 PERMOHONAN LAYANAN" : "📢 PENGADUAN MASYARAKAT";
         $instruction = $isPelayanan
             ? "Silakan sampaikan permohonan layanan/berkas Anda (misal: pengurusan KTP, Domisili, dll)."
             : "Silakan sampaikan keluhan/pengaduan Anda terkait layanan Kecamatan Besuk.";
@@ -30,7 +30,7 @@ class ComplaintHandler
             'reply' => $title . "\n\n" .
                 $instruction . "\n" .
                 "Tulis pesan Anda dalam satu pesan (maks 1000 karakter).\n\n" .
-                "Ketik *BATAL* untuk membatalkan.",
+                "Ketik BATAL untuk membatalkan.",
             'state_update' => 'WAITING_COMPLAINT_MESSAGE',
         ];
     }
@@ -47,7 +47,7 @@ class ComplaintHandler
             return [
                 'success' => true,
                 'intent' => 'complaint_cancelled',
-                'reply' => "Pengaduan dibatalkan. Ketik *MENU* untuk kembali.",
+                'reply' => "Pengaduan dibatalkan. Ketik MENU untuk kembali.",
                 'state_update' => null,
             ];
         }
@@ -56,7 +56,7 @@ class ComplaintHandler
             return [
                 'success' => true,
                 'intent' => 'complaint_too_long',
-                'reply' => "⚠️ Maaf, pengaduan Anda terlalu panjang (maks 1000 karakter).\n\nSilakan ringkas pengaduan Anda dan kirim kembali, atau ketik *BATAL*.",
+                'reply' => "⚠️ Maaf, pengaduan Anda terlalu panjang (maks 1000 karakter).\n\nSilakan ringkas pengaduan Anda dan kirim kembali, atau ketik BATAL.",
                 'state_update' => 'WAITING_COMPLAINT_MESSAGE',
             ];
         }
@@ -70,11 +70,11 @@ class ComplaintHandler
         return [
             'success' => true,
             'intent' => 'complaint_confirm',
-            'reply' => "📝 *KONFIRMASI PENGADUAN*\n\n" .
+            'reply' => "📝 KONFIRMASI PENGADUAN\n\n" .
                 "Isi Laporan:\n" .
                 "_{$preview}_\n\n" .
                 "Apakah Anda yakin ingin mengirim laporan ini?\n\n" .
-                "Balas *YA* untuk mengirim atau *BATAL* untuk membatalkan.",
+                "Balas YA untuk mengirim atau BATAL untuk membatalkan.",
             'state_update' => 'WAITING_COMPLAINT_CONFIRM',
         ];
     }
@@ -110,11 +110,11 @@ class ComplaintHandler
             return [
                 'success' => true,
                 'intent' => 'complaint_submitted',
-                'reply' => "✅ *PENGADUAN TERKIRIM*\n\n" .
+                'reply' => "✅ PENGADUAN TERKIRIM\n\n" .
                     "Terima kasih, laporan Anda telah kami terima dengan ID:\n" .
                     "*{$service->uuid}*\n\n" .
                     "Serta *PIN Lacak: {$service->tracking_code}*\n\n" .
-                    "Petugas kami akan segera menindaklanjuti. Anda dapat mengecek status laporan kapan saja dengan mengetik *STATUS* atau langsung masukkan PIN Lacak Anda.",
+                    "Petugas kami akan segera menindaklanjuti. Anda dapat mengecek status laporan kapan saja dengan mengetik STATUS atau langsung masukkan PIN Lacak Anda.",
                 'state_update' => null,
             ];
         }
@@ -125,7 +125,7 @@ class ComplaintHandler
         return [
             'success' => true,
             'intent' => 'complaint_cancelled',
-            'reply' => "Pengaduan dibatalkan. Ketik *MENU* untuk kembali.",
+            'reply' => "Pengaduan dibatalkan. Ketik MENU untuk kembali.",
             'state_update' => null,
         ];
     }

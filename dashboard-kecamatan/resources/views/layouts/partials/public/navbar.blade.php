@@ -27,81 +27,9 @@
             <li><a href="{{ route('landing.wilayah') }}"
                     class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Wilayah</a>
             </li>
-            <li class="dropdown dropdown-hover group">
-                <label tabindex="0"
-                    class="text-sm font-bold text-slate-600 group-hover:text-teal-600 group-hover:bg-teal-50/50 rounded-full px-4 py-2 transition-all cursor-pointer flex items-center gap-1.5">
-                    <i class="fas fa-briefcase text-teal-500 opacity-80 group-hover:opacity-100"></i>
-                    <span>Ekonomi & Jasa</span>
-                    <i
-                        class="fas fa-chevron-down text-[9px] opacity-40 group-hover:translate-y-0.5 transition-transform duration-300"></i>
-                </label>
-                <ul tabindex="0"
-                    class="dropdown-content z-[200] menu p-3 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] bg-white/95 backdrop-blur-xl border border-white/60 rounded-[1.5rem] w-64 mt-2 animate-[slideUp_0.2s_ease-out]">
-
-                    {{-- Section: Direktori --}}
-                    <div class="px-4 py-2 mb-1">
-                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Direktori</span>
-                    </div>
-
-                    <li class="mb-1"><a href="{{ route('public.loker.index') }}"
-                            class="py-3 px-4 text-xs font-bold text-slate-600 hover:text-teal-600 hover:bg-teal-50 rounded-xl flex gap-3 group/item">
-                            <span
-                                class="w-6 h-6 rounded-lg bg-teal-100/50 flex items-center justify-center text-teal-500 group-hover/item:bg-teal-500 group-hover/item:text-white transition-all">
-                                <i class="fas fa-briefcase text-[10px]"></i>
-                            </span>
-                            Papan Lowongan Kerja
-                        </a></li>
-
-                    <li class="mb-1"><a href="{{ route('public.umkm.index') }}"
-                            class="py-3 px-4 text-xs font-bold text-slate-600 hover:text-teal-600 hover:bg-teal-50 rounded-xl flex gap-3 group/item">
-                            <span
-                                class="w-6 h-6 rounded-lg bg-teal-100/50 flex items-center justify-center text-teal-500 group-hover/item:bg-teal-500 group-hover/item:text-white transition-all">
-                                <i class="fas fa-store text-[10px]"></i>
-                            </span>
-                            Etalase Produk UMKM
-                        </a></li>
-
-                    <li class="mb-1"><a href="{{ route('umkm_rakyat.nearby') }}"
-                            class="py-3 px-4 text-xs font-bold text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded-xl flex gap-3 group/item">
-                            <span
-                                class="w-6 h-6 rounded-lg bg-purple-100/50 flex items-center justify-center text-purple-500 group-hover/item:bg-purple-500 group-hover/item:text-white transition-all">
-                                <i class="fas fa-map-marked-alt text-[10px]"></i>
-                            </span>
-                            Peta Sebaran Ekonomi
-                        </a></li>
-
-                    {{-- Section: Untuk Warga --}}
-                    <div class="px-4 py-2 mt-2 mb-1 border-t border-slate-50">
-                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Untuk Warga</span>
-                    </div>
-
-                    <li class="mb-1"><a href="{{ route('public.loker.create') }}"
-                            class="py-3 px-4 text-xs font-bold text-slate-600 hover:text-teal-600 hover:bg-teal-50 rounded-xl flex gap-3 group/item">
-                            <span
-                                class="w-6 h-6 rounded-lg bg-teal-100/50 flex items-center justify-center text-teal-500 group-hover/item:bg-teal-500 group-hover/item:text-white transition-all">
-                                <i class="fas fa-bullhorn text-[10px]"></i>
-                            </span>
-                            Pasang Info Loker
-                        </a></li>
-
-                    <li class="mb-1"><a href="{{ route('umkm_rakyat.create') }}"
-                            class="py-3 px-4 text-xs font-bold text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl flex gap-3 group/item">
-                            <span
-                                class="w-6 h-6 rounded-lg bg-emerald-100/50 flex items-center justify-center text-emerald-500 group-hover/item:bg-emerald-500 group-hover/item:text-white transition-all">
-                                <i class="fas fa-plus text-[10px]"></i>
-                            </span>
-                            Buka Etalase UMKM
-                        </a></li>
-
-                    <li><a href="{{ route('umkm_rakyat.login') }}"
-                            class="py-3 px-4 text-xs font-black text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl flex gap-3 group/item">
-                            <span
-                                class="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 group-hover/item:bg-rose-500 group-hover/item:text-white transition-all">
-                                <i class="fas fa-sign-in-alt text-[10px]"></i>
-                            </span>
-                            Dashboard Seller
-                        </a></li>
-                </ul>
+            <li><a href="{{ route('economy.index') }}"
+                    class="text-sm font-medium {{ request()->is('ekonomi*') ? 'text-teal-600 bg-teal-50' : 'text-gray-600 hover:text-teal-600 hover:bg-teal-50' }} rounded-lg">Pusat
+                    Ekonomi</a>
             </li>
             <li><a href="{{ request()->is('/') ? '#berita' : '/#berita' }}"
                     class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Berita</a>

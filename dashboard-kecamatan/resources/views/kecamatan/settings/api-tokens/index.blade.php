@@ -31,15 +31,12 @@
             <div class="card-body py-3 d-flex align-items-start gap-3">
                 <div class="fs-3 text-warning pt-1">⚠️</div>
                 <div>
-                    <h6 class="fw-bold mb-1 text-dark">Token hilang atau tidak tersimpan?</h6>
+                    <h6 class="fw-bold mb-1 text-dark">Lupa menyimpan token?</h6>
                     <p class="mb-2 text-dark small">
-                        Token API <strong>hanya ditampilkan sekali</strong> saat pertama kali dibuat dan tidak bisa dilihat
-                        lagi.
-                        Jika hilang, <strong>cabut token lama</strong> lalu buat token baru.
+                        Token API sekarang <strong>disimpan secara aman</strong> dan dapat Anda lihat kembali di halaman
+                        detail token.
+                        Klik ikon mata <i class="fas fa-eye mx-1"></i> pada daftar untuk menyalin token.
                     </p>
-                    <a href="{{ route('kecamatan.settings.api-tokens.create') }}" class="btn btn-sm btn-warning fw-bold">
-                        <i class="fas fa-plus me-1"></i>Buat Token Baru Sekarang
-                    </a>
                 </div>
             </div>
         </div>
@@ -113,6 +110,14 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="d-flex gap-2 justify-content-end">
+                                            {{-- Copy Plain Token (Quick Access) --}}
+                                            @if($token->plain_token)
+                                                <button class="btn btn-sm btn-outline-success"
+                                                    onclick="copyToClipboard('{{ $token->plain_token }}', this)"
+                                                    title="Salin Token">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                            @endif
                                             {{-- View Detail --}}
                                             <a href="{{ route('kecamatan.settings.api-tokens.show', $token) }}"
                                                 class="btn btn-sm btn-outline-primary" title="Lihat Detail">
@@ -192,7 +197,8 @@
                         <pre
                             class="bg-dark text-light p-3 rounded small mb-2"><code>Authorization: Bearer &lt;TOKEN_ANDA&gt;</code></pre>
                         <p class="small text-muted mb-0">Atau set sebagai environment variable
-                            <code>DASHBOARD_API_TOKEN</code> di n8n.</p>
+                            <code>DASHBOARD_API_TOKEN</code> di n8n.
+                        </p>
                     </div>
                 </div>
             </div>

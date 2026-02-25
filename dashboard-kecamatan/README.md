@@ -50,7 +50,7 @@
 │                                                     │
 │  ┌──────────────────┐  ┌──────────────────────────┐ │
 │  │  WAHA (WhatsApp) │  │  n8n (Workflow)          │ │
-│  │  :3099           │  │  :5678                   │ │
+│  │  :3000           │  │  :5679                   │ │
 │  └──────────────────┘  └──────────────────────────┘ │
 └─────────────────────────────────────────────────────┘
 ```
@@ -133,15 +133,39 @@ Pesan WA → WAHA → n8n Webhook → Dashboard API → Response → WAHA → Pe
 **Konfigurasi nomor bot** dapat diubah langsung dari dashboard admin:
 > Menu: **Pengaturan → Monitoring WhatsApp Bot**
 
+### 🔐 Akses WAHA Dashboard
+
+WAHA Dashboard dapat diakses di: **http://localhost:3000**
+
+**Cara Login:**
+| Field | Nilai |
+|-------|-------|
+| Username | `admin` |
+| Password | (nilai `WAHA_API_KEY` dari file `.env`) |
+
+Contoh: Jika `WAHA_API_KEY=62a72516dd1b418499d9dd22075ccfa0`, maka password adalah `62a72516dd1b418499d9dd22075ccfa0`
+
+> ⚠️ **Penting**: WAHA menggunakan API Key sebagai password untuk autentikasi dashboard.
+
 ---
 
 ## 👥 Akun Default
 
+### Laravel Dashboard (localhost:8000)
 | Role | Username | Password |
 |---|---|---|
-| Super Admin | `superadmin` | `password` |
+| Super Admin | `admin` | `admin123` |
 | Operator Kecamatan | `admin_kec` | `password` |
 | Operator Desa | `admin_desa` | `password` |
+
+### WAHA Dashboard (localhost:3000)
+| Field | Nilai |
+|-------|-------|
+| Username | `admin` |
+| Password | (nilai `WAHA_API_KEY` dari `.env`) |
+
+### n8n Workflow (localhost:5679)
+Tidak memerlukan autentikasi (sesuai konfigurasi).
 
 ---
 

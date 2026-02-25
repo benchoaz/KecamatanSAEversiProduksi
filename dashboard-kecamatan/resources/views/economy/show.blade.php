@@ -12,9 +12,9 @@
 @section('content')
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
 
-        {{-- Breadcrumb --}}
-        <div class="bg-white border-b border-slate-200">
-            <div class="container mx-auto px-6 py-4">
+        {{-- Breadcrumb - Compact --}}
+        <div class="bg-white border-b border-slate-100">
+            <div class="container mx-auto px-6 py-2.5">
                 <nav class="flex items-center gap-2 text-sm">
                     <a href="/" class="text-teal-600 hover:text-teal-700 font-medium">
                         <i class="fas fa-home"></i> Beranda
@@ -36,101 +36,102 @@
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
 
-                        {{-- Header --}}
-                        <div class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white p-8">
-                            <div class="flex items-start gap-6">
+                        {{-- Header - Compact --}}
+                        <div class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white p-6">
+                            <div class="flex items-start gap-4">
                                 <div
-                                    class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-4xl shadow-lg">
+                                    class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-3xl shadow-lg">
                                     <i class="fas {{ $workItem->icon }}"></i>
                                 </div>
                                 <div class="flex-1">
                                     <span
-                                        class="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-bold rounded-full mb-3">
+                                        class="inline-block px-2 py-0.5 bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold rounded-full mb-2">
                                         {{ $workItem->job_category }}
                                     </span>
-                                    <h1 class="text-3xl md:text-4xl font-black mb-2">
+                                    <h1 class="text-2xl md:text-3xl font-black mb-1">
                                         {{ $workItem->job_title }}
                                     </h1>
-                                    <p class="text-xl text-teal-50">
-                                        <i class="fas fa-user mr-2"></i>
+                                    <p class="text-base text-teal-50 opacity-90">
+                                        <i class="fas fa-user mr-1.5 text-xs"></i>
                                         {{ $workItem->display_name }}
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        {{-- Details --}}
-                        <div class="p-8">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        {{-- Details - Compact --}}
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
 
                                 @if($workItem->service_area)
-                                    <div class="flex items-start gap-4">
+                                    <div class="flex items-start gap-3">
                                         <div
-                                            class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 flex-shrink-0">
-                                            <i class="fas fa-map-marker-alt text-xl"></i>
+                                            class="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center text-teal-600 flex-shrink-0">
+                                            <i class="fas fa-map-marker-alt text-lg"></i>
                                         </div>
                                         <div>
-                                            <h3 class="font-bold text-slate-700 mb-1">Wilayah Layanan</h3>
-                                            <p class="text-slate-600">{{ $workItem->service_area }}</p>
+                                            <h3 class="font-bold text-slate-700 mb-0.5 text-xs">Wilayah Layanan</h3>
+                                            <p class="text-slate-600 text-xs">{{ $workItem->service_area }}</p>
                                         </div>
                                     </div>
                                 @endif
 
                                 @if($workItem->service_time)
-                                    <div class="flex items-start gap-4">
+                                    <div class="flex items-start gap-3">
                                         <div
-                                            class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 flex-shrink-0">
-                                            <i class="fas fa-clock text-xl"></i>
+                                            class="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center text-teal-600 flex-shrink-0">
+                                            <i class="fas fa-clock text-lg"></i>
                                         </div>
                                         <div>
-                                            <h3 class="font-bold text-slate-700 mb-1">Jam Layanan</h3>
-                                            <p class="text-slate-600">{{ $workItem->service_time }}</p>
+                                            <h3 class="font-bold text-slate-700 mb-0.5 text-xs">Jam Layanan</h3>
+                                            <p class="text-slate-600 text-xs">{{ $workItem->service_time }}</p>
                                         </div>
                                     </div>
                                 @endif
 
-                                <div class="flex items-start gap-4">
+                                <div class="flex items-start gap-3">
                                     <div
-                                        class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 flex-shrink-0">
-                                        <i class="fas fa-briefcase text-xl"></i>
+                                        class="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center text-teal-600 flex-shrink-0">
+                                        <i class="fas fa-briefcase text-lg"></i>
                                     </div>
                                     <div>
-                                        <h3 class="font-bold text-slate-700 mb-1">Tipe Pekerjaan</h3>
-                                        <p class="text-slate-600 capitalize">{{ $workItem->job_type }}</p>
+                                        <h3 class="font-bold text-slate-700 mb-0.5 text-xs">Tipe Pekerjaan</h3>
+                                        <p class="text-slate-600 capitalize text-xs">{{ $workItem->job_type }}</p>
                                     </div>
                                 </div>
 
-                                <div class="flex items-start gap-4">
+                                <div class="flex items-start gap-3">
                                     <div
-                                        class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 flex-shrink-0">
-                                        <i class="fas fa-database text-xl"></i>
+                                        class="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center text-teal-600 flex-shrink-0">
+                                        <i class="fas fa-database text-lg"></i>
                                     </div>
                                     <div>
-                                        <h3 class="font-bold text-slate-700 mb-1">Sumber Data</h3>
-                                        <p class="text-slate-600 capitalize">{{ ucfirst($workItem->data_source) }}</p>
+                                        <h3 class="font-bold text-slate-700 mb-0.5 text-xs">Sumber Data</h3>
+                                        <p class="text-slate-600 capitalize text-xs">{{ ucfirst($workItem->data_source) }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
 
                             @if($workItem->short_description)
-                                <div class="bg-slate-50 rounded-xl p-6 mb-8">
-                                    <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
-                                        <i class="fas fa-info-circle text-teal-600"></i>
-                                        Keterangan
+                                <div class="bg-slate-50 rounded-xl p-5 mb-6">
+                                    <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2 text-xs">
+                                        <i class="fas fa-info-circle text-teal-600 uppercase"></i>
+                                        Deskripsi Layanan
                                     </h3>
-                                    <p class="text-slate-700 leading-relaxed">{{ $workItem->short_description }}</p>
+                                    <p class="text-slate-700 leading-relaxed text-xs">{{ $workItem->short_description }}</p>
                                 </div>
                             @endif
 
-                            {{-- Contact Button --}}
-                            <div class="flex gap-4">
+                            {{-- Contact Button - Compact --}}
+                            <div class="flex gap-3">
                                 <a href="{{ $workItem->whatsapp_link }}" target="_blank"
-                                    class="flex-1 px-8 py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-center transition-all shadow-lg text-lg">
-                                    <i class="fab fa-whatsapp mr-2 text-xl"></i>
-                                    Hubungi via WhatsApp
+                                    class="flex-1 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-center transition-all shadow-md text-sm">
+                                    <i class="fab fa-whatsapp mr-2"></i>
+                                    Chat WhatsApp
                                 </a>
                                 <a href="tel:{{ $workItem->contact_phone }}"
-                                    class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg">
+                                    class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-all shadow-md">
                                     <i class="fas fa-phone"></i>
                                 </a>
                             </div>

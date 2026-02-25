@@ -1,0 +1,87 @@
+# Multi-stage build untuk PHP Laravel - Builder stage
+FROM php:8.1-fpm-alpine AS builder
+
+# Install dependencies yang diperlukan composer
+RUN apk add --no-cache \
+    git \
+    libpng-dev \
+    libzip-dev \
+    libxml2-dev \
+    icu-dev \
+    oniguruma-dev
+
+# Install PHP extensions untuk builder
+RUN docker-php-ext-install \
+    pdo_mysql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip \
+    intl
+
+# Copy composer dari image composer:latest
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /app
+
+# Copy composer files
+COPY composer.json composer.lock ./
+
+# Install dependencies (no-dev untuk production)
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+# Production stage - gunakan alpine (JAUH lebih ringan)
+FROM php:8.1-fpm-alpine
+
+# Install system dependencies - HANYA yang diperlukan di runtime
+RUN apk add --no-cache \
+    libpng \
+    libzip \
+    libxml2 \
+    icu-libs \
+    oniguruma
+
+# Install PHP extensions ONLY (tanpa dev packages)
+RUN apk add --no-cache --virtual .php-build-deps \
+    $PHPIZE_DEPS \
+    libpng-dev \
+    libzip-dev \
+    libxml2-dev \
+    icu-dev \
+    oniguruma-dev && \
+    docker-php-ext-install \
+    pdo_mysql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip \
+    intl && \
+    docker-php-ext-install opcache && \
+    apk del .php-build-deps
+
+# Copy opcache config
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+# Set working directory
+WORKDIR /var/www
+
+# Copy vendor dari builder stage (jauh lebih cepat)
+COPY --from=builder --chown=www-data:www-data /app/vendor /var/www/vendor
+
+# Copy aplikasi source
+COPY --chown=www-data:www-data . /var/www
+
+# Clean up unnecessary files
+RUN rm -rf /var/www/.git /var/www/tests /var/www/docs
+
+# Set user
+USER www-data
+
+# Expose port
+EXPOSE 9000
+
+CMD ["php-fpm"]

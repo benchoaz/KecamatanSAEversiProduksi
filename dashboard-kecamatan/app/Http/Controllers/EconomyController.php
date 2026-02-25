@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\WorkDirectory;
 use Illuminate\Http\Request;
 
-class WorkDirectoryController extends Controller
+class EconomyController extends Controller
 {
     /**
-     * Display listing of work directory
+     * Display listing of economy (Jobs & UMKM)
      */
     public function index(Request $request)
     {
@@ -45,7 +45,9 @@ class WorkDirectoryController extends Controller
         // Fetch UMKM Data for the "Etalase" tab
         $umkms = \App\Models\UmkmLocal::where('is_active', true)->latest()->limit(8)->get();
 
-        return view('kerja.index', compact('workItems', 'categories', 'umkms'));
+        $defaultTab = $request->get('tab', 'jasa');
+
+        return view('economy.index', compact('workItems', 'categories', 'umkms', 'defaultTab'));
     }
 
     /**
@@ -62,6 +64,6 @@ class WorkDirectoryController extends Controller
             ->limit(3)
             ->get();
 
-        return view('kerja.show', compact('workItem', 'relatedItems'));
+        return view('economy.show', compact('workItem', 'relatedItems'));
     }
 }

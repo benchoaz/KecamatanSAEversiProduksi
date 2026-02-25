@@ -36,8 +36,9 @@
     {{-- Geo Tags for Local SEO --}}
     <meta name="geo.region" content="ID-JI">
     <meta name="geo.placename" content="{{ appProfile()->full_region_name }}">
-    <meta name="geo.position" content="-7.8;113.3">
-    <meta name="ICBM" content="-7.8, 113.3">
+    <meta name="geo.position"
+        content="{{ appProfile()->map_latitude ?? -7.8 }};{{ appProfile()->map_longitude ?? 113.3 }}">
+    <meta name="ICBM" content="{{ appProfile()->map_latitude ?? -7.8 }}, {{ appProfile()->map_longitude ?? 113.3 }}">
 
     @if(appProfile()->logo_path)
         <link rel="icon" href="{{ asset('storage/' . appProfile()->logo_path) }}" type="image/png">
@@ -151,8 +152,8 @@
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": "-7.8",
-        "longitude": "113.3"
+        "latitude": "{{ appProfile()->map_latitude ?? -7.8 }}",
+        "longitude": "{{ appProfile()->map_longitude ?? 113.3 }}"
       },
       "areaServed": {
         "@type": "AdministrativeArea",
@@ -619,7 +620,7 @@
                                 <span>Buka Peta Wilayah</span>
                                 <i class="fas fa-arrow-right ml-2"></i>
                             </a>
-                            <a href="{{ route('public.umkm.index') }}"
+                            <a href="{{ route('economy.index', ['tab' => 'produk']) }}"
                                 class="flex items-center gap-3 px-6 py-3 bg-white rounded-2xl border border-slate-100 shadow-sm hover:border-teal-200 transition-all hover:bg-slate-50 group/umkm">
                                 <div class="flex -space-x-2">
                                     @foreach($umkms->take(3) as $u)
@@ -1778,7 +1779,7 @@
 
             // Initialize Map with smooth motion
             const map = L.map('mapContainer', {
-                center: [-7.78, 113.47],
+                center: [{{ appProfile()->map_latitude ?? -7.78 }}, {{ appProfile()->map_longitude ?? 113.47 }}],
                 zoom: 13,
                 scrollWheelZoom: false,
                 attributionControl: false,
@@ -1812,7 +1813,7 @@
                                 easeLinearity: 0.25
                             });
                         } else {
-                            map.flyTo([-7.78, 113.47], 13.5, {
+                            map.flyTo([{{ appProfile()->map_latitude ?? -7.78 }}, {{ appProfile()->map_longitude ?? 113.47 }}], 13.5, {
                                 duration: 1.5
                             });
                         }

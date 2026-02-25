@@ -20,7 +20,7 @@
 
                 <!-- Search Bar -->
                 <div class="w-full md:w-96">
-                    <form action="{{ route('public.umkm.index') }}" method="GET" class="relative">
+                    <form action="{{ route('economy.index', ['tab' => 'produk']) }}" method="GET" class="relative">
                         <input type="text" name="q" value="{{ request('q') }}"
                             class="w-full h-14 bg-white border border-slate-200 rounded-2xl px-6 pr-14 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all outline-none font-medium shadow-sm"
                             placeholder="Cari produk atau toko...">
@@ -35,7 +35,7 @@
             @if(request('q'))
                 <div class="mb-10 text-slate-500 font-medium">
                     Menampilkan hasil pencarian untuk: <span class="text-teal-600 font-bold">"{{ request('q') }}"</span>
-                    <a href="{{ route('public.umkm.index') }}"
+                    <a href="{{ route('economy.index', ['tab' => 'produk']) }}"
                         class="ml-2 text-xs text-slate-400 underline hover:text-slate-600">Hapus</a>
                 </div>
             @endif

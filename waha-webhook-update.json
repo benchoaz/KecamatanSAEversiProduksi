@@ -1,0 +1,10 @@
+{
+    "webhooks": [
+        {
+            "url": "http://dashboard-n8n:5678/webhook/whatsapp-primary",
+            "events": [
+                "message"
+            ]
+        }
+    ]
+}

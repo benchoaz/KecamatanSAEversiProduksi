@@ -16,6 +16,7 @@ class WorkDirectory extends Model
         'job_category',
         'job_type',
         'job_title',
+        'price',
         'service_area',
         'service_time',
         'contact_phone',
