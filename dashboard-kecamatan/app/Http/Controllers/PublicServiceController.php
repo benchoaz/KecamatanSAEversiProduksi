@@ -86,6 +86,7 @@ class PublicServiceController extends Controller
 
         // 5. Validation
         $validator = Validator::make($request->all(), [
+            'category' => 'nullable|in:pelayanan,pengaduan,umkm,loker',
             'jenis_layanan' => 'required|string',
             'desa_id' => 'nullable|string', // Changed to string to handle '999'
             'nama_pemohon' => 'nullable|string|max:255',
@@ -104,10 +105,10 @@ class PublicServiceController extends Controller
             $desaId = null;
         }
 
-        // 6. Create record (Status: Menunggu Klarifikasi)
+        // 6. Create record (Status: Menunggu Verification)
         $service = PublicService::create([
             'uuid' => (string) Str::uuid(),
-            'nama_pemohon' => $request->nama_pemohon ?? 'Warga (Bot)',
+            'nama_pemohon' => $request->nama_pemohon ?? 'Warga (Web)',
             'nik' => $request->nik,
             'desa_id' => $desaId,
             'jenis_layanan' => $request->jenis_layanan,
@@ -116,7 +117,7 @@ class PublicServiceController extends Controller
             'is_agreed' => $request->boolean('is_agreed', true),
             'ip_address' => $request->ip(),
             'status' => PublicService::STATUS_MENUNGGU,
-            'category' => PublicService::CATEGORY_PELAYANAN,
+            'category' => $request->input('category', PublicService::CATEGORY_PELAYANAN),
             'source' => $request->input('source', 'web_form')
         ]);
 
@@ -162,6 +163,54 @@ class PublicServiceController extends Controller
                         $service->update(['file_path_2' => $path]);
                 }
             }
+        }
+
+        // 8. Send WhatsApp notification to reporter
+        try {
+            $wahaSettings = \App\Models\WahaN8nSetting::getSettings();
+            if ($wahaSettings && $wahaSettings->isBotOperational() && !empty($service->whatsapp)) {
+                // Normalize phone: strip leading 0, ensure starts with 62
+                $phone = preg_replace('/[^0-9]/', '', $service->whatsapp);
+                if (str_starts_with($phone, '0')) {
+                    $phone = '62' . substr($phone, 1);
+                } elseif (!str_starts_with($phone, '62')) {
+                    $phone = '62' . $phone;
+                }
+
+                $kategori = $service->category === 'pengaduan' ? '📢 Pengaduan' : '📋 Permohonan Layanan';
+                $notifMsg = "✅ *Laporan Diterima!*\n\n";
+                $notifMsg .= "Halo *{$service->nama_pemohon}*, laporan Anda telah berhasil kami terima.\n\n";
+                $notifMsg .= "━━━━━━━━━━━━━━━━━\n";
+                $notifMsg .= "🔑 *PIN Lacak:* `{$service->tracking_code}`\n";
+                $notifMsg .= "📁 *Jenis:* {$kategori}\n";
+                $notifMsg .= "🕐 *Waktu:* " . now()->format('d/m/Y H:i') . " WIB\n";
+                $notifMsg .= "━━━━━━━━━━━━━━━━━\n\n";
+                $notifMsg .= "Simpan PIN di atas untuk melacak status laporan Anda.\n";
+                $notifMsg .= "Reply ke nomor ini atau kunjungi:\n";
+                $notifMsg .= route('public.tracking') . "?q={$service->tracking_code}\n\n";
+                $notifMsg .= "_Pesan ini dikirim otomatis oleh sistem._";
+
+                // Use direct WAHA sendText endpoint
+                $wahaUrl = $wahaSettings->waha_api_url;
+                $wahaKey = $wahaSettings->waha_api_key;
+                $session = $wahaSettings->waha_session_name ?? 'default';
+
+                if ($wahaUrl) {
+                    $headers = ['Content-Type' => 'application/json'];
+                    if ($wahaKey)
+                        $headers['X-Api-Key'] = $wahaKey;
+
+                    \Illuminate\Support\Facades\Http::withHeaders($headers)
+                        ->timeout(8)
+                        ->post(rtrim($wahaUrl, '/') . '/api/sendText', [
+                            'session' => $session,
+                            'chatId' => $phone . '@c.us',
+                            'text' => $notifMsg,
+                        ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('WA notification gagal (non-fatal): ' . $e->getMessage());
         }
 
         return response()->json([
@@ -382,20 +431,62 @@ class PublicServiceController extends Controller
 
         // Try to find by Tracking PIN, UUID or WhatsApp
         // MUST be in category 'pelayanan' as per user request (focus on files/docs)
-        $query = PublicService::where('category', PublicService::CATEGORY_PELAYANAN)
-            ->where(function ($q) use ($identifier, $cleanIdentifier) {
-                $q->where('tracking_code', $identifier)
-                    ->orWhere('uuid', $identifier);
 
-                // If it looks like a phone number (longer than 8 digits), use fuzzy match
-                if (strlen($cleanIdentifier) >= 9) {
-                    // Get the last 10 digits for robust matching (e.g. bypass +62 vs 08)
-                    $suffix = substr($cleanIdentifier, -10);
-                    $q->orWhere('whatsapp', 'LIKE', '%' . $suffix);
-                } else {
-                    $q->orWhere('whatsapp', $identifier);
-                }
-            });
+        // Check if it looks like a PIN (6 digits)
+        if (preg_match('/^[0-9]{6}$/', $identifier)) {
+            // Try cache first for PIN lookup
+            $cacheKey = 'tracking:pin:' . $identifier;
+            $cached = cache()->get($cacheKey);
+
+            if ($cached) {
+                return response()->json($cached);
+            }
+
+            $service = PublicService::where('tracking_code', $identifier)
+                ->with(['desa', 'handler'])
+                ->first();
+
+            if ($service) {
+                $response = $this->buildStatusResponse($service);
+                cache()->put($cacheKey, $response, 300); // 5 min cache
+                return response()->json($response);
+            }
+        }
+
+        // Try UUID
+        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $identifier)) {
+            $cacheKey = 'tracking:uuid:' . $identifier;
+            $cached = cache()->get($cacheKey);
+
+            if ($cached) {
+                return response()->json($cached);
+            }
+
+            $service = PublicService::where('uuid', $identifier)
+                ->with(['desa', 'handler'])
+                ->first();
+
+            if ($service) {
+                $response = $this->buildStatusResponse($service);
+                cache()->put($cacheKey, $response, 300);
+                return response()->json($response);
+            }
+        }
+
+        // For phone number search - use indexed suffix column
+        if (strlen($cleanIdentifier) >= 9) {
+            $suffix = substr($cleanIdentifier, -10);
+
+            // First try exact suffix match (fastest with index)
+            $query = PublicService::where('category', PublicService::CATEGORY_PELAYANAN)
+                ->where(function ($q) use ($suffix) {
+                    $q->where('whatsapp_suffix', $suffix)
+                        ->orWhere('whatsapp', 'LIKE', '%' . $suffix);
+                });
+        } else {
+            $query = PublicService::where('category', PublicService::CATEGORY_PELAYANAN)
+                ->where('whatsapp', $identifier);
+        }
 
         $service = $query->with(['desa', 'handler'])
             ->latest()
@@ -409,6 +500,14 @@ class PublicServiceController extends Controller
         }
 
         // Build response
+        return response()->json($this->buildStatusResponse($service));
+    }
+
+    /**
+     * Build standardized status response
+     */
+    protected function buildStatusResponse(PublicService $service): array
+    {
         $response = [
             'found' => true,
             'uuid' => $service->uuid,
@@ -436,7 +535,7 @@ class PublicServiceController extends Controller
             ];
         }
 
-        return response()->json($response);
+        return $response;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class Loker extends Model
 {
@@ -57,9 +58,25 @@ class Loker extends Model
         });
     }
 
+    // Auto-hash PIN when setting
+    public function setOwnerPinAttribute($value)
+    {
+        if (!empty($value)) {
+            $this->attributes['owner_pin'] = Hash::make($value);
+        }
+    }
+
     public function desa()
     {
         return $this->belongsTo(Desa::class, 'desa_id');
+    }
+
+    /**
+     * Owner relationship - links to User account (optional)
+     */
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_user_id');
     }
 
     /**

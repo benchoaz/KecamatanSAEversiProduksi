@@ -105,9 +105,19 @@
                             </div>
                             <div class="col-md-6 col-lg-3">
                                 <label class="text-[10px] text-slate-400 uppercase fw-bold tracking-wider mb-1 d-block">Kontak Pelapor</label>
-                                <a href="https://wa.me/62{{ ltrim($complaint->whatsapp, '0') }}" target="_blank"
+                                @php
+                                    $waRaw = preg_replace('/[^0-9]/', '', $complaint->whatsapp);
+                                    // Normalize to 0-prefix for display (Indonesian style)
+                                    $waDisplay = $waRaw;
+                                    if (str_starts_with($waRaw, '62')) {
+                                        $waDisplay = '0' . substr($waRaw, 2);
+                                    }
+                                    // Build wa.me link (needs 62 prefix)
+                                    $waLink = str_starts_with($waRaw, '62') ? $waRaw : '62' . ltrim($waRaw, '0');
+                                @endphp
+                                <a href="https://wa.me/{{ $waLink }}" target="_blank"
                                     class="text-emerald-600 fw-bold text-decoration-none small">
-                                    <i class="fab fa-whatsapp me-1"></i> +62{{ $complaint->whatsapp }}
+                                    <i class="fab fa-whatsapp me-1"></i> {{ $waDisplay }}
                                 </a>
                             </div>
                         </div>

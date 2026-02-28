@@ -64,7 +64,7 @@
                                         <div class="fw-semibold text-slate-700 small">{{ $item->created_at->format('d/m/y') }}</div>
                                         <div class="text-[10px] text-slate-400 text-nowrap">{{ $item->created_at->format('H:i') }} WIB</div>
                                     </td>
-                                    <td class="py-3" style="max-width: 300px;">
+                                     <td class="py-3" style="max-width: 300px;">
                                         <div class="fw-bold text-slate-800 small truncate">
                                             @if($category == 'umkm' || $category == 'loker')
                                                 {{ Str::limit($item->uraian, 60) }}
@@ -73,9 +73,12 @@
                                                 @if(str_contains($item->uraian, '[ANONIM]'))
                                                     <i class="fas fa-user-secret text-slate-400 ms-1" title="Pelapor meminta anonimitas"></i>
                                                 @endif
+                                                @if(str_contains($item->uraian, '[RAHASIA]'))
+                                                    <span class="badge bg-rose-100 text-rose-600 border border-rose-200 text-[8px] ms-1 px-1 py-0"><i class="fas fa-lock me-1"></i>RAHASIA</span>
+                                                @endif
                                             @endif
                                         </div>
-                                        <div class="text-[10px] text-slate-400 d-flex align-items-center gap-1">
+                                        <div class="text-[10px] text-slate-400 d-flex align-items-center gap-1 flex-wrap">
                                             @if($category == 'pelayanan')
                                                 {{ Str::limit($item->uraian, 40) }}
                                             @elseif($category == 'umkm')
@@ -85,8 +88,11 @@
                                                 <span class="badge bg-emerald-50 text-emerald-600 border border-emerald-100 text-[8px] px-1 py-0">LOKER</span>
                                                 Info Kerja Warga
                                             @endif
+                                            @if($item->attachments_count > 0)
+                                                <span class="badge bg-slate-100 text-slate-500 border border-slate-200 text-[8px] px-1 py-0"><i class="fas fa-paperclip me-1"></i>{{ $item->attachments_count }}</span>
+                                            @endif
                                         </div>
-                                    </td>
+                                     </td>
                                     <td class="py-3">
                                         @php 
                                             $sourceIcon = 'fa-globe';

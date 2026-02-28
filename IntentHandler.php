@@ -51,55 +51,50 @@ class IntentHandler
 
         // --- NUMERIC SELECTION (Top Level) ---
         if ($this->isSelection($messageLower, '1')) {
-            // Show submenu for Administrasi
-            return [
-                'success' => true,
-                'intent' => 'administrasi_submenu',
-                'reply' => $this->getAdministrasiSubmenu()['reply'],
-                'state_update' => 'ADM_SUBMENU',
-            ];
+            return $this->statusHandler->handle($phone, 'STATUS');
         }
 
         if ($this->isSelection($messageLower, '2')) {
-            // Option 2: Loker & Toko (UMKM)
-            $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+            $baseUrl = config('app.public_base_url', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
             return [
                 'success' => true,
-                'intent' => 'loker_umkm',
-                'reply' => "LOKER & TOKO/ETALASE\n\n" .
-                    "Pilih kategori:\n\n" .
-                    "1. Loker - Lowongan Kerja\n" .
-                    "   {$baseUrl}/loker\n\n" .
-                    "2. Toko/Etalase - Produk Warga\n" .
-                    "   {$baseUrl}/umkm\n\n" .
-                    "Ketik *MENU* untuk kembali.",
+                'intent' => 'syarat_link',
+                'reply' => "📋 *Informasi & Ajukan Layanan*\n\n" .
+                    "Lihat daftar lengkap layanan dan syarat pengajuan:\n\n" .
+                    "🔗 " . $baseUrl . "/layanan\n\n" .
+                    "Ketik MENU untuk kembali.",
                 'state_update' => null,
             ];
         }
 
         if ($this->isSelection($messageLower, '3')) {
-            // Option 3: Jasa - cari tukang/servis
-            $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+            $baseUrl = config('app.public_base_url', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
             return [
                 'success' => true,
-                'intent' => 'jasa',
-                'reply' => "JASA - Cari Tukang/Servis\n\n" .
-                    "Lihat daftar penyedia jasa di kecamatan:\n\n" .
-                    "{$baseUrl}/ekonomi?tab=jasa\n\n" .
-                    "Ketik jenis jasa yang Anda butuhkan (contoh: 'tukang', 'service', 'ledeng')\n" .
-                    "Ketik *MENU* untuk kembali.",
-                'state_update' => 'MENU_JASA',
+                'intent' => 'umkm_link',
+                'reply' => "🛍️ *Lihat Etalase Produk UMK*\n\n" .
+                    "Lihat produk-produk lokal dari UMK Besuk:\n\n" .
+                    "🔗 " . $baseUrl . "/ekonomi\n\n" .
+                    "Ketik MENU untuk kembali.",
+                'state_update' => null,
             ];
         }
 
         if ($this->isSelection($messageLower, '4')) {
-            // Option 4: Pengaduan - aspirasi warga
-            return $this->complaintHandler->initiate($phone, 'pengaduan');
+            $baseUrl = config('app.public_base_url', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+            return [
+                'success' => true,
+                'intent' => 'loker_link',
+                'reply' => "👷 *Info Lowongan Kerja*\n\n" .
+                    "Lihat lowongan kerja terbaru:\n\n" .
+                    "🔗 " . $baseUrl . "/ekonomi\n\n" .
+                    "Ketik MENU untuk kembali.",
+                'state_update' => null,
+            ];
         }
 
         if ($this->isSelection($messageLower, '5')) {
-            // Option 5: Kelola Data - aktif/nonaktifkan data
-            return $this->ownerHandler->initiate($phone);
+            return $this->complaintHandler->initiate($phone, 'pengaduan');
         }
 
         // --- KEYWORD FALLBACKS ---
@@ -121,16 +116,10 @@ class IntentHandler
         }
 
         // SYARAT (requirements) intent - with link when no specific query
-        if (
-            str_starts_with($messageLower, 'syarat') ||
-            str_starts_with($messageLower, 'buat') ||
-            $this->matchesIntent($messageLower, ['persyaratan', 'ketentuan'])
-        ) {
-            // Extract query - remove "syarat" or "buat" prefix
-            $query = str_replace(['syarat', 'persyaratan', 'ketentuan', 'buat'], '', $messageLower);
+        if (str_starts_with($messageLower, 'syarat') || $this->matchesIntent($messageLower, ['persyaratan', 'ketentuan'])) {
+            $query = str_replace(['syarat', 'persyaratan', 'ketentuan'], '', $messageLower);
             $query = trim($query);
-
-            // If just "syarat" or "buat" without query, show link to layanan page
+            // If just "syarat" without query, show link to layanan page
             if (empty($query) || strlen($query) < 2) {
                 return $this->getLayananLink();
             }
@@ -173,22 +162,6 @@ class IntentHandler
 
         // --- STATE BASED HANDLING ---
         $session = WhatsappSession::where('phone', $phone)->first();
-
-        // Administrasi Submenu state
-        if ($session && $session->state === 'ADM_SUBMENU') {
-            if ($this->isSelection($messageLower, '1') || $messageLower === 'status' || $messageLower === 'cek status') {
-                return $this->statusHandler->handle($phone, 'STATUS');
-            }
-            if ($this->isSelection($messageLower, '2') || $messageLower === 'syarat') {
-                return $this->getLayananLink();
-            }
-            if ($this->isSelection($messageLower, '3') || $messageLower === 'menu' || $messageLower === 'kembali') {
-                return $this->getMainMenu();
-            }
-            // If user types something else, show submenu again
-            return $this->getAdministrasiSubmenu();
-        }
-
         if ($session && $session->state === 'MENU_ADMIN') {
             if ($this->isSelection($messageLower, '1')) {
                 return $this->syaratHandler->search(null);
@@ -216,7 +189,7 @@ class IntentHandler
     }
 
     /**
-     * 
+     * Check if message matches any of the intent keywords
      */
     protected function matchesIntent(string $message, array $keywords): bool
     {
@@ -229,23 +202,23 @@ class IntentHandler
     }
 
     /**
-     * 
+     * Menu intent response
      */
     protected function getMainMenu(): array
     {
         $regionName = strtoupper(appProfile()->region_name ?? 'BESUK');
         $baseUrl = config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev');
 
-        $menu = "MENU LAYANAN KECAMATAN {$regionName}\n\n";
+        $menu = "🏛️ *MENU LAYANAN KECAMATAN {$regionName}*\n\n";
         $menu .= "Silakan pilih layanan (Ketik angka):\n\n";
-        $menu .= "1. Administrasi - Syarat & Status Berkas\n";
-        $menu .= "2. Loker & UMKM - Kerja & Produk Desa\n";
-        $menu .= "   Ketik: KELOLA (untuk Aktif/Nonaktifkan)\n\n";
-        $menu .= "3. Jasa - Cari Tukang/Servis\n";
-        $menu .= "   Ketik: KELOLA (untuk Aktif/Nonaktifkan)\n\n";
-        $menu .= "4. Pengaduan - Aspirasi Warga\n\n";
-        $menu .= "5. Kelola Data - Aktif/Nonaktifkan Data Anda\n\n";
-        $menu .= "Ketik MENU kapan saja untuk kembali.";
+        $menu .= "1️⃣ *Administrasi* – Syarat & Status Berkas\n";
+        $menu .= "2️⃣ *Loker & UMKM* – Kerja & Produk Desa\n";
+        $menu .= "   └ Ketik: KELOLA (untuk Aktif/Nonaktifkan)\n\n";
+        $menu .= "3️⃣ *Jasa* – Cari Tukang/Servis\n";
+        $menu .= "   └ Ketik: KELOLA (untuk Aktif/Nonaktifkan)\n\n";
+        $menu .= "4️⃣ *Pengaduan* – Aspirasi Warga\n\n";
+        $menu .= "5️⃣ *Kelola Data* – Aktif/Nonaktifkan Data Anda\n\n";
+        $menu .= "_Ketik MENU kapan saja untuk kembali._";
 
         return [
             'success' => true,
@@ -256,7 +229,7 @@ class IntentHandler
     }
 
     /**
-     * 
+     * @deprecated Use getMainMenu() instead
      */
     protected function menuIntent(): array
     {
@@ -264,7 +237,7 @@ class IntentHandler
     }
 
     /**
-     * 
+     * Map basic numeric strings to technical emojis often sent by WA
      */
     protected function isSelection(string $message, string $number): bool
     {
@@ -276,18 +249,18 @@ class IntentHandler
 
         // Emoji match mapping
         $emojis = [
-            '1' => '1',
-            '2' => '2',
-            '3' => '3',
-            '4' => '4',
-            '5' => '5',
+            '1' => '1️⃣',
+            '2' => '2️⃣',
+            '3' => '3️⃣',
+            '4' => '4️⃣',
+            '5' => '5️⃣',
         ];
 
-        return isset($emojis[$number]) && isset($emojis[$message]) && $emojis[$message] === $emojis[$number];
+        return isset($emojis[$number]) && $message === $emojis[$number];
     }
 
     /**
-     * 
+     * Unknown intent message
      */
     protected function getUnknownIntentMessage(): string
     {
@@ -295,7 +268,7 @@ class IntentHandler
     }
 
     /**
-     * 
+     * Get UMK/Produk link
      */
     protected function getUmkmLink(): array
     {
@@ -305,9 +278,9 @@ class IntentHandler
         return [
             'success' => true,
             'intent' => 'umkm_link',
-            'reply' => "ETALASE PRODUK UMK\n\n" .
+            'reply' => "🛍️ *ETALASE PRODUK UMK*\n\n" .
                 "Lihat semua produk UMK {$this->getRegionName()} di:\n\n" .
-                "{$umkmUrl}\n\n" .
+                "🔗 {$umkmUrl}\n\n" .
                 "Anda juga bisa ketik nama produk yang dicari.\n" .
                 "Contoh: *umkm bakso*\n\n" .
                 "Ketik *MENU* untuk kembali.",
@@ -316,7 +289,7 @@ class IntentHandler
     }
 
     /**
-     * 
+     * Get Loker/Job listing link
      */
     protected function getLokerLink(): array
     {
@@ -327,73 +300,45 @@ class IntentHandler
         return [
             'success' => true,
             'intent' => 'loker_link',
-            'reply' => "LOWONGAN KERJA\n\n" .
-                "Lihat info lowongan kerja:\n" .
-                "{$lokerUrl}\n\n" .
-                "Pasang lowongan kerja:\n" .
-                "{$daftarUrl}\n\n" .
+            'reply' => "👷 *LOWONGAN KERJA*\n\n" .
+                "📋 Lihat info lowongan kerja:\n" .
+                "🔗 {$lokerUrl}\n\n" .
+                "📝 Pasang lowongan kerja:\n" .
+                "🔗 {$daftarUrl}\n\n" .
                 "Anda juga bisa ketik kata kunci.\n" .
-                "Contoh: *loker tukang*\n" .
+                "Contoh: *loker tukang*\n\n" .
                 "Ketik *MENU* untuk kembali.",
             'state_update' => null,
         ];
     }
 
     /**
-     * 
+     * Get Layanan/Syarat link
      */
     protected function getLayananLink(): array
     {
-        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
-        $layananUrl = $baseUrl . '/#layanan';
+        $baseUrl = config('app.url');
+        $layananUrl = $baseUrl . '/layanan';
 
         return [
             'success' => true,
             'intent' => 'syarat_link',
-            'reply' => "LAYANAN KECAMATAN\n\n" .
-                "Silakan pilih layanan yang dibutuhkan:\n\n" .
-                "- syarat ktp - Pembuatan KTP\n" .
-                "- syarat kk - Pembuatan KK\n" .
-                "- syarat akta - Akta Kelahiran\n" .
-                "- syarat sktm - SKTM\n" .
-                "- syarat domisili - Surat Domisili\n\n" .
-                "Ajukan Secara Online:\n"
-                . "{$layananUrl}\n\n" .
+            'reply' => "📋 *LAYANAN KECAMATAN*\n\n" .
+                "Lihat daftar layanan dan syarat pengajuan di:\n\n" .
+                "🔗 {$layananUrl}\n\n" .
+                "Anda juga bisa langsung tanya syarat layanan tertentu.\n" .
+                "Contoh: *syarat ktp*, *syarat kk*\n\n" .
                 "Ketik *MENU* untuk kembali.",
-            'state_update' => 'ADM_SUBMENU', // Keep user in admin submenu
+            'state_update' => null,
         ];
     }
 
     /**
-     * 
+     * Get region name for responses
      */
     protected function getRegionName(): string
     {
         $profile = appProfile();
         return $profile->region_name ?? 'Kecamatan';
-    }
-
-    /**
-     * 
-     */
-    protected function getAdministrasiSubmenu(): array
-    {
-        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
-
-        $reply = "MENU ADMINISTRASI\n\n";
-        $reply .= "Silakan pilih layanan:\n\n";
-        $reply .= "1. STATUS - Lacak Berkas Anda\n";
-        $reply .= "   Ketik: STATUS atau 1\n\n";
-        $reply .= "2. SYARAT - Syarat Layanan & Ajukan Online\n";
-        $reply .= "   Ketik: SYARAT atau 2\n\n";
-        $reply .= "3. MENU - Kembali ke Menu Utama\n";
-        $reply .= "   Ketik: MENU atau 3";
-
-        return [
-            'success' => true,
-            'intent' => 'administrasi_submenu',
-            'reply' => $reply,
-            'state_update' => 'ADM_SUBMENU',
-        ];
     }
 }

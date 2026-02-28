@@ -25,6 +25,14 @@ class RoleSeeder extends Seeder
                 'nama_role' => 'Operator Desa',
                 'deskripsi' => 'Penginput data pembangunan dan administrasi tingkat desa.'
             ],
+            [
+                'nama_role' => 'Verifikator',
+                'deskripsi' => 'Menyetuju atau menolak pengajuan dan submission dari desa.'
+            ],
+            [
+                'nama_role' => 'Auditor',
+                'deskripsi' => 'Melihat laporan dan log aktivitas sistem tanpa hak edit (view-only).'
+            ],
         ];
 
         foreach ($roles as $role) {

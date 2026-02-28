@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 
 class UmkmLocal extends Model
 {
@@ -36,6 +37,14 @@ class UmkmLocal extends Model
         'last_toggle_at' => 'datetime',
     ];
 
+    // Auto-hash PIN when setting
+    public function setOwnerPinAttribute($value)
+    {
+        if (!empty($value)) {
+            $this->attributes['owner_pin'] = Hash::make($value);
+        }
+    }
+
     // Module Constants
     public const MODULE_UMKM = 'umkm';
     public const MODULE_JASA = 'jasa';
@@ -64,5 +73,13 @@ class UmkmLocal extends Model
     public function scopeJasa($query)
     {
         return $query->where('module', self::MODULE_JASA);
+    }
+
+    /**
+     * Owner relationship - links to User account (optional)
+     */
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_user_id');
     }
 }

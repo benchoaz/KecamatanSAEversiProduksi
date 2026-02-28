@@ -4,129 +4,134 @@ namespace App\Services\WhatsApp;
 
 use App\Models\WhatsappSession;
 use App\Models\PublicService;
+use App\Models\AppProfile;
 use Illuminate\Support\Str;
 
 class ComplaintHandler
 {
     /**
-     * Initiate submission flow
+     * Get complaint form URL from AppProfile
+     */
+    protected function getComplaintFormUrl(): string
+    {
+        $profile = app(AppProfile::class);
+        $baseUrl = $profile->public_base_url ?? $profile->app_url ?? config('app.url', 'https://localhost');
+        return rtrim($baseUrl, '/') . '/#pengaduan';
+    }
+
+    /**
+     * Initiate complaint flow - ask for name
      */
     public function initiate(string $phone, string $category = 'pengaduan'): array
     {
-        $session = WhatsappSession::where('phone', $phone)->first();
-        if ($session) {
-            $session->setTempValue('submission_category', $category);
-        }
-
-        $isPelayanan = $category === 'pelayanan';
-        $title = $isPelayanan ? "📄 PERMOHONAN LAYANAN" : "📢 PENGADUAN MASYARAKAT";
-        $instruction = $isPelayanan
-            ? "Silakan sampaikan permohonan layanan/berkas Anda (misal: pengurusan KTP, Domisili, dll)."
-            : "Silakan sampaikan keluhan/pengaduan Anda terkait layanan Kecamatan Besuk.";
+        $session = WhatsappSession::getOrCreate($phone);
+        $session->setTempValue('submission_category', $category);
 
         return [
             'success' => true,
             'intent' => 'complaint_initiate',
-            'reply' => $title . "\n\n" .
-                $instruction . "\n" .
-                "Tulis pesan Anda dalam satu pesan (maks 1000 karakter).\n\n" .
-                "Ketik BATAL untuk membatalkan.",
-            'state_update' => 'WAITING_COMPLAINT_MESSAGE',
+            'reply' => "📢 *PENGADUAN MASYARAKAT*\n\n" .
+                "Terima kasih ingin menyampaikan aspirasi.\n\n" .
+                "Siapa nama lengkap Anda?\n" .
+                "(Ketik nama Anda, atau ketik TIDAK untuk membatalkan)",
+            'state_update' => 'WAITING_COMPLAINT_NAME',
         ];
     }
 
     /**
-     * Handle complaint message and ask for confirmation
+     * Handle name input - ask for WhatsApp number
      */
-    public function handleMessage(WhatsappSession $session, string $message): array
+    public function handleName(WhatsappSession $session, string $message): array
     {
-        $messageLower = strtolower(trim($message));
+        $messageTrim = trim($message);
+        $messageLower = strtolower($messageTrim);
 
-        if ($messageLower === 'batal') {
+        // Check for cancel
+        if (in_array($messageLower, ['tidak', 'batal', 'cancel', 'no'])) {
             $session->clear();
             return [
                 'success' => true,
                 'intent' => 'complaint_cancelled',
-                'reply' => "Pengaduan dibatalkan. Ketik MENU untuk kembali.",
+                'reply' => "Pengaduan dibatalkan.\n" .
+                    "Ketik *MENU* untuk kembali ke menu utama.",
                 'state_update' => null,
             ];
         }
 
-        if (strlen($message) > 1000) {
-            return [
-                'success' => true,
-                'intent' => 'complaint_too_long',
-                'reply' => "⚠️ Maaf, pengaduan Anda terlalu panjang (maks 1000 karakter).\n\nSilakan ringkas pengaduan Anda dan kirim kembali, atau ketik BATAL.",
-                'state_update' => 'WAITING_COMPLAINT_MESSAGE',
-            ];
-        }
+        // Store name
+        $session->setTempValue('complaint_name', $messageTrim);
 
-        // Store complaint temporarily
-        $session->setTempValue('complaint_message', $message);
-        $session->updateState('WAITING_COMPLAINT_CONFIRM');
-
-        $preview = Str::limit($message, 150);
+        // Get user's current phone number
+        $userPhone = $session->phone;
 
         return [
             'success' => true,
-            'intent' => 'complaint_confirm',
-            'reply' => "📝 KONFIRMASI PENGADUAN\n\n" .
-                "Isi Laporan:\n" .
-                "_{$preview}_\n\n" .
-                "Apakah Anda yakin ingin mengirim laporan ini?\n\n" .
-                "Balas YA untuk mengirim atau BATAL untuk membatalkan.",
-            'state_update' => 'WAITING_COMPLAINT_CONFIRM',
+            'intent' => 'complaint_name_received',
+            'reply' => "Terima kasih *{$messageTrim}*.\n\n" .
+                "Nomor WhatsApp yang dapat kami hubungi: *{$userPhone}*\n\n" .
+                "Apakah nomor ini benar untuk dihubungi?\n\n" .
+                "Ketik *YA* jika benar, atau ketik nomor WhatsApp lain yang ingin dihubungi.",
+            'state_update' => 'WAITING_COMPLAINT_WA',
         ];
     }
 
     /**
-     * Handle confirmation response
+     * Handle WhatsApp number input - send form link with disclaimer
      */
-    public function handleConfirmation(WhatsappSession $session, string $message): array
+    public function handleWhatsApp(WhatsappSession $session, string $message): array
     {
-        $messageLower = strtolower(trim($message));
+        $messageTrim = trim($message);
+        $messageLower = strtolower($messageTrim);
 
-        if ($messageLower === 'ya' || $messageLower === 'y' || $messageLower === 'yes') {
-            // Create complaint record using PublicService model
-            $complaintMessage = $session->getTempValue('complaint_message');
-
-            $category = $session->getTempValue('submission_category') ?: 'pengaduan';
-            $defaultService = $category === 'pelayanan' ? 'Permohonan Layanan/Berkas' : 'Layanan Pengaduan/Administrasi';
-
-            $service = PublicService::create([
-                'uuid' => (string) Str::uuid(),
-                'category' => $category,
-                'source' => 'whatsapp_bot',
-                'whatsapp' => $session->phone,
-                'nama_pemohon' => 'Warga (WhatsApp)',
-                'uraian' => $complaintMessage,
-                'jenis_layanan' => $defaultService,
-                'status' => 'menunggu_verifikasi',
-                'ip_address' => request()->ip() ?? '127.0.0.1',
-            ]);
-
-            $session->clear();
-
-            return [
-                'success' => true,
-                'intent' => 'complaint_submitted',
-                'reply' => "✅ PENGADUAN TERKIRIM\n\n" .
-                    "Terima kasih, laporan Anda telah kami terima dengan ID:\n" .
-                    "*{$service->uuid}*\n\n" .
-                    "Serta *PIN Lacak: {$service->tracking_code}*\n\n" .
-                    "Petugas kami akan segera menindaklanjuti. Anda dapat mengecek status laporan kapan saja dengan mengetik STATUS atau langsung masukkan PIN Lacak Anda.",
-                'state_update' => null,
-            ];
+        // If user confirms with YA
+        if (in_array($messageLower, ['ya', 'y', 'yes', 'benar', 'ok', 'oke', 'siap'])) {
+            $waNumber = $session->phone; // Use current session phone
+        } else {
+            // User provided different WhatsApp number
+            $waNumber = preg_replace('/[^0-9]/', '', $messageTrim);
+            // Add country code if not present
+            if (!str_starts_with($waNumber, '62')) {
+                $waNumber = '62' . ltrim($waNumber, '0');
+            }
         }
 
-        // Cancel complaint if anything else
+        // Store WhatsApp number
+        $session->setTempValue('complaint_wa', $waNumber);
+
+        // Get form URL
+        $formUrl = $this->getComplaintFormUrl();
+        $name = $session->getTempValue('complaint_name');
+
+        // Clear session after providing link
         $session->clear();
+
+        $reply = "✅ *Data Diterima!*\n\n" .
+            "Nama: *{$name}*\n" .
+            "WhatsApp: *{$waNumber}*\n\n" .
+            "━━━━━━━━━━━━━━━━━━━━\n\n" .
+            "📝 *ISI FORM PENGADUAN*:\n{$formUrl}\n\n" .
+            "━━━━━━━━━━━━━━━━━━━━\n\n" .
+            "⚠️ *PERINGATAN & DISCLAIMER*:\n\n" .
+            "1. Informasi yang Anda berikan akan diverifikasi oleh petugas.\n\n" .
+            "2. Dilarang menyebarkan informasi bohong (hoax), fitnah, atau tuduhan tanpa bukti.\n\n" .
+            "3. Setiap laporan palsu/hoax adalah pelanggaran hukum dan dapat dipidana.\n\n" .
+            "4. Kami akan menindaklanjuti laporan Anda setelah verifikasi selesai.\n\n" .
+            "5. Jangan mudah percaya dengan informasi yang belum terverifikasi.\n\n" .
+            "━━━━━━━━━━━━━━━━━━━━\n\n" .
+            "Terima kasih atas partisipasi Anda membangun {@region}.\n" .
+            "Ketik *MENU* untuk kembali.";
+
+        // Replace placeholder with region name
+        $profile = app(AppProfile::class);
+        $regionName = $profile->region_name ?? 'kecamatan kami';
+        $reply = str_replace('{@region}', $regionName, $reply);
 
         return [
             'success' => true,
-            'intent' => 'complaint_cancelled',
-            'reply' => "Pengaduan dibatalkan. Ketik MENU untuk kembali.",
+            'intent' => 'complaint_link_sent',
+            'reply' => $reply,
             'state_update' => null,
         ];
     }
+
 }

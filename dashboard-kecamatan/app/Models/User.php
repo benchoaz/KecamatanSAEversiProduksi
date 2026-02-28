@@ -6,24 +6,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Models\Contracts\HasName;
-use Filament\Panel;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements FilamentUser, HasName
+class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, \App\Traits\Auditable;
-
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return $this->status === self::STATUS_AKTIF;
-    }
-
-    public function getFilamentName(): string
-    {
-        return $this->nama_lengkap ?? $this->username;
-    }
 
     protected $fillable = [
         'nama_lengkap',
@@ -39,6 +26,13 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     const STATUS_AKTIF = 'aktif';
     const STATUS_NONAKTIF = 'nonaktif';
+
+    // Role Constants
+    const ROLE_SUPER_ADMIN = 'Super Admin';
+    const ROLE_OPERATOR_KECAMATAN = 'Operator Kecamatan';
+    const ROLE_OPERATOR_DESA = 'Operator Desa';
+    const ROLE_VERIFIKATOR = 'Verifikator';
+    const ROLE_AUDITOR = 'Auditor';
 
     protected $hidden = [
         'password',
@@ -77,11 +71,42 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     public function isOperatorDesa()
     {
-        return $this->hasRole('Operator Desa');
+        return $this->hasRole(self::ROLE_OPERATOR_DESA);
+    }
+
+    public function isVerifikator()
+    {
+        return $this->hasRole(self::ROLE_VERIFIKATOR);
+    }
+
+    public function isAuditor()
+    {
+        return $this->hasRole(self::ROLE_AUDITOR);
     }
 
     public function submissions()
     {
         return $this->hasMany(Submission::class, 'submitted_by');
+    }
+
+    // Relationships to listing owners
+    public function umkms()
+    {
+        return $this->hasMany(Umkm::class, 'owner_user_id');
+    }
+
+    public function lokers()
+    {
+        return $this->hasMany(Loker::class, 'owner_user_id');
+    }
+
+    public function jasas()
+    {
+        return $this->hasMany(UmkmLocal::class, 'owner_user_id')->where('module', UmkmLocal::MODULE_JASA);
+    }
+
+    public function umkmLocals()
+    {
+        return $this->hasMany(UmkmLocal::class, 'owner_user_id');
     }
 }

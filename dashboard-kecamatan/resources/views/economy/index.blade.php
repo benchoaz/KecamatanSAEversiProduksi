@@ -10,6 +10,20 @@
 @section('content')
     <div class="min-h-screen bg-slate-50" x-data="{ activeTab: '{{ $defaultTab }}' }">
 
+        {{-- Success Message --}}
+        @session('success')
+            <div class="container mx-auto px-6 pt-6">
+                <div class="bg-emerald-50 border-l-4 border-emerald-500 rounded-xl p-4 flex items-center gap-3 shadow-lg animate__animated animate__fadeInDown">
+                    <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 flex-shrink-0">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-emerald-800">{{ $value }}</p>
+                    </div>
+                </div>
+            </div>
+        @endsession
+
         {{-- Header Section - Scaled down --}}
         <div class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white pt-10 pb-16 relative overflow-hidden">
             {{-- Background Patterns --}}
@@ -104,10 +118,10 @@
                                 Daftarkan jasa atau keahlian Anda di direktori resmi kecamatan. Gratis dan terverifikasi.
                             </p>
                         </div>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', appProfile()->phone ?? '') }}?text=Halo%20Admin%20{{ appProfile()->region_level }}%20{{ appProfile()->region_name }},%20saya%20ingin%20mendaftarkan%20jasa/pekerjaan%20saya%20di%20Direktori%20Kerja."
+                        <a href="{{ route('economy.create') }}"
                             target="_blank"
                             class="px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-teal-500/20 transition-all whitespace-nowrap relative z-10">
-                            <i class="fab fa-whatsapp mr-2"></i> Daftar Sekarang
+                            <i class="fas fa-plus mr-2"></i> Daftar Sekarang
                         </a>
                     </div>
                 </div>
@@ -192,6 +206,24 @@
         <div x-show="activeTab === 'produk'" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
             class="container mx-auto px-6 py-12 -mt-12 relative z-20 min-h-[500px]" style="display: none;">
+
+            {{-- CTA for Self-Registration --}}
+            <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden mb-8">
+                <div class="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-x-1/3 -translate-y-1/4"></div>
+                <div class="relative z-10">
+                    <h4 class="font-bold text-lg mb-1 flex items-center gap-2">
+                        <i class="fas fa-store text-amber-300"></i>
+                        Punya Produk Atau Jasa?
+                    </h4>
+                    <p class="text-sm text-white/90 max-w-md">
+                        Daftarkan produk atau jasa Anda di etalase resmi kecamatan. Gratis dan mudah!
+                    </p>
+                </div>
+                <a href="{{ route('umkm_rakyat.create') }}"
+                    class="px-6 py-3 bg-white hover:bg-amber-50 text-orange-600 rounded-xl font-bold text-sm shadow-lg transition-all whitespace-nowrap relative z-10">
+                    <i class="fas fa-plus mr-2"></i> Daftar Sekarang
+                </a>
+            </div>
 
             <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm mb-8 text-center">
                 <h3 class="text-2xl font-black text-slate-800 mb-2">Etalase Produk Unggulan</h3>

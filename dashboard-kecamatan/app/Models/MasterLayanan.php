@@ -13,6 +13,7 @@ class MasterLayanan extends Model
 
     protected $fillable = [
         'nama_layanan',
+        'slug',
         'deskripsi_syarat',
         'attachment_requirements',
         'estimasi_waktu',

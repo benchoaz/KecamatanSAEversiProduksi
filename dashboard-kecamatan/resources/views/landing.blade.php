@@ -404,6 +404,16 @@
                     <h3 class="font-black text-slate-800 text-sm mb-1">Jam Operasional</h3>
                     <p class="text-[10px] text-slate-500 font-medium">Cek jadwal pelayanan hari ini</p>
                 </div>
+
+                <div onclick="document.getElementById('complaintModal').showModal()"
+                    class="bg-white/90 backdrop-blur-xl p-6 rounded-[2rem] shadow-xl border border-rose-100 hover:scale-105 transition-all cursor-pointer group">
+                    <div
+                        class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-exclamation-circle text-xl"></i>
+                    </div>
+                    <h3 class="font-black text-slate-800 text-sm mb-1">Pengaduan</h3>
+                    <p class="text-[10px] text-slate-500 font-medium">Sampaikan Keluhan Anda</p>
+                </div>
             </div>
 
             <!-- Section: Lacak Berkas (NEW) -->
@@ -536,111 +546,261 @@
         </div>
     </div>
 
-    <!-- Section: Wilayah Teaser (Detailed & Aesthetic) -->
-    <div class="relative py-24 overflow-hidden">
-        <!-- Background with Overlay -->
-        <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1596328330776-6d9b4b0e503b?q=80&w=1600&auto=format&fit=crop"
-                alt="Wilayah Landscape" class="w-full h-full object-cover opacity-20 filter blur-sm scale-110">
-            <div class="absolute inset-0 bg-gradient-to-b from-slate-50 via-white/80 to-slate-50"></div>
+    <!-- Section: Layanan Pengaduan Modern (Elegant & Integrated) -->
+    <div id="pengaduan" class="relative py-24 overflow-hidden">
+        <!-- Background with Gradient -->
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <div class="absolute inset-0 bg-gradient-to-br from-slate-50 via-teal-50/30 to-rose-50/20"></div>
+            <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-teal-100/20 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 w-1/3 h-1/2 bg-gradient-to-t from-rose-100/10 to-transparent"></div>
+            <!-- Decorative circles -->
+            <div class="absolute top-20 -right-20 w-80 h-80 bg-teal-200/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 -left-20 w-96 h-96 bg-rose-200/10 rounded-full blur-3xl"></div>
         </div>
 
         <div class="container mx-auto px-6 relative z-10">
             <div
-                class="bg-white/60 backdrop-blur-xl rounded-[3rem] p-8 md:p-12 border border-white shadow-2xl overflow-hidden relative group hover:border-teal-200/50 transition-all duration-700">
+                class="bg-white/70 backdrop-blur-xl rounded-[3rem] p-8 md:p-12 border border-white shadow-2xl overflow-hidden relative">
                 <!-- Decorative Grid Pattern -->
                 <div
-                    class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#0f766e_1px,transparent_1px)] [background-size:16px_16px]">
+                    class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#0f766e_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none">
                 </div>
 
-                <div class="flex flex-col lg:flex-row items-center gap-12 sm:gap-16">
-                    <!-- Left Column: Visual Map Preview -->
-                    <div class="w-full lg:w-1/2 relative order-2 lg:order-1">
+                <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16 relative z-10">
+                    <!-- Left Column: Membangun Bersama Messaging & Stats -->
+                    <div class="w-full lg:w-1/2 text-center lg:text-left order-2 lg:order-1">
                         <div
-                            class="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white transform md:rotate-[-2deg] group-hover:rotate-0 transition-all duration-700">
-                            <!-- Overlay Gradient -->
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent z-10"></div>
-
-                            <!-- Static Map Image (Besuk Stylized) -->
-                            <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-                                class="w-full h-64 md:h-80 object-cover transform group-hover:scale-110 transition-transform duration-1000"
-                                alt="Peta Wilayah Kecamatan Besuk">
-
-                            <!-- Floating Badges -->
-                            <div class="absolute bottom-6 left-6 z-20 flex flex-col gap-2">
-                                <a href="{{ route('landing.wilayah') }}"
-                                    class="bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg flex items-center gap-3 hover:bg-teal-50 transition-colors group/badge">
-                                    <div
-                                        class="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 group-hover/badge:bg-teal-600 group-hover/badge:text-white transition-all">
-                                        <i class="fas fa-map-marked-alt text-xs"></i>
-                                    </div>
-                                    <div>
-                                        <p
-                                            class="text-[9px] font-bold text-slate-400 uppercase tracking-wider leading-none">
-                                            Total
-                                            Wilayah</p>
-                                        <p class="text-sm font-black text-slate-800 leading-tight">
-                                            {{ $desas->count() ?? '17' }} Desa
-                                        </p>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Accent Elements -->
-                        <div
-                            class="absolute -top-6 -right-6 w-24 h-24 bg-teal-400/20 rounded-full blur-2xl animate-pulse">
-                        </div>
-                    </div>
-
-                    <!-- Right Column: Content -->
-                    <div class="w-full lg:w-1/2 text-center lg:text-left order-1 lg:order-2">
-                        <div
-                            class="inline-flex items-center gap-2 bg-teal-50 text-teal-700 px-4 py-2 rounded-full mb-6 text-[10px] font-black uppercase tracking-widest border border-teal-100/50">
-                            <i class="fas fa-globe-asia"></i>
-                            <span>Jelajah Administrator</span>
+                            class="inline-flex items-center gap-2 bg-gradient-to-r from-teal-100 to-emerald-100 text-teal-700 px-4 py-2 rounded-full mb-6 text-[10px] font-black uppercase tracking-widest border border-teal-200/50">
+                            <i class="fas fa-headset"></i>
+                            <span>Layanan Pengaduan</span>
                         </div>
 
                         <h2
-                            class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-800 mb-6 tracking-tight leading-[1.1]">
-                            Potensi Wilayah & <br>
-                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">
-                                Ekonomi Warga
+                            class="text-4xl md:text-5xl lg:text-5xl font-black text-slate-800 mb-6 tracking-tight leading-[1.15]">
+                            Membangun Bersama <br>
+                            <span
+                                class="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 via-emerald-500 to-rose-500">
+                                Suara Rakyat
                             </span>
                         </h2>
 
                         <p class="text-lg text-slate-600 mb-8 leading-relaxed font-medium max-w-xl mx-auto lg:mx-0">
-                            Temukan data lengkap mengenai batas administrasi desa, sebaran UMKM unggulan, serta potensi
-                            ekonomi kreatif dalam satu portal terintegrasi.
+                            Sampaikan keluhan, aspirasi, dan masukan Anda untuk bersama-sama membangun
+                            {{ appProfile()->region_name ?? 'kecamatan' }} yang lebih baik.
                         </p>
 
-                        <div class="flex flex-wrap justify-center lg:justify-start gap-4">
-                            <a href="{{ route('landing.wilayah') }}"
-                                class="btn bg-slate-900 hover:bg-slate-800 text-white border-0 rounded-2xl px-10 py-4 h-auto font-bold shadow-xl shadow-slate-900/20 transition-all hover:-translate-y-1">
-                                <span>Buka Peta Wilayah</span>
-                                <i class="fas fa-arrow-right ml-2"></i>
-                            </a>
-                            <a href="{{ route('economy.index', ['tab' => 'produk']) }}"
-                                class="flex items-center gap-3 px-6 py-3 bg-white rounded-2xl border border-slate-100 shadow-sm hover:border-teal-200 transition-all hover:bg-slate-50 group/umkm">
-                                <div class="flex -space-x-2">
-                                    @foreach($umkms->take(3) as $u)
-                                        <div
-                                            class="w-8 h-8 rounded-full border-2 border-white bg-slate-100 overflow-hidden group-hover/umkm:scale-105 transition-transform">
-                                            <img src="{{ $u->foto_usaha ? asset('storage/' . $u->foto_usaha) : 'https://ui-avatars.com/api/?name=' . $u->nama_usaha }}"
-                                                class="w-full h-full object-cover">
-                                        </div>
-                                    @endforeach
+                        <!-- Statistics / Icons -->
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-slate-100 shadow-sm">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center">
+                                        <i class="fas fa-bolt text-teal-600"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-2xl font-black text-slate-800">24 Jam</p>
+                                        <p class="text-xs text-slate-500 font-medium">Respons Cepat</p>
+                                    </div>
                                 </div>
-                                <span class="text-xs font-bold text-slate-500">
-                                    <span class="text-teal-600 font-black">{{ $umkms->count() }}+</span> UMKM
-                                </span>
-                            </a>
+                            </div>
+                            <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-slate-100 shadow-sm">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center">
+                                        <i class="fas fa-shield-alt text-rose-600"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-2xl font-black text-slate-800">100%</p>
+                                        <p class="text-xs text-slate-500 font-medium">Terjamin</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-slate-100 shadow-sm">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                                        <i class="fas fa-whatsapp text-emerald-600"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-2xl font-black text-slate-800">WhatsApp</p>
+                                        <p class="text-xs text-slate-500 font-medium">Notifikasi Realtime</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-slate-100 shadow-sm">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                                        <i class="fas fa-lock text-blue-600"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-2xl font-black text-slate-800">Privasi</p>
+                                        <p class="text-xs text-slate-500 font-medium">Data Aman</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trust Badge -->
+                        <div class="flex items-center justify-center lg:justify-start gap-3">
+                            <div class="flex -space-x-2">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-teal-500 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+                                    D</div>
+                                <div
+                                    class="w-8 h-8 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+                                    S</div>
+                                <div
+                                    class="w-8 h-8 rounded-full bg-rose-500 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+                                    K</div>
+                            </div>
+                            <p class="text-xs text-slate-500 font-medium">
+                                <span class="text-slate-800 font-bold">Terpercaya</span> oleh masyarakat
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Modern Complaint Form -->
+                    <div class="w-full lg:w-1/2 order-1 lg:order-2">
+                        <div
+                            class="bg-white rounded-[2.5rem] p-6 md:p-8 border border-slate-100 shadow-xl shadow-slate-200/50">
+                            <!-- Form Header -->
+                            <div class="text-center mb-6">
+                                <div
+                                    class="w-14 h-14 bg-gradient-to-br from-rose-400 to-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-500/30">
+                                    <i class="fas fa-exclamation-circle text-white text-xl"></i>
+                                </div>
+                                <h3 class="text-xl font-black text-slate-800">Form Pengaduan</h3>
+                                <p class="text-xs text-slate-500 font-medium mt-1">Sampaikan keluhan Anda dengan jelas
+                                </p>
+                            </div>
+
+                            <!-- Form -->
+                            <form id="inlineComplaintForm" class="space-y-4">
+                                @csrf
+                                <input type="hidden" name="jenis_layanan" value="Pengaduan Publik">
+                                <input type="hidden" name="category" value="pengaduan">
+
+                                <!-- Kategori Pengaduan -->
+                                <div>
+                                    <label
+                                        class="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Kategori</label>
+                                    <select name="jenis_pengaduan" id="inlineJenisPengaduan"
+                                        class="select select-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500 text-sm"
+                                        required>
+                                        <option value="">Pilih kategori...</option>
+                                        <option value="Pengaduan">📢 Pengaduan</option>
+                                        <option value="Aspirasi">💡 Aspirasi</option>
+                                        <option value="Permintaan">📋 Permintaan</option>
+                                    </select>
+                                </div>
+
+                                <!-- Nama (Opsional) & WhatsApp -->
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label
+                                            class="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Nama
+                                            <span class="text-slate-400">(Ops)</span></label>
+                                        <input type="text" name="nama_pemohon" id="inlineComplaintName"
+                                            class="input input-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500 text-sm h-10"
+                                            placeholder="Nama Anda">
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="text-[10px] font-bold text-slate-600 uppercase tracking-wider">WhatsApp
+                                            <span class="text-rose-500">*</span></label>
+                                        <input type="tel" name="whatsapp" id="inlineComplaintWa"
+                                            class="input input-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500 text-sm h-10"
+                                            placeholder="08xxxxxxxxx" required>
+                                    </div>
+                                </div>
+
+                                <!-- Judul Pengaduan -->
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Judul
+                                        <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="judul_pengaduan" id="inlineComplaintTitle"
+                                        class="input input-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500 text-sm"
+                                        placeholder="Ringkasan pengaduan" required maxlength="100">
+                                </div>
+
+                                <!-- Isi Pengaduan -->
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Detail
+                                        <span class="text-rose-500">*</span></label>
+                                    <textarea name="uraian" id="inlineComplaintMessage" rows="3"
+                                        class="textarea textarea-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500 text-sm"
+                                        placeholder="Jelaskan kronologi dan detail..." required
+                                        maxlength="1000"></textarea>
+                                    <div class="flex justify-between mt-1">
+                                        <p class="text-[9px] text-slate-400" id="inlineCharCountLabel">Min. 20 karakter
+                                        </p>
+                                        <p class="text-[9px] text-slate-400"><span id="inlineCharCount">0</span>/1000
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Upload Lampiran -->
+                                <div>
+                                    <label
+                                        class="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Lampiran
+                                        <span class="text-slate-400">(Opsional)</span></label>
+                                    <div class="mt-1">
+                                        <label for="inlineComplaintFile"
+                                            class="flex items-center gap-2 cursor-pointer bg-slate-50 border border-dashed border-slate-300 hover:border-rose-400 rounded-xl px-4 py-3 transition-colors group">
+                                            <div class="relative shrink-0">
+                                                <i
+                                                    class="fas fa-paperclip text-slate-400 group-hover:text-rose-500 transition-colors"></i>
+                                                <span id="inlineFileCount"
+                                                    class="absolute -top-2 -right-2 w-4 h-4 bg-rose-500 text-white text-[8px] font-bold rounded-full items-center justify-center hidden">0</span>
+                                            </div>
+                                            <span id="inlineFileLabel"
+                                                class="text-sm text-slate-500 group-hover:text-rose-600 transition-colors font-medium">Upload
+                                                Lampiran</span>
+                                        </label>
+                                        <input type="file" id="inlineComplaintFile" name="foto[]" accept="image/*,.pdf"
+                                            multiple class="hidden">
+                                    </div>
+                                    <div id="inlinePhotoPreview" class="flex flex-wrap gap-2 mt-2"></div>
+                                    <p class="text-[9px] text-slate-400 mt-1">JPG, PNG, atau PDF (Maks. 5MB per file)
+                                    </p>
+                                </div>
+
+                                <!-- Anonim / Rahasia -->
+                                <div class="flex items-center gap-5">
+                                    <label class="flex items-center gap-2 cursor-pointer group">
+                                        <input type="checkbox" name="is_anonim"
+                                            class="checkbox checkbox-sm border-slate-300" value="1">
+                                        <span
+                                            class="text-sm text-slate-600 font-medium group-hover:text-rose-600 transition-colors">Anonim</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer group">
+                                        <input type="checkbox" name="is_rahasia"
+                                            class="checkbox checkbox-sm border-slate-300" value="1">
+                                        <span
+                                            class="text-sm text-slate-600 font-medium group-hover:text-rose-600 transition-colors">Rahasia</span>
+                                    </label>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" id="inlineComplaintSubmitBtn"
+                                    class="btn bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white border-0 rounded-xl w-full h-12 font-black shadow-lg shadow-rose-500/30 transition-all hover:scale-[1.02] uppercase tracking-widest text-base">
+                                    <i class="fas fa-flag mr-2"></i>
+                                    <span>LAPOR!</span>
+                                </button>
+
+                                <!-- Disclaimer -->
+                                <div class="bg-amber-50 border border-amber-100 rounded-xl p-3">
+                                    <p class="text-[10px] text-amber-700 font-medium text-center">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Dengan submit, Anda menyetujui bahwa pengaduan akan diproses secara resmi.
+                                        Notifikasi akan dikirim via WhatsApp.
+                                    </p>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
 
     <!-- Section: Layanan Terpadu (REFINED) -->
@@ -1270,6 +1430,138 @@
         </div>
     </dialog>
 
+    <!-- SP4N-LAPOR Style Complaint Modal -->
+    <dialog id="complaintModal" class="modal modal-bottom sm:modal-middle">
+        <div
+            class="modal-box max-w-lg rounded-t-3xl rounded-b-3xl bg-white p-0 shadow-2xl border border-rose-100 h-[80vh] overflow-y-auto">
+            <!-- Header -->
+            <div
+                class="bg-gradient-to-r from-rose-500 to-rose-600 p-5 text-white flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                        <i class="fas fa-exclamation-circle text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base leading-tight">Form Pengaduan</h3>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 bg-white/50 rounded-full"></span>
+                            <p class="text-[10px] text-rose-100 font-medium">Sampaikan keluhan Anda dengan jelas</p>
+                        </div>
+                    </div>
+                </div>
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost text-rose-100 hover:text-white"><i
+                            class="fas fa-times"></i></button>
+                </form>
+            </div>
+
+            <!-- Form -->
+            <form id="complaintForm" class="p-6 space-y-4">
+                @csrf
+                <input type="hidden" name="jenis_layanan" value="Pengaduan Publik">
+                <input type="hidden" name="category" value="pengaduan">
+
+                <!-- Kategori Pengaduan -->
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Kategori</label>
+                    <select name="jenis_pengaduan" id="jenisPengaduan"
+                        class="select select-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500"
+                        required>
+                        <option value="">Pilih kategori pengaduan...</option>
+                        <option value="Pengaduan">📢 Pengaduan (Layanan Tidak Memadai)</option>
+                        <option value="Aspirasi">💡 Aspirasi (Saran & Masukan)</option>
+                        <option value="Permintaan">📋 Permintaan (Butuh Layanan Khusus)</option>
+                    </select>
+                </div>
+
+                <!-- Nama -->
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Nama Pelapor <span
+                            class="text-slate-400">(Opsional)</span></label>
+                    <input type="text" name="nama_pemohon" id="complaintName"
+                        class="input input-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500"
+                        placeholder="Nama lengkap Anda">
+                </div>
+
+                <!-- No WhatsApp -->
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">No. WhatsApp <span
+                            class="text-rose-500">*</span></label>
+                    <input type="tel" name="whatsapp" id="complaintWa"
+                        class="input input-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500"
+                        placeholder="08xxxxxxxxx" required>
+                    <p class="text-[10px] text-slate-400 mt-1">Notifikasi status akan dikirim via WhatsApp</p>
+                </div>
+
+                <!-- Judul Pengaduan -->
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Judul Pengaduan <span
+                            class="text-rose-500">*</span></label>
+                    <input type="text" name="judul_pengaduan" id="complaintTitle"
+                        class="input input-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500"
+                        placeholder="Ringkasan singkat pengaduan Anda" required maxlength="100">
+                </div>
+
+                <!-- Isi Pengaduan -->
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Isi Pengaduan <span
+                            class="text-rose-500">*</span></label>
+                    <textarea name="uraian" id="complaintMessage" rows="4"
+                        class="textarea textarea-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500"
+                        placeholder="Jelaskan kronologi dan detail pengaduan Anda dengan jelas..." required
+                        maxlength="1000"></textarea>
+                    <div class="flex justify-between mt-1">
+                        <p class="text-[10px] text-slate-400">Min. 20 karakter</p>
+                        <p class="text-[10px] text-slate-400"><span id="charCount">0</span>/1000</p>
+                    </div>
+                </div>
+
+                <!-- Lampiran -->
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Lampiran <span
+                            class="text-slate-400">(Opsional)</span></label>
+                    <input type="file" name="foto[]" id="complaintAttachment"
+                        class="file-input file-input-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200 focus:border-rose-500"
+                        accept="image/*,.pdf" multiple>
+                    <div id="complaintPhotoPreview" class="flex flex-wrap gap-2 mt-2"></div>
+                    <p class="text-[10px] text-slate-400 mt-1">JPG, PNG, atau PDF (Maks. 5MB per file)</p>
+                </div>
+
+                <!-- Anonim / Rahasia -->
+                <div class="flex items-center gap-5">
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input type="checkbox" name="is_anonim" class="checkbox checkbox-sm" value="1">
+                        <span
+                            class="text-sm text-slate-600 font-medium group-hover:text-rose-600 transition-colors">Anonim</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input type="checkbox" name="is_rahasia" class="checkbox checkbox-sm" value="1">
+                        <span
+                            class="text-sm text-slate-600 font-medium group-hover:text-rose-600 transition-colors">Rahasia</span>
+                    </label>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-3">
+                    <p class="text-[10px] text-amber-700 leading-relaxed">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Dengan menyerahkan pengaduan ini, Anda setuju bahwa pengaduan akan diproses oleh pihak
+                        kecamatan. Untuk
+                        laporan terkait korupsi atau penyimpangan berat, silakan gunakan kanal resmi <a
+                            href="https://lapor.go.id" target="_blank" class="font-bold underline">SP4N-LAPOR</a>.
+                    </p>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="complaintSubmitBtn"
+                    class="btn w-full bg-rose-500 hover:bg-rose-600 text-white border-0 rounded-xl h-12 font-black shadow-lg transition-all uppercase tracking-widest text-base">
+                    <i class="fas fa-flag mr-2"></i>
+                    LAPOR!
+                </button>
+            </form>
+        </div>
+    </dialog>
+
     <!-- Survei Kepuasan Masyarakat (SKM) Modal -->
     <dialog id="surveyModal" class="modal modal-bottom sm:modal-middle">
         <div class="modal-box max-w-md rounded-3xl bg-white p-0 overflow-hidden shadow-2xl border border-slate-100">
@@ -1442,7 +1734,7 @@
             botInput.value = '';
 
             try {
-                const response = await fetch(`{{ route('api.faq.search') }}?q=${encodeURIComponent(inputVal)}`);
+                const response = await fetch(`{{ route('api.faq.search', [], false) }}?q=${encodeURIComponent(inputVal)}`);
                 const data = await response.json();
 
                 if (data.found && data.results && data.results.length > 0) {
@@ -1474,7 +1766,7 @@
             appendMessage('bot', 'Sedang mencatat permintaan Anda untuk petugas...');
 
             try {
-                const response = await fetch("{{ route('public.service.submit') }}", {
+                const response = await fetch("{{ route('public.service.submit', [], false) }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1627,7 +1919,7 @@
 
                 try {
                     const formData = new FormData(this);
-                    const response = await fetch("{{ route('public.service.submit') }}", {
+                    const response = await fetch("{{ route('public.service.submit', [], false) }}", {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -1718,6 +2010,449 @@
         // --- MODULAR VOICE GUIDE INTEGRATION ---
         window.APP_WILAYAH_NAMA = {!! json_encode(optional(appProfile())->region_name ?? 'Wilayah') !!};
         window.APP_FAQ_KEYWORDS = {!! json_encode($faqKeywords ?? []) !!};
+
+        // --- COMPLAINT FORM LOGIC ---
+        // Character counter
+        const complaintMessage = document.getElementById('complaintMessage');
+        const charCount = document.getElementById('charCount');
+        if (complaintMessage && charCount) {
+            complaintMessage.addEventListener('input', function () {
+                charCount.textContent = this.value.length;
+                if (this.value.length < 20) {
+                    charCount.classList.add('text-rose-500');
+                } else {
+                    charCount.classList.remove('text-rose-500');
+                }
+            });
+        }
+
+        // Complaint form submission
+        document.getElementById('complaintForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const submitBtn = document.getElementById('complaintSubmitBtn');
+            const message = form.uraian.value.trim();
+            const wa = form.whatsapp.value.trim();
+            const jenisPengaduan = form.jenis_pengaduan.value;
+            const title = form.judul_pengaduan.value.trim();
+
+            // Validation
+            if (!jenisPengaduan) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pilih Kategori',
+                    text: 'Mohon pilih kategori pengaduan terlebih dahulu',
+                    confirmButtonColor: '#f43f5e'
+                });
+                return;
+            }
+
+            if (!title) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Judul Diperlukan',
+                    text: 'Mohon masukkan judul pengaduan',
+                    confirmButtonColor: '#f43f5e'
+                });
+                return;
+            }
+
+            if (message.length < 20) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pesan Terlalu Pendek',
+                    text: 'Mohon jelaskan pengaduan Anda minimal 20 karakter',
+                    confirmButtonColor: '#f43f5e'
+                });
+                return;
+            }
+
+            if (!wa.match(/^[0-9]+$/)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nomor WhatsApp Tidak Valid',
+                    text: 'Mohon masukkan nomor WhatsApp yang valid (hanya angka)',
+                    confirmButtonColor: '#f43f5e'
+                });
+                return;
+            }
+
+            // Build privacy flags from checkboxes
+            const _isAnonim = form.querySelector('[name="is_anonim"]')?.checked;
+            const _isRahasia = form.querySelector('[name="is_rahasia"]')?.checked;
+            let _privTags = '';
+            if (_isAnonim) _privTags += '[ANONIM]';
+            if (_isRahasia) _privTags += '[RAHASIA]';
+
+            // Combine title and message, set jenis_layanan
+            form.uraian.value = `[${jenisPengaduan}]${_privTags ? ' ' + _privTags : ''} ${title}\n\n${message}`;
+            form.jenis_layanan.value = `Pengaduan - ${jenisPengaduan}`;
+
+            // Show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim...';
+
+            try {
+                const formData = new FormData(form);
+
+                const response = await fetch('{{ route('public.service.submit', [], false) }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok && (result.success || result.tracking_code || result.uuid)) {
+                    // Success
+                    const trackingId = result.tracking_code || result.uuid || 'baru';
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pengaduan Terkirim! 🎉',
+                        html: `<p class="text-sm text-slate-600 mb-3">Terima kasih telah menyampaikan pengaduan. Kami akan memprosesnya segera.</p>
+                               <div class="bg-rose-50 p-3 rounded-lg">
+                                   <p class="text-xs text-rose-600 font-bold">NO. PENGADUAN</p>
+                                   <p class="text-lg font-black text-rose-600">${trackingId}</p>
+                               </div>
+                               <p class="text-xs text-slate-400 mt-2">Notifikasi akan dikirim via WhatsApp</p>`,
+                        confirmButtonColor: '#f43f5e',
+                        confirmButtonText: 'Tutup'
+                    });
+
+                    // Close modal and reset form
+                    document.getElementById('complaintModal').close();
+                    form.reset();
+                    if (charCount) charCount.textContent = '0';
+
+                } else if (result.type === 'security_referral') {
+                    // Security keyword detected
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Informasi',
+                        html: `<p class="text-sm text-slate-600">${result.message}</p>
+                               <a href="${result.link}" target="_blank" class="btn btn-sm btn-warning mt-3">Buka SP4N-LAPOR</a>`,
+                        confirmButtonColor: '#f59e0b'
+                    });
+                } else if (result.type === 'siak_referral') {
+                    // SIAK keyword detected
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Informasi Layanan',
+                        html: `<p class="text-sm text-slate-600">${result.message}</p>
+                               <a href="${result.link}" target="_blank" class="btn btn-sm btn-info mt-3">Buka Portal SIAK</a>`,
+                        confirmButtonColor: '#0ea5e9'
+                    });
+                } else if (result.errors) {
+                    // Validation errors
+                    const errors = Object.values(result.errors).flat().join('<br>');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validasi Gagal',
+                        html: errors,
+                        confirmButtonColor: '#f43f5e'
+                    });
+                } else {
+                    throw new Error(result.message || 'Terjadi kesalahan');
+                }
+            } catch (error) {
+                console.error('Complaint submission error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Mengirim',
+                    text: 'Terjadi kesalahan saat mengirim pengaduan. Silakan coba lagi.',
+                    confirmButtonColor: '#f43f5e'
+                });
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Kirim Pengaduan';
+            }
+        });
+
+        // Pre-fill WhatsApp from stored value if available
+        const storedWa = localStorage.getItem('user_wa');
+
+        // Check for WhatsApp in URL parameter (from WhatsApp bot)
+        const urlParams = new URLSearchParams(window.location.search);
+        const waFromUrl = urlParams.get('wa');
+
+        // Priority: URL parameter > localStorage > empty
+        const defaultWa = waFromUrl || storedWa || '';
+
+        if (!document.getElementById('complaintWa').value) {
+            document.getElementById('complaintWa').value = defaultWa;
+        }
+
+        // --- INLINE COMPLAINT FORM LOGIC ---
+        // Character count for inline form
+        const inlineComplaintMessage = document.getElementById('inlineComplaintMessage');
+        const inlineCharCount = document.getElementById('inlineCharCount');
+        const inlineCharCountLabel = document.getElementById('inlineCharCountLabel');
+        if (inlineComplaintMessage && inlineCharCount) {
+            inlineComplaintMessage.addEventListener('input', function () {
+                const len = this.value.length;
+                inlineCharCount.textContent = len;
+
+                // Visual feedback for validation
+                if (len > 0 && len < 20) {
+                    inlineCharCount.classList.add('text-rose-500', 'font-bold');
+                    inlineCharCountLabel.classList.add('text-rose-500');
+                    inlineCharCountLabel.textContent = 'Min. 20 karakter';
+                } else if (len >= 20) {
+                    inlineCharCount.classList.remove('text-rose-500', 'font-bold');
+                    inlineCharCount.classList.add('text-teal-500', 'font-bold');
+                    inlineCharCountLabel.classList.remove('text-rose-500');
+                    inlineCharCountLabel.classList.add('text-teal-600');
+                    inlineCharCountLabel.textContent = '✓ Valid';
+                } else {
+                    inlineCharCount.classList.remove('text-rose-500', 'font-bold', 'text-teal-500');
+                    inlineCharCountLabel.classList.remove('text-rose-500', 'text-teal-600');
+                    inlineCharCountLabel.textContent = 'Min. 20 karakter';
+                }
+            });
+        }
+
+        // === FILE PREVIEW LOGIC ===
+        const inlineFileInput = document.getElementById('inlineComplaintFile');
+        if (inlineFileInput) {
+            inlineFileInput.addEventListener('change', function () {
+                const preview = document.getElementById('inlinePhotoPreview');
+                const fileCount = document.getElementById('inlineFileCount');
+                const fileLabel = document.getElementById('inlineFileLabel');
+                if (!preview) return;
+                preview.innerHTML = '';
+
+                const files = Array.from(this.files);
+
+                if (fileCount) {
+                    fileCount.textContent = files.length;
+                    if (files.length > 0) {
+                        fileCount.classList.remove('hidden');
+                        fileCount.classList.add('flex');
+                    } else {
+                        fileCount.classList.add('hidden');
+                        fileCount.classList.remove('flex');
+                    }
+                }
+                if (fileLabel) {
+                    fileLabel.textContent = files.length > 0 ? `${files.length} file dipilih` : 'Upload Lampiran';
+                }
+
+                files.forEach((file) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative group';
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function (ev) {
+                            wrapper.innerHTML = `<img src="${ev.target.result}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shadow-sm" alt="preview">`;
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        wrapper.innerHTML = `
+                            <div class="w-16 h-16 bg-slate-100 rounded-xl border border-slate-200 flex flex-col items-center justify-center shadow-sm">
+                                <i class="fas fa-file-pdf text-rose-500 text-xl mb-1"></i>
+                                <span class="text-[8px] text-slate-500 font-bold uppercase">PDF</span>
+                            </div>`;
+                    }
+                    preview.appendChild(wrapper);
+                });
+            });
+        }
+
+        const complaintFileInput = document.getElementById('complaintAttachment');
+        if (complaintFileInput) {
+            complaintFileInput.addEventListener('change', function () {
+                const preview = document.getElementById('complaintPhotoPreview');
+                if (!preview) return;
+                preview.innerHTML = '';
+
+                const files = Array.from(this.files);
+                files.forEach((file) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative group';
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function (ev) {
+                            wrapper.innerHTML = `<img src="${ev.target.result}" class="w-14 h-14 object-cover rounded-xl border border-slate-200 shadow-sm" alt="preview">`;
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        wrapper.innerHTML = `
+                            <div class="w-14 h-14 bg-slate-100 rounded-xl border border-slate-200 flex flex-col items-center justify-center shadow-sm">
+                                <i class="fas fa-file-pdf text-rose-500 text-lg mb-1"></i>
+                                <span class="text-[8px] text-slate-500 font-bold uppercase">PDF</span>
+                            </div>`;
+                    }
+                    preview.appendChild(wrapper);
+                });
+            });
+        }
+        // === END FILE PREVIEW LOGIC ===
+
+        // Inline complaint form submission
+        document.getElementById('inlineComplaintForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const submitBtn = document.getElementById('inlineComplaintSubmitBtn');
+            const message = form.uraian.value.trim();
+            const wa = form.whatsapp.value.trim();
+            const jenisPengaduan = form.jenis_pengaduan.value;
+            const title = form.judul_pengaduan.value.trim();
+
+            // Validation
+            if (!jenisPengaduan) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pilih Kategori',
+                    text: 'Mohon pilih kategori pengaduan terlebih dahulu',
+                    confirmButtonColor: '#f43f5e'
+                });
+                return;
+            }
+
+            if (!title) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Judul Diperlukan',
+                    text: 'Mohon masukkan judul pengaduan',
+                    confirmButtonColor: '#f43f5e'
+                });
+                return;
+            }
+
+            if (message.length < 20) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pesan Terlalu Pendek',
+                    text: 'Mohon jelaskan pengaduan Anda minimal 20 karakter',
+                    confirmButtonColor: '#f43f5e'
+                });
+                return;
+            }
+
+            if (!wa.match(/^[0-9]+$/)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nomor WhatsApp Tidak Valid',
+                    text: 'Mohon masukkan nomor WhatsApp yang valid (hanya angka)',
+                    confirmButtonColor: '#f43f5e'
+                });
+                return;
+            }
+
+            // Build privacy flags from checkboxes (inline form)
+            const _isAnonim2 = form.querySelector('[name="is_anonim"]')?.checked;
+            const _isRahasia2 = form.querySelector('[name="is_rahasia"]')?.checked;
+            let _privTags2 = '';
+            if (_isAnonim2) _privTags2 += '[ANONIM]';
+            if (_isRahasia2) _privTags2 += '[RAHASIA]';
+
+            // Combine title and message, set jenis_layanan
+            form.uraian.value = `[${jenisPengaduan}]${_privTags2 ? ' ' + _privTags2 : ''} ${title}\n\n${message}`;
+            form.jenis_layanan.value = `Pengaduan - ${jenisPengaduan}`;
+
+            // Show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim...';
+
+            try {
+                const formData = new FormData(form);
+
+                const response = await fetch('{{ route('public.service.submit', [], false) }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok && (result.success || result.tracking_code || result.uuid)) {
+                    // Success
+                    const trackingId = result.tracking_code || result.uuid || 'baru';
+
+                    // Store WhatsApp for future use
+                    localStorage.setItem('user_wa', wa);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pengaduan Terkirim! 🎉',
+                        html: `<p class="text-sm text-slate-600 mb-3">Terima kasih telah menyampaikan pengaduan. Kami akan memprosesnya segera.</p>
+                               <div class="bg-rose-50 p-3 rounded-lg">
+                                   <p class="text-xs text-rose-600 font-bold">NO. PENGADUAN</p>
+                                   <p class="text-lg font-black text-rose-600">${trackingId}</p>
+                               </div>
+                               <p class="text-xs text-slate-400 mt-2">Notifikasi akan dikirim via WhatsApp</p>`,
+                        confirmButtonColor: '#f43f5e',
+                        confirmButtonText: 'Tutup'
+                    });
+
+                    // Reset form
+                    form.reset();
+                    if (inlineCharCount) inlineCharCount.textContent = '0';
+
+                } else if (result.type === 'security_referral') {
+                    // Security keyword detected
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Informasi',
+                        html: `<p class="text-sm text-slate-600">${result.message}</p>
+                               <a href="${result.link}" target="_blank" class="btn btn-sm btn-warning mt-3">Buka SP4N-LAPOR</a>`,
+                        confirmButtonColor: '#f59e0b'
+                    });
+                } else if (result.type === 'siak_referral') {
+                    // SIAK keyword detected
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Informasi Layanan',
+                        html: `<p class="text-sm text-slate-600">${result.message}</p>
+                               <a href="${result.link}" target="_blank" class="btn btn-sm btn-info mt-3">Buka Portal SIAK</a>`,
+                        confirmButtonColor: '#0ea5e9'
+                    });
+                } else if (result.errors) {
+                    // Validation errors
+                    const errors = Object.values(result.errors).flat().join('<br>');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validasi Gagal',
+                        html: errors,
+                        confirmButtonColor: '#f43f5e'
+                    });
+                } else {
+                    throw new Error(result.message || 'Terjadi kesalahan');
+                }
+            } catch (error) {
+                console.error('Inline complaint submission error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Mengirim',
+                    text: 'Terjadi kesalahan saat mengirim pengaduan. Silakan coba lagi.',
+                    confirmButtonColor: '#f43f5e'
+                });
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Kirim Pengaduan';
+            }
+        });
+
+        // Pre-fill inline form with stored WhatsApp or URL parameter
+        if (!document.getElementById('inlineComplaintWa').value) {
+            document.getElementById('inlineComplaintWa').value = defaultWa;
+        }
+
+        // Scroll to pengaduan section if wa parameter exists
+        if (waFromUrl) {
+            const pengaduanSection = document.getElementById('pengaduan');
+            if (pengaduanSection) {
+                setTimeout(() => {
+                    pengaduanSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 500);
+            }
+        }
 
         // --- TRACKING LOGIC ---
         function handleTracking() {

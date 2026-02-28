@@ -127,11 +127,17 @@ class WhatsappController extends Controller
 
             $duration = round((microtime(true) - $startTime) * 1000, 2);
 
+            $replyPreview = 'NULL';
+            if (isset($response['reply'])) {
+                $replyText = is_array($response['reply']) ? json_encode($response['reply']) : $response['reply'];
+                $replyPreview = is_string($replyText) ? substr($replyText, 0, 50) . '...' : 'Not a string';
+            }
+
             \Log::info('Bot Handler Response', [
                 'intent' => $response['intent'] ?? 'N/A',
                 'state_update' => $response['state_update'] ?? 'N/A',
                 'duration_ms' => $duration . 'ms',
-                'reply_preview' => isset($response['reply']) ? substr($response['reply'], 0, 50) . '...' : 'NULL'
+                'reply_preview' => $replyPreview
             ]);
 
             // =====================================================
@@ -150,12 +156,17 @@ class WhatsappController extends Controller
                 }
             }
 
-            // Log interaction
+            // Log interaction - convert array reply to string
+            $replyForLog = '';
+            if (isset($response['reply'])) {
+                $replyForLog = is_array($response['reply']) ? json_encode($response['reply']) : (string) $response['reply'];
+            }
+
             WhatsappLog::logInteraction(
                 $phone,
                 $message,
                 $response['intent'] ?? null,
-                $response['reply'] ?? null,
+                $replyForLog,
                 $response['success'] ?? true
             );
 

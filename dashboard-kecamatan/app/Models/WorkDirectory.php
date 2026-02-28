@@ -31,6 +31,45 @@ class WorkDirectory extends Model
     ];
 
     /**
+     * Get available categories
+     */
+    public static function getCategories()
+    {
+        return [
+            // Jasa Harian
+            'Tukang Pijat',
+            'Tukang Bangunan',
+            'Buruh Tani',
+            'Tukang Gali',
+            'Tukang Potong Rumput',
+            'Jasa Rumah Tangga',
+            'Tukang Rantai',
+            'Tukang Las',
+            'Tukang Kayu',
+            'Montir',
+            'Salon / Potong Rambut',
+            'Laundry',
+
+            // Transportasi
+            'Ojek',
+            'Becak',
+            'Sopir',
+            'Angkot',
+
+            // Keliling
+            'Tukang Sayur',
+            'Penjual Ikan',
+            'Penjual Tahu Tempe',
+            'Penjual Gas',
+            'Penjual Bubur',
+            'Kue Keliling',
+
+            // Lainnya
+            'Lainnya'
+        ];
+    }
+
+    /**
      * Scope untuk data yang aktif dan izin publik
      */
     public function scopePublic($query)

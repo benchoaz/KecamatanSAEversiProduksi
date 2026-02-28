@@ -23,7 +23,7 @@ class PelayananController extends Controller
     {
         $category = $request->query('category', 'pelayanan');
 
-        $query = PublicService::with('desa');
+        $query = PublicService::with('desa')->withCount('attachments');
 
         // Mapping logic for strict separation
         if ($category === 'pelayanan') {
@@ -92,9 +92,9 @@ class PelayananController extends Controller
 
         $complaint->update($updateData);
 
-        // Send WhatsApp notification if status changed and notification is enabled
+        // Send WhatsApp notification if status changed
         $shouldNotify = $request->boolean('send_whatsapp_notification', true);
-        if ($shouldNotify && $complaint->whatsapp && $complaint->source === 'whatsapp' && $oldStatus !== $request->status) {
+        if ($shouldNotify && $complaint->whatsapp && $oldStatus !== $request->status) {
             $this->sendWhatsAppNotification($complaint, $request->status);
         }
 
@@ -113,21 +113,46 @@ class PelayananController extends Controller
         try {
             $message = $this->buildStatusMessage($complaint, $newStatus);
 
-            \Illuminate\Support\Facades\Http::post(
-                config('services.n8n.reply_webhook_url', env('N8N_REPLY_WEBHOOK_URL')),
-                [
+            // Normalize phone
+            $phone = preg_replace('/[^0-9]/', '', $complaint->whatsapp);
+            if (str_starts_with($phone, '0')) {
+                $phone = '62' . substr($phone, 1);
+            } elseif (!str_starts_with($phone, '62')) {
+                $phone = '62' . $phone;
+            }
+
+            // Try WAHA direct first
+            $wahaSettings = \App\Models\WahaN8nSetting::getSettings();
+            if ($wahaSettings && $wahaSettings->waha_api_url) {
+                $headers = ['Content-Type' => 'application/json'];
+                if ($wahaSettings->waha_api_key) {
+                    $headers['X-Api-Key'] = $wahaSettings->waha_api_key;
+                }
+                \Illuminate\Support\Facades\Http::withHeaders($headers)
+                    ->timeout(8)
+                    ->post(rtrim($wahaSettings->waha_api_url, '/') . '/api/sendText', [
+                        'session' => $wahaSettings->waha_session_name ?? 'default',
+                        'chatId' => $phone . '@c.us',
+                        'text' => $message,
+                    ]);
+                return;
+            }
+
+            // Fallback: n8n reply webhook
+            $n8nWebhook = config('services.n8n.reply_webhook_url', env('N8N_REPLY_WEBHOOK_URL'));
+            if ($n8nWebhook) {
+                \Illuminate\Support\Facades\Http::post($n8nWebhook, [
                     'phone' => $complaint->whatsapp,
                     'message' => $message,
                     'type' => 'status_update',
                     'service_id' => $complaint->id,
                     'uuid' => $complaint->uuid
-                ]
-            );
+                ]);
+            }
         } catch (\Exception $e) {
             \Log::error('Failed to send WhatsApp notification', [
                 'error' => $e->getMessage(),
                 'service_id' => $complaint->id,
-                'uuid' => $complaint->uuid
             ]);
         }
     }

@@ -77,6 +77,14 @@ class Umkm extends Model
     }
 
     /**
+     * Owner relationship - links to User account (optional)
+     */
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_user_id');
+    }
+
+    /**
      * Helpers for Automation & UI
      */
     public function getStatusLabelAttribute()

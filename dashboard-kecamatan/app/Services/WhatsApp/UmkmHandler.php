@@ -55,28 +55,28 @@ class UmkmHandler
      */
     protected function formatResults($umkms, string $query): string
     {
-        $message = "🏪 *HASIL PENCARIAN UMKM*\n";
+        $message = "HASIL PENCARIAN UMKM\n";
         $message .= "Kata kunci: \"*{$query}*\"\n";
         $message .= "Ditemukan {$umkms->count()} UMKM:\n\n";
 
         foreach ($umkms as $index => $umkm) {
             $num = $index + 1;
             $message .= "{$num}. *{$umkm->name}*\n";
-            $message .= "   📍 {$umkm->address}\n";
+            $message .= "   {$umkm->address}\n";
 
             if ($umkm->contact_wa) {
-                $message .= "   📞 {$umkm->contact_wa}\n";
+                $message .= "   {$umkm->contact_wa}\n";
             }
 
             if ($umkm->product) {
-                $message .= "   🏷️ {$umkm->product}\n";
+                $message .= "   {$umkm->product}\n";
             }
 
             $message .= "\n";
         }
 
         if ($umkms->count() === 5) {
-            $message .= "💡 _Menampilkan 5 hasil teratas._";
+            $message .= "_Menampilkan 5 hasil teratas._";
         }
 
         return $message;

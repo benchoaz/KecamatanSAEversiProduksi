@@ -55,28 +55,28 @@ class JasaHandler
      */
     protected function formatResults($jasaList, string $query): string
     {
-        $message = "🔧 *HASIL PENCARIAN JASA*\n";
+        $message = "HASIL PENCARIAN JASA\n";
         $message .= "Kata kunci: \"*{$query}*\"\n";
         $message .= "Ditemukan {$jasaList->count()} penyedia jasa:\n\n";
 
         foreach ($jasaList as $index => $jasa) {
             $num = $index + 1;
             $message .= "{$num}. *{$jasa->name}*\n";
-            $message .= "   📍 {$jasa->address}\n";
+            $message .= "   {$jasa->address}\n";
 
             if ($jasa->contact_wa) {
-                $message .= "   📞 {$jasa->contact_wa}\n";
+                $message .= "   {$jasa->contact_wa}\n";
             }
 
             if ($jasa->product) {
-                $message .= "   🛠️ {$jasa->product}\n";
+                $message .= "   {$jasa->product}\n";
             }
 
             $message .= "\n";
         }
 
         if ($jasaList->count() === 5) {
-            $message .= "💡 _Menampilkan 5 hasil teratas._";
+            $message .= "_Menampilkan 5 hasil teratas._";
         }
 
         return $message;

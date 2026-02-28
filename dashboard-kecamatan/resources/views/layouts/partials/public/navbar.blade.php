@@ -24,12 +24,16 @@
             <li><a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}"
                     class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Layanan</a>
             </li>
-            <li><a href="{{ route('landing.wilayah') }}"
-                    class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Wilayah</a>
+            <li><a href="{{ request()->is('/') ? '#pengaduan' : '/#pengaduan' }}"
+                    class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Pengaduan</a>
             </li>
             <li><a href="{{ route('economy.index') }}"
                     class="text-sm font-medium {{ request()->is('ekonomi*') ? 'text-teal-600 bg-teal-50' : 'text-gray-600 hover:text-teal-600 hover:bg-teal-50' }} rounded-lg">Pusat
                     Ekonomi</a>
+            </li>
+            <li><a href="{{ route('landing.wilayah') }}"
+                    class="text-sm font-medium {{ request()->is('wilayah*') ? 'text-teal-600 bg-teal-50' : 'text-gray-600 hover:text-teal-600 hover:bg-teal-50' }} rounded-lg">Peta
+                    Wilayah</a>
             </li>
             <li><a href="{{ request()->is('/') ? '#berita' : '/#berita' }}"
                     class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Berita</a>

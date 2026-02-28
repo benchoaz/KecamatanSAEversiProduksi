@@ -99,17 +99,57 @@ class SyaratHandler
     }
 
     /**
-     * Format FAQ answer for WhatsApp
+     * Format FAQ answer for WhatsApp with link
      */
     protected function formatFaqAnswer(PelayananFaq $faq): string
     {
-        $reply = "📋 *{$faq->question}*\n\n";
+        // Detect service keyword to build link
+        $serviceLink = $this->detectServiceLink($faq->keywords);
+        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+
+        $reply = "{$faq->question}\n\n";
         $reply .= $faq->answer;
-        $reply .= "\n\n";
-        $reply .= "💡 Ketik *SYARAT* untuk melihat daftar layanan lainnya.\n";
-        $reply .= " Ketik *MENU* untuk kembali ke menu utama.";
+
+        // Add link if service detected
+        if ($serviceLink) {
+            $reply .= "\n\nAjukan Permohonan Online:\n";
+            $reply .= "{$baseUrl}/{$serviceLink}";
+        }
+
+        $reply .= "\n\nKetik *SYARAT* untuk melihat daftar layanan lainnya.\n";
+        $reply .= "Ketik *MENU* untuk kembali ke menu utama.";
 
         return $reply;
+    }
+
+    /**
+     * Detect service link from keywords
+     */
+    protected function detectServiceLink(string $keywords): ?string
+    {
+        $serviceLinks = [
+            'ktp' => 'ktp',
+            'kartu tanda penduduk' => 'ktp',
+            'kk' => 'kk',
+            'kartu keluarga' => 'kk',
+            'akta' => 'akta',
+            'akta lahir' => 'akta',
+            'kelahiran' => 'akta',
+            'sktm' => 'sktm',
+            'tidak mampu' => 'sktm',
+            'domisili' => 'domisili',
+            'nikah' => 'nikah',
+            'bpjs' => 'bpjs',
+        ];
+
+        $keywordsLower = strtolower($keywords);
+        foreach ($serviceLinks as $keyword => $link) {
+            if (str_contains($keywordsLower, $keyword)) {
+                return $link;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -117,7 +157,9 @@ class SyaratHandler
      */
     protected function getCategoriesList(): string
     {
-        $reply = "📋 *SYARAT LAYANAN KECAMATAN*\n\n";
+        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+
+        $reply = "SYARAT LAYANAN KECAMATAN\n\n";
         $reply .= "Silakan ketik layanan yang Anda butuhkan:\n\n";
 
         // Get all active FAQs grouped by category
@@ -127,24 +169,25 @@ class SyaratHandler
             ->orderBy('priority', 'desc')
             ->get();
 
-        $grouped = $faqs->groupBy('category');
+        if ($faqs->isEmpty()) {
+            $reply .= "Belum ada layanan tersedia.\n";
+        } else {
+            $grouped = $faqs->groupBy('category');
 
-        \Log::info('Generating Syarat Category List', [
-            'total_faqs' => $faqs->count(),
-            'total_categories' => $grouped->count()
-        ]);
-
-        foreach ($grouped as $category => $items) {
-            $reply .= "*{$category}:*\n";
-            foreach ($items as $faq) {
-                $keywords = explode(',', $faq->keywords);
-                $mainKeyword = trim($keywords[0] ?? '');
-                $reply .= "• SYARAT {$mainKeyword}\n";
+            foreach ($grouped as $category => $items) {
+                $reply .= "*{$category}:*\n";
+                foreach ($items as $faq) {
+                    $keywords = explode(',', $faq->keywords);
+                    $mainKeyword = trim($keywords[0] ?? '');
+                    $reply .= "- SYARAT {$mainKeyword}\n";
+                }
+                $reply .= "\n";
             }
-            $reply .= "\n";
         }
 
         $reply .= "Contoh: *syarat kk*, *syarat ktp*, *syarat domisili*\n\n";
+        $reply .= "Ajukan Secara Online:\n";
+        $reply .= "{$baseUrl}/#layanan\n\n";
         $reply .= "Ketik *MENU* untuk kembali ke menu utama.";
 
         return $reply;
@@ -155,13 +198,17 @@ class SyaratHandler
      */
     protected function getNotFoundMessage(string $query): string
     {
-        $reply = "❌ Maaf, tidak ditemukan informasi syarat untuk \"{$query}\".\n\n";
+        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+
+        $reply = "Maaf, tidak ditemukan informasi syarat untuk \"{$query}\".\n\n";
         $reply .= "Silakan coba kata kunci lain seperti:\n";
-        $reply .= "• SYARAT KTP\n";
-        $reply .= "• SYARAT KK\n";
-        $reply .= "• SYARAT AKTA\n";
-        $reply .= "• SYARAT DOMISILI\n\n";
-        $reply .= "Ketik *SYARAT* untuk melihat daftar lengkap.\n";
+        $reply .= "- SYARAT KTP\n";
+        $reply .= "- SYARAT KK\n";
+        $reply .= "- SYARAT AKTA\n";
+        $reply .= "- SYARAT DOMISILI\n\n";
+        $reply .= "Lihat Semua Layanan:\n";
+        $reply .= "{$baseUrl}/#layanan\n\n";
+        $reply .= "Ketik *SYARAT* untuk melihat daftar lengkap.";
         $reply .= "Ketik *MENU* untuk kembali ke menu utama.";
 
         return $reply;

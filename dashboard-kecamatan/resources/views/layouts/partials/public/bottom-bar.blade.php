@@ -11,17 +11,17 @@
             <i class="fas fa-layer-group text-lg"></i>
             <span class="text-[9px] font-bold uppercase tracking-tighter">Layanan</span>
         </a>
-        <button onclick="document.getElementById('publicServiceModal').showModal()"
-            class="flex flex-col items-center gap-1 -mt-8 bg-teal-600 text-white w-14 h-14 rounded-full shadow-lg border-4 border-white">
-            <i class="fas fa-search mt-3"></i>
-            <span class="text-[7px] font-black uppercase tracking-tighter mt-1">Lacak</span>
+        <button onclick="document.getElementById('complaintModal').showModal()"
+            class="flex flex-col items-center gap-1 -mt-8 bg-rose-500 text-white w-14 h-14 rounded-full shadow-lg border-4 border-white">
+            <i class="fas fa-exclamation-circle mt-3 text-lg"></i>
+            <span class="text-[7px] font-black uppercase tracking-tighter mt-0.5">Pengaduan</span>
         </button>
         <a href="{{ route('landing.wilayah') }}"
             class="flex flex-col items-center gap-1 {{ request()->is('wilayah') ? 'text-teal-600' : 'text-slate-400' }} hover:text-teal-600 transition-colors">
             <i class="fas fa-map-marked-alt text-lg"></i>
             <span class="text-[9px] font-bold uppercase tracking-tighter">Wilayah</span>
         </a>
-        <button onclick="activateVoiceGuide()"
+        <button onclick="document.getElementById('publicServiceModal').showModal()"
             class="flex flex-col items-center gap-1 text-slate-400 hover:text-teal-600 transition-colors">
             <i class="fas fa-headset text-lg"></i>
             <span class="text-[9px] font-bold uppercase tracking-tighter">Bantuan</span>

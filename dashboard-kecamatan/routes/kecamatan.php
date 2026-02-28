@@ -91,18 +91,10 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin'])->prefix('keca
         Route::delete('/{apiToken}', [\App\Http\Controllers\ApiTokenController::class, 'destroy'])->name('destroy');
     });
 
-    // WAHA & n8n Management
+    // WAHA & n8n Management - Simplified
     Route::prefix('settings/waha-n8n')->name('settings.waha-n8n.')->group(function () {
         Route::get('/', [WahaN8nController::class, 'index'])->name('index');
         Route::put('/', [WahaN8nController::class, 'update'])->name('update');
-        Route::get('/status', [WahaN8nController::class, 'status'])->name('status');
-        Route::post('/check-waha', [WahaN8nController::class, 'checkWaha'])->name('check-waha');
-        Route::post('/check-n8n', [WahaN8nController::class, 'checkN8n'])->name('check-n8n');
-        Route::post('/check-all', [WahaN8nController::class, 'checkAll'])->name('check-all');
-        Route::post('/start-session', [WahaN8nController::class, 'startSession'])->name('start-session');
-        Route::post('/logout-session', [WahaN8nController::class, 'logoutSession'])->name('logout-session');
-        Route::get('/qr-code', [WahaN8nController::class, 'getQrCode'])->name('qr-code');
-        Route::post('/test-message', [WahaN8nController::class, 'testMessage'])->name('test-message');
     });
 
     // Ekbang (Monitoring Side)

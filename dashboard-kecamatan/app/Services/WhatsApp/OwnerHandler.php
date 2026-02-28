@@ -44,7 +44,7 @@ class OwnerHandler
         return [
             'success' => true,
             'intent' => 'owner_request_pin',
-            'reply' => "🔐 KELOLA DATA ANDA\n\n" .
+            'reply' => "KELOLA DATA ANDA\n\n" .
                 "Ditemukan data terdaftar untuk nomor ini.\n" .
                 "Silakan masukkan PIN Anda untuk melanjutkan.\n\n" .
                 "Ketik BATAL untuk membatalkan.",
@@ -67,6 +67,15 @@ class OwnerHandler
             ];
         }
 
+        // Check for lupa pin
+        if (
+            str_contains(strtolower($message), 'lupa') ||
+            str_contains(strtolower($message), 'forgot') ||
+            str_contains(strtolower($message), 'reset')
+        ) {
+            return $this->handleForgotOwnerPin($session);
+        }
+
         $umkmId = $session->getTempValue('owner_umkm_id');
         $lokerId = $session->getTempValue('owner_loker_id');
 
@@ -77,25 +86,26 @@ class OwnerHandler
             return [
                 'success' => true,
                 'intent' => 'owner_pin_invalid',
-                'reply' => "❌ PIN salah. Silakan coba lagi atau ketik BATAL.",
+                'reply' => "PIN salah. Silakan coba lagi atau ketik BATAL.\n\n" .
+                    "Ketik LUPA PIN untuk bantuan reset PIN.",
                 'state_update' => 'WAITING_OWNER_PIN',
             ];
         }
 
         $session->updateState('WAITING_OWNER_ACTION');
 
-        $reply = "✅ PIN benar!\n\n";
+        $reply = "PIN benar!\n\n";
         $reply .= "Silakan pilih data yang ingin dikelola:\n";
 
         if ($umkm) {
-            $status = $umkm->is_active ? '✅ AKTIF' : '❌ NONAKTIF';
-            $reply .= "• UMKM/JASA: *{$umkm->name}* ({$status})\n";
+            $status = $umkm->is_active ? 'AKTIF' : 'NONAKTIF';
+            $reply .= "UMKM/JASA: {$umkm->name} ({$status})\n";
             $session->setTempValue('target_type', 'umkm');
         }
 
         if ($loker) {
-            $status = ($loker->status === 'aktif') ? '✅ AKTIF' : '❌ NONAKTIF';
-            $reply .= "• LOKER: *{$loker->title}* ({$status})\n";
+            $status = ($loker->status === 'aktif') ? 'AKTIF' : 'NONAKTIF';
+            $reply .= "LOKER: {$loker->title} ({$status})\n";
             // If both exist, we might need a selection step. 
             // For now, prioritize the one they typed if ambiguous, or handle both as a toggle.
             // Simplified: Toggle whatever is available.
@@ -104,9 +114,9 @@ class OwnerHandler
         }
 
         $reply .= "\nPilih aksi:\n";
-        $reply .= "1️⃣ Ketik AKTIF untuk mengaktifkan\n";
-        $reply .= "2️⃣ Ketik NONAKTIF untuk mematikan (tidak bisa dicari)\n";
-        $reply .= "3️⃣ Ketik BATAL untuk keluar";
+        $reply .= "1. Ketik AKTIF untuk mengaktifkan\n";
+        $reply .= "2. Ketik NONAKTIF untuk mematikan (tidak bisa dicari)\n";
+        $reply .= "3. Ketik BATAL untuk keluar";
 
         return [
             'success' => true,
@@ -139,13 +149,13 @@ class OwnerHandler
         $action = ($messageLower === 'aktif');
         $newStatus = $action ? 'AKTIF' : 'NONAKTIF';
 
-        $summary = "✅ STATUS DIPERBARUI\n\n";
+        $summary = "STATUS DIPERBARUI\n\n";
 
         if ($umkmId) {
             $umkm = UmkmLocal::find($umkmId);
             if ($umkm) {
                 $umkm->update(['is_active' => $action, 'last_toggle_at' => now()]);
-                $summary .= "📍 *{$umkm->name}* -> *{$newStatus}*\n";
+                $summary .= "{$umkm->name} -> {$newStatus}\n";
             }
         }
 
@@ -154,7 +164,7 @@ class OwnerHandler
             if ($loker) {
                 $lokerStatus = $action ? 'aktif' : 'nonaktif';
                 $loker->update(['status' => $lokerStatus, 'last_toggle_at' => now()]);
-                $summary .= "💼 *{$loker->title}* -> *{$newStatus}*\n";
+                $summary .= "{$loker->title} -> {$newStatus}\n";
             }
         }
 
@@ -166,6 +176,29 @@ class OwnerHandler
             'success' => true,
             'intent' => 'owner_toggled',
             'reply' => $summary,
+            'state_update' => null,
+        ];
+    }
+
+    /**
+     * Handle forgot owner PIN
+     */
+    protected function handleForgotOwnerPin(WhatsappSession $session): array
+    {
+        // Use PUBLIC_BASE_URL if available, fallback to app.url
+        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+        $loginUrl = $baseUrl . '/owner/login';
+
+        return [
+            'success' => true,
+            'intent' => 'owner_lupa_pin',
+            'reply' => "LUPA PIN\n\n" .
+                "Anda lupa PIN untuk mengelola data Anda (UMKM/Jasa/Loker).\n\n" .
+                "Cara Reset PIN:\n" .
+                "1. Buka: {$loginUrl}\n" .
+                "2. Klik \"Lupa PIN?\"\n" .
+                "3. Hubungi petugas kecamatan untuk reset manual\n\n" .
+                "Ketik MENU untuk kembali.",
             'state_update' => null,
         ];
     }

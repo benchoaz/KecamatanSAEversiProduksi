@@ -20,7 +20,7 @@
                         <i class="fas fa-home"></i> Beranda
                     </a>
                     <i class="fas fa-chevron-right text-slate-400 text-xs"></i>
-                    <a href="{{ route('kerja.index') }}" class="text-teal-600 hover:text-teal-700 font-medium">
+                    <a href="{{ route('economy.index') }}" class="text-teal-600 hover:text-teal-700 font-medium">
                         Direktori Kerja & Jasa
                     </a>
                     <i class="fas fa-chevron-right text-slate-400 text-xs"></i>
@@ -200,7 +200,7 @@
 
                             <div class="space-y-4">
                                 @foreach($relatedItems as $related)
-                                    <a href="{{ route('kerja.show', $related->id) }}"
+                                    <a href="{{ route('economy.show', $related->id) }}"
                                         class="block p-4 bg-slate-50 hover:bg-teal-50 rounded-xl transition-all border border-slate-100 hover:border-teal-200">
                                         <div class="flex items-center gap-3">
                                             <div
@@ -217,7 +217,7 @@
                                 @endforeach
                             </div>
 
-                            <a href="{{ route('kerja.index', ['kategori' => $workItem->job_category]) }}"
+                            <a href="{{ route('economy.index', ['kategori' => $workItem->job_category]) }}"
                                 class="block mt-4 text-center text-teal-600 hover:text-teal-700 font-bold text-sm">
                                 Lihat Semua <i class="fas fa-arrow-right ml-1"></i>
                             </a>

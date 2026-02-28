@@ -53,7 +53,7 @@ class LokerHandler
      */
     protected function formatResults($lokers, string $query): string
     {
-        $message = "💼 *LOWONGAN KERJA*\n";
+        $message = "LOWONGAN KERJA\n";
 
         if (!empty($query)) {
             $message .= "Kata kunci: \"*{$query}*\"\n";
@@ -66,22 +66,22 @@ class LokerHandler
             $message .= "{$num}. *{$loker->title}*\n";
 
             if ($loker->contact_wa) {
-                $message .= "   📞 {$loker->contact_wa}\n";
+                $message .= "   {$loker->contact_wa}\n";
             }
 
             if ($loker->work_time) {
-                $message .= "   ⏰ Waktu Kerja: {$loker->work_time}\n";
+                $message .= "   Waktu Kerja: {$loker->work_time}\n";
             }
 
             if ($loker->created_at) {
-                $message .= "   📅 Diposting: {$loker->created_at->format('d/m/Y')}\n";
+                $message .= "   Diposting: {$loker->created_at->format('d/m/Y')}\n";
             }
 
             $message .= "\n";
         }
 
         if ($lokers->count() === 5) {
-            $message .= "💡 _Menampilkan 5 lowongan terbaru._";
+            $message .= "_Menampilkan 5 lowongan terbaru._";
         }
 
         return $message;

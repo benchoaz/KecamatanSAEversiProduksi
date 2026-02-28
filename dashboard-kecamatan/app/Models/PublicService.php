@@ -15,6 +15,7 @@ class PublicService extends Model
     public const CATEGORY_PENGADUAN = 'pengaduan';
     public const CATEGORY_UMKM = 'umkm';
     public const CATEGORY_LOKER = 'loker';
+    public const CATEGORY_PEKERJAAN = 'pekerjaan';
 
     // Statuses (Standardized Lowercase for API/n8n)
     public const STATUS_MENUNGGU = 'menunggu_verifikasi';
@@ -34,9 +35,19 @@ class PublicService extends Model
             self::CATEGORY_PENGADUAN => 'Pengaduan Masyarakat',
             self::CATEGORY_UMKM => 'UMKM',
             self::CATEGORY_LOKER => 'Loker',
+            self::CATEGORY_PEKERJAAN => 'Pekerjaan & Jasa',
             default => ucfirst($this->category ?? 'Layanan')
         };
     }
+
+    /**
+     * Get nama for compatibility with admin templates using $item->nama
+     */
+    public function getNamaAttribute(): ?string
+    {
+        return $this->nama_pemohon;
+    }
+
 
     protected $casts = [
         'is_agreed' => 'boolean',
@@ -45,7 +56,7 @@ class PublicService extends Model
     ];
 
     /**
-     * Bootstrap the model and its traits.
+     * The "booting" method of the model.
      */
     protected static function boot()
     {
@@ -55,7 +66,27 @@ class PublicService extends Model
             if (!$model->tracking_code) {
                 $model->tracking_code = static::generateUniqueTrackingCode();
             }
+            // Auto-generate whatsapp_suffix for faster lookups
+            if ($model->whatsapp) {
+                $model->whatsapp_suffix = static::generateWhatsAppSuffix($model->whatsapp);
+            }
         });
+
+        static::updating(function ($model) {
+            // Update whatsapp_suffix when whatsapp changes
+            if ($model->isDirty('whatsapp')) {
+                $model->whatsapp_suffix = static::generateWhatsAppSuffix($model->whatsapp);
+            }
+        });
+    }
+
+    /**
+     * Generate WhatsApp suffix (last 10 digits) for faster lookup
+     */
+    public static function generateWhatsAppSuffix(string $whatsapp): string
+    {
+        $clean = preg_replace('/[^0-9]/', '', $whatsapp);
+        return substr($clean, -10);
     }
 
     /**

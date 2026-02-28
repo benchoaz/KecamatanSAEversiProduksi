@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\ForceHttps::class, // Force HTTPS on production
     ];
 
     /**
@@ -67,5 +68,6 @@ class Kernel extends HttpKernel
         'menu.toggle' => \App\Http\Middleware\CheckMenuToggle::class,
         'api.token' => \App\Http\Middleware\ApiTokenMiddleware::class,
         'module.role' => \App\Http\Middleware\ModuleRoleMiddleware::class,
+        'https' => \App\Http\Middleware\ForceHttps::class,
     ];
 }

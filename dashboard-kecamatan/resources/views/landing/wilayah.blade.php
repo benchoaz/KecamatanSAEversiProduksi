@@ -172,7 +172,7 @@
         </style>
     @endif
 
-    <!-- Page Header -->
+    <!-- Page Header (Refined for Pengaduan focus) -->
     <section class="relative pt-32 pb-20 overflow-hidden">
         <div class="absolute inset-0 bg-slate-900">
             @if($isHeroActive && $heroImage)
@@ -186,21 +186,22 @@
 
         <div class="container mx-auto px-6 relative z-10 text-center">
             <div
-                class="inline-flex items-center gap-2 bg-teal-500/10 border border-teal-500/20 rounded-full px-4 py-1.5 mb-6 backdrop-blur-sm">
-                <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
-                <span class="text-teal-300 text-[10px] font-bold uppercase tracking-widest">Jelajah Potensi Desa</span>
+                class="inline-flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 rounded-full px-4 py-1.5 mb-6 backdrop-blur-sm">
+                <span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span>
+                <span class="text-rose-300 text-[10px] font-bold uppercase tracking-widest">Layanan Pengaduan &
+                    Aspirasi</span>
             </div>
 
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight">
-                Wilayah Administrator <br>
+                Membangun Bersama <br>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">
-                    {{ appProfile()->region_name }}
+                    Suara Rakyat
                 </span>
             </h1>
 
-            <p class="text-slate-400 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-                Menelusuri batas wilayah administrasi, data demografi desa, serta potensi ekonomi kreatif warga dalam
-                satu peta terintegrasi.
+            <p class="text-slate-300 max-w-2xl mx-auto text-lg font-medium leading-relaxed">
+                Sampaikan aspirasi dan keluhan Anda langsung ke pemerintah kecamatan.
+                Transparan, Cepat, dan Terintegrasi dengan WhatsApp.
             </p>
         </div>
     </section>
@@ -703,6 +704,81 @@
         </div>
     </dialog>
 
+    <!-- SP4N-LAPOR Style Complaint Modal -->
+    <dialog id="complaintModal" class="modal modal-bottom sm:modal-middle">
+        <div
+            class="modal-box max-w-lg rounded-t-3xl rounded-b-3xl bg-white p-0 shadow-2xl border border-rose-100 h-[80vh] overflow-y-auto">
+            <div
+                class="bg-gradient-to-r from-rose-500 to-rose-600 p-5 text-white flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                        <i class="fas fa-exclamation-circle text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base leading-tight">Form Pengaduan</h3>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 bg-white/50 rounded-full"></span>
+                            <p class="text-[10px] text-rose-100 font-medium">Sampaikan keluhan Anda</p>
+                        </div>
+                    </div>
+                </div>
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost text-rose-100 hover:text-white"><i
+                            class="fas fa-times"></i></button>
+                </form>
+            </div>
+            <form id="complaintForm" class="p-6 space-y-4">
+                @csrf
+                <input type="hidden" name="jenis_layanan" value="Pengaduan Publik">
+                <input type="hidden" name="category" value="pengaduan">
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Kategori</label>
+                    <select name="jenis_pengaduan" id="jenisPengaduan"
+                        class="select select-bordered w-full mt-1 rounded-xl bg-slate-50 border-slate-200" required>
+                        <option value="">Pilih...</option>
+                        <option value="Pengaduan">📢 Pengaduan</option>
+                        <option value="Aspirasi">💡 Aspirasi</option>
+                        <option value="Permintaan">📋 Permintaan</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Nama <span
+                            class="text-slate-400">(Ops)</span></label>
+                    <input type="text" name="nama_pemohon"
+                        class="input input-bordered w-full mt-1 rounded-xl bg-slate-50">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">WhatsApp <span
+                            class="text-rose-500">*</span></label>
+                    <input type="tel" name="whatsapp" class="input input-bordered w-full mt-1 rounded-xl bg-slate-50"
+                        required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Judul <span
+                            class="text-rose-500">*</span></label>
+                    <input type="text" name="judul_pengaduan"
+                        class="input input-bordered w-full mt-1 rounded-xl bg-slate-50" required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Isi <span
+                            class="text-rose-500">*</span></label>
+                    <textarea name="uraian" rows="4"
+                        class="textarea textarea-bordered w-full mt-1 rounded-xl bg-slate-50" required></textarea>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider">Bukti/Foto</label>
+                    <input type="file" name="foto[]"
+                        class="file-input file-input-bordered w-full mt-1 rounded-xl bg-slate-50" accept="image/*,.pdf"
+                        multiple>
+                </div>
+                <button type="submit"
+                    class="btn w-full bg-rose-500 hover:bg-rose-600 text-white border-0 rounded-xl h-12 font-bold">
+                    <i class="fas fa-paper-plane mr-2"></i> Kirim
+                </button>
+            </form>
+        </div>
+    </dialog>
+
     <!-- Survei Kepuasan Masyarakat (SKM) Modal -->
     <dialog id="surveyModal" class="modal modal-bottom sm:modal-middle">
         <div class="modal-box max-w-md rounded-3xl bg-white p-0 overflow-hidden shadow-2xl border border-slate-100">
@@ -875,7 +951,7 @@
             botInput.value = '';
 
             try {
-                const response = await fetch(`{{ route('api.faq.search') }}?q=${encodeURIComponent(inputVal)}`);
+                const response = await fetch(`{{ route('api.faq.search', [], false) }}?q=${encodeURIComponent(inputVal)}`);
                 const data = await response.json();
 
                 if (data.found && data.results && data.results.length > 0) {
@@ -907,7 +983,7 @@
             appendMessage('bot', 'Sedang mencatat permintaan Anda untuk petugas...');
 
             try {
-                const response = await fetch("{{ route('public.service.submit') }}", {
+                const response = await fetch("{{ route('public.service.submit', [], false) }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1055,7 +1131,7 @@
 
                 try {
                     const formData = new FormData(this);
-                    const response = await fetch("{{ route('public.service.submit') }}", {
+                    const response = await fetch("{{ route('public.service.submit', [], false) }}", {
                         method: 'POST',
                         body: formData,
                         headers: {
@@ -1154,9 +1230,52 @@
                 showToast('Mohon masukkan nomor WA atau ID Berkas', 'info');
                 return;
             }
-            // Redirect to tracking page
             window.location.href = '{{ route('public.tracking') }}?q=' + encodeURIComponent(input);
         }
+
+        // --- COMPLAINT FORM LOGIC (Wilayah) ---
+        document.getElementById('complaintForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const message = form.uraian.value.trim();
+            const wa = form.whatsapp.value.trim();
+            const jenisPengaduan = form.jenis_pengaduan.value;
+            const title = form.judul_pengaduan.value.trim();
+
+            if (!jenisPengaduan || !title || message.length < 20 || !wa.match(/^[0-9]+$/)) {
+                Swal.fire({ icon: 'warning', title: 'Data Tidak Valid', text: 'Mohon lengkapi semua data dengan benar' });
+                return;
+            }
+
+            form.uraian.value = `[${jenisPengaduan}] ${title}\n\n${message}`;
+            form.jenis_layanan.value = `Pengaduan - ${jenisPengaduan}`;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim...';
+
+            try {
+                const formData = new FormData(form);
+                const response = await fetch('{{ route('public.service.submit', [], false) }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                });
+                const result = await response.json();
+                if (response.ok && (result.success || result.tracking_code || result.uuid)) {
+                    Swal.fire({ icon: 'success', title: 'Terkirim!', html: `No. Pengaduan: ${result.tracking_code || result.uuid}` });
+                    document.getElementById('complaintModal').close();
+                    form.reset();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Gagal', text: 'Silakan coba lagi' });
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Kirim';
+            }
+        });
 
         // --- MOBILE BOTTOM BAR LOGIC ---
         function toggleMobileMenu() {
