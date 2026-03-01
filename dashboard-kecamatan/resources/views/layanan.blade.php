@@ -365,16 +365,15 @@
                         placeholder="Jelaskan keperluan Anda..." rows="4"></textarea>
                 </div>
 
-                <!-- Berkas Upload -->
+                <!-- Berkas Upload (Dynamic) -->
                 <div class="form-control mt-4">
                     <label class="label">
-                        <span class="label-text font-medium">Upload Berkas (Opsional)</span>
+                        <span class="label-text font-medium">Persyaratan Berkas</span>
                     </label>
-                    <input type="file" name="foto[]" class="file-input file-input-bordered w-full" multiple
-                        accept=".jpg,.jpeg,.png,.pdf">
-                    <label class="label">
-                        <span class="label-text-alt text-gray-500">Format: JPG, PNG, PDF (max 5MB per file)</span>
-                    </label>
+                    <div id="dynamicAttachments" class="space-y-3">
+                        <p class="text-sm text-gray-500 italic">Klik "Ajukan" pada layanan untuk melihat persyaratan
+                            berkas.</p>
+                    </div>
                 </div>
 
                 <!-- Agreement -->
@@ -427,6 +426,7 @@
             const categoryInput = document.getElementById('category');
             const serviceNameEl = document.getElementById('serviceName');
             const serviceInfo = document.getElementById('serviceInfo');
+            const dynamicAttachments = document.getElementById('dynamicAttachments');
 
             // Set service name and jenis_layanan
             serviceNameEl.textContent = serviceName;
@@ -434,7 +434,61 @@
             jenisInput.value = serviceName;
             categoryInput.value = 'pelayanan';
 
+            // Clear and populate dynamic attachments
+            if (dynamicAttachments) {
+                dynamicAttachments.innerHTML = '';
+
+                let reqList = [];
+
+                // 1. Priority: Use structured JSON if available (from MasterLayanan)
+                if (Array.isArray(attachmentsJson) && attachmentsJson.length > 0) {
+                    reqList = attachmentsJson;
+                }
+                // 2. Fallback: Parse from text requirements
+                else if (requirements) {
+                    let cleanReqs = requirements.replace(/^(Persyaratan|Syarat|SOP):\s*/i, '');
+                    let splitters = [/\d+[\.\)]\s*/, /,\s*/, /;\s*/];
+                    let currentList = [cleanReqs];
+
+                    splitters.forEach(regex => {
+                        let newList = [];
+                        currentList.forEach(item => {
+                            newList = newList.concat(item.split(regex).filter(s => s.trim().length > 3));
+                        });
+                        currentList = newList;
+                    });
+                    reqList = currentList.map(s => s.trim()).slice(0, 5);
+                }
+
+                if (reqList.length > 0) {
+                    reqList.forEach(label => {
+                        addAttachmentField(dynamicAttachments, label);
+                    });
+                } else {
+                    // Default - no specific requirements
+                    dynamicAttachments.innerHTML = '<p class="text-sm text-gray-500 italic">Tidak ada persyaratan berkas khusus untuk layanan ini.</p>';
+                }
+            }
+
             modal.showModal();
+        }
+
+        function addAttachmentField(container, label = '') {
+            const div = document.createElement('div');
+            div.className = 'bg-white p-3 rounded-lg border border-gray-200';
+            div.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <label class="text-sm font-medium text-gray-700">${label || 'Berkas'}</label>
+                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-red-500">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <input type="file" name="foto[]" 
+                    class="file-input file-input-bordered w-full text-sm" 
+                    accept=".jpg,.jpeg,.png,.pdf" required>
+                <input type="hidden" name="foto_labels[]" value="${label}">
+            `;
+            container.appendChild(div);
         }
 
         function openModal(service) {
