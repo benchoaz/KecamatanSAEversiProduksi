@@ -189,6 +189,11 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 // Generic Auth-Required Routes
 Route::middleware(['auth'])->group(function () {
     // Generic Auth-Required Routes
+
+    // Profile Routes (Password Change)
+    Route::get('/profile/password', [\App\Http\Controllers\ProfileController::class, 'editPassword'])->name('profile.password.edit');
+    Route::put('/profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
     Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
     Route::get('/dashboard/chart-data', [DashboardController::class, 'chartData'])->name('dashboard.chart-data');
 

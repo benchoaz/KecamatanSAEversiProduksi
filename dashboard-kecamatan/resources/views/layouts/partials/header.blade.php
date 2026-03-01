@@ -137,7 +137,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/admin/profile" class="gov-profile__item">
+                            <a href="{{ route('profile.password.edit') }}" class="gov-profile__item">
                                 <i class="fas fa-lock text-info"></i> Ubah Password
                             </a>
                         </li>
