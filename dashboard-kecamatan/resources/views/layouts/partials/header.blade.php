@@ -64,7 +64,7 @@
                                     </div>
                                 </div>
                             </a>
-                        @endforeach
+                        @endforelse
 
                         {{-- Announcements --}}
                         @forelse($announcements as $ann)
