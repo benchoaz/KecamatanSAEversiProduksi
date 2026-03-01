@@ -20,6 +20,8 @@ class WorkDirectory extends Model
         'service_area',
         'service_time',
         'contact_phone',
+        'owner_pin',
+        'last_toggle_at',
         'short_description',
         'data_source',
         'consent_public',

@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\UmkmLocal;
 use App\Models\Loker;
+use App\Models\WorkDirectory;
 use App\Models\AppProfile;
 use App\Models\PelayananFaq;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class ExternalApiController extends Controller
@@ -275,6 +277,23 @@ class ExternalApiController extends Controller
             ]);
         }
 
+        // Check Ekonomi/Jasa (WorkDirectory)
+        $economy = WorkDirectory::whereIn('contact_phone', $phoneVariants)
+            ->get()
+            ->first(fn($item) => $item->owner_pin && Hash::check($validated['pin'], $item->owner_pin));
+
+        if ($economy) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'owner_phone' => $phone,
+                    'listing_id' => $economy->id,
+                    'listing_type' => 'economy',
+                    'listing_name' => $economy->job_title,
+                ]
+            ]);
+        }
+
         return response()->json([
             'success' => false,
             'message' => 'PIN salah atau tidak ditemukan'
@@ -343,7 +362,7 @@ class ExternalApiController extends Controller
     {
         $validated = $request->validate([
             'listing_id' => 'required|integer',
-            'listing_type' => 'required|in:umkm,jasa,loker',
+            'listing_type' => 'required|in:umkm,jasa,loker,economy',
             'action' => 'required|in:open,close',
             'phone' => 'required|string',
             'pin' => 'required|string|size:6',
@@ -355,6 +374,8 @@ class ExternalApiController extends Controller
             $listing = umkmLocal::find($validated['listing_id']);
         } elseif ($validated['listing_type'] === 'loker') {
             $listing = Loker::find($validated['listing_id']);
+        } elseif ($validated['listing_type'] === 'economy') {
+            $listing = WorkDirectory::find($validated['listing_id']);
         }
 
         if (!$listing) {
@@ -365,7 +386,7 @@ class ExternalApiController extends Controller
         }
 
         // Verify PIN
-        if ($listing->owner_pin !== $validated['pin']) {
+        if ($listing->owner_pin && !Hash::check($validated['pin'], $listing->owner_pin)) {
             return response()->json([
                 'success' => false,
                 'message' => 'PIN salah'
@@ -376,7 +397,8 @@ class ExternalApiController extends Controller
         $phone = preg_replace('/[^0-9]/', '', $validated['phone']);
         $phoneVariants = $this->getPhoneVariants($phone);
 
-        if (!in_array($listing->contact_wa, $phoneVariants)) {
+        $contactField = $validated['listing_type'] === 'economy' ? 'contact_phone' : 'contact_wa';
+        if ($listing->$contactField && !in_array($listing->$contactField, $phoneVariants)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Nomor tidak sesuai dengan listing'
@@ -388,8 +410,10 @@ class ExternalApiController extends Controller
 
         if ($listing instanceof umkmLocal) {
             $listing->is_listed = $newStatus;
-        } else {
+        } elseif ($listing instanceof Loker) {
             $listing->status = $newStatus ? Loker::STATUS_AKTIF : Loker::STATUS_NONAKTIF;
+        } elseif ($listing instanceof WorkDirectory) {
+            $listing->status = $newStatus ? 'active' : 'inactive';
         }
 
         $listing->last_toggle_at = now();
