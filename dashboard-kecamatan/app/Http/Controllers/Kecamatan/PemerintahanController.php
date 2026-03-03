@@ -41,7 +41,7 @@ class PemerintahanController extends Controller
             'B' => ['title' => 'Administrasi BPD', 'icon' => 'fa-users-rectangle', 'route' => 'kecamatan.pemerintahan.detail.bpd.index', 'desc' => 'Arsip data pimpinan & anggota serta masa keanggotaan BPD.'],
             'C' => ['title' => 'Registrasi Lembaga Desa', 'icon' => 'fa-sitemap', 'route' => 'kecamatan.pemerintahan.detail.lembaga.index', 'desc' => 'Pendataan struktur & kepengurusan lembaga kemasyarakatan.'],
             'D' => ['title' => 'Arsip Perencanaan Desa', 'icon' => 'fa-calendar-check', 'route' => 'kecamatan.pemerintahan.detail.perencanaan.index', 'desc' => 'Penyimpanan dokumen Musrenbang & usulan pembangunan desa.'],
-            'E' => ['title' => 'Monitoring LKPJ & LPPD', 'icon' => 'fa-file-signature', 'route' => 'kecamatan.pemerintahan.detail.laporan.index', 'desc' => 'Pemantauan status penyampaian & kelengkapan laporan tahunan.'],
+            'E' => ['title' => 'Monitoring Laporan Desa', 'icon' => 'fa-file-signature', 'route' => 'kecamatan.pemerintahan.detail.laporan.index', 'desc' => 'Pemantauan status penyampaian berbagai laporan tahunan & pertanggungjawaban.'],
             'F' => ['title' => 'Administrasi Inventaris', 'icon' => 'fa-boxes-stacked', 'route' => 'kecamatan.pemerintahan.detail.inventaris.index', 'desc' => 'Pendataan status administrasi aset barang & tanah milik desa.'],
             'G' => ['title' => 'Arsip Dokumen Perencanaan', 'icon' => 'fa-folder-open', 'route' => 'kecamatan.pemerintahan.detail.dokumen.index', 'desc' => 'Penyimpanan referensi dokumen RPJMDes & RKPDes (Tanpa APBDes).'],
             'H' => ['title' => 'Inventaris Peraturan Desa', 'icon' => 'fa-gavel', 'route' => 'kecamatan.pemerintahan.detail.peraturan.index', 'desc' => 'Daftar produk hukum & peraturan desa yang telah ditetapkan.'],
@@ -314,20 +314,46 @@ class PemerintahanController extends Controller
         $laporans = [];
         $desas = [];
 
+        $reportTypes = ['LKPJ', 'LPPD', 'APBDes', 'LKPPD', 'LPJ_APBDes', 'IPPD', 'BUMDes', 'Rekap_Penduduk', 'LPPD_AMJ'];
+
         if ($desa_id) {
             $laporans = DokumenDesa::where('desa_id', $desa_id)
-                ->whereIn('tipe_dokumen', ['LKPJ', 'LPPD'])
+                ->whereIn('tipe_dokumen', $reportTypes)
                 ->orderBy('tahun', 'desc')
                 ->get();
         } else {
             $desas = Desa::withCount([
-                'dokumens' => function ($q) {
-                    $q->whereIn('tipe_dokumen', ['LKPJ', 'LPPD']);
+                'dokumens' => function ($q) use ($reportTypes) {
+                    $q->whereIn('tipe_dokumen', $reportTypes);
                 }
             ])->orderBy('nama_desa')->get();
         }
 
         return view('kecamatan.pemerintahan.laporan.index', compact('laporans', 'desa_id', 'desas'));
+    }
+
+    public function laporanVerify(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:diterima,dikembalikan',
+            'catatan' => 'nullable|string'
+        ]);
+
+        $laporan = DokumenDesa::findOrFail($id);
+
+        $laporan->status = $validated['status'];
+        if ($validated['status'] == 'dikembalikan') {
+            $laporan->catatan = $validated['catatan'];
+        } else {
+            // Jika diterima, pastikan catatan bersih
+            $laporan->catatan = null;
+        }
+
+        $laporan->tanggal_verifikasi = now();
+        $laporan->verified_by = auth()->id();
+        $laporan->save();
+
+        return back()->with('success', 'Verifikasi laporan berhasil diproses.');
     }
 
     public function dokumenIndex()
@@ -515,10 +541,12 @@ class PemerintahanController extends Controller
 
         // 3. Dokumen Inti & Laporan
         $dokumens = DokumenDesa::where('desa_id', $desa->id)->get();
+        $reportTypes = ['LKPJ', 'LPPD', 'APBDes', 'LKPPD', 'LPJ_APBDes', 'IPPD', 'BUMDes', 'Rekap_Penduduk', 'LPPD_AMJ'];
+
         foreach ($dokumens as $d) {
             $fullPath = storage_path('app/local/' . $d->file_path);
             if (file_exists($fullPath)) {
-                $folder = in_array($d->tipe_dokumen, ['LKPJ', 'LPPD']) ? "E_Laporan_Tahunan/" : "G_Dokumen_Inti/";
+                $folder = in_array($d->tipe_dokumen, $reportTypes) ? "E_Laporan_Tahunan/" : "G_Dokumen_Inti/";
                 $zipFile->addFile($fullPath, $folder . basename($d->file_path));
             }
         }

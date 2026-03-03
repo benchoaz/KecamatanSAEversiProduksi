@@ -193,7 +193,9 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 Route::middleware(['auth'])->group(function () {
     // Generic Auth-Required Routes
 
-    // Profile Routes (Password Change)
+    // Profile Routes (All Authenticated Users)
+    Route::get('/admin/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/admin/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/password', [\App\Http\Controllers\ProfileController::class, 'editPassword'])->name('profile.password.edit');
     Route::put('/profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
@@ -204,8 +206,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/files/{uuid}/{filename}', [FileController::class, 'show'])->name('files.show');
 
     // Kecamatan Domain Routes
-    Route::middleware(['role:Operator Kecamatan,Super Admin'])->group(function () {
-        // System Settings
+    Route::middleware(['role:Operator Kecamatan,Super Admin,pelayanan_admin,Admin Pelayanan'])->group(function () {
+        // System Settings - Allow all authenticated users
         Route::get('/kecamatan/settings/profile', [ApplicationProfileController::class, 'index'])->name('kecamatan.settings.profile');
         Route::put('/kecamatan/settings/profile', [ApplicationProfileController::class, 'update'])->name('kecamatan.settings.profile.update');
 
@@ -241,7 +243,7 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // Pengumuman Domain
-        Route::prefix('kecamatan/announcements')->name('kecamatan.announcements.')->group(function () {
+        Route::prefix('kecamatan/announcements')->name('kecamatan.announcements.')->middleware('role:Operator Kecamatan,Super Admin')->group(function () {
             Route::get('/', [\App\Http\Controllers\Kecamatan\AnnouncementController::class, 'index'])->name('index');
             Route::get('/create', [\App\Http\Controllers\Kecamatan\AnnouncementController::class, 'create'])->name('create');
             Route::post('/', [\App\Http\Controllers\Kecamatan\AnnouncementController::class, 'store'])->name('store');
@@ -251,7 +253,7 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // Layanan Publik (UMKM & Loker) - Module Isolated with role-based access
-        Route::prefix('kecamatan/layanan')->name('kecamatan.')->group(function () {
+        Route::prefix('kecamatan/layanan')->name('kecamatan.')->middleware('role:Operator Kecamatan,Super Admin')->group(function () {
             // UMKM Module - Isolated
             Route::middleware(['module.role:umkm'])->prefix('umkm')->name('umkm.')->group(function () {
                 Route::get('/', [LayananPublikController::class, 'umkmIndex'])->name('index');

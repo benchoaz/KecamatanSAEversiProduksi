@@ -321,9 +321,9 @@ class AdministrasiController extends Controller
         $query = DokumenDesa::where('desa_id', $desaId);
 
         if ($tipe == 'perdes') {
-            $query->whereIn('tipe_dokumen', ['Perdes', 'Perkades']);
+            $query->whereIn('tipe_dokumen', ['Perdes', 'Perkades', 'SK_Desa']);
         } elseif ($tipe == 'laporan') {
-            $query->whereIn('tipe_dokumen', ['LKPJ', 'LPPD', 'APBDes']);
+            $query->whereIn('tipe_dokumen', ['LKPJ', 'LPPD', 'APBDes', 'LKPPD', 'LPJ_APBDes', 'IPPD', 'BUMDes', 'Rekap_Penduduk', 'LPPD_AMJ']);
         }
 
         $dokumens = $query->latest()->paginate(10);
@@ -357,7 +357,7 @@ class AdministrasiController extends Controller
             $dokumen->save();
         });
 
-        $redirectTipe = in_array($request->tipe_dokumen, ['Perdes', 'Perkades']) ? 'perdes' : 'laporan';
+        $redirectTipe = in_array($request->tipe_dokumen, ['Perdes', 'Perkades', 'SK_Desa']) ? 'perdes' : 'laporan';
         return redirect()->route('desa.administrasi.dokumen.index', ['tipe' => $redirectTipe])
             ->with('success', 'Dokumen berhasil disimpan sebagai Draft.');
     }

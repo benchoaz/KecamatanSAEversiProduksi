@@ -41,4 +41,21 @@ class DokumenDesa extends Model
             default => 'Draft'
         };
     }
+
+    public function getTipeLabelAttribute()
+    {
+        return match ($this->tipe_dokumen) {
+            'Perdes' => 'Peraturan Desa',
+            'Perkades' => 'Peraturan Kades',
+            'SK_Desa' => 'SK Kepala Desa',
+            'LPPD' => 'LPPD Tahunan',
+            'LPPD_AMJ' => 'LPPD-AMJ',
+            'LKPPD' => 'LKPPD (BPD)',
+            'LPJ_APBDes' => 'LPJ APBDesa',
+            'IPPD' => 'I.P.P.D (Masyarakat)',
+            'BUMDes' => 'Laporan BUMDes',
+            'Rekap_Penduduk' => 'Rekap Penduduk',
+            default => $this->tipe_dokumen
+        };
+    }
 }

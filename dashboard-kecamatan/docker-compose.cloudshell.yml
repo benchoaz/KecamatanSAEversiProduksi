@@ -1,0 +1,150 @@
+services:
+
+  # PHP Service - optimized for Cloud Shell
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    image: dashboard-kecamatan-app:v1-alpine
+    container_name: dashboard-kecamatan-app
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./.env:/var/www/.env:ro
+      - ./app:/var/www/app
+      - ./routes:/var/www/routes
+      - ./config:/var/www/config
+      - ./public:/var/www/public
+      - ./resources:/var/www/resources
+      - ./storage:/var/www/storage
+      - ./bootstrap:/var/www/bootstrap
+      - ./artisan:/var/www/artisan:ro
+      - ./composer.json:/var/www/composer.json:ro
+      - ./composer.lock:/var/www/composer.lock:ro
+      - ./package.json:/var/www/package.json:ro
+      - ./vite.config.js:/var/www/vite.config.js:ro
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro
+      - ./database/migrations:/var/www/database/migrations:ro
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "php-fpm", "-t" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # MySQL Service
+  db:
+    image: mysql:8.0
+    container_name: dashboard-kecamatan-db
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-dashboard_kecamatan}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_USER: ${DB_USERNAME:-root}
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./_migration/database.sql:/docker-entrypoint-initdb.d/database.sql:ro
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root}" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Nginx Service
+  nginx:
+    image: nginx:alpine
+    container_name: dashboard-kecamatan-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./public:/var/www/public:ro
+      - ./storage:/var/www/storage:ro
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/:ro
+    networks:
+      - app-network
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "nginx", "-t" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # n8n Service
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: dashboard-n8n
+    restart: unless-stopped
+    ports:
+      - "5679:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=false
+      - N8N_ALLOW_ENV_IN_EXPRESSIONS=true
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - N8N_RUNNERS_TASK_ENV_ALLOW_LIST=WAHA_API_KEY,DASHBOARD_API_TOKEN,WHATSAPP_API_TOKEN,DASHBOARD_URL,PUBLIC_BASE_URL
+      - N8N_ENV_ALLOWLIST=WAHA_API_KEY,DASHBOARD_API_TOKEN,WHATSAPP_API_TOKEN,DASHBOARD_URL,PUBLIC_BASE_URL
+      - WAHA_API_KEY=${WAHA_API_KEY}
+      - DASHBOARD_API_TOKEN=${DASHBOARD_API_TOKEN}
+      - WHATSAPP_API_TOKEN=${WHATSAPP_API_TOKEN}
+      - DASHBOARD_URL=http://dashboard-kecamatan-nginx
+      - PUBLIC_BASE_URL=${APP_URL:-http://localhost:8000}
+    volumes:
+      - n8n_data_dashboard:/home/node/.n8n
+    networks:
+      - app-network
+    depends_on:
+      nginx:
+        condition: service_healthy
+
+  # WAHA Service - WhatsApp API
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: waha-kecamatan
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - WHATSAPP_API_TOKEN=${WAHA_API_KEY}
+      - WAHA_API_KEY=${WAHA_API_KEY}
+      - WAHA_DASHBOARD_USERNAME=${WAHA_DASHBOARD_USERNAME:-admin}
+      - WAHA_DASHBOARD_PASSWORD=${WAHA_API_KEY}
+      - WHATSAPP_START_SESSION=${WAHA_SESSION:-default}
+      - WHATSAPP_RESTART_ALL_SESSIONS=true
+      - WHATSAPP_HOOK_URL=http://dashboard-n8n:5678/webhook/whatsapp-primary
+    volumes:
+      - waha_sessions:/app/.sessions
+    networks:
+      - app-network
+    depends_on:
+      - app
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "--header=X-Api-Key: ${WAHA_API_KEY}", "http://localhost:3000/api/sessions" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
+  n8n_data_dashboard:
+    driver: local
+  waha_sessions:
+    driver: local

@@ -52,13 +52,18 @@
                                             <option value="Perdes" {{ $dokumen->tipe_dokumen == 'Perdes' ? 'selected' : '' }}>
                                                 Peraturan Desa (Perdes)</option>
                                             <option value="Perkades" {{ $dokumen->tipe_dokumen == 'Perkades' ? 'selected' : '' }}>Peraturan Kepala Desa (Perkades)</option>
-                                            <option value="LKPJ" {{ $dokumen->tipe_dokumen == 'LKPJ' ? 'selected' : '' }}>LKPJ
-                                                Akhir Tahun</option>
-                                            <option value="LPPD" {{ $dokumen->tipe_dokumen == 'LPPD' ? 'selected' : '' }}>LPPD
-                                            </option>
-                                            <option value="APBDes" {{ $dokumen->tipe_dokumen == 'APBDes' ? 'selected' : '' }}>
-                                                APBDes</option>
                                             <option value="SK_Desa" {{ $dokumen->tipe_dokumen == 'SK_Desa' ? 'selected' : '' }}>SK Kepala Desa</option>
+                                            <option value="LPPD" {{ $dokumen->tipe_dokumen == 'LPPD' ? 'selected' : '' }}>LPPD
+                                                Akhir Tahun Anggaran</option>
+                                            <option value="LPPD_AMJ" {{ $dokumen->tipe_dokumen == 'LPPD_AMJ' ? 'selected' : '' }}>LPPD Akhir Masa Jabatan (LPPD-AMJ)</option>
+                                            <option value="LKPPD" {{ $dokumen->tipe_dokumen == 'LKPPD' ? 'selected' : '' }}>
+                                                LKPPD (Keterangan Pemerintah Desa)</option>
+                                            <option value="LPJ_APBDes" {{ $dokumen->tipe_dokumen == 'LPJ_APBDes' ? 'selected' : '' }}>LPJ Realisasi APBDesa</option>
+                                            <option value="IPPD" {{ $dokumen->tipe_dokumen == 'IPPD' ? 'selected' : '' }}>
+                                                Informasi Penyelenggaraan (IPPD)</option>
+                                            <option value="BUMDes" {{ $dokumen->tipe_dokumen == 'BUMDes' ? 'selected' : '' }}>
+                                                Laporan BUMDes</option>
+                                            <option value="Rekap_Penduduk" {{ $dokumen->tipe_dokumen == 'Rekap_Penduduk' ? 'selected' : '' }}>Laporan Rekapitulasi Penduduk</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">

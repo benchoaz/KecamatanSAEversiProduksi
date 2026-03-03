@@ -33,6 +33,12 @@ class User extends Authenticatable
     const ROLE_OPERATOR_DESA = 'Operator Desa';
     const ROLE_VERIFIKATOR = 'Verifikator';
     const ROLE_AUDITOR = 'Auditor';
+    const ROLE_ADMIN_PELAYANAN = 'pelayanan_admin';
+
+    public function isAdminPelayanan()
+    {
+        return in_array($this->role->nama_role ?? '', ['pelayanan_admin', 'Admin Pelayanan']);
+    }
 
     protected $hidden = [
         'password',

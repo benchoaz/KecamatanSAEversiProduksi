@@ -136,109 +136,175 @@
         </div>
 
         <div class="row g-5">
-            <!-- Domain Grid -->
-            <div class="col-xl-8 animate-entrance" style="animation-delay: 0.5s">
-                <div class="mb-4 d-flex align-items-center justify-content-between">
-                    <div>
-                        <h4 class="fw-black text-primary-900 mb-1 tracking-tight">Bidang Pengawasan & Layanan Wilayah</h4>
-                        <p class="text-tertiary small mb-0 font-medium">Akses cepat ke setiap modul operasional kecamatan
-                        </p>
+            @if(!auth()->user()->isAdminPelayanan())
+                <!-- Domain Grid -->
+                <div class="col-xl-8 animate-entrance" style="animation-delay: 0.5s">
+                    <div class="mb-4 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h4 class="fw-black text-primary-900 mb-1 tracking-tight">Bidang Pengawasan & Layanan Wilayah</h4>
+                            <p class="text-tertiary small mb-0 font-medium">Akses cepat ke setiap modul operasional kecamatan
+                            </p>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
                     </div>
-                    <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                        <i class="fas fa-ellipsis-h"></i>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <a href="{{ route('kecamatan.pemerintahan.index') }}" class="text-decoration-none group">
+                                <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
+                                    style="background: white;">
+                                    <div
+                                        class="position-absolute top-0 end-0 w-32 h-32 bg-primary opacity-0 group-hover:opacity-5 blur-3xl -translate-y-1/2 translate-x-1/2 transition-opacity">
+                                    </div>
+                                    <div class="d-flex align-items-center gap-4 position-relative z-10">
+                                        <div class="icon-box bg-slate-900 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg group-hover:scale-110 transition-transform"
+                                            style="width: 65px; height: 65px;">
+                                            <i class="fas fa-building-user fa-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-black text-primary-900 fs-5 group-hover:text-primary-600">
+                                                Pemerintahan</h6>
+                                            <p class="mb-0 text-tertiary small leading-snug">Monitoring SK, BPD, & Profil Desa
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ route('kecamatan.ekbang.index') }}" class="text-decoration-none group">
+                                <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
+                                    style="background: white;">
+                                    <div
+                                        class="position-absolute top-0 end-0 w-32 h-32 bg-teal-500 opacity-0 group-hover:opacity-5 blur-3xl -translate-y-1/2 translate-x-1/2 transition-opacity">
+                                    </div>
+                                    <div class="d-flex align-items-center gap-4 position-relative z-10">
+                                        <div class="icon-box bg-teal-600 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg group-hover:scale-110 transition-transform"
+                                            style="width: 65px; height: 65px;">
+                                            <i class="fas fa-chart-line-up fa-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-black text-primary-900 fs-5 group-hover:text-teal-600">Ekonomi &
+                                                Pembangunan</h6>
+                                            <p class="mb-0 text-tertiary small leading-snug">Monitoring APBDes & Realisasi Fisik
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ route('kecamatan.kesra.index') }}" class="text-decoration-none group">
+                                <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
+                                    style="background: white;">
+                                    <div
+                                        class="position-absolute top-0 end-0 w-32 h-32 bg-rose-500 opacity-0 group-hover:opacity-5 blur-3xl -translate-y-1/2 translate-x-1/2 transition-opacity">
+                                    </div>
+                                    <div class="d-flex align-items-center gap-4 position-relative z-10">
+                                        <div class="icon-box bg-rose-600 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg group-hover:scale-110 transition-transform"
+                                            style="width: 65px; height: 65px;">
+                                            <i class="fas fa-heart-pulse fa-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-black text-primary-900 fs-5 group-hover:text-rose-600">
+                                                Kesejahteraan Rakyat</h6>
+                                            <p class="mb-0 text-tertiary small leading-snug">Data Bantuan Sosial & Layanan Warga
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ route('kecamatan.trantibum.index') }}" class="text-decoration-none group">
+                                <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
+                                    style="background: white;">
+                                    <div
+                                        class="position-absolute top-0 end-0 w-32 h-32 bg-amber-500 opacity-0 group-hover:opacity-5 blur-3xl -translate-y-1/2 translate-x-1/2 transition-opacity">
+                                    </div>
+                                    <div class="d-flex align-items-center gap-4 position-relative z-10">
+                                        <div class="icon-box bg-amber-500 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg group-hover:scale-110 transition-transform"
+                                            style="width: 65px; height: 65px;">
+                                            <i class="fas fa-shield-halved fa-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-black text-primary-900 fs-5 group-hover:text-amber-600">Trantibum
+                                                & Linmas</h6>
+                                            <p class="mb-0 text-tertiary small leading-snug">Laporan Ketertiban & Keamanan
+                                                Wilayah</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <a href="{{ route('kecamatan.pemerintahan.index') }}" class="text-decoration-none group">
-                            <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
-                                style="background: white;">
-                                <div
-                                    class="position-absolute top-0 end-0 w-32 h-32 bg-primary opacity-0 group-hover:opacity-5 blur-3xl -translate-y-1/2 translate-x-1/2 transition-opacity">
-                                </div>
-                                <div class="d-flex align-items-center gap-4 position-relative z-10">
-                                    <div class="icon-box bg-slate-900 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg group-hover:scale-110 transition-transform"
-                                        style="width: 65px; height: 65px;">
-                                        <i class="fas fa-building-user fa-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1 fw-black text-primary-900 fs-5 group-hover:text-primary-600">
-                                            Pemerintahan</h6>
-                                        <p class="mb-0 text-tertiary small leading-snug">Monitoring SK, BPD, & Profil Desa
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
+            @else
+                <!-- Pelayanan Domain quick access for Admin Pelayanan -->
+                <div class="col-xl-8 animate-entrance" style="animation-delay: 0.5s">
+                    <div class="mb-4 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h4 class="fw-black text-primary-900 mb-1 tracking-tight">Bidang Pelayanan Terpadu</h4>
+                            <p class="text-tertiary small mb-0 font-medium">Akses cepat ke manajemen pelayanan dan pengaduan</p>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <a href="{{ route('kecamatan.ekbang.index') }}" class="text-decoration-none group">
-                            <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
-                                style="background: white;">
-                                <div
-                                    class="position-absolute top-0 end-0 w-32 h-32 bg-teal-500 opacity-0 group-hover:opacity-5 blur-3xl -translate-y-1/2 translate-x-1/2 transition-opacity">
-                                </div>
-                                <div class="d-flex align-items-center gap-4 position-relative z-10">
-                                    <div class="icon-box bg-teal-600 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg group-hover:scale-110 transition-transform"
-                                        style="width: 65px; height: 65px;">
-                                        <i class="fas fa-chart-line-up fa-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1 fw-black text-primary-900 fs-5 group-hover:text-teal-600">Ekonomi &
-                                            Pembangunan</h6>
-                                        <p class="mb-0 text-tertiary small leading-snug">Monitoring APBDes & Realisasi Fisik
-                                        </p>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <a href="{{ route('kecamatan.pelayanan.inbox') }}" class="text-decoration-none group">
+                                <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
+                                    style="background: white;">
+                                    <div class="d-flex align-items-center gap-4 position-relative z-10">
+                                        <div class="icon-box bg-indigo-600 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg"
+                                            style="width: 65px; height: 65px;">
+                                            <i class="fas fa-inbox fa-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-black text-primary-900 fs-5">Inbox Terpadu</h6>
+                                            <p class="mb-0 text-tertiary small leading-snug">Kelola semua berkas permohonan
+                                                warga</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-md-6">
-                        <a href="{{ route('kecamatan.kesra.index') }}" class="text-decoration-none group">
-                            <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
-                                style="background: white;">
-                                <div
-                                    class="position-absolute top-0 end-0 w-32 h-32 bg-rose-500 opacity-0 group-hover:opacity-5 blur-3xl -translate-y-1/2 translate-x-1/2 transition-opacity">
-                                </div>
-                                <div class="d-flex align-items-center gap-4 position-relative z-10">
-                                    <div class="icon-box bg-rose-600 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg group-hover:scale-110 transition-transform"
-                                        style="width: 65px; height: 65px;">
-                                        <i class="fas fa-heart-pulse fa-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1 fw-black text-primary-900 fs-5 group-hover:text-rose-600">
-                                            Kesejahteraan Rakyat</h6>
-                                        <p class="mb-0 text-tertiary small leading-snug">Data Bantuan Sosial & Layanan Warga
-                                        </p>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ route('kecamatan.pelayanan.pengaduan') }}" class="text-decoration-none group">
+                                <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
+                                    style="background: white;">
+                                    <div class="d-flex align-items-center gap-4 position-relative z-10">
+                                        <div class="icon-box bg-rose-500 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg"
+                                            style="width: 65px; height: 65px;">
+                                            <i class="fas fa-bullhorn fa-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-black text-primary-900 fs-5">Pengaduan Masyarakat</h6>
+                                            <p class="mb-0 text-tertiary small leading-snug">Pantau laporan via WhatsApp</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-md-6">
-                        <a href="{{ route('kecamatan.trantibum.index') }}" class="text-decoration-none group">
-                            <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
-                                style="background: white;">
-                                <div
-                                    class="position-absolute top-0 end-0 w-32 h-32 bg-amber-500 opacity-0 group-hover:opacity-5 blur-3xl -translate-y-1/2 translate-x-1/2 transition-opacity">
-                                </div>
-                                <div class="d-flex align-items-center gap-4 position-relative z-10">
-                                    <div class="icon-box bg-amber-500 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg group-hover:scale-110 transition-transform"
-                                        style="width: 65px; height: 65px;">
-                                        <i class="fas fa-shield-halved fa-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1 fw-black text-primary-900 fs-5 group-hover:text-amber-600">Trantibum
-                                            & Linmas</h6>
-                                        <p class="mb-0 text-tertiary small leading-snug">Laporan Ketertiban & Keamanan
-                                            Wilayah</p>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ route('kecamatan.pelayanan.visitor.index') }}" class="text-decoration-none group">
+                                <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden domain-card transition-all"
+                                    style="background: white;">
+                                    <div class="d-flex align-items-center gap-4 position-relative z-10">
+                                        <div class="icon-box bg-emerald-500 text-white rounded-4xl d-flex align-items-center justify-content-center shadow-lg"
+                                            style="width: 65px; height: 65px;">
+                                            <i class="fas fa-book fa-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-black text-primary-900 fs-5">Buku Tamu</h6>
+                                            <p class="mb-0 text-tertiary small leading-snug">Catat kunjungan warga</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
 
             <!-- Activity Log -->
             <div class="col-xl-4 animate-entrance" style="animation-delay: 0.6s">

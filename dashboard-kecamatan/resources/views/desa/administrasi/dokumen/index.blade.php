@@ -44,7 +44,7 @@
                             @forelse($dokumens as $dok)
                                 <tr>
                                     <td class="px-4">
-                                        <div class="fw-bold text-slate-800">{{ $dok->tipe_dokumen }}</div>
+                                        <div class="fw-bold text-slate-800">{{ $dok->tipe_label }}</div>
                                         <div class="text-slate-500 small">Tahun {{ $dok->tahun }}</div>
                                     </td>
                                     <td>

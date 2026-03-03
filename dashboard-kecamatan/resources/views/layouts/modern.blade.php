@@ -72,10 +72,7 @@
                             </li>
                             <li><a>Pengaturan</a></li>
                             <li>
-                                <form action="{{ url('/logout') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left">Keluar</button>
-                                </form>
+                                <a href="{{ url('/logout') }}">Keluar</a>
                             </li>
                         </ul>
                     </div>

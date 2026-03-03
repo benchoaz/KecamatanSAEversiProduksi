@@ -108,131 +108,135 @@
             </ul>
         </div>
 
-        <div class="nav-section">
-            <span class="nav-section-title">BIDANG PENGAWASAN</span>
-            <ul class="nav-menu">
-                <!-- Pemerintahan -->
-                <!-- Pemerintahan -->
-                <li class="nav-item has-submenu">
-                    <a href="javascript:void(0)" class="nav-link submenu-toggle">
-                        <span class="nav-icon"><i class="fas fa-shield-halved"></i></span>
-                        <span class="nav-text">Pemerintahan</span>
-                        <span class="ms-auto small"><i class="fas fa-chevron-right nav-arrow"></i></span>
-                    </a>
-                    <ul class="nav-submenu">
-                        <li class="nav-submenu-item">
-                            <a href="{{ route('kecamatan.pemerintahan.index') }}"
-                                class="nav-sublink {{ request()->is('kecamatan/pemerintahan*') ? 'active' : '' }}">
-                                <i class="fas fa-chart-line me-2 small"></i> Monev Tata Kelola
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+        @if(!auth()->user()->isAdminPelayanan())
+            <div class="nav-section">
+                <span class="nav-section-title">BIDANG PENGAWASAN</span>
+                <ul class="nav-menu">
+                    <!-- Pemerintahan -->
+                    <!-- Pemerintahan -->
+                    <li class="nav-item has-submenu">
+                        <a href="javascript:void(0)" class="nav-link submenu-toggle">
+                            <span class="nav-icon"><i class="fas fa-shield-halved"></i></span>
+                            <span class="nav-text">Pemerintahan</span>
+                            <span class="ms-auto small"><i class="fas fa-chevron-right nav-arrow"></i></span>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li class="nav-submenu-item">
+                                <a href="{{ route('kecamatan.pemerintahan.index') }}"
+                                    class="nav-sublink {{ request()->is('kecamatan/pemerintahan*') ? 'active' : '' }}">
+                                    <i class="fas fa-chart-line me-2 small"></i> Monev Tata Kelola
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <!-- Ekonomi & Pembangunan (Integrated Dropdown) -->
-                <li class="nav-item has-submenu">
-                    <a href="javascript:void(0)" class="nav-link submenu-toggle">
-                        <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
-                        <span class="nav-text">Ekonomi & Pembangunan</span>
-                        <span class="ms-auto small"><i class="fas fa-chevron-right nav-arrow"></i></span>
-                    </a>
-                    <ul class="nav-submenu">
-                        <li class="nav-submenu-item">
-                            <a href="{{ route('kecamatan.pembangunan.index') }}"
-                                class="nav-sublink {{ request()->routeIs('kecamatan.pembangunan.index') || request()->routeIs('kecamatan.pembangunan.show') ? 'active' : '' }}">
-                                <i class="fas fa-display me-2 small"></i> Monitoring Utama
-                            </a>
-                        </li>
-                        <li class="nav-submenu-item">
-                            <a href="{{ route('kecamatan.pembangunan.referensi.ssh.index') }}"
-                                class="nav-sublink {{ request()->is('kecamatan/pembangunan/referensi/ssh*') ? 'active' : '' }}">
-                                <i class="fas fa-tags me-2 small"></i> Master SSH
-                            </a>
-                        </li>
-                        <li class="nav-submenu-item">
-                            <a href="{{ route('kecamatan.pembangunan.referensi.sbu.index') }}"
-                                class="nav-sublink {{ request()->is('kecamatan/pembangunan/referensi/sbu*') ? 'active' : '' }}">
-                                <i class="fas fa-file-invoice-dollar me-2 small"></i> Master SBU
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                    <!-- Ekonomi & Pembangunan (Integrated Dropdown) -->
+                    <li class="nav-item has-submenu">
+                        <a href="javascript:void(0)" class="nav-link submenu-toggle">
+                            <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
+                            <span class="nav-text">Ekonomi & Pembangunan</span>
+                            <span class="ms-auto small"><i class="fas fa-chevron-right nav-arrow"></i></span>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li class="nav-submenu-item">
+                                <a href="{{ route('kecamatan.pembangunan.index') }}"
+                                    class="nav-sublink {{ request()->routeIs('kecamatan.pembangunan.index') || request()->routeIs('kecamatan.pembangunan.show') ? 'active' : '' }}">
+                                    <i class="fas fa-display me-2 small"></i> Monitoring Utama
+                                </a>
+                            </li>
+                            <li class="nav-submenu-item">
+                                <a href="{{ route('kecamatan.pembangunan.referensi.ssh.index') }}"
+                                    class="nav-sublink {{ request()->is('kecamatan/pembangunan/referensi/ssh*') ? 'active' : '' }}">
+                                    <i class="fas fa-tags me-2 small"></i> Master SSH
+                                </a>
+                            </li>
+                            <li class="nav-submenu-item">
+                                <a href="{{ route('kecamatan.pembangunan.referensi.sbu.index') }}"
+                                    class="nav-sublink {{ request()->is('kecamatan/pembangunan/referensi/sbu*') ? 'active' : '' }}">
+                                    <i class="fas fa-file-invoice-dollar me-2 small"></i> Master SBU
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <!-- Kesejahteraan Rakyat -->
-                <li class="nav-item">
-                    <a href="{{ route('kecamatan.kesra.index') }}"
-                        class="nav-link {{ request()->is('kecamatan/kesra*') ? 'active' : '' }}">
-                        <span class="nav-icon"><i class="fas fa-dove"></i></span>
-                        <span class="nav-text">Kesejahteraan Sosial</span>
-                    </a>
-                </li>
+                    <!-- Kesejahteraan Rakyat -->
+                    <li class="nav-item">
+                        <a href="{{ route('kecamatan.kesra.index') }}"
+                            class="nav-link {{ request()->is('kecamatan/kesra*') ? 'active' : '' }}">
+                            <span class="nav-icon"><i class="fas fa-dove"></i></span>
+                            <span class="nav-text">Kesejahteraan Sosial</span>
+                        </a>
+                    </li>
 
-                <!-- Trantibum (Integrated Dropdown) -->
-                <li class="nav-item has-submenu">
-                    <a href="javascript:void(0)" class="nav-link submenu-toggle">
-                        <span class="nav-icon"><i class="fas fa-masks-theater"></i></span>
-                        <span class="nav-text">Trantibum & Linmas</span>
-                        <span class="ms-auto small"><i class="fas fa-chevron-right nav-arrow"></i></span>
-                    </a>
-                    <ul class="nav-submenu">
-                        <li class="nav-submenu-item">
-                            <a href="{{ route('kecamatan.trantibum.index') }}"
-                                class="nav-sublink {{ request()->routeIs('kecamatan.trantibum.index') ? 'active' : '' }}">
-                                <i class="fas fa-chart-pie me-2 small"></i> Dashboard Monitoring
-                            </a>
-                        </li>
-                        <li class="nav-submenu-item">
-                            <a href="{{ route('kecamatan.trantibum.kejadian') }}"
-                                class="nav-sublink {{ request()->routeIs('kecamatan.trantibum.kejadian') ? 'active' : '' }}">
-                                <i class="fas fa-list-ul me-2 small"></i> Data Laporan
-                            </a>
-                        </li>
-                        <li class="nav-submenu-item">
-                            <a href="{{ route('kecamatan.trantibum.relawan') }}"
-                                class="nav-sublink {{ request()->routeIs('kecamatan.trantibum.relawan') ? 'active' : '' }}">
-                                <i class="fas fa-users-cog me-2 small"></i> Relawan Tangguh
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                    <!-- Trantibum (Integrated Dropdown) -->
+                    <li class="nav-item has-submenu">
+                        <a href="javascript:void(0)" class="nav-link submenu-toggle">
+                            <span class="nav-icon"><i class="fas fa-masks-theater"></i></span>
+                            <span class="nav-text">Trantibum & Linmas</span>
+                            <span class="ms-auto small"><i class="fas fa-chevron-right nav-arrow"></i></span>
+                        </a>
+                        <ul class="nav-submenu">
+                            <li class="nav-submenu-item">
+                                <a href="{{ route('kecamatan.trantibum.index') }}"
+                                    class="nav-sublink {{ request()->routeIs('kecamatan.trantibum.index') ? 'active' : '' }}">
+                                    <i class="fas fa-chart-pie me-2 small"></i> Dashboard Monitoring
+                                </a>
+                            </li>
+                            <li class="nav-submenu-item">
+                                <a href="{{ route('kecamatan.trantibum.kejadian') }}"
+                                    class="nav-sublink {{ request()->routeIs('kecamatan.trantibum.kejadian') ? 'active' : '' }}">
+                                    <i class="fas fa-list-ul me-2 small"></i> Data Laporan
+                                </a>
+                            </li>
+                            <li class="nav-submenu-item">
+                                <a href="{{ route('kecamatan.trantibum.relawan') }}"
+                                    class="nav-sublink {{ request()->routeIs('kecamatan.trantibum.relawan') ? 'active' : '' }}">
+                                    <i class="fas fa-users-cog me-2 small"></i> Relawan Tangguh
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
-                <!-- Modul Laporan -->
-                <li class="nav-item">
-                    <a href="{{ route('kecamatan.laporan.index') }}"
-                        class="nav-link {{ request()->is('kecamatan/laporan*') ? 'active' : '' }}">
-                        <span class="nav-icon"><i class="fas fa-file-invoice"></i></span>
-                        <span class="nav-text">Laporan Terpadu</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+                    <!-- Modul Laporan -->
+                    <li class="nav-item">
+                        <a href="{{ route('kecamatan.laporan.index') }}"
+                            class="nav-link {{ request()->is('kecamatan/laporan*') ? 'active' : '' }}">
+                            <span class="nav-icon"><i class="fas fa-file-invoice"></i></span>
+                            <span class="nav-text">Laporan Terpadu</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        @endif
 
-        <div class="nav-section">
-            <span class="nav-section-title">PUBLIKASI & INFORMASI</span>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="{{ route('kecamatan.berita.index') }}"
-                        class="nav-link {{ request()->is('kecamatan/berita*') ? 'active' : '' }}">
-                        <span class="nav-icon"><i class="fas fa-newspaper text-info"></i></span>
-                        <span class="nav-text">Berita & Artikel</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('kecamatan.umkm.index') }}"
-                        class="nav-link {{ Route::is('kecamatan.umkm.*') ? 'active' : '' }}">
-                        <span class="nav-icon"><i class="fas fa-store text-orange-500"></i></span>
-                        <span class="nav-text">Etalase UMKM</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('kecamatan.loker.index') }}"
-                        class="nav-link {{ Route::is('kecamatan.loker.*') ? 'active' : '' }}">
-                        <span class="nav-icon"><i class="fas fa-briefcase text-blue-500"></i></span>
-                        <span class="nav-text">Lowongan Kerja</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+        @if(!auth()->user()->isAdminPelayanan())
+            <div class="nav-section">
+                <span class="nav-section-title">PUBLIKASI & INFORMASI</span>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="{{ route('kecamatan.berita.index') }}"
+                            class="nav-link {{ request()->is('kecamatan/berita*') ? 'active' : '' }}">
+                            <span class="nav-icon"><i class="fas fa-newspaper text-info"></i></span>
+                            <span class="nav-text">Berita & Artikel</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('kecamatan.umkm.index') }}"
+                            class="nav-link {{ Route::is('kecamatan.umkm.*') ? 'active' : '' }}">
+                            <span class="nav-icon"><i class="fas fa-store text-orange-500"></i></span>
+                            <span class="nav-text">Etalase UMKM</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('kecamatan.loker.index') }}"
+                            class="nav-link {{ Route::is('kecamatan.loker.*') ? 'active' : '' }}">
+                            <span class="nav-icon"><i class="fas fa-briefcase text-blue-500"></i></span>
+                            <span class="nav-text">Lowongan Kerja</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        @endif
 
         @if(auth()->user()->isSuperAdmin() || auth()->user()->isOperatorKecamatan())
             <div class="nav-section">
@@ -312,15 +316,12 @@
         </div>
 
         <!-- Logout Button -->
-        <form action="{{ route('logout') }}" method="POST" class="mt-2">
-            @csrf
-            <button type="submit"
-                class="btn btn-danger btn-sm w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 py-2 shadow-sm"
-                onclick="return confirm('Konfirmasi Keluar\n\nApakah Anda yakin ingin keluar dari aplikasi?')"
-                style="font-size: 13px;">
-                <i class="fas fa-power-off"></i>
-                <span>Keluar Aplikasi</span>
-            </button>
-        </form>
+        <a href="{{ route('logout') }}"
+            class="btn btn-danger btn-sm w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 py-2 shadow-sm mt-2"
+            onclick="return confirm('Konfirmasi Keluar\n\nApakah Anda yakin ingin keluar dari aplikasi?')"
+            style="font-size: 13px;">
+            <i class="fas fa-power-off"></i>
+            <span>Keluar Aplikasi</span>
+        </a>
     </div>
 </aside>

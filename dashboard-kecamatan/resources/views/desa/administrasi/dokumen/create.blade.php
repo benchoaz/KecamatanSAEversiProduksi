@@ -55,10 +55,20 @@
                                                 <option value="Perkades">Peraturan Kepala Desa (Perkades)</option>
                                                 <option value="SK_Desa">SK Kepala Desa</option>
                                             @else
-                                                <option value="LKPJ" {{ $tipe == 'LKPJ' ? 'selected' : '' }}>LKPJ Akhir Tahun
+                                                <option value="LPPD" {{ $tipe == 'LPPD' ? 'selected' : '' }}>LPPD Akhir Tahun
+                                                    Anggaran</option>
+                                                <option value="LPPD_AMJ" {{ $tipe == 'LPPD_AMJ' ? 'selected' : '' }}>LPPD Akhir
+                                                    Masa Jabatan (LPPD-AMJ)</option>
+                                                <option value="LKPPD" {{ $tipe == 'LKPPD' ? 'selected' : '' }}>LKPPD (Keterangan
+                                                    Pemerintah Desa)</option>
+                                                <option value="LPJ_APBDes" {{ $tipe == 'LPJ_APBDes' ? 'selected' : '' }}>LPJ
+                                                    Realisasi APBDesa</option>
+                                                <option value="IPPD" {{ $tipe == 'IPPD' ? 'selected' : '' }}>Informasi
+                                                    Penyelenggaraan (IPPD)</option>
+                                                <option value="BUMDes" {{ $tipe == 'BUMDes' ? 'selected' : '' }}>Laporan BUMDes
                                                 </option>
-                                                <option value="LPPD" {{ $tipe == 'LPPD' ? 'selected' : '' }}>LPPD</option>
-                                                <option value="APBDes" {{ $tipe == 'APBDes' ? 'selected' : '' }}>APBDes</option>
+                                                <option value="Rekap_Penduduk" {{ $tipe == 'Rekap_Penduduk' ? 'selected' : '' }}>
+                                                    Laporan Rekapitulasi Penduduk</option>
                                             @endif
                                         </select>
                                     </div>
@@ -106,6 +116,65 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- PANDUAN PELAPORAN -->
+                <div class="card border-0 shadow-sm rounded-4 bg-light">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-slate-800 mb-3"><i class="fas fa-info-circle me-2 text-primary"></i> Panduan
+                            Jenis Laporan</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-white rounded-3 shadow-sm h-100">
+                                    <p class="fw-bold mb-1 small text-primary">1. LPPD Akhir Tahun</p>
+                                    <p class="small text-slate-600 mb-0">Laporan menyeluruh pelaksanaan pemerintahan desa
+                                        selama satu tahun anggaran kepada Bupati melalui Camat.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-white rounded-3 shadow-sm h-100">
+                                    <p class="fw-bold mb-1 small text-primary">2. LKPPD (Keterangan)</p>
+                                    <p class="small text-slate-600 mb-0">Laporan pertanggungjawaban kinerja Pemerintah Desa
+                                        kepada BPD sebagai bahan evaluasi dan pengawasan.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-white rounded-3 shadow-sm h-100">
+                                    <p class="fw-bold mb-1 small text-primary">3. LPJ Realisasi APBDesa</p>
+                                    <p class="small text-slate-600 mb-0">Laporan keuangan rincian pendapatan, belanja, dan
+                                        pembiayaan yang ditetapkan dengan Perdes.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-white rounded-3 shadow-sm h-100 border-start border-4 border-primary">
+                                    <p class="fw-bold mb-1 small text-primary">4. Informasi Penyelenggaraan (IPPD)</p>
+                                    <p class="small text-slate-600 mb-0">Ringkasan realisasi APBDesa dan LPPD untuk
+                                        masyarakat melalui papan pengumuman/website sebagai wujud transparansi.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-white rounded-3 shadow-sm h-100 border-start border-4 border-warning">
+                                    <p class="fw-bold mb-1 small text-warning">5. LPPD Akhir Masa Jabatan (LPPD-AMJ)</p>
+                                    <p class="small text-slate-600 mb-0">Laporan Kepala Desa kepada Bupati melalui Camat
+                                        paling lambat 5 bulan sebelum berakhirnya masa jabatan.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-white rounded-3 shadow-sm h-100 border-start border-4 border-info">
+                                    <p class="fw-bold mb-1 small text-info">6. Laporan BUMDes</p>
+                                    <p class="small text-slate-600 mb-0">Pertanggungjawaban usaha dan keuangan BUMDes
+                                        termasuk neraca dan laba rugi kepada Pemerintah Desa.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-white rounded-3 shadow-sm h-100 border-start border-4 border-slate-400">
+                                    <p class="fw-bold mb-1 small text-slate-600">7. Rekapitulasi Penduduk</p>
+                                    <p class="small text-slate-600 mb-0">Lampiran rekapitulasi data kependudukan desa
+                                        sebagai data pendukung yang disampaikan bersama LPPD.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
