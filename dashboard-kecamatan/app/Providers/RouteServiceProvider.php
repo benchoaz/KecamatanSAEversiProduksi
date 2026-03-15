@@ -47,8 +47,24 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function configureRateLimiting(): void
     {
+        // API Rate Limiting - 60 requests per minute per user/IP
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        // Auth Rate Limiting - 5 attempts per minute (strict for login protection)
+        RateLimiter::for('auth', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
+        });
+
+        // Public forms - 10 submissions per minute
+        RateLimiter::for('public-forms', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
+        // WhatsApp API - 30 requests per minute
+        RateLimiter::for('whatsapp', function (Request $request) {
+            return Limit::perMinute(30)->by($request->user()?->id ?: $request->ip());
         });
     }
 }

@@ -8,8 +8,9 @@
 *.swp
 *.swo
 
-# Docker
-docker/
+# Docker - Allow specific docker directories
+!docker/php/
+!docker/nginx/
 Dockerfile
 docker-compose*.yml
 .dockerignore
@@ -41,6 +42,7 @@ storage/framework/cache/*
 storage/framework/sessions/*
 storage/framework/views/*
 storage/logs/*
+!storage/public/
 
 # Database
 *.sqlite

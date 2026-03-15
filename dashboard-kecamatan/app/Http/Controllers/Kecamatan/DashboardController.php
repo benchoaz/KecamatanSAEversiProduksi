@@ -28,7 +28,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get()
             ->map(function ($log) {
-                return [
+                return (object)[
                     'icon' => $this->getIconForAction($log->action),
                     'type' => $this->getTypeForAction($log->action),
                     'message' => ($log->user->name ?? 'System') . ' ' . $log->action . ' ' . $log->table_name,

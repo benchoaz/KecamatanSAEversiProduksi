@@ -2,6 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+
+// ============================================================
+// Include route files for better organization
+// ============================================================
+require __DIR__ . '/public/layanan.php';
+require __DIR__ . '/public/economy.php';
+
 // DISABLED: Debug route removed for security - 2026-02-22
 // require __DIR__ . '/debug.php';
 
@@ -21,24 +28,6 @@ use App\Http\Controllers\FileController;
 // Public Landing Page
 Route::get('/', [\App\Http\Controllers\LandingController::class, 'index']);
 Route::get('/wilayah', [\App\Http\Controllers\LandingController::class, 'wilayah'])->name('landing.wilayah');
-
-// Public Economy Hub (Unidentified UMKM & Jasa)
-Route::get('/ekonomi', [\App\Http\Controllers\EconomyController::class, 'index'])->name('economy.index');
-
-// Pendaftaran Pekerjaan & Jasa (HARUS di sebelum route /ekonomi/{id})
-Route::get('/ekonomi/daftar', [\App\Http\Controllers\EconomyController::class, 'create'])->name('economy.create');
-Route::post('/ekonomi/daftar', [\App\Http\Controllers\EconomyController::class, 'store'])->name('economy.store');
-
-// Detail Pekerjaan & Jasa
-Route::get('/ekonomi/{id}', [\App\Http\Controllers\EconomyController::class, 'show'])->name('economy.show');
-
-// Redirects for backward compatibility
-Route::get('/umkm', function () {
-    return redirect()->route('economy.index', ['tab' => 'produk']);
-})->name('public.umkm.index');
-Route::get('/kerja', function () {
-    return redirect()->route('economy.index', ['tab' => 'jasa']);
-});
 
 // Owner Dashboard (UMKM/Jasa/Loker)
 Route::prefix('owner')->name('owner.')->group(function () {
@@ -109,57 +98,13 @@ Route::get('/layanan', function (\Illuminate\Http\Request $request) {
     ));
 })->name('layanan');
 
-// Clean Application Routes (for WhatsApp Bot)
-Route::get('/ktp', function () {
-    $jenis = 'ktp';
-    $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
-    $desas = \App\Models\Desa::orderBy('nama_desa')->get();
-    return view('layanan', compact('jenis', 'masterLayanan', 'desas'));
-})->name('apply.ktp');
-
-Route::get('/kk', function () {
-    $jenis = 'kk';
-    $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
-    return view('layanan', compact('jenis', 'masterLayanan'));
-})->name('apply.kk');
-
-Route::get('/akta', function () {
-    $jenis = 'akta';
-    $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
-    return view('layanan', compact('jenis', 'masterLayanan'));
-})->name('apply.akta');
-
-Route::get('/sktm', function () {
-    $jenis = 'sktm';
-    $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
-    return view('layanan', compact('jenis', 'masterLayanan'));
-})->name('apply.sktm');
-
-Route::get('/domisili', function () {
-    $jenis = 'domisili';
-    $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
-    return view('layanan', compact('jenis', 'masterLayanan'));
-})->name('apply.domisili');
-
-Route::get('/nikah', function () {
-    $jenis = 'nikah';
-    $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
-    return view('layanan', compact('jenis', 'masterLayanan'));
-})->name('apply.nikah');
-
-Route::get('/bpjs', function () {
-    $jenis = 'bpjs';
-    $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
-    return view('layanan', compact('jenis', 'masterLayanan'));
-})->name('apply.bpjs');
-
 use App\Http\Controllers\PublicServiceController;
 use App\Http\Controllers\ApplicationProfileController;
 use App\Http\Controllers\Kecamatan\DesaMasterController; // Added for DesaMasterController
 use App\Http\Controllers\Kecamatan\LayananPublikController;
 
 Route::post('/public-service/submit', [PublicServiceController::class, 'submit'])->name('public.service.submit');
-Route::get('/api/faq-search', [PublicServiceController::class, 'faqSearch'])->name('api.faq.search');
+Route::get('/api/faq-search', [PublicServiceController::class, 'faqSearch']);
 Route::get('/lacak-berkas', [PublicServiceController::class, 'trackingPage'])->name('public.tracking');
 Route::post('/lacak-berkas/cek', [PublicServiceController::class, 'checkStatus'])->name('public.tracking.check');
 

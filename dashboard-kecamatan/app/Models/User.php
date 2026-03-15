@@ -12,6 +12,9 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, \App\Traits\Auditable;
 
+    // Always load role with user to prevent N+1 queries
+    protected $with = ['role'];
+
     protected $fillable = [
         'nama_lengkap',
         'username',
@@ -48,6 +51,14 @@ class User extends Authenticatable
     protected $casts = [
         'last_login' => 'datetime',
     ];
+
+    // Cache role name to avoid repeated lookups
+    protected $appends = ['role_name'];
+
+    public function getRoleNameAttribute()
+    {
+        return $this->role?->nama_role;
+    }
 
     public function role()
     {

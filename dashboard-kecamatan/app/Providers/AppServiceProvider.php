@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Cache;
 use App\Services\ModuleSettingsService;
 
 class AppServiceProvider extends ServiceProvider
@@ -33,16 +34,20 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Aspek::observe(\App\Observers\AspekObserver::class);
         \App\Models\Indikator::observe(\App\Observers\IndikatorObserver::class);
 
-        // Site Wide Announcements (Public)
+        // Site Wide Announcements (Public) - With Caching
         view()->composer('landing', function ($view) {
-            $view->with('publicAnnouncements', app(\App\Services\AnnouncementService::class)->getPublicAnnouncements());
+            $announcements = Cache::remember('public_announcements', 1800, function () {
+                return app(\App\Services\AnnouncementService::class)->getPublicAnnouncements();
+            });
+            $view->with('publicAnnouncements', $announcements);
         });
 
-        // Desa Module Composer
+        // Desa Module Composer - With Caching
         view()->composer(['desa.*', 'layouts.desa'], function ($view) {
             if (auth()->check() && auth()->user()->desa_id) {
+                $cacheKey = 'desa_announcements_' . auth()->user()->desa_id;
                 $service = app(\App\Services\AnnouncementService::class);
-                $view->with('internalAnnouncements', $service->getDesaAnnouncements(auth()->user()->desa_id));
+                $view->with('internalAnnouncements', Cache::remember($cacheKey, 600, fn() => $service->getDesaAnnouncements(auth()->user()->desa_id)));
             }
         });
 
@@ -90,14 +95,19 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        // Kecamatan General Layout Composer (for shared components)
+        // Kecamatan General Layout Composer (for shared components) - With Caching
         view()->composer(['layouts.kecamatan', 'kecamatan.dashboard.*'], function ($view) {
             if (auth()->check() && !auth()->user()->desa_id) {
                 $service = app(\App\Services\AnnouncementService::class);
-                $view->with('internalAnnouncements', $service->getInternalAnnouncements());
+                $view->with('internalAnnouncements', Cache::remember('kecamatan_announcements', 600, fn() => $service->getInternalAnnouncements()));
 
-                // Specific for Kecamatan: Service Submissions Notifications
-                $view->with('unreadServiceCount', \App\Models\PublicService::where('status', 'Menunggu Klarifikasi')->count());
+                // Specific for Kecamatan: Service Submissions Notifications - Cached
+                $view->with('unreadServiceCount', Cache::remember(
+                    'unread_service_count',
+                    300,
+                    fn() =>
+                    \App\Models\PublicService::where('status', 'Menunggu Klarifikasi')->count()
+                ));
                 $view->with('recentUnreadServices', \App\Models\PublicService::where('status', 'Menunggu Klarifikasi')
                     ->orderBy('created_at', 'desc')
                     ->take(5)

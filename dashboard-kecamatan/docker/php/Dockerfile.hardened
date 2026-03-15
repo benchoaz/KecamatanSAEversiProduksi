@@ -1,0 +1,98 @@
+# ============================================================
+# Hardened Laravel PHP-FPM Dockerfile
+# Optimized for Security & Minimal Size
+# Build: docker build -f docker/php/Dockerfile.hardened -t dashboard-kecamatan:hardened .
+# ============================================================
+
+# Stage 1: Build base
+FROM php:8.1-fpm-alpine AS base
+
+# Install only essential packages
+RUN apk add --no-cache \
+    shadow \
+    curl \
+    git \
+    unzip \
+    libzip-dev \
+    oniguruma-dev \
+    mysql-client
+
+# Install and configure PHP extensions
+RUN docker-php-ext-configure zip --with-libzip \
+    && docker-php-ext-install -j$(nproc) \
+    pdo \
+    pdo_mysql \
+    mbstring \
+    exif \
+    bcmath \
+    opcache \
+    zip \
+    intl \
+    gd
+
+# Install Redis extension
+RUN pecl install redis-6.0.2 \
+    && docker-php-ext-enable redis
+
+# OPcache for production (memory optimized)
+RUN echo "opcache.memory_consumption=128" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.interned_strings_buffer=16" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.max_accelerated_files=4000" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.enable_cli=0" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.revalidate_freq=60" >> /usr/local/etc/php/conf.d/opcache.ini
+
+# Install Composer (production only)
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# ============================================================
+# Stage 2: Production build
+# ============================================================
+FROM base AS production
+
+WORKDIR /var/www
+
+# Copy only production files
+COPY --from=composer --chown=www-data:www-data /usr/bin/composer /usr/bin/composer
+
+# Copy only necessary files
+COPY --chown=www-data:www-data composer.json composer.lock ./
+COPY --chown=www-data:www-data .env ./
+
+# Install production dependencies only
+RUN composer install --no-dev --optimize-autoloader --no-interaction \
+    --ignore-platform-reqs \
+    --no-scripts \
+    && rm -rf composer.lock
+
+# Copy application
+COPY --chown=www-data:www-data app app/
+COPY --chown=www-data:www-data bootstrap bootstrap/
+COPY --chown=www-data:www-data config config/
+COPY --chown=www-data:www-data database database/
+COPY --chown=www-data:www-data public public/
+COPY --chown=www-data:www-data resources resources/
+COPY --chown=www-data:www-data routes routes/
+COPY --chown=www-data:www-data storage storage/
+
+# Create cache directories
+RUN mkdir -p bootstrap/cache \
+    && mkdir -p storage/framework/{cache,sessions,views} \
+    && mkdir -p storage/app/public \
+    && chmod -R 775 storage bootstrap/cache \
+    && chmod +x artisan \
+    && chown -R www-data:www-data /var/www
+
+# Custom PHP configuration for production
+COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
+
+# Expose port
+EXPOSE 9000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD php-fpm -t || exit 1
+
+# Run as www-data (not root!)
+USER www-data
+
+CMD ["php-fpm", "-d", "opcache.enable=1"]

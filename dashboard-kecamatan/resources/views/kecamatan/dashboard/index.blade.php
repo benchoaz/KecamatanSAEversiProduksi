@@ -321,20 +321,20 @@
                                 <div
                                     class="list-group-item border-start-0 border-end-0 border-top-0 border-bottom border-primary-50 px-4 py-4 bg-transparent hover:bg-slate-50 transition-colors">
                                     <div class="d-flex gap-4">
-                                        <div class="flex-shrink-0 bg-{{ $activity['type'] }} text-white rounded-3xl d-flex align-items-center justify-content-center shadow-sm"
+                                        <div class="flex-shrink-0 bg-{{ $activity->type }} text-white rounded-3xl d-flex align-items-center justify-content-center shadow-sm"
                                             style="width: 40px; height: 40px; font-size: 14px;">
-                                            <i class="fas {{ $activity['icon'] }}"></i>
+                                            <i class="fas {{ $activity->icon }}"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <div class="small text-primary-900 fw-black mb-1">{{ $activity['message'] }}</div>
+                                            <div class="small text-primary-900 fw-black mb-1">{{ $activity->message }}</div>
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <span class="text-tertiary fw-bold"
                                                     style="font-size: 10px; color: #94a3b8 !important;">
-                                                    <i class="far fa-clock me-1"></i> {{ $activity['time'] }}
+                                                    <i class="far fa-clock me-1"></i> {{ $activity->time }}
                                                 </span>
                                                 <span
-                                                    class="text-[10px] font-bold text-{{ $activity['type'] }} uppercase tracking-widest opacity-70">
-                                                    {{ $activity['type'] }}
+                                                    class="text-[10px] font-bold text-{{ $activity->type }} uppercase tracking-widest opacity-70">
+                                                    {{ $activity->type }}
                                                 </span>
                                             </div>
                                         </div>
