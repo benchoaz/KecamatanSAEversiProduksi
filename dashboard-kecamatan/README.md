@@ -103,6 +103,14 @@ WHATSAPP_API_TOKEN=your_token_here
 
 ---
 
+## 🔒 Sistem Autentikasi (Web Portal Ekonomi)
+
+Guna memaksimalkan keamanan dan kemudahan bagi warga pelaku usaha, sistem portal menggunakan otentikasi aman tanpa pendaftaran akun rumit:
+
+*   **UMKM Seller Center:** Menggunakan sistem **Magic Link via WhatsApp**. Saat warga (pemilik UMKM) memasukkan Nomor WhatsApp, sistem mengotentikasi dan menembakkan tautan akses unik (*Token*) yang aman ke WA warga. Link tersebut berfungsi sebagai akses masuk praktis (*passwordless*) menuju ke **Dasbor Manajemen Toko** khusus yang terisolasi dari sistem Admin Internal. *(Catatan: Tersedia mekanisme Bypass Otomatis khusus mode pengembangan/QA jika Bot WAHA terpantau offline).*
+*   **Kelola Profil Jasa Pekerjaan:** Menggunakan sistem **Autentikasi PIN rahasia 6 Digit** yang distribusinya dipatenkan via WhatsApp.
+
+---
 ## 🤖 WhatsApp Bot
 
 Bot WhatsApp terintegrasi dengan **WAHA** (WhatsApp HTTP API) dan **n8n** untuk workflow automation.
