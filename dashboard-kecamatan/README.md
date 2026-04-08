@@ -8,7 +8,12 @@
 
 ---
 
-## 🌐 Landing Page
+## 🌐 Landing Page & Web Portal Publik
+
+Landing Page dibangun sebagai **Single Source of Truth** (Etalase Utama) bagi kemajuan digital warga. Didukung dengan desain (UI/UX) *premium* bernuansa modern, portal ini bukan sekadar halaman statis:
+
+1. **Eksplorasi Navigasi Publik:** Mengedepankan kemudahan akses super cepat ke Pusat Pelayanan, Hub Ekonomi (UMKM), Info Pekerjaan (Jasa), serta fitur Lacak Berkas.
+2. **Konsistensi Visual Web (Unified UI):** Semua subsistem warga—dari melihat Etalase Toko sebuah UMKM (`/umkm-rakyat/toko/...`) hingga profil Pemasar Jasa—berjalan pada _layout_ portal mandiri tanpa tercampur baur dengan kompleksitas struktur portal Admin Internal Kecamatan.
 
 ![Landing Page Hero](docs/screenshots/landing-hero.png)
 
