@@ -120,11 +120,11 @@ class StateHandler
             $regionName = strtoupper(appProfile()->region_name ?? 'BESUK');
             $menu = "MENU LAYANAN KECAMATAN {$regionName}\n\n";
             $menu .= "Silakan pilih layanan (Ketik angka):\n\n";
-            $menu .= "1. Administrasi - Syarat & Status Berkas\n";
-            $menu .= "2. Loker & UMKM - Kerja & Produk Desa\n";
-            $menu .= "3. Jasa - Cari Tukang/Servis\n";
-            $menu .= "4. Pengaduan - Aspirasi Warga\n";
-            $menu .= "5. Kelola Data - Aktif/Nonaktifkan Data Anda\n\n";
+            $menu .= "1. ADMINISTRASI - Cek Syarat dan Status Berkas\n";
+            $menu .= "2. HUB EKONOMI - Lowongan Kerja dan Produk Desa\n";
+            $menu .= "3. DIREKTORI JASA - Cari Tukang dan Tenaga Ahli\n";
+            $menu .= "4. PENGADUAN - Aspirasi dan Laporan Warga\n";
+            $menu .= "5. KELOLA PROFIL - Edit Data dan Status Jasa/UMKM Anda\n\n";
             $menu .= "Ketik MENU kapan saja untuk kembali.";
             return [
                 'success' => true,

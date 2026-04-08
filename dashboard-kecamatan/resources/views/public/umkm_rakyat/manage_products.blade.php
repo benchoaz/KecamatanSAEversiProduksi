@@ -43,16 +43,33 @@
                     </div>
                 </div>
                 <div class="px-2">
-                    <h4 class="font-black text-slate-800 text-lg mb-4 truncate">{{ $product->nama_produk }}</h4>
-                    <div class="flex items-center gap-2 pt-4 border-t border-slate-50">
+                    <div class="flex items-start justify-between gap-2 mb-4">
+                        <h4 class="font-black text-slate-800 text-lg truncate flex-1">{{ $product->nama_produk }}</h4>
+                        <div class="flex flex-col items-end shrink-0">
+                            <span class="text-[9px] font-black uppercase tracking-widest {{ $product->is_available ? 'text-emerald-500' : 'text-rose-500' }} mb-1">
+                                {{ $product->is_available ? 'Tersedia' : 'Habis' }}
+                            </span>
+                            <form action="{{ route('umkm_rakyat.manage.product.toggle', ['token' => $umkm->manage_token, 'productId' => $product->id]) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="w-10 h-5 {{ $product->is_available ? 'bg-emerald-400' : 'bg-slate-200' }} rounded-full relative shadow-inner block">
+                                    <div class="w-4 h-4 bg-white rounded-full absolute top-0.5 {{ $product->is_available ? 'right-0.5' : 'left-0.5' }} shadow-sm transition-all"></div>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-2 pt-4 border-t border-slate-50">
+                        <button type="button" class="w-full sm:w-1/2 py-3 rounded-xl bg-slate-50 text-slate-600 font-bold text-xs uppercase tracking-widest hover:bg-slate-100 transition-all">
+                            <i class="fas fa-edit mr-1"></i> Edit
+                        </button>
                         <form
-                            action="{{ route('umkm_rakyat.product.delete', ['token' => $umkm->manage_token, 'productId' => $product->id]) }}"
-                            method="POST" class="w-full">
+                            action="{{ route('umkm_rakyat.manage.product.delete', ['token' => $umkm->manage_token, 'productId' => $product->id]) }}"
+                            method="POST" class="w-full sm:w-1/2">
                             @csrf
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('Hapus produk ini?')"
                                 class="w-full py-3 rounded-xl border-2 border-slate-100 text-slate-400 font-bold text-xs uppercase tracking-widest hover:bg-rose-50 hover:border-rose-100 hover:text-rose-500 transition-all">
-                                <i class="fas fa-trash-alt mr-2 text-[10px]"></i> Hapus Produk
+                                <i class="fas fa-trash-alt md:hidden lg:inline mr-1 text-[10px]"></i> Hapus
                             </button>
                         </form>
                     </div>
@@ -82,7 +99,7 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <form action="{{ route('umkm_rakyat.product.store', $umkm->manage_token) }}" method="POST"
+            <form action="{{ route('umkm_rakyat.manage.product.store', $umkm->manage_token) }}" method="POST"
                 enctype="multipart/form-data" class="p-8 space-y-6">
                 @csrf
                 <div>
@@ -91,11 +108,33 @@
                     <input type="text" name="nama_produk" required placeholder="Contoh: Keripik Singkong Renyah"
                         class="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-700 focus:bg-white focus:border-sky-500/20 focus:ring-4 focus:ring-sky-500/10 transition-all outline-none">
                 </div>
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Harga
-                        (Rp)</label>
-                    <input type="number" name="harga" required placeholder="Contoh: 15000"
-                        class="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-700 focus:bg-white focus:border-sky-500/20 focus:ring-4 focus:ring-sky-500/10 transition-all outline-none">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Harga
+                            (Rp)</label>
+                        <input type="number" name="harga" required placeholder="Contoh: 15000"
+                            class="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-700 focus:bg-white focus:border-sky-500/20 focus:ring-4 focus:ring-sky-500/10 transition-all outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Satuan</label>
+                        <div class="relative">
+                            <select name="satuan_harga" required
+                                class="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-700 focus:bg-white focus:border-sky-500/20 focus:ring-4 focus:ring-sky-500/10 transition-all outline-none appearance-none cursor-pointer">
+                                <option value="Pcs">per Pcs</option>
+                                <option value="Bungkus">per Bungkus</option>
+                                <option value="Porsi">per Porsi</option>
+                                <option value="Kotak">per Kotak</option>
+                                <option value="Botol">per Botol</option>
+                                <option value="Cup">per Cup</option>
+                                <option value="Kg">per Kg</option>
+                                <option value="Gram">per Gram</option>
+                                <option value="Liter">per Liter</option>
+                                <option value="Paket">per Paket</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></i>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Foto

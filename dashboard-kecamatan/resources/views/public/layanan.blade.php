@@ -3,6 +3,10 @@
 @section('title', 'Portal Layanan Publik - ' . appProfile()->region_level . ' ' . appProfile()->region_name)
 
 @section('content')
+    @php
+        $waRaw = preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot ?? '628123456789');
+        $waAdminLink = str_starts_with($waRaw, '0') ? '62' . substr($waRaw, 1) : $waRaw;
+    @endphp
     <div class="min-h-screen bg-gradient-to-tr from-slate-50 via-teal-50/20 to-blue-50/20 py-12 md:py-20">
         <div class="container mx-auto px-6">
             {{-- Header --}}
@@ -77,7 +81,7 @@
                             <p class="text-slate-400 text-sm mb-8 leading-relaxed">
                                 Jika Anda mengalami kesulitan atau memiliki pertanyaan lebih lanjut, hubungi petugas layanan kami melalui WhatsApp.
                             </p>
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot ?? '628123456789') }}" target="_blank" class="flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 rounded-2xl transition-all group">
+                            <a href="https://wa.me/{{ $waAdminLink }}" target="_blank" class="flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 rounded-2xl transition-all group">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center">
                                         <i class="fab fa-whatsapp text-lg"></i>
@@ -133,7 +137,7 @@
                     </div>
                     <div class="flex items-center gap-3 p-2 bg-white rounded-2xl shadow-sm border border-slate-100">
                         <span class="text-[10px] font-black uppercase text-slate-400 ml-3">Butuh Bantuan?</span>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot ?? '628123456789') }}" class="btn btn-sm bg-teal-600 hover:bg-teal-700 text-white border-0 rounded-xl px-6 normal-case font-bold">Tanya Admin</a>
+                        <a href="https://wa.me/{{ $waAdminLink }}" class="btn btn-sm bg-teal-600 hover:bg-teal-700 text-white border-0 rounded-xl px-6 normal-case font-bold">Tanya Admin</a>
                     </div>
                 </div>
 
@@ -177,7 +181,7 @@
                             <p class="text-slate-400 text-sm mb-8 leading-relaxed">
                                 Jika Anda mengalami kesulitan atau memiliki pertanyaan lebih lanjut, hubungi petugas layanan kami melalui WhatsApp.
                             </p>
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot ?? '628123456789') }}" target="_blank" class="flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 rounded-2xl transition-all group">
+                            <a href="https://wa.me/{{ $waAdminLink }}" target="_blank" class="flex items-center justify-between p-4 bg-white/10 hover:bg-white/20 rounded-2xl transition-all group">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center">
                                         <i class="fab fa-whatsapp text-lg"></i>

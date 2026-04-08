@@ -12,7 +12,7 @@
             </div>
         @endif
 
-        <form action="{{ route('umkm_rakyat.settings.update', $umkm->manage_token) }}" method="POST"
+        <form action="{{ route('umkm_rakyat.manage.settings.update', $umkm->manage_token) }}" method="POST"
             enctype="multipart/form-data">
             @csrf
 
@@ -38,6 +38,14 @@
                             <input type="text" name="nama_pemilik" value="{{ $umkm->nama_pemilik }}" required
                                 class="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-700 focus:bg-white focus:border-sky-500/20 focus:ring-4 focus:ring-sky-500/10 transition-all outline-none">
                         </div>
+                        <div>
+                            <label
+                                class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Nomor KTP (NIK)</label>
+                            <input type="number" name="nik" value="{{ $umkm->nik }}" required
+                                oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                maxlength="16"
+                                class="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-700 focus:bg-white focus:border-sky-500/20 focus:ring-4 focus:ring-sky-500/10 transition-all outline-none">
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -58,6 +66,14 @@
                                 @endforeach
                             </select>
                         </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Patokan Lokasi (Ancer-Ancer)</label>
+                        <input type="text" name="patokan_lokasi" value="{{ $umkm->patokan_lokasi }}"
+                            placeholder="Contoh: 3 Ruko dari timur Alfamart / Depan lapangan basket"
+                            class="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl px-6 py-4 text-sm font-semibold text-slate-700 focus:bg-white focus:border-sky-500/20 focus:ring-4 focus:ring-sky-500/10 transition-all outline-none">
+                        <p class="text-[10px] text-slate-400 mt-2 ml-1">Panduan alamat ekstra agar tetangga lebih mudah menemukan toko fisik Anda.</p>
                     </div>
 
                     <!-- Marketplace Links Section -->

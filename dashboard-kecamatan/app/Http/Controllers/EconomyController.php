@@ -139,6 +139,87 @@ class EconomyController extends Controller
     }
 
     /**
+     * Show PIN login form for Jasa
+     */
+    public function loginForm()
+    {
+        return view('economy.login');
+    }
+
+    /**
+     * Authenticate Jasa owner using Phone & PIN
+     */
+    public function authenticate(Request $request)
+    {
+        $request->validate([
+            'contact_phone' => 'required',
+            'owner_pin' => 'required|digits:6',
+        ]);
+
+        $phone = $request->contact_phone;
+        // Basic normalization
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        if (str_starts_with($phone, '0')) {
+            $phone = '0' . substr($phone, 1); // Keep as is since it's stored as entered usually
+        }
+
+        $workItem = WorkDirectory::where('contact_phone', 'like', "%{$request->contact_phone}%")->first();
+
+        if (!$workItem || !Hash::check($request->owner_pin, $workItem->owner_pin)) {
+            return back()->with('error', 'Nomor WhatsApp atau PIN salah.')->withInput();
+        }
+
+        // Store in session
+        session(['manage_jasa_id' => $workItem->id]);
+
+        return redirect()->route('economy.manage', $workItem->id);
+    }
+
+    /**
+     * Show management page for a specific Jasa
+     */
+    public function manage($id)
+    {
+        if (session('manage_jasa_id') != $id) {
+            return redirect()->route('economy.login')->with('error', 'Sesi berakhir. Silakan login kembali.');
+        }
+
+        $workItem = WorkDirectory::findOrFail($id);
+        $desas = Desa::orderBy('nama_desa')->get();
+        $categories = WorkDirectory::getCategories();
+        $jobTypes = ['jasa' => 'Jasa', 'transportasi' => 'Transportasi', 'keliling' => 'Keliling', 'harian' => 'Harian'];
+
+        return view('economy.manage', compact('workItem', 'desas', 'categories', 'jobTypes'));
+    }
+
+    /**
+     * Update Jasa data
+     */
+    public function update(Request $request, $id)
+    {
+        if (session('manage_jasa_id') != $id) {
+            return redirect()->route('economy.login');
+        }
+
+        $workItem = WorkDirectory::findOrFail($id);
+
+        $request->validate([
+            'display_name' => 'required|string|max:255',
+            'job_category' => 'required|string',
+            'job_type' => 'required|string|in:jasa,transportasi,keliling,harian',
+            'job_title' => 'required|string|max:255',
+            'service_area' => 'nullable|string|max:255',
+            'service_time' => 'nullable|string|max:100',
+            'short_description' => 'nullable|string|max:500',
+            'status' => 'required|in:active,inactive,pending'
+        ]);
+
+        $workItem->update($request->all());
+
+        return back()->with('success', 'Data berhasil diperbarui.');
+    }
+
+    /**
      * Send WhatsApp notification with PIN
      */
     private function sendWhatsAppNotification($workDir, $pin)

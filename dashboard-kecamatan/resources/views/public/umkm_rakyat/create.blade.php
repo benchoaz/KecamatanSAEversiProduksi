@@ -194,6 +194,17 @@
                                 </div>
 
                                 <div class="group">
+                                    <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Patokan Lokasi (Ancer-ancer) <span class="text-rose-500">*</span></label>
+                                    <div class="relative">
+                                        <i class="fas fa-compass absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                                        <input type="text" name="patokan_lokasi" required
+                                            placeholder="Contoh: Depan Masjid Al-Ittihad / Samping Toko Sembako Pak Min"
+                                            class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-5 py-4 text-sm font-semibold text-slate-700 focus:bg-white focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all outline-none placeholder:text-slate-300 shadow-sm">
+                                    </div>
+                                    <p class="text-[9px] text-slate-400 mt-2 ml-1">Sangat penting agar pembeli atau petugas verifikasi tidak nyasar.</p>
+                                </div>
+
+                                <div class="group">
                                     <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Ceritakan Produk
                                         Anda</label>
                                     <div class="relative">
@@ -264,6 +275,14 @@
                                     <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Nama Lengkap Pemilik
                                         <span class="text-rose-500">*</span></label>
                                     <input type="text" name="nama_pemilik" required placeholder="Sesuai KTP"
+                                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-700 focus:bg-white focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all outline-none placeholder:text-slate-300 shadow-sm">
+                                </div>
+                                <div class="group">
+                                    <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Nomor KTP (NIK)
+                                        <span class="text-rose-500">*</span></label>
+                                    <input type="number" name="nik" required placeholder="16 Digit NIK"
+                                        oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                        maxlength="16"
                                         class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-700 focus:bg-white focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all outline-none placeholder:text-slate-300 shadow-sm">
                                 </div>
                                 <div class="group">

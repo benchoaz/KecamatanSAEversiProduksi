@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\PublicService;
 use Carbon\Carbon;
+use App\Models\WahaN8nSetting;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class UmkmRakyatController extends Controller
 {
@@ -47,8 +50,10 @@ class UmkmRakyatController extends Controller
         $request->validate([
             'nama_usaha' => 'required|string|max:255',
             'nama_pemilik' => 'required|string|max:255',
+            'nik' => 'required|string|digits:16',
             'no_wa' => 'required|string|max:20',
             'desa' => 'required|string',
+            'patokan_lokasi' => 'required|string|max:255',
             'jenis_usaha' => 'required|string',
             'foto_usaha' => 'nullable|image|max:2048',
         ]);
@@ -158,7 +163,7 @@ class UmkmRakyatController extends Controller
             abort(404);
         }
 
-        $products = $umkm->products()->latest()->get();
+        $products = $umkm->products()->where('is_available', true)->latest()->get();
 
         return view('public.umkm_rakyat.show', compact('umkm', 'products'));
     }
@@ -190,8 +195,10 @@ class UmkmRakyatController extends Controller
         $request->validate([
             'nama_usaha' => 'required|string|max:255',
             'nama_pemilik' => 'required|string|max:255',
+            'nik' => 'required|string|digits:16',
             'no_wa' => 'required|string|max:20',
             'desa' => 'required|string',
+            'patokan_lokasi' => 'nullable|string|max:255',
             'jenis_usaha' => 'required|string',
             'deskripsi' => 'nullable|string',
             'foto_usaha' => 'nullable|image|max:2048',
@@ -219,11 +226,13 @@ class UmkmRakyatController extends Controller
         $request->validate([
             'nama_produk' => 'required|string|max:255',
             'harga' => 'required|numeric',
+            'satuan_harga' => 'nullable|string|max:50',
             'foto_produk' => 'nullable|image|max:2048',
         ]);
 
         $product = new UmkmProduct($request->except('foto_produk'));
         $product->umkm_id = $umkm->id;
+        $product->is_available = true;
 
         if ($request->hasFile('foto_produk')) {
             $path = $request->file('foto_produk')->store('umkm/products', 'public');
@@ -242,6 +251,17 @@ class UmkmRakyatController extends Controller
         $product->delete();
 
         return back()->with('success', 'Produk berhasil dihapus.');
+    }
+
+    public function toggleProductAvailability($token, $productId)
+    {
+        $umkm = Umkm::where('manage_token', $token)->firstOrFail();
+        $product = UmkmProduct::where('umkm_id', $umkm->id)->findOrFail($productId);
+        
+        $product->is_available = !$product->is_available;
+        $product->save();
+
+        return back()->with('success', 'Status ketersediaan produk diperbarui.');
     }
 
     public function allProducts(Request $request)
@@ -287,24 +307,75 @@ class UmkmRakyatController extends Controller
             ->first();
 
         if ($umkm) {
-            $adminWa = appProfile()->whatsapp_complaint ?? "6282121212121"; // Admin WA number config
-            $manageUrl = route('umkm_rakyat.manage', $umkm->manage_token);
+            $waStatus = $this->sendWhatsAppMagicLink($umkm);
+            
+            // Jika bot offline, kita arahkan langsung (HANYA untuk bypass darurat/testing)
+            if (!$waStatus['success']) {
+                return redirect($waStatus['url'])->with('warning', 'Bot WhatsApp Sedang Offline. Anda dialihkan langsung ke Dasbor melalui mode Bypass.');
+            }
 
-            // Format message for Admin to forward or direct message if we had WA API
-            // Since we don't have WA API, we'll simulate the "Link sent" via UI mostly,
-            // or redirect them to a page showing the link (in dev/demo mode)
-            // OR redirection to Admin WA to ask for link manually if we want to follow previous verification pattern.
-
-            // BETTER APPROACH FOR DEMO/MVP without WA Gateway:
-            // Verify ownership via simple challenge or just show link if simple (Not secure for production but fits the 'no backend backend' vibe)
-            // SECURE APPROACH (Simulated):
-            // Redirect to a page saying "We found your shop [Name]! Click button below to open dashboard".
-            // Since we rely on "Management Token" as the key.
-
-            return redirect()->route('umkm_rakyat.manage', $umkm->manage_token)
-                ->with('success', 'Selamat datang kembali! Anda telah masuk ke dashboard toko.');
+            return view('public.umkm_rakyat.login_success', compact('umkm'));
         }
 
         return back()->with('error', 'Nomor WhatsApp tidak ditemukan. Pastikan Anda sudah mendaftar.');
+    }
+
+    /**
+     * Kirim Magic Link via WhatsApp
+     */
+    private function sendWhatsAppMagicLink($umkm)
+    {
+        $dashboardUrl = route('umkm_rakyat.manage', $umkm->manage_token);
+
+        try {
+            $wahaSettings = WahaN8nSetting::getSettings();
+
+            if (!$wahaSettings || !$wahaSettings->isBotOperational()) {
+                return ['success' => false, 'url' => $dashboardUrl];
+            }
+
+            // Normalize phone: strip leading 0, ensure starts with 62
+            $phone = preg_replace('/[^0-9]/', '', $umkm->no_wa);
+            if (str_starts_with($phone, '0')) {
+                $phone = '62' . substr($phone, 1);
+            } elseif (!str_starts_with($phone, '62')) {
+                $phone = '62' . $phone;
+            }
+
+            $message = "🔐 *Info Akses Dasbor UMKM*\n\n" .
+                       "Halo *{$umkm->nama_pemilik}*,\n" .
+                       "Seseorang (atau Anda sendiri) meminta akses untuk mengelola etalase toko *{$umkm->nama_usaha}* di portal Kecamatan Digital.\n\n" .
+                       "Klik tautan aman di bawah ini untuk masuk ke Dashboard langsung tanpa password:\n" .
+                       "{$dashboardUrl}\n\n" .
+                       "_PENTING: Link ini adalah akses sensitif yang mengizinkan pengeditan data produk toko Anda. JANGAN BAGIKAN link ini kepada siapa pun._";
+
+            // Use direct WAHA sendText endpoint
+            $wahaUrl = $wahaSettings->waha_api_url;
+            $wahaKey = $wahaSettings->waha_api_key;
+            $session = $wahaSettings->waha_session_name ?? 'default';
+
+            if ($wahaUrl) {
+                $headers = ['Content-Type' => 'application/json'];
+                if ($wahaKey) {
+                    $headers['X-Api-Key'] = $wahaKey;
+                }
+
+                $response = Http::withHeaders($headers)
+                    ->timeout(8)
+                    ->post(rtrim($wahaUrl, '/') . '/api/sendText', [
+                        'session' => $session,
+                        'chatId' => $phone . '@c.us',
+                        'text' => $message,
+                    ]);
+                    
+                if ($response->successful()) {
+                     return ['success' => true, 'url' => $dashboardUrl];
+                }
+            }
+            return ['success' => false, 'url' => $dashboardUrl];
+        } catch (\Exception $e) {
+            Log::error('WA Magic Link gagal dikirim untuk UMKM: ' . $e->getMessage());
+            return ['success' => false, 'url' => $dashboardUrl];
+        }
     }
 }

@@ -444,19 +444,7 @@
                     </div>
                 </div>
 
-                <!-- Lacak Berkas (Search Tool) -->
-                <div class="bg-white/80 backdrop-blur-2xl p-2 rounded-[2.5rem] shadow-2xl border border-white flex flex-col md:flex-row items-center gap-2 mb-8">
-                    <div class="flex-grow flex items-center px-6 gap-3 w-full">
-                        <i class="fas fa-search text-teal-500 text-xl"></i>
-                        <input type="text" id="trackingInput" name="q"
-                            placeholder="Mau Cek Status Berkas? Masukkan No. WhatsApp atau ID Permohonan..."
-                            class="bg-transparent border-none focus:ring-0 text-base font-bold w-full text-slate-800 h-14">
-                    </div>
-                    <button onclick="handleTracking()"
-                        class="btn bg-teal-600 hover:bg-teal-700 text-white border-0 rounded-[1.8rem] px-10 h-14 w-full md:w-auto font-black shadow-xl shadow-teal-900/10">
-                        Lacak Berkas
-                    </button>
-                </div>
+
 
                 <!-- Section: Layanan Paling Dicari (Grid) -->
                 <div class="grid grid-cols-2 md:grid-cols-{{ min(4, count($featuredLayanan) > 0 ? count($featuredLayanan) : 1) }} gap-5">
@@ -530,7 +518,11 @@
                                 <p class="text-white font-black text-[13px]">{{ appProfile()->whatsapp_bot_number ?? '08xxxxxxxxxx' }}</p>
                             </div>
                         </div>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot_number) }}" 
+                        @php
+                            $waNumber = preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot_number ?? '');
+                            $waLink = str_starts_with($waNumber, '0') ? '62' . substr($waNumber, 1) : $waNumber;
+                        @endphp
+                        <a href="https://wa.me/{{ $waLink }}" 
                            target="_blank"
                            class="btn bg-white hover:bg-emerald-50 text-emerald-700 border-0 rounded-2xl px-8 h-12 font-black transition-all flex items-center gap-2 w-full sm:w-auto justify-center">
                             Mulai Chat <i class="fas fa-paper-plane text-[10px]"></i>
@@ -722,6 +714,26 @@
                     </div>
                 @endforeach
             </div>
+
+            <!-- Lacak Berkas (Moved Here) -->
+            <div class="mt-16 max-w-4xl mx-auto">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-black text-slate-800">Sudah Punya Berkas? Cek Statusnya Disini</h3>
+                </div>
+                <div class="bg-white p-2 rounded-[2.5rem] shadow-xl border border-slate-200 flex flex-col md:flex-row items-center gap-2 mb-8">
+                    <div class="flex-grow flex items-center px-6 gap-3 w-full">
+                        <i class="fas fa-search text-teal-500 text-xl"></i>
+                        <input type="text" id="trackingInput" name="q"
+                            placeholder="Masukkan No. WhatsApp atau ID Permohonan..."
+                            class="bg-transparent border-none focus:ring-0 text-base font-bold w-full text-slate-800 h-14">
+                    </div>
+                    <button onclick="handleTracking()"
+                        class="btn bg-teal-600 hover:bg-teal-700 text-white border-0 rounded-[1.8rem] px-10 h-14 w-full md:w-auto font-black shadow-lg shadow-teal-900/10">
+                        Lacak Berkas
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 

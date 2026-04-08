@@ -26,8 +26,9 @@ class OwnerHandler
             return [
                 'success' => true,
                 'intent' => 'owner_not_found',
-                'reply' => "Nomor Anda tidak terdaftar sebagai pemilik UMKM, Penyedia Jasa, atau Pemasang Loker di sistem kami.\n\n" .
-                    "Pastikan nomor WhatsApp ini ({$phone}) sesuai dengan yang terdaftar di database.",
+                'reply' => "INFORMASI PROFIL\n\n" .
+                    "Nomor WhatsApp Anda ({$phone}) belum terdaftar sebagai pemilik usaha (UMKM) atau tenaga ahli (Jasa) di sistem kami.\n\n" .
+                    "Pilih nomor 2 atau 3 pada MENU untuk mulai mendaftarkan usaha/jasa Anda.",
                 'state_update' => null,
             ];
         }
@@ -44,10 +45,10 @@ class OwnerHandler
         return [
             'success' => true,
             'intent' => 'owner_request_pin',
-            'reply' => "KELOLA DATA ANDA\n\n" .
-                "Ditemukan data terdaftar untuk nomor ini.\n" .
-                "Silakan masukkan PIN Anda untuk melanjutkan.\n\n" .
-                "Ketik BATAL untuk membatalkan.",
+            'reply' => "PUSAT KENDALI PROFIL\n\n" .
+                "Nomor Anda terdaftar sebagai pemilik data. Silakan masukkan PIN 6-digit Anda untuk masuk ke sistem keamanan.\n\n" .
+                "Lupa PIN? Ketik RESET\n" .
+                "Ketik MENU untuk kembali.",
             'state_update' => 'WAITING_OWNER_PIN',
         ];
     }
@@ -192,12 +193,13 @@ class OwnerHandler
         return [
             'success' => true,
             'intent' => 'owner_lupa_pin',
-            'reply' => "LUPA PIN\n\n" .
-                "Anda lupa PIN untuk mengelola data Anda (UMKM/Jasa/Loker).\n\n" .
-                "Cara Reset PIN:\n" .
-                "1. Buka: {$loginUrl}\n" .
-                "2. Klik \"Lupa PIN?\"\n" .
-                "3. Hubungi petugas kecamatan untuk reset manual\n\n" .
+            'reply' => "BANTUAN PIN AKSES\n\n" .
+                "Untuk keamanan data, silakan gunakan link Login Web berikut untuk masuk atau meriset PIN melalui profil Anda:\n\n" .
+                "1. Bagi Jasa & Pekerjaan:\n" .
+                "   {$baseUrl}/ekonomi/login\n\n" .
+                "2. Bagi UMKM (Seller Center):\n" .
+                "   {$baseUrl}/umkm-rakyat/login\n\n" .
+                "Jika masih kendala, silakan hubungi admin di kantor kecamatan.\n\n" .
                 "Ketik MENU untuk kembali.",
             'state_update' => null,
         ];

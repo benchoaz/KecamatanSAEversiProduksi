@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.public')
 
 @section('content')
     <div class="min-h-screen bg-slate-50 relative overflow-hidden font-sans">
@@ -191,6 +191,11 @@
                                         <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
                                             Lokasi</h4>
                                         <p class="text-sm font-black text-slate-800">{{ $umkm->desa }}</p>
+                                        @if($umkm->patokan_lokasi)
+                                            <p class="text-[10px] text-slate-500 font-medium leading-tight mt-1">
+                                                <i class="fas fa-info-circle text-indigo-400 mr-1"></i> {{ $umkm->patokan_lokasi }}
+                                            </p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -242,6 +247,7 @@
                                         <span
                                             class="bg-indigo-600/90 backdrop-blur-md text-white font-black px-4 py-2 rounded-xl shadow-lg border border-white/20 text-sm">
                                             Rp {{ number_format($product->harga, 0, ',', '.') }}
+                                            <span class="text-[10px] opacity-60 font-medium lowercase">/{{ $product->satuan_harga ?? 'Pcs' }}</span>
                                         </span>
                                     </div>
                                 </div>

@@ -15,6 +15,7 @@ class UmkmProduct extends Model
         'umkm_id',
         'nama_produk',
         'harga',
+        'satuan_harga',
         'deskripsi',
         'foto_produk',
         'is_available'

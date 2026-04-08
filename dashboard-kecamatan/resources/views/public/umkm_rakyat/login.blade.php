@@ -88,7 +88,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('umkm_rakyat.login.post') }}" method="POST" class="space-y-6">
+                <form action="{{ route('umkm_rakyat.send_access') }}" method="POST" class="space-y-6">
                     @csrf
                     <div class="group">
                         <label

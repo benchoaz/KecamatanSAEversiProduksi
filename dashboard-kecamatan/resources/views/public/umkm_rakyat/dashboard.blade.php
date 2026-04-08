@@ -59,6 +59,29 @@
         </a>
     </div>
 
+    <!-- Share CTA Section -->
+    <div class="mb-12">
+        @php
+            $shareText = "Halo tetangga! Kunjungi toko online kami *" . $umkm->nama_usaha . "* di portal resmi UMKM Kecamatan. %0A%0ACek katalog dan harga terbaru di sini: " . route('umkm_rakyat.show', $umkm->slug);
+            $shareUrl = "https://wa.me/?text=" . $shareText;
+        @endphp
+        <a href="{{ $shareUrl }}" target="_blank"
+            class="flex flex-col md:flex-row items-center justify-between bg-gradient-to-r from-emerald-500 to-teal-600 p-8 rounded-[3rem] shadow-2xl shadow-emerald-500/20 group hover:scale-[1.01] transition-all">
+            <div class="flex items-center gap-6 mb-6 md:mb-0">
+                <div class="shrink-0 w-20 h-20 bg-white/20 rounded-[2rem] flex items-center justify-center text-white text-3xl backdrop-blur-md">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-black text-white mb-2 leading-tight">Bagikan Toko Saya ke WhatsApp</h3>
+                    <p class="text-emerald-50 font-medium">Bantu promosikan dagangan Anda ke status dan kontak dengan satu klik.</p>
+                </div>
+            </div>
+            <div class="w-full md:w-auto flex items-center justify-center bg-white text-emerald-600 px-8 py-5 rounded-[2rem] font-black uppercase tracking-widest text-sm shadow-xl group-hover:-translate-y-1 transition-transform cursor-pointer">
+                Share Sekarang <i class="fas fa-paper-plane ml-3"></i>
+            </div>
+        </a>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Welcome Card -->
         <div

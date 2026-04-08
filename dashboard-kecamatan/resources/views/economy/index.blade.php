@@ -118,11 +118,17 @@
                                 Daftarkan jasa atau keahlian Anda di direktori resmi kecamatan. Gratis dan terverifikasi.
                             </p>
                         </div>
-                        <a href="{{ route('economy.create') }}"
-                            target="_blank"
-                            class="px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-teal-500/20 transition-all whitespace-nowrap relative z-10">
-                            <i class="fas fa-plus mr-2"></i> Daftar Sekarang
-                        </a>
+                        <div class="flex flex-wrap items-center gap-4 relative z-10">
+                            <a href="{{ route('economy.create') }}"
+                                target="_blank"
+                                class="px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-teal-500/20 transition-all whitespace-nowrap">
+                                <i class="fas fa-plus mr-2"></i> Daftar Sekarang
+                            </a>
+                            <a href="{{ route('economy.login') }}"
+                                class="px-6 py-3 bg-transparent hover:bg-white/10 text-white border border-white/20 rounded-xl font-bold text-sm transition-all whitespace-nowrap">
+                                <i class="fas fa-key mr-2"></i> Kelola Jasa Saya
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -213,16 +219,22 @@
                 <div class="relative z-10">
                     <h4 class="font-bold text-lg mb-1 flex items-center gap-2">
                         <i class="fas fa-store text-amber-300"></i>
-                        Punya Produk Atau Jasa?
+                        Punya Produk Unggulan?
                     </h4>
                     <p class="text-sm text-white/90 max-w-md">
-                        Daftarkan produk atau jasa Anda di etalase resmi kecamatan. Gratis dan mudah!
+                        Buka etalase toko digital Anda di platform kecamatan. Gratis, mudah, dan langsung terhubung ke WhatsApp.
                     </p>
                 </div>
-                <a href="{{ route('economy.create') }}"
-                    class="px-6 py-3 bg-white hover:bg-amber-50 text-orange-600 rounded-xl font-bold text-sm shadow-lg transition-all whitespace-nowrap relative z-10">
-                    <i class="fas fa-plus mr-2"></i> Daftar Sekarang
-                </a>
+                    <div class="flex flex-wrap items-center gap-4 relative z-10">
+                        <a href="{{ route('umkm_rakyat.create') }}"
+                            class="px-6 py-3 bg-white hover:bg-amber-50 text-orange-600 rounded-xl font-bold text-sm shadow-lg transition-all whitespace-nowrap">
+                            <i class="fas fa-store mr-2"></i> Buka Toko Sekarang
+                        </a>
+                        <a href="{{ route('umkm_rakyat.login') }}"
+                            class="px-6 py-3 bg-orange-700/30 hover:bg-orange-700/50 text-white border border-white/20 rounded-xl font-bold text-sm transition-all whitespace-nowrap">
+                            <i class="fas fa-user-circle mr-2"></i> Masuk Seller Center
+                        </a>
+                    </div>
             </div>
 
             <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm mb-8 text-center">
