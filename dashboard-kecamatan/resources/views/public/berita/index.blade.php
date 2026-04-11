@@ -67,13 +67,12 @@
                         <button onclick="changeFontSize(1)" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-white rounded-full transition" title="Besarkan Teks">A+</button>
                     </div>
                 </div>
-                <div class="flex items-center gap-6">
-                    <div class="hidden md:block">
-                        <a href="/" class="text-slate-600 hover:text-blue-600 font-medium transition flex items-center gap-2">
-                            <i class="fas fa-arrow-left text-xs"></i> Ke Beranda
-                        </a>
-                    </div>
-                    <button class="md:hidden text-slate-600"><i class="fas fa-bars"></i></button>
+                <div class="flex items-center gap-3">
+                    <a href="/" class="text-slate-600 hover:text-blue-600 font-medium transition flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-50">
+                        <i class="fas fa-home md:hidden text-lg"></i>
+                        <span class="hidden md:flex items-center gap-2"><i class="fas fa-arrow-left text-xs"></i> Ke Beranda</span>
+                    </a>
+                    <button class="md:hidden text-slate-400 hover:text-blue-600 w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-50 transition border border-transparent"><i class="fas fa-bars"></i></button>
                 </div>
             </div>
         </div>
@@ -118,16 +117,16 @@
             <div class="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-hide px-2">
                 <!-- Kecamatan Filter -->
                 <a href="{{ route('public.berita.index') }}" 
-                   class="flex-none flex items-center gap-2 px-6 py-2.5 rounded-full transition-all duration-300 font-bold whitespace-nowrap {{ !request('desa_id') ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-200 scale-105 z-10' : 'bg-slate-100 text-slate-500 hover:bg-slate-200' }}">
-                    <i class="fas fa-landmark text-xs {{ !request('desa_id') ? 'text-white' : 'text-slate-400' }}"></i>
-                    <span>Tingkat Kecamatan</span>
+                   class="flex-none flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-full transition-all duration-300 font-bold whitespace-nowrap {{ !request('desa_id') ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-200 scale-105 z-10' : 'bg-slate-100 text-slate-500 hover:bg-slate-200' }}">
+                    <i class="fas fa-landmark text-[10px] md:text-xs {{ !request('desa_id') ? 'text-white' : 'text-slate-400' }}"></i>
+                    <span class="text-xs md:text-sm">Tingkat Kecamatan</span>
                 </a>
 
                 @foreach($desas as $desa)
                     <a href="{{ route('public.berita.index', ['desa_id' => $desa->id]) }}" 
-                       class="relative flex-none flex items-center gap-2 px-6 py-2.5 rounded-full transition-all duration-300 font-bold whitespace-nowrap {{ request('desa_id') == $desa->id ? 'bg-gradient-to-r from-teal-500 to-emerald-600 text-white shadow-lg shadow-teal-200 scale-105 z-10' : 'bg-slate-100 text-slate-500 hover:bg-slate-200' }}">
-                        <i class="fas fa-home-alt text-xs {{ request('desa_id') == $desa->id ? 'text-white' : 'text-slate-400' }}"></i>
-                        <span>Desa {{ $desa->nama_desa }}</span>
+                       class="relative flex-none flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-full transition-all duration-300 font-bold whitespace-nowrap {{ request('desa_id') == $desa->id ? 'bg-gradient-to-r from-teal-500 to-emerald-600 text-white shadow-lg shadow-teal-200 scale-105 z-10' : 'bg-slate-100 text-slate-500 hover:bg-slate-200' }}">
+                        <i class="fas fa-home-alt text-[10px] md:text-xs {{ request('desa_id') == $desa->id ? 'text-white' : 'text-slate-400' }}"></i>
+                        <span class="text-xs md:text-sm">Desa {{ $desa->nama_desa }}</span>
                         
                         @if(isset($counts[$desa->id]) && $counts[$desa->id] > 0)
                             <span class="absolute -top-1 -right-1 flex h-4 w-4">

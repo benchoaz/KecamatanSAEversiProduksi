@@ -146,12 +146,11 @@
                         <button onclick="changeFontSize(1)" class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-white rounded-full transition" title="Besarkan Teks">A+</button>
                     </div>
                 </div>
-                <div class="flex items-center gap-6">
-                    <div class="hidden md:block">
-                        <a href="/" class="text-slate-600 hover:text-blue-600 font-medium transition flex items-center gap-2">
-                            <i class="fas fa-arrow-left text-xs"></i> Ke Beranda
-                        </a>
-                    </div>
+                <div class="flex items-center gap-3">
+                    <a href="/" class="text-slate-600 hover:text-blue-600 font-medium transition flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-50">
+                        <i class="fas fa-home md:hidden text-lg"></i>
+                        <span class="hidden md:flex items-center gap-2"><i class="fas fa-arrow-left text-xs"></i> Ke Beranda</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -209,9 +208,9 @@
 
         <!-- Content -->
         <article
-            class="prose prose-lg prose-slate mx-auto article-content bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-slate-100">
+            class="prose prose-lg prose-slate mx-auto article-content bg-white p-6 md:p-12 rounded-[2rem] shadow-sm border border-slate-100">
             {!! nl2br(e($berita->konten)) !!}
-                </article>
+        </article>
 
                 <!-- Share & Tags -->
                 <div class="max-w-3xl mx-auto mt-12 border-t border-slate-200 pt-8 flex flex-col sm:flex-row justify-between items-center gap-6">
