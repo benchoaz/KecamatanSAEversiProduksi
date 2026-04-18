@@ -27,8 +27,14 @@ class WahaN8nController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'bot_number'  => 'nullable|string|max:20',
-            'bot_enabled' => 'nullable|boolean',
+            'bot_number'        => 'nullable|string|max:20',
+            'bot_enabled'       => 'nullable|boolean',
+            'public_url'        => 'nullable|string|max:500', // Relax from 'url' to allow ports/internal links
+            'whatsapp_bot_menu' => 'nullable|array',
+            'whatsapp_bot_menu.*.label'       => 'nullable|string|max:100',
+            'whatsapp_bot_menu.*.description' => 'nullable|string|max:255',
+            'whatsapp_bot_menu.*.action'      => 'nullable|string|max:100',
+            'whatsapp_bot_menu.*.enabled'     => 'nullable',
         ]);
 
         $validated['bot_enabled'] = $request->has('bot_enabled') ? true : false;
@@ -45,14 +51,44 @@ class WahaN8nController extends Controller
 
         $settings = WahaN8nSetting::first();
         if ($settings) {
-            $settings->update($validated);
+            $settings->update([
+                'bot_number' => $validated['bot_number'] ?? null,
+                'bot_enabled' => $validated['bot_enabled'],
+            ]);
         } else {
-            $settings = WahaN8nSetting::create($validated);
+            WahaN8nSetting::create([
+                'bot_number' => $validated['bot_number'] ?? null,
+                'bot_enabled' => $validated['bot_enabled'],
+            ]);
         }
 
+        // Save bot number, URL, and menu to AppProfile
+        $profileData = [];
+
         if (!empty($validated['bot_number'])) {
-            AppProfile::query()->update(['whatsapp_bot_number' => $validated['bot_number']]);
-            Cache::forget('app_profile_global');
+            $profileData['whatsapp_bot_number'] = $validated['bot_number'];
+        }
+
+        $profileData['public_url'] = $validated['public_url'] ?? null;
+
+        if ($request->has('whatsapp_bot_menu')) {
+            $menuItems = $request->input('whatsapp_bot_menu', []);
+            foreach ($menuItems as $i => $item) {
+                $menuItems[$i]['enabled'] = !empty($item['enabled']);
+                $menuItems[$i]['number']  = (string)($i + 1);
+            }
+            $profileData['whatsapp_bot_menu'] = $menuItems;
+        }
+
+        if (!empty($profileData)) {
+            $profile = AppProfile::first();
+            if ($profile) {
+                // Using model update instead of query update to ensure Eloquent casts are triggered
+                $profile->update($profileData);
+            }
+            
+            // Clear cache using the service to ensure consistency
+            app(\App\Services\ApplicationProfileService::class)->clearCache();
         }
 
         WahaN8nSetting::clearCache();

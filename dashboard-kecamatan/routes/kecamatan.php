@@ -224,11 +224,7 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             Route::get('/kesehatan', [KesraController::class, 'kesehatanIndex'])->name('kesehatan.index');
             Route::get('/sosial-budaya', [KesraController::class, 'sosialBudayaIndex'])->name('sosial-budaya.index');
             Route::get('/rekomendasi', [KesraController::class, 'rekomendasiIndex'])->name('rekomendasi.index');
-            
-            // Analisis Stunting
-            Route::get('/stunting/analisis', [KesraController::class, 'stuntingAnalysis'])->name('stunting.analysis');
-            Route::get('/stunting/peringkat', [KesraController::class, 'stuntingRanking'])->name('stunting.ranking');
-            
+
             Route::post('/process/{id}', [KesraController::class, 'process'])->name('process');
         });
 

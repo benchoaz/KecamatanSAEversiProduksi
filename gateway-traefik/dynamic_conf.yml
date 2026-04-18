@@ -11,8 +11,18 @@ http:
         - kecamatan-compress
         - kecamatan-headers
 
+    kecamatan-local:
+      rule: "PathPrefix(`/`)"
+      entryPoints:
+        - websecure
+      service: kecamatan-dashboard-svc
+      tls: {}
+      middlewares:
+        - kecamatan-compress
+        - kecamatan-headers
+
     kecamatan-http-redirect:
-      rule: "Host(`kecamatanbesuk.my.id`)"
+      rule: "PathPrefix(`/`)"
       entryPoints:
         - web
       middlewares:
@@ -23,6 +33,7 @@ http:
     redirect-to-https:
       redirectScheme:
         scheme: https
+        port: "8443"
         permanent: true
 
     kecamatan-compress:

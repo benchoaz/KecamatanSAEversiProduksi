@@ -268,7 +268,7 @@
                         <a href="{{ route('kecamatan.settings.waha-n8n.index') }}"
                             class="nav-link {{ request()->routeIs('kecamatan.settings.waha-n8n.*') ? 'active' : '' }}">
                             <span class="nav-icon"><i class="fab fa-whatsapp"></i></span>
-                            <span class="nav-text">Pengaturan Kontak WA</span>
+                            <span class="nav-text">BOT Manajemen</span>
                         </a>
                     </li>
                     @if(auth()->user()->isSuperAdmin())

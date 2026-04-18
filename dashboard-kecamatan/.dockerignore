@@ -1,58 +1,26 @@
-# Git
 .git
-.gitignore
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Docker - Allow specific docker directories
-!docker/php/
-!docker/nginx/
-Dockerfile
-docker-compose*.yml
-.dockerignore
-
-# Documentation
-*.md
-!README.md
-docs/
-*.txt
-
-# Testing
-phpunit.xml
-tests/
-.phpunit.result.cache
-
-# Node
-node_modules/
-npm-debug.log
-yarn-error.log
-package-lock.json
-
-# Laravel specific
+node_modules
+vendor
+storage/app/*
+!storage/app/public
+storage/framework/*
+!storage/framework/.gitignore
+storage/logs/*
 .env
 .env.*
 !.env.example
-.env.backup
-storage/*.key
-storage/framework/cache/*
-storage/framework/sessions/*
-storage/framework/views/*
-storage/logs/*
-!storage/public/
-
-# Database
-*.sqlite
-*.sqlite3
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Backup files
-*.backup
-*.bak
-*~
+.phpunit.result.cache
+docker-compose.yml
+Dockerfile
+.dockerignore
+tests/
+phpunit.xml
+.editorconfig
+.styleci.yml
+REVISION
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.vscode/
+.idea/
+.antigravityignore

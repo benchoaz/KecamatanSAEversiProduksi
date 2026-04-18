@@ -11,8 +11,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // Update the enum to include 'pending'
-        DB::statement("ALTER TABLE work_directory MODIFY COLUMN status ENUM('active', 'inactive', 'pending') DEFAULT 'pending'");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE work_directory ALTER COLUMN status TYPE VARCHAR(255)");
+            DB::statement("ALTER TABLE work_directory ALTER COLUMN status SET DEFAULT 'pending'");
+        } else {
+            DB::statement("ALTER TABLE work_directory MODIFY COLUMN status ENUM('active', 'inactive', 'pending') DEFAULT 'pending'");
+        }
     }
 
     /**
@@ -20,6 +24,10 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE work_directory MODIFY COLUMN status ENUM('active', 'inactive') DEFAULT 'active'");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE work_directory ALTER COLUMN status SET DEFAULT 'active'");
+        } else {
+            DB::statement("ALTER TABLE work_directory MODIFY COLUMN status ENUM('active', 'inactive') DEFAULT 'active'");
+        }
     }
 };

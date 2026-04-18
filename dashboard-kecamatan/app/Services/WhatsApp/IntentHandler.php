@@ -62,8 +62,7 @@ class IntentHandler
         }
 
         if ($this->isSelection($messageLower, '2')) {
-            // Option 2: Langsung ke Etalase Produk UMKM
-            $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+            $baseUrl = $this->getPublicUrl();
             return [
                 'success' => true,
                 'intent' => 'umkm_produk',
@@ -76,8 +75,7 @@ class IntentHandler
         }
 
         if ($this->isSelection($messageLower, '3')) {
-            // Option 3: Langsung ke Direktori Jasa
-            $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://localhost'));
+            $baseUrl = $this->getPublicUrl();
             return [
                 'success' => true,
                 'intent' => 'jasa',
@@ -156,7 +154,7 @@ class IntentHandler
 
         // LOKER keyword - redirect ke Jasa/Direktori karena Loker sudah dihapus
         if ($this->matchesIntent($messageLower, ['loker', 'lowongan', 'kerja'])) {
-            $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+            $baseUrl = $this->getPublicUrl();
             return [
                 'success' => true,
                 'intent' => 'jasa_link',
@@ -269,22 +267,60 @@ class IntentHandler
     protected function getMainMenu(): array
     {
         $regionName = strtoupper(appProfile()->region_name ?? 'BESUK');
-        $baseUrl = config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev');
+        $profile    = appProfile();
+        $menuItems  = $profile->whatsapp_bot_menu;
 
-        $menu = "MENU LAYANAN KECAMATAN {$regionName}\n\n";
+        if (is_string($menuItems)) {
+            $menuItems = json_decode($menuItems, true);
+        }
+        $menuItems = $menuItems ?: $this->defaultBotMenu();
+
+        $menu  = "MENU LAYANAN KECAMATAN {$regionName}\n\n";
         $menu .= "Silakan pilih layanan (Ketik angka):\n\n";
-        $menu .= "1. ADMINISTRASI - Cek Syarat dan Status Berkas\n";
-        $menu .= "2. PRODUK UMKM - Belanja Produk & Olahan Warga Lokal\n";
-        $menu .= "3. CARI JASA - Tukang, ART, Ojek, Tenaga Harian\n";
-        $menu .= "4. PENGADUAN - Aspirasi dan Laporan Warga\n";
-        $menu .= "5. KELOLA PROFIL - Kelola Data Jasa / Toko UMKM Anda\n\n";
-        $menu .= "Ketik MENU kapan saja untuk kembali.";
+
+        $numbering = 1;
+        foreach ($menuItems as $item) {
+            if (!($item['enabled'] ?? true)) continue;
+            $num   = $item['number'] ?? $numbering;
+            $label = $item['label'] ?? '';
+            $desc  = $item['description'] ?? '';
+            $menu .= "{$num}. {$label} - {$desc}\n";
+            $numbering++;
+        }
+
+        $menu .= "\nKetik MENU kapan saja untuk kembali.";
 
         return [
-            'success' => true,
-            'intent' => 'menu',
-            'reply' => $menu,
+            'success'      => true,
+            'intent'       => 'menu',
+            'reply'        => $menu,
             'state_update' => null,
+        ];
+    }
+
+    /**
+     * Get configured public URL, falling back to app.url
+     */
+    protected function getPublicUrl(): string
+    {
+        $profile = appProfile();
+        if (!empty($profile->public_url)) {
+            return rtrim($profile->public_url, '/');
+        }
+        return rtrim(env('PUBLIC_BASE_URL', config('app.url', 'https://kecamatanbesuk.my.id')), '/');
+    }
+
+    /**
+     * Default bot menu items when none configured in DB
+     */
+    protected function defaultBotMenu(): array
+    {
+        return [
+            ['number' => '1', 'label' => 'ADMINISTRASI',  'description' => 'Cek Syarat dan Status Berkas',      'action' => 'administrasi',   'enabled' => true],
+            ['number' => '2', 'label' => 'PRODUK UMKM',   'description' => 'Belanja Produk & Olahan Warga Lokal','action' => 'umkm_produk',    'enabled' => true],
+            ['number' => '3', 'label' => 'CARI JASA',      'description' => 'Tukang, ART, Ojek, Tenaga Harian', 'action' => 'jasa',           'enabled' => true],
+            ['number' => '4', 'label' => 'PENGADUAN',      'description' => 'Aspirasi dan Laporan Warga',        'action' => 'pengaduan',      'enabled' => true],
+            ['number' => '5', 'label' => 'KELOLA PROFIL',  'description' => 'Kelola Data Jasa / Toko UMKM Anda','action' => 'kelola_profil',  'enabled' => true],
         ];
     }
 
@@ -334,7 +370,7 @@ class IntentHandler
      */
     protected function getUmkmLink(): array
     {
-        $baseUrl = config('app.url');
+        $baseUrl = $this->getPublicUrl();
         $umkmUrl = $baseUrl . '/ekonomi?tab=produk';
 
         return [
@@ -379,22 +415,22 @@ class IntentHandler
      */
     public function getLayananLink(): array
     {
-        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+        $baseUrl    = $this->getPublicUrl();
         $layananUrl = $baseUrl . '/#layanan';
 
         return [
             'success' => true,
-            'intent' => 'syarat_link',
-            'reply' => "🏛️ *LAYANAN ADMINISTRASI*\n\n" .
+            'intent'  => 'syarat_link',
+            'reply'   => "🏛️ *LAYANAN ADMINISTRASI*\n\n" .
                 "Silakan pilih layanan yang Anda butuhkan:\n\n" .
                 "- syarat ktp - Pembuatan KTP\n" .
                 "- syarat kk - Pembuatan KK\n" .
                 "- syarat akta - Akta Kelahiran\n" .
                 "- syarat domisili - Surat Domisili\n\n" .
-                "Ajukan Secara Online:\n"
-                . "👉 {$layananUrl}\n\n" .
+                "Ajukan Secara Online:\n" .
+                "👉 {$layananUrl}\n\n" .
                 "Ketik *MENU* atau *0* untuk kembali.",
-            'state_update' => 'ADM_SUBMENU', 
+            'state_update' => 'ADM_SUBMENU',
         ];
     }
 

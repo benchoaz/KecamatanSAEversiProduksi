@@ -13,16 +13,17 @@ use App\Models\MasterLayanan;
 use App\Models\Umkm;
 use App\Models\Desa;
 use App\Services\ApplicationProfileService;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
 class LandingController extends Controller
 {
     public function index()
     {
-        $profileService = app(\App\Services\ApplicationProfileService::class);
+        $profileService = app(ApplicationProfileService::class);
         $appProfile = $profileService->getProfile();
 
-        $publicAnnouncements = \App\Models\Announcement::where('target_type', 'public')
+        $publicAnnouncements = Announcement::where('target_type', 'public')
             ->where('is_active', true)
             ->where('start_date', '<=', now())
             ->where('end_date', '>=', now())
@@ -39,19 +40,19 @@ class LandingController extends Controller
         $whatsappUrl = $profileService->getWhatsappBotUrl('MENU');
 
         // Other required vars for the view
-        $latestBerita = \App\Models\Berita::published()->latest()->take(3)->get();
+        $latestBerita = Berita::published()->latest()->take(3)->get();
         $faqKeywords = [];
-        $featuredLayanan = \App\Models\MasterLayanan::where('is_active', true)
+        $featuredLayanan = MasterLayanan::where('is_active', true)
             ->where('is_popular', true)
             ->orderBy('urutan')
             ->get();
-        $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
-        $resolvedComplaints = \App\Models\PublicService::where('status', 'Selesai')->take(5)->get();
-        $desas = \App\Models\Desa::all();
+        $masterLayanan = MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
+        $resolvedComplaints = PublicService::where('status', 'Selesai')->take(5)->get();
+        $desas = Desa::all();
 
         // Data UMKM & Produk untuk Etalase Landing Page
-        $officialUmkms = \App\Models\Umkm::where('status', 'aktif')->latest()->take(3)->get();
-        $featuredProducts = \App\Models\UmkmLocal::where('is_active', true)
+        $officialUmkms = Umkm::where('status', 'aktif')->latest()->take(3)->get();
+        $featuredProducts = UmkmLocal::where('is_active', true)
             ->where('is_featured', true)
             ->latest()
             ->take(4)
@@ -59,7 +60,7 @@ class LandingController extends Controller
             
         // Jika tidak ada featured_product, ambil yang terbaru saja
         if ($featuredProducts->isEmpty()) {
-            $featuredProducts = \App\Models\UmkmLocal::where('is_active', true)->latest()->take(4)->get();
+            $featuredProducts = UmkmLocal::where('is_active', true)->latest()->take(4)->get();
         }
 
         return view('landing', compact(
@@ -170,16 +171,8 @@ class LandingController extends Controller
     {
         $common = $this->prepareStatistikData();
 
-        // Load convergence data from scraped JSON
-        $convergenceData = null;
-        if (\Illuminate\Support\Facades\Storage::exists('convergence_data.json')) {
-            $raw = \Illuminate\Support\Facades\Storage::get('convergence_data.json');
-            $convergenceData = json_decode($raw, true);
-        }
-
-        return view('landing.statistik.kesehatan', array_merge($common, [
-            'convergenceData' => $convergenceData,
-        ]));
+        // Focus only on internal village-level health data
+        return view('landing.statistik.kesehatan', $common);
     }
 
     public function statKesejahteraan()

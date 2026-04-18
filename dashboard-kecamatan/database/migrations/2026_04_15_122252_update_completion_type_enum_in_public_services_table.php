@@ -12,7 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE public_services MODIFY COLUMN completion_type ENUM(\"digital\", \"physical\", \"whatsapp\") NULL");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE public_services ALTER COLUMN completion_type TYPE VARCHAR(255)");
+            DB::statement("ALTER TABLE public_services ALTER COLUMN completion_type DROP NOT NULL");
+        } else {
+            DB::statement("ALTER TABLE public_services MODIFY COLUMN completion_type ENUM(\"digital\", \"physical\", \"whatsapp\") NULL");
+        }
     }
 
     /**
@@ -20,6 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE public_services MODIFY COLUMN completion_type ENUM(\"digital\", \"physical\") NULL");
+        if (DB::getDriverName() === 'pgsql') {
+             DB::statement("ALTER TABLE public_services ALTER COLUMN completion_type TYPE VARCHAR(255)");
+        } else {
+            DB::statement("ALTER TABLE public_services MODIFY COLUMN completion_type ENUM(\"digital\", \"physical\") NULL");
+        }
     }
 };

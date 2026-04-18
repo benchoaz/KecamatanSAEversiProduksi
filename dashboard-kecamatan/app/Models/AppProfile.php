@@ -44,7 +44,14 @@ class AppProfile extends Model
         'office_hours_fri',
         'map_latitude',
         'map_longitude',
-        'updated_by'
+        'updated_by',
+        // Bot Settings
+        'public_url',
+        'whatsapp_bot_menu',
+    ];
+
+    protected $casts = [
+        'whatsapp_bot_menu' => 'array',
     ];
 
     public function editor()

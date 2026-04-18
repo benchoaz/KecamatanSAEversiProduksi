@@ -33,12 +33,17 @@ class VillageSeeder extends Seeder
         ];
 
         foreach ($villages as $v) {
+            $subdomain = \Illuminate\Support\Str::slug(str_replace(' ', '', $v['nama']), '');
+            $domain = "{$subdomain}.tatadesa.com";
+            
             \App\Models\Desa::updateOrCreate(
                 ['kode_desa' => $v['kode']],
                 [
                     'nama_desa' => $v['nama'],
                     'kecamatan' => 'Besuk',
                     'kabupaten' => 'Probolinggo',
+                    'tatadesa_domain' => $domain,
+                    'website_url' => $domain,
                     'status' => 'aktif',
                     'is_active' => true
                 ]

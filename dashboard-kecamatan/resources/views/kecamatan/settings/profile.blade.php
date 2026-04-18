@@ -554,7 +554,7 @@
                                                     class="form-control bg-white border-slate-200 rounded-3 text-sm"
                                                     placeholder="(0335) 123456">
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <label class="form-label text-slate-700 fw-semibold">WhatsApp Pengaduan
                                                     (Lapor!)</label>
                                                 <input type="text" name="whatsapp_complaint"
@@ -562,17 +562,7 @@
                                                     class="form-control bg-white border-slate-200 rounded-3 text-sm"
                                                     placeholder="08123456789">
                                             </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label text-slate-700 fw-semibold text-primary">Nomor
-                                                    WhatsApp Bot</label>
-                                                <input type="text" name="whatsapp_bot_number"
-                                                    value="{{ old('whatsapp_bot_number', $profile->whatsapp_bot_number) }}"
-                                                    class="form-control bg-white border-primary border-opacity-25 rounded-3 text-sm"
-                                                    placeholder="08xxxxxxxxxx">
-                                                <div class="form-text text-[10px] text-primary text-opacity-75 mt-1 small">
-                                                    Gunakan nomor yang terhubung ke bot WAHA.</div>
-                                            </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <label class="form-label text-slate-700 fw-semibold">Buka: Senin -
                                                     Kamis</label>
                                                 <input type="text" name="office_hours_mon_thu"
@@ -624,7 +614,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            {{-- Section Bot WhatsApp was moved to WahaN8n settings --}}
 
                             <div class="d-flex justify-content-end mt-5 pt-3 border-top border-light">
                                 <button type="submit" class="btn btn-primary btn-lg px-5 rounded-3 fw-bold shadow-sm"

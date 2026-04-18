@@ -47,7 +47,6 @@ class ApplicationProfileController extends Controller
             'address' => 'nullable|string|max:1000',
             'phone' => 'nullable|string|max:50',
             'whatsapp_complaint' => 'nullable|string|max:50',
-            'whatsapp_bot_number' => 'nullable|string|max:50',
             'is_ai_active' => 'nullable|boolean',
             'facebook_url' => 'nullable|url|max:255',
             'instagram_url' => 'nullable|url|max:255',
@@ -59,6 +58,12 @@ class ApplicationProfileController extends Controller
             'office_hours_fri' => 'nullable|string|max:100',
             'map_latitude' => 'nullable|numeric|between:-90,90',
             'map_longitude' => 'nullable|numeric|between:-180,180',
+            'public_url' => 'nullable|url|max:500',
+            'whatsapp_bot_menu' => 'nullable|array',
+            'whatsapp_bot_menu.*.label' => 'nullable|string|max:100',
+            'whatsapp_bot_menu.*.description' => 'nullable|string|max:255',
+            'whatsapp_bot_menu.*.action' => 'nullable|string|max:100',
+            'whatsapp_bot_menu.*.enabled' => 'nullable',
         ]);
 
         $profile = AppProfile::first() ?? new AppProfile();
@@ -74,7 +79,6 @@ class ApplicationProfileController extends Controller
             'address',
             'phone',
             'whatsapp_complaint',
-            'whatsapp_bot_number',
             'is_ai_active',
             'facebook_url',
             'instagram_url',
@@ -85,7 +89,8 @@ class ApplicationProfileController extends Controller
             'office_hours_mon_thu',
             'office_hours_fri',
             'map_latitude',
-            'map_longitude'
+            'map_longitude',
+            'public_url',
         ]);
         $data['hero_image_active'] = $request->has('hero_image_active') ? true : false;
         $data['is_menu_pengaduan_active'] = $request->has('is_menu_pengaduan_active') ? true : false;
@@ -94,6 +99,16 @@ class ApplicationProfileController extends Controller
         $data['is_menu_pelayanan_active'] = $request->has('is_menu_pelayanan_active') ? true : false;
         $data['is_menu_statistik_active'] = $request->has('is_menu_statistik_active') ? true : false;
         $data['updated_by'] = auth()->id();
+
+        // Process whatsapp_bot_menu: normalize enabled field (checkbox only sends when checked)
+        if ($request->has('whatsapp_bot_menu')) {
+            $menuItems = $request->input('whatsapp_bot_menu', []);
+            foreach ($menuItems as $i => $item) {
+                $menuItems[$i]['enabled'] = !empty($item['enabled']);
+                $menuItems[$i]['number']  = (string)($i + 1);
+            }
+            $data['whatsapp_bot_menu'] = $menuItems;
+        }
 
         // Handle File Uploads
         $fileFields = [

@@ -5,6 +5,11 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration {
     /**
+     * @var bool
+     */
+    public $withinTransaction = false;
+
+    /**
      * Run the migrations.
      * 
      * View Agregat untuk Real-time Reporting Ekonomi & Pembangunan

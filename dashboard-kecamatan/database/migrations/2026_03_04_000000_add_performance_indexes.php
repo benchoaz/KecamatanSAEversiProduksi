@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration {
     /**
+     * @var bool
+     */
+    public $withinTransaction = false;
+
+    /**
      * Run the migrations.
      * 
      * Performance indexes for faster queries

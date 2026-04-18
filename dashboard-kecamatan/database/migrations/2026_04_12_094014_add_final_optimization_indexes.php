@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * @var bool
+     */
+    public $withinTransaction = false;
+
     public function up(): void
     {
         // UMKM Table Indexes

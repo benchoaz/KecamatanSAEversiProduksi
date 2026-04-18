@@ -12,9 +12,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE work_directory MODIFY COLUMN job_type ENUM('harian', 'jasa', 'keliling', 'transportasi', 'umkm') NOT NULL");
-        DB::statement("ALTER TABLE work_directory MODIFY COLUMN status ENUM('active', 'inactive', 'pending') DEFAULT 'pending'");
-        DB::statement("ALTER TABLE work_directory MODIFY COLUMN data_source ENUM('kecamatan', 'desa', 'warga', 'web_form') DEFAULT 'kecamatan'");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE work_directory ALTER COLUMN job_type TYPE VARCHAR(255)");
+            DB::statement("ALTER TABLE work_directory ALTER COLUMN status TYPE VARCHAR(255)");
+            DB::statement("ALTER TABLE work_directory ALTER COLUMN status SET DEFAULT 'pending'");
+            DB::statement("ALTER TABLE work_directory ALTER COLUMN data_source TYPE VARCHAR(255)");
+            DB::statement("ALTER TABLE work_directory ALTER COLUMN data_source SET DEFAULT 'kecamatan'");
+        } else {
+            DB::statement("ALTER TABLE work_directory MODIFY COLUMN job_type ENUM('harian', 'jasa', 'keliling', 'transportasi', 'umkm') NOT NULL");
+            DB::statement("ALTER TABLE work_directory MODIFY COLUMN status ENUM('active', 'inactive', 'pending') DEFAULT 'pending'");
+            DB::statement("ALTER TABLE work_directory MODIFY COLUMN data_source ENUM('kecamatan', 'desa', 'warga', 'web_form') DEFAULT 'kecamatan'");
+        }
     }
 
     /**
@@ -22,8 +30,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE work_directory MODIFY COLUMN job_type ENUM('harian', 'jasa', 'keliling', 'transportasi') NOT NULL");
-        DB::statement("ALTER TABLE work_directory MODIFY COLUMN status ENUM('active', 'inactive') DEFAULT 'active'");
-        DB::statement("ALTER TABLE work_directory MODIFY COLUMN data_source ENUM('kecamatan', 'desa', 'warga') DEFAULT 'kecamatan'");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE work_directory ALTER COLUMN status SET DEFAULT 'active'");
+        } else {
+            DB::statement("ALTER TABLE work_directory MODIFY COLUMN job_type ENUM('harian', 'jasa', 'keliling', 'transportasi') NOT NULL");
+            DB::statement("ALTER TABLE work_directory MODIFY COLUMN status ENUM('active', 'inactive') DEFAULT 'active'");
+            DB::statement("ALTER TABLE work_directory MODIFY COLUMN data_source ENUM('kecamatan', 'desa', 'warga') DEFAULT 'kecamatan'");
+        }
     }
 };
