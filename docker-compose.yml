@@ -1,0 +1,169 @@
+version: "3.8"
+
+services:
+  # ============================================================
+  # Reverse Proxy & SSL (Traefik)
+  # ============================================================
+  gateway:
+    image: traefik:v2.10
+    container_name: traefik-gateway
+    restart: always
+    command:
+      - "--log.level=INFO"
+      - "--api.insecure=false"
+      - "--providers.file.filename=/etc/traefik/dynamic_conf.yml"
+      - "--providers.file.watch=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL:-benchoaz@gmail.com}"
+      - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./gateway/dynamic_conf.yml:/etc/traefik/dynamic_conf.yml:ro
+      - ./gateway/acme.json:/acme.json
+    networks:
+      - kecamatan-network
+
+  # ============================================================
+  # Application Core (Laravel 10)
+  # ============================================================
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      target: production
+    container_name: kecamatan-app
+    restart: unless-stopped
+    working_dir: /var/www
+    env_file: ./app/.env
+    volumes:
+      - ./app:/var/www
+    networks:
+      - kecamatan-network
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    container_name: kecamatan-nginx
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kecamatan-dashboard.rule=Host(`${DOMAIN:-kecamatanbesuk.my.id}`)"
+      - "traefik.http.routers.kecamatan-dashboard.entrypoints=web,websecure"
+      - "traefik.http.routers.kecamatan-dashboard.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.kecamatan-compress.compress=true"
+      - "traefik.http.routers.kecamatan-dashboard.middlewares=kecamatan-compress"
+    volumes:
+      - ./app:/var/www:ro
+      - ./app/docker/nginx/conf.d:/etc/nginx/conf.d:ro
+    networks:
+      kecamatan-network:
+        aliases:
+          - dashboard-kecamatan
+          - dashboard-kecamatan-nginx
+    depends_on:
+      - app
+
+  db:
+    image: postgres:17-alpine
+    container_name: kecamatan-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dashboard_kecamatan
+      POSTGRES_USER: ${DB_USERNAME:-user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - kecamatan-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-user} -d dashboard_kecamatan"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: kecamatan-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - kecamatan-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+
+  scheduler:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: kecamatan-scheduler
+    restart: unless-stopped
+    working_dir: /var/www
+    env_file: ./app/.env
+    command: >
+      sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
+    networks:
+      - kecamatan-network
+    depends_on:
+      - app
+
+  # ============================================================
+  # WhatsApp & Automation (WAHA + n8n)
+  # ============================================================
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: waha-kecamatan
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - WHATSAPP_API_TOKEN=${WAHA_API_KEY}
+      - WAHA_API_KEY=${WAHA_API_KEY}
+      - WAHA_SESSION_DATA_SAVE=true
+      - WAHA_DASHBOARD_USERNAME=${WAHA_DASHBOARD_USERNAME}
+      - WAHA_DASHBOARD_PASSWORD=${WAHA_DASHBOARD_PASSWORD}
+      - WHATSAPP_SWAGGER_USERNAME=${WAHA_DASHBOARD_USERNAME}
+      - WHATSAPP_SWAGGER_PASSWORD=${WAHA_DASHBOARD_PASSWORD}
+    volumes:
+      - waha_sessions:/app/.sessions
+    networks:
+      - kecamatan-network
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: kecamatan-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=false
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - N8N_ENV_VARS_ALLOWED=WHATSAPP_API_TOKEN,WAHA_API_KEY,DASHBOARD_API_TOKEN,DASHBOARD_URL
+      - WAHA_API_KEY=${WAHA_API_KEY}
+      - DASHBOARD_API_TOKEN=${DASHBOARD_API_TOKEN}
+      - DASHBOARD_URL=http://kecamatan-nginx
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - kecamatan-network
+    depends_on:
+      - waha
+
+networks:
+  kecamatan-network:
+    driver: bridge
+
+volumes:
+  pgdata:
+  redis_data:
+  n8n_data:
+  waha_sessions:

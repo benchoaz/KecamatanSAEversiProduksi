@@ -64,13 +64,11 @@ graph TD
 
 ## 🚀 Panduan Deployment (VPS & Server)
 
-### Prasyarat (Prerequisites):
-- Server Linux (Ubuntu/Debian direkomendasikan)
-- Git terinstall
-- Docker & Docker Compose (Versi terbaru)
-- Nama domain yang sudah diarahkan ke IP Server (Opsional)
+### Prasyarat:
+- Server Linux (Ubuntu/Debian)
+- Docker & Docker Compose v2+
 
-### Langkah Instalasi Pertama Kali:
+### Langkah Instalasi:
 
 1. **Clone Repositori**:
    ```bash
@@ -78,28 +76,15 @@ graph TD
    cd KecamatanSAEversiKabupaten
    ```
 
-2. **Konfigurasi Environment**:
-   Salin file `.env.example` ke `.env` pada subdirektori `dashboard-kecamatan` dan konfigurasi password database serta kredensial lainnya.
+2. **Jalankan Setup Otomatis**:
+   Cukup jalankan satu skrip ini untuk menyiapkan seluruh sistem:
    ```bash
-   cp dashboard-kecamatan/.env.example dashboard-kecamatan/.env
+   chmod +x setup.sh
+   ./setup.sh
    ```
 
-3. **Jalankan Instalasi dan Container**:
-   Menjalankan *script* bawaan untuk memastikan instalasi awal berjalan mulus:
-   ```bash
-   docker compose up -d --build
-   ```
-
-4. **Konfigurasi Laravel Inti**:
-   Jalankan migrasi database agar struktur siap digunakan:
-   ```bash
-   docker exec kecamatan-app php /var/www/artisan key:generate
-   docker exec kecamatan-app php /var/www/artisan migrate --seed --force
-   docker exec kecamatan-app php /var/www/artisan optimize:clear
-   ```
-
-5. **Pairing WhatsApp**:
-   Akses dashboard WAHA (contoh `http://ip-vps:3000`) untuk memindai kode QR dan menghubungkan nomor WhatsApp layanan utama.
+3. **Konfigurasi Khusus (Opsional)**:
+   Edit file `.env` di root untuk menyesuaikan domain atau password database jika diperlukan.
 
 ---
 

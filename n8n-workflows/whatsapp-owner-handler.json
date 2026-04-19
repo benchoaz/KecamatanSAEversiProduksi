@@ -92,7 +92,7 @@
                     "parameters": [
                         {
                             "name": "Authorization",
-                            "value": "=Bearer {{ $env.DASHBOARD_API_TOKEN }}"
+                            "value": "Bearer waha_secret_key_2024"
                         },
                         {
                             "name": "Content-Type",
@@ -161,7 +161,7 @@
                     "parameters": [
                         {
                             "name": "Authorization",
-                            "value": "=Bearer {{ $env.DASHBOARD_API_TOKEN }}"
+                            "value": "Bearer waha_secret_key_2024"
                         },
                         {
                             "name": "Content-Type",

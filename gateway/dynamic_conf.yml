@@ -1,0 +1,55 @@
+http:
+  routers:
+    kecamatan-dashboard:
+      rule: "Host(`kecamatanbesuk.my.id`)"
+      entryPoints:
+        - websecure
+      service: kecamatan-dashboard-svc
+      tls:
+        certResolver: myresolver
+      middlewares:
+        - kecamatan-compress
+        - kecamatan-headers
+
+    kecamatan-local:
+      rule: "PathPrefix(`/`)"
+      entryPoints:
+        - websecure
+      service: kecamatan-dashboard-svc
+      tls: {}
+      middlewares:
+        - kecamatan-compress
+        - kecamatan-headers
+
+    kecamatan-http-redirect:
+      rule: "PathPrefix(`/`)"
+      entryPoints:
+        - web
+      middlewares:
+        - redirect-to-https
+      service: kecamatan-dashboard-svc
+
+  middlewares:
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+    kecamatan-compress:
+      compress: {}
+
+    kecamatan-headers:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        frameDeny: true
+
+  services:
+    kecamatan-dashboard-svc:
+      loadBalancer:
+        servers:
+          - url: "http://kecamatan-nginx:80"

@@ -1,8 +1,8 @@
-# Folders to exclude
-kantor/
-.gemini/
+# IDE & Editor files
 .idea/
 .vscode/
+*.swp
+*.swo
 
 # Environment files
 **/node_modules/
@@ -10,17 +10,36 @@ kantor/
 **/.env
 **/.env.local
 **/.env.*.local
-**/composer.lock
-**/package-lock.json
+**/.phpunit.result.cache
 
-# Laravel specific
+# Git/Composer locks (optional, but keep for production stability)
+# composer.lock
+# package-lock.json
+
+# SSL & Encryption
+**/acme.json
+**/letsencrypt/
 **/storage/*.key
+
+# Laravel Specific
 **/storage/framework/cache/data/*
 **/storage/framework/sessions/*
 **/storage/framework/testing/*
 **/storage/framework/views/*
 **/storage/logs/*
+**/bootstrap/cache/*.php
 
-# OS specific
+# Logs & Temporary files
+*.log
+*.tmp
+*.temp
 .DS_Store
 Thumbs.db
+   
+# Deployment & AI plans
+plans/
+.gemini/
+   
+# Misc
+grep_portal_desa.txt
+migration_error.log
