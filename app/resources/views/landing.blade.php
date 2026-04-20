@@ -730,7 +730,7 @@
                             </div>
                         </div>
 
-                        <a href="{{ route('apply.form', $svc->slug) }}"
+                        <a href="{{ $svc->slug ? route('apply.form', $svc->slug) : '#' }}"
                             class="btn btn-sm bg-[#003366] hover:bg-[#004488] border-none text-white rounded-xl px-6 w-full py-3 h-auto font-black uppercase tracking-widest text-[10px] flex items-center justify-center transition-all shadow-lg shadow-[#003366]/10 active:scale-95">
                             Ajukan Permohonan
                         </a>
