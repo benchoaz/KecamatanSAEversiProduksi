@@ -329,6 +329,12 @@
 
 @push('scripts')
 <script>
+// Pindahkan modal ke body untuk menghindari isu z-index/overlay
+document.addEventListener('DOMContentLoaded', function() {
+    document.body.appendChild(document.getElementById('addNodeModal'));
+    document.body.appendChild(document.getElementById('addReqModal'));
+});
+
 // ── State ─────────────────────────────────────────────────
 let activeNodeId = null;
 
