@@ -24,7 +24,7 @@ class CheckRole
         }
 
         // Strict Check temporarily disabled? No, let's keep it but handle the case.
-        if (!$request->user()->isAdminPelayanan() && !in_array($userRole, $roles)) {
+        if (!$user->isModuleAdmin() && !in_array($userRole, $roles)) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Unauthorized domain access.'], 403);
             }

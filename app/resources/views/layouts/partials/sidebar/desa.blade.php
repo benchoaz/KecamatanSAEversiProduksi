@@ -91,6 +91,13 @@
                         </a>
                     </li>
                     <li class="desa-nav-item">
+                        <a href="/desa/manajemen/dokumen-pencairan-desas"
+                            class="desa-nav-link {{ request()->is('desa/manajemen/dokumen-pencairan-desas*') ? 'active' : '' }}">
+                            <i class="desa-nav-icon fas fa-file-invoice-dollar text-primary"></i>
+                            <span>Syarat Pencairan DD</span>
+                        </a>
+                    </li>
+                    <li class="desa-nav-item">
                         <a href="{{ route('desa.pembangunan.administrasi.index') }}"
                             class="desa-nav-link {{ request()->routeIs('desa.pembangunan.administrasi.*') ? 'active' : '' }}">
                             <i class="desa-nav-icon fas fa-file-signature text-info"></i>
@@ -139,5 +146,34 @@
                 </li>
             </ul>
         </div>
+
+        {{-- Dynamic Menus Section --}}
+        @if(isset($dynamicMenus) && $dynamicMenus->count() > 0)
+            <div class="desa-nav-section">
+                <div class="desa-nav-title">Akses Otoritas (Dinamis)</div>
+                <ul class="desa-nav-menu">
+                    @foreach($dynamicMenus as $menu)
+                        <li class="desa-nav-item">
+                            <a href="{{ $menu->slug ? '#'.$menu->slug : '#' }}"
+                               class="desa-nav-link {{ request()->is($menu->slug.'*') ? 'active' : '' }}">
+                                <i class="desa-nav-icon {{ $menu->icon ?? 'fas fa-circle' }}"></i>
+                                <span>{{ $menu->name }}</span>
+                            </a>
+                        </li>
+                        @if($menu->subMenus->count() > 0)
+                            @foreach($menu->subMenus as $sub)
+                                <li class="desa-nav-item ps-3">
+                                    <a href="{{ $sub->route_name ? route($sub->route_name) : '#' }}"
+                                       class="desa-nav-link {{ request()->is($sub->slug.'*') ? 'active' : '' }}">
+                                        <i class="desa-nav-icon fas fa-dot-circle small"></i>
+                                        <span>{{ $sub->name }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        @endif
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </nav>
 </aside>

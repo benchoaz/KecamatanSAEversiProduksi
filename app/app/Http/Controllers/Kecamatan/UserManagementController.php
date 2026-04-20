@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Desa;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\NavMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -36,7 +37,8 @@ class UserManagementController extends Controller
     {
         $roles = Role::all();
         $villages = Desa::active()->get();
-        return view('kecamatan.users.create', compact('roles', 'villages'));
+        $menus = NavMenu::with('subMenus')->orderBy('order')->get();
+        return view('kecamatan.users.create', compact('roles', 'villages', 'menus'));
     }
 
     public function store(Request $request)
@@ -63,7 +65,12 @@ class UserManagementController extends Controller
         }
 
         $validated['password'] = Hash::make($request->password);
-        User::create($validated);
+        $user = User::create($validated);
+
+        // Sync extra permissions if provided
+        if ($request->has('permissions')) {
+            $user->syncPermissions($request->permissions);
+        }
 
         return redirect()->route('kecamatan.users.index')
             ->with('success', 'User berhasil ditambahkan ke sistem.');
@@ -73,7 +80,10 @@ class UserManagementController extends Controller
     {
         $roles = Role::all();
         $villages = Desa::active()->get();
-        return view('kecamatan.users.edit', compact('user', 'roles', 'villages'));
+        $menus = NavMenu::with('subMenus')->orderBy('order')->get();
+        $userPermissions = $user->getPermissionNames()->toArray();
+
+        return view('kecamatan.users.edit', compact('user', 'roles', 'villages', 'menus', 'userPermissions'));
     }
 
     public function update(Request $request, User $user)
@@ -105,6 +115,11 @@ class UserManagementController extends Controller
 
         // Username is immutable (not included in validated/update)
         $user->update($validated);
+
+        // Sync extra permissions if provided
+        if ($request->has('permissions')) {
+            $user->syncPermissions($request->permissions);
+        }
 
         return redirect()->route('kecamatan.users.index')
             ->with('success', 'Data user berhasil diperbarui.');

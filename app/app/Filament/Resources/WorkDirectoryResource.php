@@ -14,6 +14,15 @@ class WorkDirectoryResource extends Resource
 {
     protected static ?string $model = WorkDirectory::class;
 
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+
+        $role = $user->role->nama_role ?? '';
+        return in_array($role, ['Super Admin', 'Operator Kecamatan', 'umkm_admin']);
+    }
+
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
 
     protected static ?string $navigationLabel = 'Direktori Kerja & Jasa';

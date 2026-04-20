@@ -193,7 +193,8 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
-        // App\Providers\Filament\AdminPanelProvider::class, // Disabled - using custom admin panel
+        App\Providers\Filament\AdminPanelProvider::class,
+        App\Providers\Filament\DesaPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
 
     ],

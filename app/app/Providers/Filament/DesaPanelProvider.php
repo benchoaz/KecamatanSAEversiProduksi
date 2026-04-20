@@ -19,53 +19,29 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Navigation\NavigationItem;
 
-class AdminPanelProvider extends PanelProvider
+class DesaPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         $appProfile = appProfile();
-        $brandName = $appProfile->region_level . ' ' . $appProfile->region_name;
-        $logoUrl = $appProfile->logo_path ? asset('storage/' . $appProfile->logo_path) : null;
+        $brandName = 'DESA - ' . ($appProfile->region_name ?? 'Manajemen');
 
         return $panel
-            ->default()
-            ->id('admin')
-            ->path('kecamatan/manajemen')
+            ->id('desa')
+            ->path('desa/manajemen')
             ->login()
-            ->profile()
-            ->brandName($brandName)
-            ->brandLogo($logoUrl)
-            ->brandLogoHeight('2.5rem')
             ->colors([
-                'primary' => Color::Slate,
-                'gray' => Color::Slate,
-                'info' => Color::Blue,
-                'success' => Color::Teal,
-                'warning' => Color::Amber,
-                'danger' => Color::Rose,
+                'primary' => Color::Sky,
             ])
             ->font('Outfit')
-            ->sidebarCollapsibleOnDesktop()
             ->navigationItems([
                 NavigationItem::make('Beranda Dashboard')
-                    ->url(fn(): string => route('kecamatan.dashboard'))
+                    ->url(fn(): string => route('desa.dashboard'))
                     ->icon('heroicon-o-home')
-                    ->group('DASHBOARD UTAMA')
                     ->sort(-1),
-            ])
-            ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
-            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
-            ->pages([
-                Pages\Dashboard::class,
             ])
             ->resources([
                 \App\Filament\Admin\Resources\DokumenPencairanDesaResource::class,
-                \App\Filament\Admin\Resources\RekomendasiPencairanDdResource::class,
-            ])
-            ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
-            ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

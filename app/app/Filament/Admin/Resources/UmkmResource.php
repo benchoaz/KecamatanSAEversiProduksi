@@ -14,6 +14,26 @@ use Illuminate\Database\Eloquent\Builder;
 
 class UmkmResource extends Resource
 {
+    public static function canViewAny(): bool
+    {
+        return auth()->check();
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if ($user && $user->isOperatorDesa()) {
+            // Operator Desa only sees UMKM from their village
+            $namaDesa = $user->desa->nama_desa ?? '';
+            return $query->where('desa', $namaDesa);
+        }
+
+        // Super Admin, Operator Kecamatan, and umkm_admin can see all
+        return $query;
+    }
+
     protected static ?string $model = Umkm::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';

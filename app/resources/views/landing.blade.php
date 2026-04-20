@@ -672,56 +672,68 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($masterLayanan as $svc)
                     @if(in_array($svc->slug, ['kependudukan', 'pengaduan', 'jam-layanan'])) @continue @endif
+                    @php
+                        // Government Symbol Mapping
+                        $iconMap = [
+                            'ktp' => 'fa-id-card',
+                            'kk' => 'fa-users',
+                            'pindah' => 'fa-truck-moving',
+                            'akta' => 'fa-file-signature',
+                            'sktm' => 'fa-hand-holding-heart',
+                            'usaha' => 'fa-briefcase',
+                            'izin' => 'fa-stamp',
+                            'domisili' => 'fa-map-marker-alt',
+                        ];
+                        $finalIcon = $svc->ikon ?? 'fa-file-shield';
+                        foreach($iconMap as $key => $icon) {
+                            if(str_contains(strtolower($svc->nama_layanan), $key)) {
+                                $finalIcon = $icon;
+                                break;
+                            }
+                        }
+                    @endphp
                     <div
-                        class="group bg-white rounded-[2.5rem] p-8 border border-slate-100 hover:border-teal-100 transition-all duration-500 hover:shadow-[0_20px_50px_-12px_rgba(13,148,136,0.12)] relative overflow-hidden flex flex-col h-full">
+                        class="group bg-white rounded-[2.5rem] p-8 border border-slate-100 hover:border-[#003366]/20 transition-all duration-500 hover:shadow-[0_20px_50px_-12px_rgba(0,51,102,0.1)] active:scale-[0.98] relative overflow-hidden flex flex-col h-full cursor-pointer">
                         <!-- Top Accent -->
                         <div
-                            class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r {{ $svc->warna_bg ?? 'from-teal-500 to-teal-600' }} opacity-0 group-hover:opacity-100 transition-opacity">
+                            class="absolute top-0 left-0 w-full h-1.5 bg-[#003366] opacity-0 group-hover:opacity-100 transition-opacity">
                         </div>
 
                         <div class="flex items-start gap-6 mb-6">
                             <div
-                                class="w-16 h-16 rounded-2xl {{ $svc->warna_bg ?? 'bg-teal-50' }} {{ $svc->warna_text ?? 'text-teal-600' }} flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                                <i class="fas {{ $svc->ikon ?? 'fa-file-alt' }} text-2xl"></i>
+                                class="w-16 h-16 rounded-2xl bg-slate-50 text-[#003366] flex items-center justify-center shrink-0 shadow-sm group-hover:bg-[#003366] group-hover:text-white transition-all duration-500">
+                                <i class="fas {{ $finalIcon }} text-2xl"></i>
                             </div>
                             <div>
                                 <h3
-                                    class="text-xl font-black text-slate-800 mb-1 group-hover:text-teal-700 transition-colors leading-tight">
+                                    class="text-xl font-black text-slate-800 mb-1 group-hover:text-[#003366] transition-colors leading-tight">
                                     {{ $svc->nama_layanan }}
                                 </h3>
                                 <div
                                     class="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                    <i class="far fa-clock text-teal-500"></i>
-                                    <span>Estimasi: {{ $svc->estimasi_waktu ?? '15 Menit' }}</span>
+                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                                    <span>Layanan Terverifikasi</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="space-y-4 mb-8 flex-grow">
                             <div
-                                class="bg-slate-50 rounded-2xl p-4 border border-slate-100 group-hover:bg-white group-hover:border-teal-50 transition-colors">
+                                class="bg-slate-50 rounded-2xl p-4 border border-slate-100 group-hover:bg-white group-hover:border-slate-200 transition-colors">
                                 <p
-                                    class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                    <i class="fas fa-list-check text-[10px]"></i> Persyaratan
+                                    class="text-[10px] font-black text-[#003366] uppercase tracking-widest mb-2 flex items-center gap-2">
+                                    <i class="fas fa-clipboard-list"></i> Persyaratan Dokumen
                                 </p>
-                                <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                                <p class="text-xs text-slate-600 leading-relaxed font-medium line-clamp-3">
                                     {{ $svc->deskripsi_syarat }}
                                 </p>
                             </div>
                         </div>
 
-                        @if($svc->slug === 'pengaduan')
-                            <button
-                                onclick="document.getElementById('complaintModal').showModal()"
-                                class="btn btn-sm bg-teal-600 hover:bg-teal-700 border-none text-white rounded-xl px-6 w-full group-hover:shadow-md transition-all py-3 h-auto font-black uppercase tracking-widest text-[10px]">
-                                Ajukan / Hubungi
-                            </button>
-                        @else
-                            <a href="{{ route('apply.form', $svc->slug) }}"
-                                class="btn btn-sm bg-teal-600 hover:bg-teal-700 border-none text-white rounded-xl px-6 w-full group-hover:shadow-md transition-all py-3 h-auto font-black uppercase tracking-widest text-[10px] flex items-center justify-center">
-                                Ajukan Sekarang
-                            </a>
-                        @endif
+                        <a href="{{ route('apply.form', $svc->slug) }}"
+                            class="btn btn-sm bg-[#003366] hover:bg-[#004488] border-none text-white rounded-xl px-6 w-full py-3 h-auto font-black uppercase tracking-widest text-[10px] flex items-center justify-center transition-all shadow-lg shadow-[#003366]/10 active:scale-95">
+                            Ajukan Permohonan
+                        </a>
                     </div>
                 @endforeach
             </div>

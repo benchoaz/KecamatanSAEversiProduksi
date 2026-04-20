@@ -55,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
         // Kecamatan Level Roles
         if ($user->hasRole('Super Admin') ||
             $user->hasRole('Operator Kecamatan') ||
-            $user->isAdminPelayanan()) {
+            $user->isModuleAdmin()) {
             return redirect()->route('kecamatan.dashboard');
         }
 

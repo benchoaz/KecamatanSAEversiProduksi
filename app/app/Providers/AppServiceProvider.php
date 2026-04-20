@@ -54,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
         // Trantibum Module Composer - Isolated
         view()->composer(['kecamatan.trantibum.*', 'layouts.trantibum'], function ($view) {
             if (auth()->check()) {
-                $userRole = auth()->user()->role->nama_role ?? null;
+                $userRole = auth()->user()->role->name ?? auth()->user()->role->nama_role ?? null;
                 $allowedRoles = ['trantibum_admin', 'Super Admin', 'Operator Kecamatan'];
 
                 if (in_array($userRole, $allowedRoles)) {
@@ -68,7 +68,7 @@ class AppServiceProvider extends ServiceProvider
         // UMKM Module Composer - Isolated
         view()->composer(['kecamatan.layanan.umkm.*', 'layouts.umkm-admin'], function ($view) {
             if (auth()->check()) {
-                $userRole = auth()->user()->role->nama_role ?? null;
+                $userRole = auth()->user()->role->name ?? auth()->user()->role->nama_role ?? null;
                 $allowedRoles = ['umkm_admin', 'Super Admin', 'Operator Kecamatan'];
 
                 if (in_array($userRole, $allowedRoles)) {
@@ -83,7 +83,7 @@ class AppServiceProvider extends ServiceProvider
         // Loker Module Composer - Isolated
         view()->composer(['kecamatan.layanan.loker.*', 'layouts.loker'], function ($view) {
             if (auth()->check()) {
-                $userRole = auth()->user()->role->nama_role ?? null;
+                $userRole = auth()->user()->role->name ?? auth()->user()->role->nama_role ?? null;
                 $allowedRoles = ['loker_admin', 'Super Admin', 'Operator Kecamatan'];
 
                 if (in_array($userRole, $allowedRoles)) {
@@ -112,6 +112,15 @@ class AppServiceProvider extends ServiceProvider
                     ->orderBy('created_at', 'desc')
                     ->take(5)
                     ->get());
+            }
+        });
+
+        // Dynamic Navigation Composer
+        view()->composer(['layouts.partials.sidebar.*'], function ($view) {
+            if (auth()->check()) {
+                $dashboard = request()->is('desa*') ? 'desa' : 'kecamatan';
+                $navService = app(\App\Services\NavigationService::class);
+                $view->with('dynamicMenus', $navService->getMenus($dashboard));
             }
         });
     }

@@ -28,7 +28,7 @@ class ModuleRoleMiddleware
     protected array $moduleRoles = [
         'trantibum' => ['trantibum_admin', 'Super Admin', 'Operator Kecamatan'],
         'umkm' => ['umkm_admin', 'Super Admin', 'Operator Kecamatan'],
-        'loker' => ['loker_admin', 'Super Admin', 'Operator Kecamatan'],
+        'loker' => ['umkm_admin', 'Super Admin', 'Operator Kecamatan'],
         'pelayanan' => ['pelayanan_admin', 'Super Admin', 'Operator Kecamatan'],
     ];
 

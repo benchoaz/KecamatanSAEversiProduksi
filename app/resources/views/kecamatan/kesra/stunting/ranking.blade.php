@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.kecamatan')
 
 @section('title', 'Peringkat Desa - Stunting')
 

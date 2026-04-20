@@ -1,5 +1,45 @@
-<div class="navbar bg-white shadow-md px-6 py-3 sticky top-0 z-50 border-b border-gray-200">
-    <div class="navbar-start">
+
+<div class="navbar bg-white/95 backdrop-blur-xl shadow-sm px-3 md:px-6 py-2 sticky top-0 z-50 border-b border-slate-100">
+    <div class="navbar-start flex items-center">
+        <!-- Mobile Drawer Toggle -->
+        <div class="dropdown lg:hidden mr-2">
+            <label tabindex="0" class="btn btn-ghost btn-circle text-teal-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                </svg>
+            </label>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-xl bg-white rounded-2xl w-64 border border-teal-50">
+                <div class="px-4 py-3 mb-2 border-b border-slate-50">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-teal-600">Menu Navigasi</span>
+                </div>
+                <li><a href="/" class="py-3 font-bold {{ request()->is('/') ? 'text-teal-600 bg-teal-50' : 'text-slate-600' }}">Beranda</a></li>
+                
+                @if(appProfile()->is_menu_pelayanan_active)
+                <li><a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="py-3 font-bold text-slate-600">Layanan</a></li>
+                @endif
+                
+                @if(appProfile()->is_menu_umkm_active)
+                <li><a href="{{ route('economy.index') }}" class="py-3 font-bold {{ request()->is('ekonomi*') ? 'text-teal-600 bg-teal-50' : 'text-slate-600' }}">Pusat Ekonomi</a></li>
+                @endif
+                
+                @if(appProfile()->is_menu_statistik_active)
+                <li><a href="{{ route('landing.statistik.index') }}" class="py-3 font-bold {{ request()->is('statistik*') ? 'text-teal-600 bg-teal-50' : 'text-slate-600' }}">Statistik</a></li>
+                @endif
+                
+                @if(appProfile()->is_menu_berita_active)
+                <li><a href="{{ request()->is('/') ? '#berita' : '/#berita' }}" class="py-3 font-bold text-slate-600">Berita</a></li>
+                @endif
+                
+                <div class="mt-4 pt-4 border-t border-slate-50">
+                    @if(appProfile()->is_menu_pengaduan_active)
+                    <button onclick="document.getElementById('complaintModal').showModal()" class="btn btn-sm btn-error btn-outline w-full rounded-xl">
+                        <i class="fas fa-exclamation-circle"></i> Lapor!
+                    </button>
+                    @endif
+                </div>
+            </ul>
+        </div>
+
         <a href="/" class="flex items-center gap-3">
             @if(appProfile()->logo_path && Storage::disk('public')->exists(appProfile()->logo_path))
                 <img src="{{ asset('storage/' . appProfile()->logo_path) }}"
@@ -12,10 +52,10 @@
                 </div>
             @endif
             <div>
-                <div class="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                <div class="text-[10px] md:text-xs font-black text-[#003366] uppercase tracking-wide leading-tight">
                     {{ strtoupper(appProfile()->full_region_name) }}
                 </div>
-                <div class="text-[10px] text-gray-500">{{ appProfile()->app_name }}</div>
+                <div class="text-[8px] md:text-[10px] text-slate-500 font-medium tracking-wider">{{ appProfile()->app_name }}</div>
             </div>
         </a>
     </div>
@@ -57,7 +97,17 @@
             <i class="fas fa-exclamation-circle mr-1"></i> Lapor!
         </button>
         <div class="hidden lg:block w-px h-6 bg-slate-200 mx-1"></div>
+        
+        <!-- Mobile Portal Admin Icon -->
         <a href="{{ route('login') }}"
-            class="btn btn-sm bg-teal-600 hover:bg-teal-700 text-white border-0 rounded-lg px-6 font-bold shadow-md">Portal Admin</a>
+            class="lg:hidden btn btn-ghost btn-circle text-teal-600 transition-all active:scale-90">
+            <i class="fas fa-fingerprint text-xl"></i>
+        </a>
+
+        <!-- Desktop Portal Admin Button -->
+        <a href="{{ route('login') }}"
+            class="hidden lg:flex btn btn-sm bg-teal-600 hover:bg-teal-700 text-white border-0 rounded-xl px-6 font-black shadow-lg shadow-teal-900/10 transition-all">
+            Portal Admin
+        </a>
     </div>
 </div>
