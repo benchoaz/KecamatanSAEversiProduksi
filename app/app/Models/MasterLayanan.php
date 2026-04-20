@@ -24,8 +24,16 @@ class MasterLayanan extends Model
         'urutan',
         'is_popular',
         'link_type',
-        'custom_link'
+        'custom_link',
+        'has_nodes',
     ];
+
+    public function serviceNodes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\ServiceNode::class, 'master_layanan_id')
+            ->whereNull('parent_id')
+            ->orderBy('urutan');
+    }
 
     protected $casts = [
         'is_active' => 'boolean',

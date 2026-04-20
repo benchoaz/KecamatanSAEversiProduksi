@@ -77,3 +77,16 @@ Route::middleware(['auth'])->group(function () {
 
 // Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
+
+// Internal API: Service Decision Tree (AJAX — auth protected)
+Route::middleware(['auth'])->prefix('api/layanan')->name('api.layanan.')->group(function () {
+    Route::get('/nodes/{nodeId}/requirements', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'getRequirements'])->name('requirements');
+    Route::get('/nodes/{nodeId}/children', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'getChildren'])->name('children');
+    Route::delete('/requirements/{id}', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'destroyRequirement'])->name('requirements.destroy');
+});
+
+// Public API: Decision Tree untuk warga (tanpa auth)
+Route::prefix('api/public/layanan')->name('api.public.layanan.')->group(function () {
+    Route::get('/{id}/nodes', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'getChildren'])->name('nodes');
+});
+

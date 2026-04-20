@@ -56,6 +56,14 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             Route::get('/{id}/edit', [PelayananController::class, 'layananEdit'])->name('edit');
             Route::put('/{id}', [PelayananController::class, 'layananUpdate'])->name('update');
             Route::delete('/{id}', [PelayananController::class, 'layananDestroy'])->name('destroy');
+
+            // Node Manager (Decision Tree Builder)
+            Route::get('/{id}/nodes', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'index'])->name('nodes.index');
+            Route::post('/nodes', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'store'])->name('nodes.store');
+            Route::delete('/nodes/{node}', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'destroy'])->name('nodes.destroy');
+
+            // Requirements (per node)
+            Route::post('/requirements', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'storeRequirement'])->name('requirements.store');
         });
 
         // Pelayanan Detail & Status Update: Catch-all ID routes moved to end 

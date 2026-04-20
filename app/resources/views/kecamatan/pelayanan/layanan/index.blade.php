@@ -83,19 +83,25 @@
                                         @endif
                                     </td>
                                     <td class="pe-4 text-end">
-                                        <div class="btn-group">
+                                        <div class="d-flex align-items-center justify-content-end gap-2">
+                                            <a href="{{ route('kecamatan.pelayanan.layanan.nodes.index', $item->id) }}"
+                                               class="btn btn-sm rounded-3 fw-semibold {{ $item->has_nodes ? 'text-indigo-600' : 'btn-light text-slate-500' }}"
+                                               style="{{ $item->has_nodes ? 'background:#eef2ff;border:1.5px solid #c7d2fe;' : '' }}"
+                                               title="Kelola Decision Tree">
+                                                <i class="fas fa-sitemap me-1" style="font-size:11px;"></i>
+                                                {{ $item->has_nodes ? 'Node Aktif' : 'Buat Node' }}
+                                            </a>
                                             <a href="{{ route('kecamatan.pelayanan.layanan.edit', $item->id) }}"
-                                                class="btn btn-light btn-sm rounded-pill text-teal-600 me-2" title="Edit">
-                                                <i class="fas fa-edit"></i>
+                                               class="btn btn-light btn-sm rounded-3" title="Edit">
+                                                <i class="fas fa-edit text-teal-600"></i>
                                             </a>
                                             <form action="{{ route('kecamatan.pelayanan.layanan.destroy', $item->id) }}"
                                                 method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-light btn-sm rounded-pill text-rose-500"
-                                                    onclick="return confirm('Apakah Anda yakin ingin menghapus layanan ini?')"
-                                                    title="Hapus">
-                                                    <i class="fas fa-trash-alt"></i>
+                                                <button type="submit" class="btn btn-light btn-sm rounded-3"
+                                                    onclick="return confirm('Hapus layanan ini?')" title="Hapus">
+                                                    <i class="fas fa-trash-alt text-rose-500"></i>
                                                 </button>
                                             </form>
                                         </div>
