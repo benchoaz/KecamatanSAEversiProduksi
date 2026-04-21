@@ -443,7 +443,7 @@ document.querySelectorAll('.edit-node-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         const d = this.dataset;
         const nodeId = d.nodeId;
-        const route  = '{{ route("kecamatan.pelayanan.layanan.nodes.update", ":id") }}'.replace(':id', nodeId);
+        const route  = '{{ route("kecamatan.pelayanan.layanan.nodes.update", "DUMMY_ID") }}'.replace('DUMMY_ID', nodeId);
 
         document.getElementById('addNodeModalTitle').textContent = 'Edit Node: ' + d.nodeName;
         document.getElementById('nodeForm').action    = route;
