@@ -123,7 +123,7 @@
                 <input type="hidden" name="_method" id="nodeMethod" value="POST">
                 <input type="hidden" name="parent_id" id="nodeParentId" value="">
                 <input type="hidden" name="depth" id="nodeDepth" value="0">
-                <input type="hidden" name="master_layanan_id" value="{{ $layanan->id }}">
+                <input type="hidden" name="master_layanan_id" id="nodeMasterLayananId" value="{{ $layanan->id }}">
                 <div class="modal-body px-4 py-4 space-y-3">
 
                     <div class="mb-3">
@@ -165,6 +165,39 @@
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" name="is_active" id="nodeIsActive" value="1" checked>
                         <label class="form-check-label fw-bold small text-slate-700" for="nodeIsActive">Aktif (tampil ke warga)</label>
+                    </div>
+
+                    {{-- ── Leaf Configurations (Only if is_leaf active) ── --}}
+                    <div id="leafConfigs" class="d-none border-top border-slate-100 mt-3 pt-3">
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="show_identity_form" id="nodeShowIdentity" value="1" checked>
+                            <label class="form-check-label fw-bold small text-slate-700" for="nodeShowIdentity">
+                                <i class="fas fa-user-check me-1 text-primary"></i> Tampilkan Form Identitas Pemohon
+                            </label>
+                            <div class="text-slate-400 small mt-1">Sertakan (Nama, NIK, WA, Desa) saat warga mengajukan</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-slate-700">
+                                <i class="fas fa-info-circle me-1 text-primary"></i> Persyaratan (Teks/Instruksi)
+                            </label>
+                            <textarea name="requirement_text" id="nodeReqText" class="form-control form-control-sm rounded-3 border-slate-200" 
+                                      rows="4" placeholder="Contoh: Lampirkan fotokopi KK asli. Pastikan foto dokumen tidak blur..."></textarea>
+                            <div class="text-slate-400 small mt-1">Keterangan ini akan tampil di bagian atas formulir warga.</div>
+                        </div>
+
+                        <div class="mb-2 d-flex align-items-center justify-content-between">
+                            <label class="form-label fw-bold small text-slate-700 mb-0">
+                                <i class="fas fa-paperclip me-1 text-primary"></i> Upload Berkas Mandiri (opsional)
+                            </label>
+                            <button type="button" class="btn btn-xs btn-outline-primary rounded-pill py-1 px-3" id="addRequirementField">
+                                <i class="fas fa-plus me-1"></i> Tambah Field Upload
+                            </button>
+                        </div>
+                        <div id="requirementRepeater" class="space-y-2 mt-2">
+                            {{-- Container for requirements --}}
+                        </div>
+                        <p class="text-slate-400 small mt-2">Tentukan berkas apa saja yang harus di-upload oleh warga saat memilih layanan ini.</p>
                     </div>
                 </div>
                 <div class="modal-footer border-0 bg-slate-50 px-4 py-3 gap-2">
@@ -313,7 +346,7 @@
     transition: all 0.2s;
 }
 .req-item:hover { border-color: #6366f1; background: white; }
-.req-item .req-type-badge {
+.req-type-badge {
     font-size: 10px;
     font-weight: 700;
     padding: 2px 8px;
@@ -324,6 +357,17 @@
 .badge-file { background: #dbeafe; color: #1d4ed8; }
 .badge-info { background: #fef9c3; color: #92400e; }
 .badge-check { background: #dcfce7; color: #166534; }
+
+/* Repeater Styles */
+.repeater-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 </style>
 @endpush
 
@@ -357,8 +401,90 @@ document.querySelectorAll('.add-node-btn').forEach(btn => {
         document.getElementById('nodeUrutan').value   = '0';
         document.getElementById('nodeIsLeaf').checked = false;
         document.getElementById('nodeIsActive').checked = true;
+        document.getElementById('nodeShowIdentity').checked = true;
+        document.getElementById('nodeReqText').value = '';
+        document.getElementById('leafConfigs').classList.add('d-none');
+        document.getElementById('requirementRepeater').innerHTML = '';
     });
 });
+
+// ── Toggle Leaf Configs ───────────────────────────────────
+document.getElementById('nodeIsLeaf').addEventListener('change', function() {
+    const configs = document.getElementById('leafConfigs');
+    if (this.checked) {
+        configs.classList.remove('d-none');
+        // Add initial requirement if empty
+        const repeater = document.getElementById('requirementRepeater');
+        if (repeater.children.length === 0) addRequirementRow();
+    } else {
+        configs.classList.add('d-none');
+    }
+});
+
+// ── Repeater Logic ────────────────────────────────────────
+function addRequirementRow(value = '') {
+    const container = document.getElementById('requirementRepeater');
+    const div = document.createElement('div');
+    div.className = 'repeater-item mb-2';
+    div.innerHTML = `
+        <input type="text" name="requirements[]" class="form-control form-control-sm rounded-3 border-slate-200" 
+               placeholder="Contoh: Foto Ijazah Asli" value="${value}" required>
+        <button type="button" class="btn btn-sm btn-ghost text-rose-500 border-0 p-0 px-2" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    container.appendChild(div);
+}
+
+document.getElementById('addRequirementField').addEventListener('click', () => addRequirementRow());
+
+// ── Edit Node Modal Setup ──────────────────────────────────
+document.querySelectorAll('.edit-node-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const d = this.dataset;
+        const nodeId = d.nodeId;
+        const route  = '{{ route("kecamatan.pelayanan.layanan.nodes.update", ":id") }}'.replace(':id', nodeId);
+
+        document.getElementById('addNodeModalTitle').textContent = 'Edit Node: ' + d.nodeName;
+        document.getElementById('nodeForm').action    = route;
+        document.getElementById('nodeMethod').value   = 'PUT';
+        document.getElementById('nodeName').value     = d.nodeName;
+        document.getElementById('nodeDesc').value     = d.nodeDesc || '';
+        document.getElementById('nodeIkon').value     = d.nodeIkon || 'fa-folder';
+        document.getElementById('nodeUrutan').value   = d.nodeUrutan || 0;
+        document.getElementById('nodeIsLeaf').checked = d.isLeaf === '1';
+        document.getElementById('nodeIsActive').checked = d.isActive === '1';
+        document.getElementById('nodeShowIdentity').checked = d.showIdentity !== '0';
+        document.getElementById('nodeReqText').value = d.nodeReqText || '';
+
+        if (d.isLeaf === '1') {
+            document.getElementById('leafConfigs').classList.remove('d-none');
+            // Fetch and populate requirements
+            fetchRequirementsForModal(nodeId);
+        } else {
+            document.getElementById('leafConfigs').classList.add('d-none');
+            document.getElementById('requirementRepeater').innerHTML = '';
+        }
+    });
+});
+
+async function fetchRequirementsForModal(nodeId) {
+    const container = document.getElementById('requirementRepeater');
+    container.innerHTML = '<div class="text-center py-2"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
+    
+    try {
+        const res = await fetch(`/api/layanan/nodes/${nodeId}/requirements`);
+        const data = await res.json();
+        container.innerHTML = '';
+        if (data.requirements && data.requirements.length > 0) {
+            data.requirements.forEach(req => addRequirementRow(req.label));
+        } else {
+            addRequirementRow();
+        }
+    } catch (e) {
+        container.innerHTML = '<p class="text-danger small">Gagal memuat syarat</p>';
+    }
+}
 
 // ── Node Card Click → Load Requirements ──────────────────
 document.querySelectorAll('.node-card').forEach(card => {
@@ -372,7 +498,7 @@ document.querySelectorAll('.node-card').forEach(card => {
 
         if (isLeaf) {
             activeNodeId = nodeId;
-            loadRequirements(nodeId, this.dataset.nodeName);
+            loadRequirements(nodeId, nodeName);
         } else {
             document.getElementById('reqEmpty').classList.remove('d-none');
             document.getElementById('reqList').classList.add('d-none');

@@ -43,3 +43,7 @@ plans/
 # Misc
 grep_portal_desa.txt
 migration_error.log
+app/last_logs.txt
+app/logs_dump.txt
+app/check-master-layanan.php
+app/seed-faqs.php

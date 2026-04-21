@@ -24,10 +24,12 @@ class LayananController extends Controller
     public function showLayanan(string $slug)
     {
         // Cari berdasarkan slug ATAU nama layanan (backward compatible)
-        $layanan = MasterLayanan::where('slug', $slug)
-            ->orWhere('nama_layanan', $slug)
-            ->where('is_active', true)
-            ->first();
+        $layanan = MasterLayanan::where(function($q) use ($slug) {
+            $q->where('slug', $slug)
+              ->orWhere('nama_layanan', $slug);
+        })
+        ->where('is_active', true)
+        ->first();
 
         if (!$layanan) abort(404);
 
@@ -35,28 +37,29 @@ class LayananController extends Controller
 
         // Jika punya node → tampil step navigator baru
         if ($layanan->has_nodes) {
-            $rootNodes = ServiceNode::where('master_layanan_id', $layanan->id)
+            $nodes = ServiceNode::where('master_layanan_id', $layanan->id)
                 ->whereNull('parent_id')
                 ->where('is_active', true)
-                ->withCount('requirements')
                 ->orderBy('urutan')
                 ->get();
-
-            return view('public.service_navigator', compact('layanan', 'rootNodes', 'desas'));
         }
 
-        // Fallback: tampil apply.blade.php lama
-        $context = [
-            'title'        => $layanan->nama_layanan,
-            'icon'         => 'fas ' . ($layanan->ikon ?? 'fa-file-alt'),
-            'color'        => 'teal',
-            'requirements' => $layanan->attachment_requirements ?? [],
-        ];
-
-        return view('public.apply', [
-            'type'   => $layanan->slug ?? Str::slug($layanan->nama_layanan),
-            'desas'  => $desas,
-            'context'=> $context,
+        return view('public.service_navigator', [
+            'layanan'          => $layanan,
+            'rootNodes'        => $nodes ?? [],
+            'desas'            => $desas,
+            'directSubmission' => !$layanan->has_nodes,
+            'requirements'     => (!$layanan->has_nodes && !empty($layanan->attachment_requirements))
+                ? collect($layanan->attachment_requirements)->map(fn($r, $i) => [
+                    'id'             => 999000 + $i, // virtual ID
+                    'label'          => (string) $r,
+                    'type'           => 'file_upload',
+                    'is_required'    => true,
+                    'description'    => null,
+                    'accepted_types' => 'jpg,png,pdf',
+                    'max_size_mb'    => 5
+                ])
+                : []
         ]);
     }
 
@@ -66,15 +69,15 @@ class LayananController extends Controller
     public function showForm($type)
     {
         $validTypes = ['ktp', 'kk', 'akta', 'sktm', 'domisili', 'nikah', 'bpjs'];
-        if (!in_array($type, $validTypes)) {
-            abort(404);
+        
+        if (in_array($type, $validTypes)) {
+            $desas = Desa::orderBy('nama_desa')->get();
+            $context = $this->getServiceContext($type);
+            return view('public.apply', compact('type', 'desas', 'context'));
         }
 
-        $desas = Desa::orderBy('nama_desa')->get();
-        
-        $context = $this->getServiceContext($type);
-
-        return view('public.apply', compact('type', 'desas', 'context'));
+        // Check if it's a dynamic service (MasterLayanan)
+        return $this->showLayanan($type);
     }
 
     /**
@@ -148,27 +151,33 @@ class LayananController extends Controller
         }
     }
 
-    /**
-     * Store node-based service submission (Decision Tree flow)
-     */
     public function storeNodeBased(Request $request)
     {
+        $node = $request->node_id ? ServiceNode::find($request->node_id) : null;
+        $showIdentity = $node ? $node->show_identity_form : true;
+
         $request->validate([
-            'node_id'            => 'required|exists:service_nodes,id',
+            'node_id'            => 'nullable|exists:service_nodes,id',
             'master_layanan_id'  => 'required|exists:master_layanan,id',
-            'nama_pemohon'       => 'required|string|max:255',
-            'nik'                => 'required|string|size:16',
-            'whatsapp'           => 'required|string|min:9|max:15',
-            'desa_id'            => 'required|exists:desas,id',
+            'nama_pemohon'       => $showIdentity ? 'required|string|max:255' : 'nullable|string|max:255',
+            'nik'                => $showIdentity ? 'required|string|size:16|regex:/^[0-9]+$/' : 'nullable|string|size:16|regex:/^[0-9]+$/',
+            'whatsapp'           => $showIdentity ? 'required|string|min:9|max:15|regex:/^[0-9+]+$/' : 'nullable|string|min:9|max:15|regex:/^[0-9+]+$/',
+            'desa_id'            => $showIdentity ? 'required|exists:desas,id' : 'nullable|exists:desas,id',
             'uraian'             => 'nullable|string|max:1000',
+            'is_agreed'          => 'required|accepted',
             'attachments.*'      => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'attachment_req_ids' => 'nullable|array',
         ]);
 
         try {
             return DB::transaction(function () use ($request) {
-                $node    = ServiceNode::findOrFail($request->node_id);
                 $layanan = MasterLayanan::findOrFail($request->master_layanan_id);
+                $node    = $request->node_id ? ServiceNode::find($request->node_id) : null;
+
+                // Security: Ensure node belongs to the service
+                if ($node && $node->master_layanan_id != $layanan->id) {
+                    abort(403, 'Akses node tidak valid untuk layanan ini.');
+                }
 
                 // Format WhatsApp (normalize to 62xxx)
                 $wa = preg_replace('/[^0-9]/', '', $request->whatsapp);
@@ -178,14 +187,16 @@ class LayananController extends Controller
                 $service = PublicService::create([
                     'uuid'          => (string) Str::uuid(),
                     'category'      => PublicService::CATEGORY_PELAYANAN,
-                    'jenis_layanan' => $layanan->nama_layanan . ' — ' . $node->name,
-                    'service_node_id' => $node->id,
+                    'jenis_layanan' => $node 
+                        ? $layanan->nama_layanan . ' — ' . $node->name
+                        : $layanan->nama_layanan,
+                    'service_node_id' => $node->id ?? null,
                     'nama_pemohon'  => $request->nama_pemohon,
                     'nik'           => $request->nik,
                     'whatsapp'      => $wa,
                     'desa_id'       => $request->desa_id,
                     'uraian'        => $request->uraian
-                        ?? 'Pengajuan online: ' . $layanan->nama_layanan . ' — ' . $node->name,
+                        ?? 'Pengajuan online: ' . ($node ? $layanan->nama_layanan . ' — ' . $node->name : $layanan->nama_layanan),
                     'status'        => PublicService::STATUS_MENUNGGU,
                     'source'        => 'web_portal',
                     'is_agreed'     => true,

@@ -41,6 +41,22 @@
                 <i class="fas fa-plus"></i>
             </button>
             @endif
+            
+            <button class="btn btn-xs btn-outline-info rounded-2 edit-node-btn"
+                    data-node-id="{{ $node->id }}"
+                    data-node-name="{{ $node->name }}"
+                    data-node-desc="{{ $node->description }}"
+                    data-node-ikon="{{ $node->ikon }}"
+                    data-node-urutan="{{ $node->urutan }}"
+                    data-node-req-text="{{ $node->requirement_text }}"
+                    data-is-leaf="{{ $node->is_leaf }}"
+                    data-is-active="{{ $node->is_active }}"
+                    data-show-identity="{{ $node->show_identity_form }}"
+                    data-bs-toggle="modal" data-bs-target="#addNodeModal"
+                    title="Edit node" style="font-size:10px; padding:2px 8px;">
+                <i class="fas fa-pencil-alt"></i>
+            </button>
+
             <form action="{{ route('kecamatan.pelayanan.layanan.nodes.destroy', $node->id) }}" method="POST"
                   onsubmit="return confirm('Hapus node ini beserta semua sub-node di dalamnya?')"
                   style="display:inline;">

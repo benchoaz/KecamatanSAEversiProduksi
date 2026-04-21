@@ -18,13 +18,16 @@ class ServiceNode extends Model
         'urutan',
         'is_leaf',
         'is_active',
+        'show_identity_form',
+        'requirement_text',
     ];
 
     protected $casts = [
         'is_leaf'   => 'boolean',
         'is_active' => 'boolean',
-        'depth'     => 'integer',
-        'urutan'    => 'integer',
+        'depth'              => 'integer',
+        'urutan'             => 'integer',
+        'show_identity_form' => 'boolean',
     ];
 
     // ─── Relasi ──────────────────────────────────────────

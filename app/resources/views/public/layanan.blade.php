@@ -182,7 +182,7 @@
                             @if($svc->slug === 'pengaduan')
                                 <button onclick="document.getElementById('complaintModal').showModal()" class="btn btn-sm w-full bg-slate-900 hover:bg-black text-white border-0 rounded-xl normal-case font-black">Lapor Sekarang</button>
                             @else
-                                <a href="{{ $svc->slug ? route('apply.form', $svc->slug) : '#' }}" class="btn btn-sm w-full bg-teal-600 hover:bg-teal-700 text-white border-0 rounded-xl normal-case font-black shadow-lg shadow-teal-500/10">Ajukan Online</a>
+                                <a href="{{ $svc->slug ? route('apply.layanan', $svc->slug) : '#' }}" class="btn btn-sm w-full bg-teal-600 hover:bg-teal-700 text-white border-0 rounded-xl normal-case font-black shadow-lg shadow-teal-500/10">Ajukan Online</a>
                             @endif
                         </div>
                     @endforeach

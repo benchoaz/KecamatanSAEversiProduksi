@@ -462,15 +462,17 @@
                                 $iconBg = 'bg-slate-100';
                             }
                             
-                            $onClick = "openSubmissionModal('{$svc->nama_layanan}', '{$svc->deskripsi_syarat}', " . json_encode($svc->attachment_requirements ?? []) . ")";
-                            
-                            if ($svc->link_type === 'loker') {
+                            if ($svc->has_nodes) {
+                                $onClick = "window.location.href='" . route('apply.layanan', $svc->slug) . "'";
+                            } elseif ($svc->link_type === 'loker') {
                                 $onClick = "window.location.href='" . route('public.loker.create') . "'";
                             } elseif ($svc->link_type === 'umkm') {
                                 // Specific UMKM modal call if different
                                 $onClick = "openSubmissionModal('{$svc->nama_layanan}', '{$svc->deskripsi_syarat}', " . json_encode($svc->attachment_requirements ?? []) . ")";
                             } elseif ($svc->link_type === 'external') {
                                 $onClick = "window.location.href='{$svc->custom_link}'";
+                            } else {
+                                $onClick = "openSubmissionModal('{$svc->nama_layanan}', '{$svc->deskripsi_syarat}', " . json_encode($svc->attachment_requirements ?? []) . ")";
                             }
                         @endphp
                         <div onclick="{!! $onClick !!}"
@@ -730,7 +732,7 @@
                             </div>
                         </div>
 
-                        <a href="{{ $svc->slug ? route('apply.form', $svc->slug) : '#' }}"
+                        <a href="{{ $svc->slug ? route('apply.layanan', $svc->slug) : '#' }}"
                             class="btn btn-sm bg-[#003366] hover:bg-[#004488] border-none text-white rounded-xl px-6 w-full py-3 h-auto font-black uppercase tracking-widest text-[10px] flex items-center justify-center transition-all shadow-lg shadow-[#003366]/10 active:scale-95">
                             Ajukan Permohonan
                         </a>

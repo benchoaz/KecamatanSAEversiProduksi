@@ -41,4 +41,16 @@ class MasterLayanan extends Model
         'urutan' => 'integer',
         'attachment_requirements' => 'array'
     ];
+
+    /**
+     * Boot function for model events.
+     */
+    protected static function booted()
+    {
+        static::saving(function ($layanan) {
+            if (empty($layanan->slug) && !empty($layanan->nama_layanan)) {
+                $layanan->slug = \Illuminate\Support\Str::slug($layanan->nama_layanan);
+            }
+        });
+    }
 }

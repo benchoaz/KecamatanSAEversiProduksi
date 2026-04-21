@@ -60,6 +60,7 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             // Node Manager (Decision Tree Builder)
             Route::get('/{id}/nodes', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'index'])->name('nodes.index');
             Route::post('/nodes', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'store'])->name('nodes.store');
+            Route::put('/nodes/{node}', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'update'])->name('nodes.update');
             Route::delete('/nodes/{node}', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'destroy'])->name('nodes.destroy');
 
             // Requirements (per node)

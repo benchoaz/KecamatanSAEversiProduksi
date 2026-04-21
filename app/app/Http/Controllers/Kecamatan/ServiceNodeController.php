@@ -39,25 +39,42 @@ class ServiceNodeController extends Controller
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $validated = $request->validate([
-            'master_layanan_id' => 'required|exists:master_layanan,id',
-            'parent_id'         => 'nullable|exists:service_nodes,id',
-            'depth'             => 'required|integer|min:0',
-            'name'              => 'required|string|max:255',
-            'description'       => 'nullable|string',
-            'ikon'              => 'nullable|string|max:100',
-            'urutan'            => 'required|integer|min:0',
-            'is_leaf'           => 'nullable|boolean',
-            'is_active'         => 'nullable|boolean',
+            'master_layanan_id'  => 'required|exists:master_layanan,id',
+            'parent_id'          => 'nullable|exists:service_nodes,id',
+            'depth'              => 'required|integer|min:0',
+            'name'               => 'required|string|max:255',
+            'description'        => 'nullable|string',
+            'ikon'               => 'nullable|string|max:100',
+            'urutan'             => 'required|integer|min:0',
+            'is_leaf'            => 'nullable|boolean',
+            'is_active'          => 'nullable|boolean',
+            'show_identity_form' => 'nullable|boolean',
+            'requirement_text'   => 'nullable|string',
+            'requirements'       => 'nullable|array',
+            'requirements.*'     => 'required|string|max:255',
         ]);
 
         $masterLayananId = $request->input('master_layanan_id');
 
-        $validated['master_layanan_id'] = $masterLayananId;
-        $validated['is_leaf']   = $request->boolean('is_leaf');
-        $validated['is_active'] = $request->boolean('is_active', true);
-        $validated['parent_id'] = $validated['parent_id'] ?: null;
+        $validated['is_leaf']            = $request->boolean('is_leaf');
+        $validated['is_active']          = $request->boolean('is_active', true);
+        $validated['show_identity_form'] = $request->boolean('show_identity_form', true);
+        $validated['parent_id']          = $validated['parent_id'] ?: null;
 
-        ServiceNode::create($validated);
+        $node = ServiceNode::create($validated);
+
+        // Sync requirements if leaf
+        if ($validated['is_leaf'] && $request->has('requirements')) {
+            foreach ($request->input('requirements') as $idx => $label) {
+                ServiceRequirement::create([
+                    'node_id'     => $node->id,
+                    'type'        => 'file_upload',
+                    'label'       => $label,
+                    'is_required' => true,
+                    'urutan'      => $idx
+                ]);
+            }
+        }
 
         // Aktifkan flag has_nodes pada master_layanan
         MasterLayanan::where('id', $masterLayananId)
@@ -68,6 +85,49 @@ class ServiceNodeController extends Controller
         return redirect()
             ->route('kecamatan.pelayanan.layanan.nodes.index', $masterLayananId)
             ->with('success', 'Node berhasil ditambahkan!');
+    }
+
+    /**
+     * Update node
+     */
+    public function update(Request $request, ServiceNode $node): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'name'               => 'required|string|max:255',
+            'description'        => 'nullable|string',
+            'ikon'               => 'nullable|string|max:100',
+            'urutan'             => 'required|integer|min:0',
+            'is_leaf'            => 'nullable|boolean',
+            'is_active'          => 'nullable|boolean',
+            'show_identity_form' => 'nullable|boolean',
+            'requirement_text'   => 'nullable|string',
+            'requirements'       => 'nullable|array',
+            'requirements.*'     => 'required|string|max:255',
+        ]);
+
+        $validated['is_leaf']            = $request->boolean('is_leaf');
+        $validated['is_active']          = $request->boolean('is_active', true);
+        $validated['show_identity_form'] = $request->boolean('show_identity_form', true);
+
+        $node->update($validated);
+
+        // Sync requirements - simple approach: delete and recreate if leaf
+        if ($validated['is_leaf'] && $request->has('requirements')) {
+            $node->requirements()->delete();
+            foreach ($request->input('requirements') as $idx => $label) {
+                ServiceRequirement::create([
+                    'node_id'     => $node->id,
+                    'type'        => 'file_upload',
+                    'label'       => $label,
+                    'is_required' => true,
+                    'urutan'      => $idx
+                ]);
+            }
+        }
+
+        $this->treeService->clearCache($node->master_layanan_id);
+
+        return back()->with('success', 'Node berhasil diperbarui!');
     }
 
     /**
@@ -141,9 +201,9 @@ class ServiceNodeController extends Controller
         $children = ServiceNode::where('parent_id', $nodeId)
             ->where('is_active', true)
             ->orderBy('urutan')
-            ->get(['id', 'name', 'description', 'ikon', 'is_leaf']);
+            ->get(['id', 'name', 'description', 'ikon', 'is_leaf', 'show_identity_form', 'requirement_text']);
 
-        $node = ServiceNode::select('id', 'name', 'is_leaf', 'parent_id')->find($nodeId);
+        $node = ServiceNode::select('id', 'name', 'is_leaf', 'show_identity_form', 'requirement_text', 'parent_id')->find($nodeId);
 
         return response()->json([
             'node'     => $node,

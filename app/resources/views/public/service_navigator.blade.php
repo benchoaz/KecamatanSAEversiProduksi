@@ -3,7 +3,7 @@
 
 @section('content')
 @php
-    $waRaw = preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot ?? '628123456789');
+    $waRaw = preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot_number ?? '628123456789');
     $waLink = str_starts_with($waRaw,'0') ? '62'.substr($waRaw,1) : $waRaw;
 @endphp
 
@@ -86,6 +86,14 @@
             {{-- ─── PANEL: Leaf Form (tampil saat node is_leaf=true) ─── --}}
             <div id="snLeafPanel" class="d-none">
 
+                {{-- Expert SOP Box --}}
+                <div id="snSopBox" class="sn-sop-box d-none">
+                    <div class="sn-sop-label">
+                        <i class="fas fa-info-circle"></i> Petunjuk & Persyaratan
+                    </div>
+                    <div id="snSopText" class="sn-sop-content"></div>
+                </div>
+
                 {{-- Requirements Summary --}}
                 <div class="sn-req-summary" id="snReqSummary"></div>
 
@@ -97,7 +105,7 @@
                     <input type="hidden" name="jenis_layanan" id="snJenisLayanan" value="{{ $layanan->nama_layanan }}">
 
                     {{-- ── Bagian 1: Identitas ── --}}
-                    <div class="sn-form-section">
+                    <div class="sn-form-section" id="snIdentitySection">
                         <div class="sn-form-section-label">
                             <i class="fas fa-user-circle"></i> Data Pemohon
                         </div>
@@ -675,6 +683,29 @@
     .sn-modal { padding: 32px 20px; }
     .sn-pin-code { font-size: 28px; }
 }
+/* SOP Box */
+.sn-sop-box {
+    background: #fdf2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+.sn-sop-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #991b1b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.sn-sop-content {
+    font-size: 14px;
+    color: #b91c1c;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
 </style>
 @endpush
 
@@ -690,71 +721,40 @@ let history = []; // [{id, name}] stack navigasi
 let currentNodeId = null;
 
 // ── Render root nodes saat init ────────────────────────────
-const rootNodes = @json($rootNodes->map(fn($n) => [
-    'id'=> $n->id, 'name'=>$n->name,
-    'description'=>$n->description,
-    'ikon'=>$n->ikon ?? 'fa-folder',
-    'is_leaf'=>$n->is_leaf
-]));
+const rootNodes = @json($rootNodes);
+const directSubmission = @json($directSubmission ?? false);
+const directRequirements = @json($requirements ?? []);
 
-updateProgress(0);
-
-// ── Pilih node ────────────────────────────────────────────
-async function selectNode(nodeId, nodeName, isLeaf) {
-    history.push({ id: nodeId, name: nodeName });
-    updateBreadcrumb();
-
-    if (isLeaf) {
-        currentNodeId = nodeId;
-        await loadLeafForm(nodeId, nodeName);
-    } else {
-        await loadChildren(nodeId);
-    }
+if (directSubmission) {
+    initDirectSubmission();
+} else {
+    updateProgress(0);
 }
 
-// ── Load children via AJAX ────────────────────────────────
-async function loadChildren(nodeId) {
-    showLoading();
-    const res  = await fetch(`/api/layanan/nodes/${nodeId}/children`);
-    const data = await res.json();
-
-    updateProgress(history.length / TOTAL_STEPS * 60);
-
-    const grid = document.getElementById('snNodeGrid');
-    grid.innerHTML = data.children.map(n => `
-        <button class="sn-node-card sn-anim"
-                onclick="selectNode(${n.id}, '${escape(n.name)}', ${n.is_leaf})">
-            <div class="sn-node-card-icon">
-                <i class="fas ${n.ikon || 'fa-folder'}"></i>
-            </div>
-            <div class="sn-node-card-text">
-                <span class="sn-node-card-label">${unescape(n.name)}</span>
-                ${n.description ? `<span class="sn-node-card-desc">${n.description}</span>` : ''}
-            </div>
-            <div class="sn-node-card-arrow">
-                ${n.is_leaf
-                    ? '<span class="sn-leaf-badge">Ajukan</span>'
-                    : '<i class="fas fa-chevron-right"></i>'}
-            </div>
-        </button>
-    `).join('');
-
-    document.getElementById('snPanelHint').textContent =
-        'Pilih jenis yang sesuai:';
-    showNodePanel();
-    hideLoading();
+// Helper untuk escape data node agar aman di atribut HTML onclick
+function escapeNodeData(str) {
+    if (!str) return "";
+    return encodeURIComponent(str).replace(/'/g, "%27");
 }
 
-// ── Load leaf form ────────────────────────────────────────
-async function loadLeafForm(nodeId, nodeName) {
-    showLoading();
-    const res  = await fetch(`/api/layanan/nodes/${nodeId}/requirements`);
-    const data = await res.json();
-    const reqs = data.requirements || [];
+function unescapeNodeData(str) {
+    if (!str) return "";
+    return decodeURIComponent(str);
+}
 
-    document.getElementById('snNodeId').value = nodeId;
-    document.getElementById('snJenisLayanan').value = nodeName;
+function initDirectSubmission() {
+    currentNodeId = null; // node_id is null for direct
+    const layananName = @json($layanan->nama_layanan);
+    document.getElementById('snJenisLayanan').value = layananName;
+    
+    // Render requirements from array
+    renderRequirements(directRequirements);
+    
+    updateProgress(75);
+    showLeafPanel();
+}
 
+function renderRequirements(reqs) {
     // Requirement summary card
     const summaryEl = document.getElementById('snReqSummary');
     summaryEl.innerHTML = `
@@ -778,7 +778,7 @@ async function loadLeafForm(nodeId, nodeName) {
         </ul>
     `;
 
-    // Upload slots (hanya untuk tipe file_upload)
+    // Upload slots
     const slotsEl = document.getElementById('snUploadSlots');
     const fileReqs = reqs.filter(r => r.type === 'file_upload');
 
@@ -818,8 +818,89 @@ async function loadLeafForm(nodeId, nodeName) {
             </div>
         `).join('');
     }
+}
 
-    updateProgress(75);
+// ── Pilih node ────────────────────────────────────────────
+async function selectNode(nodeId, nodeName, isLeaf, showIdentity = true, sopText = '') {
+    history.push({ id: nodeId, name: nodeName });
+    updateBreadcrumb();
+
+    if (isLeaf) {
+        currentNodeId = nodeId;
+        await loadLeafForm(nodeId, nodeName, showIdentity, sopText);
+    } else {
+        await loadChildren(nodeId);
+    }
+}
+
+// ── Load children via AJAX ────────────────────────────────
+async function loadChildren(nodeId) {
+    showLoading();
+    const res  = await fetch(`/api/layanan/nodes/${nodeId}/children`);
+    const data = await res.json();
+
+    updateProgress(history.length / TOTAL_STEPS * 60);
+
+    const grid = document.getElementById('snNodeGrid');
+    grid.innerHTML = data.children.map(n => `
+        <button class="sn-node-card sn-anim"
+                onclick="selectNode(${n.id}, '${escapeNodeData(n.name)}', ${n.is_leaf}, ${n.show_identity_form}, '${escapeNodeData(n.requirement_text||'')}')">
+            <div class="sn-node-card-icon">
+                <i class="fas ${n.ikon || 'fa-folder'}"></i>
+            </div>
+            <div class="sn-node-card-text">
+                <span class="sn-node-card-label">${unescapeNodeData(escapeNodeData(n.name))}</span>
+                ${n.description ? `<span class="sn-node-card-desc">${n.description}</span>` : ''}
+            </div>
+            <div class="sn-node-card-arrow">
+                ${n.is_leaf
+                    ? '<span class="sn-leaf-badge">Ajukan</span>'
+                    : '<i class="fas fa-chevron-right"></i>'}
+            </div>
+        </button>
+    `).join('');
+
+    document.getElementById('snPanelHint').textContent =
+        'Pilih jenis yang sesuai:';
+    showNodePanel();
+    hideLoading();
+}
+
+// ── Load leaf form ────────────────────────────────────────
+async function loadLeafForm(nodeId, nodeName, showIdentity = true, sopText = '') {
+    showLoading();
+    const res  = await fetch(`/api/layanan/nodes/${nodeId}/requirements`);
+    const data = await res.json();
+    const reqs = data.requirements || [];
+
+    document.getElementById('snNodeId').value = nodeId;
+    document.getElementById('snJenisLayanan').value = nodeName;
+
+    // Toggle SOP Box
+    const sopBox = document.getElementById('snSopBox');
+    const sopEl  = document.getElementById('snSopText');
+    if (sopText) {
+        sopBox.classList.remove('d-none');
+        sopEl.textContent = unescapeNodeData(sopText);
+    } else {
+        sopBox.classList.add('d-none');
+    }
+
+    // Toggle Identity Form
+    const idSection = document.getElementById('snIdentitySection');
+    const idInputs  = idSection?.querySelectorAll('input, select');
+    if (showIdentity) {
+        idSection?.classList.remove('d-none');
+        idInputs?.forEach(input => input.setAttribute('required', ''));
+    } else {
+        idSection?.classList.add('d-none');
+        idInputs?.forEach(input => input.removeAttribute('required'));
+    }
+
+    // Render requirements using shared function
+    renderRequirements(reqs);
+
+    updateProgress(72);
     showLeafPanel();
     hideLoading();
 }
@@ -857,10 +938,10 @@ function goBack(toIndex) {
         const grid = document.getElementById('snNodeGrid');
         grid.innerHTML = rootNodes.map(n => `
             <button class="sn-node-card sn-anim"
-                    onclick="selectNode(${n.id}, '${escape(n.name)}', ${n.is_leaf})">
+                    onclick="selectNode(${n.id}, '${escapeNodeData(n.name)}', ${n.is_leaf}, ${n.show_identity_form}, '${escapeNodeData(n.requirement_text||'')}')">
                 <div class="sn-node-card-icon"><i class="fas ${n.ikon}"></i></div>
                 <div class="sn-node-card-text">
-                    <span class="sn-node-card-label">${unescape(n.name)}</span>
+                    <span class="sn-node-card-label">${unescapeNodeData(escapeNodeData(n.name))}</span>
                     ${n.description ? `<span class="sn-node-card-desc">${n.description}</span>` : ''}
                 </div>
                 <div class="sn-node-card-arrow">
