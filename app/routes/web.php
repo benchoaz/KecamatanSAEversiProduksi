@@ -87,6 +87,7 @@ Route::middleware(['auth'])->prefix('api/layanan')->name('api.layanan.')->group(
 
 // Public API: Decision Tree untuk warga (tanpa auth)
 Route::prefix('api/public/layanan')->name('api.public.layanan.')->group(function () {
-    Route::get('/{id}/nodes', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'getChildren'])->name('nodes');
+    Route::get('/nodes/{nodeId}/children', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'getChildren'])->name('nodes');
+    Route::get('/nodes/{nodeId}/requirements', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'getRequirements'])->name('requirements');
 });
 

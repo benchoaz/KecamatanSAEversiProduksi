@@ -1,0 +1,89 @@
+# ============================================================
+# docker-compose.local.yml — Override untuk Local Development
+# Usage: docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
+#
+# Perbedaan dari production:
+#   - Traefik: tanpa ACME, pakai self-signed TLS (browser minta accept)
+#   - Traefik: dashboard aktif di port 8080
+#   - Nginx: bisa diakses di http://localhost DAN https://localhost
+#   - WAHA & n8n: ikut profile automation (sama seperti production)
+# ============================================================
+
+services:
+  gateway:
+    # Override command Traefik untuk local (tanpa ACME)
+    command:
+      - "--log.level=DEBUG"
+      - "--api=true"
+      - "--api.insecure=true"           # Dashboard aktif di :8080 untuk debugging
+      - "--ping=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=kecamatan-network"
+      - "--providers.file.filename=/etc/traefik/dynamic_conf.yml"
+      - "--providers.file.watch=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # Tidak ada ACME — gunakan self-signed TLS bawaan Traefik
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"                     # Traefik Dashboard — http://localhost:8080
+
+  nginx:
+    labels:
+      - "traefik.enable=true"
+      # Route untuk localhost (local dev) — tanpa certresolver
+      - "traefik.http.routers.kecamatan-local.rule=Host(`localhost`) || Host(`127.0.0.1`)"
+      - "traefik.http.routers.kecamatan-local.entrypoints=web,websecure"
+      - "traefik.http.routers.kecamatan-local.tls=true"
+      - "traefik.http.routers.kecamatan-local.priority=5"
+      - "traefik.http.routers.kecamatan-local.service=kecamatan-local"
+      - "traefik.http.services.kecamatan-local.loadbalancer.server.port=80"
+      # Route production (domain asli) — tetap bisa dipakai jika ada DNS lokal
+      - "traefik.http.routers.kecamatan.rule=Host(`${DOMAIN:-kecamatanbesuk.my.id}`)"
+      - "traefik.http.routers.kecamatan.entrypoints=websecure"
+      - "traefik.http.routers.kecamatan.tls=true"
+      - "traefik.http.routers.kecamatan.priority=1"
+      - "traefik.http.services.kecamatan.loadbalancer.server.port=80"
+      - "traefik.http.routers.kecamatan.middlewares=kecamatan-compress@file,kecamatan-headers@file,kecamatan-rate@file"
+
+  app:
+    environment:
+      - APP_URL=https://localhost
+    volumes:
+      - ./app:/var/www:rw
+      - ./app/storage:/var/www/storage:rw
+
+  waha:
+    ports:
+      - "3000:3000"                      # Akses langsung: http://localhost:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.waha-local.rule=(Host(`localhost`) || Host(`127.0.0.1`)) && PathPrefix(`/waha`)"
+      - "traefik.http.routers.waha-local.entrypoints=web,websecure"
+      - "traefik.http.routers.waha-local.tls=true"
+      - "traefik.http.routers.waha-local.priority=10"
+      - "traefik.http.routers.waha-local.service=waha-local"
+      - "traefik.http.routers.waha-local.middlewares=waha-strip@docker"
+      - "traefik.http.services.waha-local.loadbalancer.server.port=3000"
+    environment:
+      - WAHA_DASHBOARD_USERNAME=admin
+      - WAHA_DASHBOARD_PASSWORD=admin123
+
+  n8n:
+    ports:
+      - "5678:5678"                      # Akses langsung: http://localhost:5678
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.n8n-local.rule=(Host(`localhost`) || Host(`127.0.0.1`)) && PathPrefix(`/n8n`)"
+      - "traefik.http.routers.n8n-local.entrypoints=web,websecure"
+      - "traefik.http.routers.n8n-local.tls=true"
+      - "traefik.http.routers.n8n-local.priority=10"
+      - "traefik.http.routers.n8n-local.service=n8n-local"
+      - "traefik.http.services.n8n-local.loadbalancer.server.port=5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/

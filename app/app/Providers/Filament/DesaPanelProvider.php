@@ -28,7 +28,7 @@ class DesaPanelProvider extends PanelProvider
 
         return $panel
             ->id('desa')
-            ->path('desa/manajemen')
+            ->path('desa/admin')
             ->login()
             ->colors([
                 'primary' => Color::Sky,

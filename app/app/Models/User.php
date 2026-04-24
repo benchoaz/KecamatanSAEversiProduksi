@@ -10,9 +10,10 @@ use Laravel\Sanctum\HasApiTokens;
 
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Filament\Models\Contracts\HasName;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasName
 {
     use HasApiTokens, HasFactory, Notifiable, \App\Traits\Auditable, HasRoles;
 
@@ -33,6 +34,14 @@ class User extends Authenticatable implements FilamentUser
         }
 
         return false;
+    }
+
+    /**
+     * Get the name of the user for Filament.
+     */
+    public function getFilamentName(): string
+    {
+        return $this->nama_lengkap ?? $this->username;
     }
 
     // Always load role with user to prevent N+1 queries
@@ -110,17 +119,25 @@ class User extends Authenticatable implements FilamentUser
     // Helper to check role
     public function hasRole($roleName, $guard = null)
     {
-        // Try Spatie's hasRole first if trait is used
-        if (method_exists($this, 'hasPermissionTo')) {
+        // 1. Direct check against the loaded 'role' relationship (Legacy support)
+        // This is often faster as the role is eager-loaded via $with = ['role']
+        if ($this->role && ($this->role->name === $roleName || ($this->role->nama_role ?? null) === $roleName)) {
+            return true;
+        }
+
+        // 2. Check via Spatie's roles relationship if the trait is used
+        if (method_exists($this, 'roles')) {
             try {
+                // We use exists() to avoid loading all roles if not needed
                 if ($this->roles()->where('name', $roleName)->exists()) {
                     return true;
                 }
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+                // Fallback to local check if Spatie roles are not accessible
+            }
         }
 
-        // Fallback to legacy role_id check
-        return ($this->role->name ?? $this->role->nama_role ?? null) === $roleName;
+        return false;
     }
 
     public function isSuperAdmin()

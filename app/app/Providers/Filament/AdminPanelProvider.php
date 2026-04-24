@@ -23,14 +23,19 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $appProfile = appProfile();
-        $brandName = $appProfile->region_level . ' ' . $appProfile->region_name;
-        $logoUrl = $appProfile->logo_path ? asset('storage/' . $appProfile->logo_path) : null;
+        try {
+            $appProfile = appProfile();
+            $brandName = ($appProfile->region_level ?? 'Kecamatan') . ' ' . ($appProfile->region_name ?? 'SAE');
+            $logoUrl = $appProfile->logo_path ? asset('storage/' . $appProfile->logo_path) : null;
+        } catch (\Exception $e) {
+            $brandName = 'Kecamatan SAE';
+            $logoUrl = null;
+        }
 
         return $panel
             ->default()
             ->id('admin')
-            ->path('kecamatan/manajemen')
+            ->path('admin')
             ->login()
             ->profile()
             ->brandName($brandName)

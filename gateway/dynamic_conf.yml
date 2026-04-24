@@ -1,43 +1,16 @@
+# ============================================================
+# Traefik Dynamic Configuration — Shared Middlewares Only
+# Routers & services are handled by Docker labels on each container.
+# HTTP→HTTPS redirect is handled by entrypoint command flags.
+# ============================================================
+
 http:
-  routers:
-    kecamatan-dashboard:
-      rule: "Host(`kecamatanbesuk.my.id`)"
-      entryPoints:
-        - websecure
-      service: kecamatan-dashboard-svc
-      tls:
-        certResolver: myresolver
-      middlewares:
-        - kecamatan-compress
-        - kecamatan-headers
-
-    kecamatan-local:
-      rule: "PathPrefix(`/`)"
-      entryPoints:
-        - websecure
-      service: kecamatan-dashboard-svc
-      tls: {}
-      middlewares:
-        - kecamatan-compress
-        - kecamatan-headers
-
-    kecamatan-http-redirect:
-      rule: "PathPrefix(`/`)"
-      entryPoints:
-        - web
-      middlewares:
-        - redirect-to-https
-      service: kecamatan-dashboard-svc
-
   middlewares:
-    redirect-to-https:
-      redirectScheme:
-        scheme: https
-        permanent: true
-
+    # --- Compression ---
     kecamatan-compress:
       compress: {}
 
+    # --- Security Headers ---
     kecamatan-headers:
       headers:
         browserXssFilter: true
@@ -47,9 +20,15 @@ http:
         stsIncludeSubdomains: true
         stsPreload: true
         frameDeny: true
+        referrerPolicy: "strict-origin-when-cross-origin"
 
-  services:
-    kecamatan-dashboard-svc:
-      loadBalancer:
-        servers:
-          - url: "http://kecamatan-nginx:80"
+    # --- Rate Limiting ---
+    kecamatan-rate:
+      rateLimit:
+        average: 100
+        burst: 50
+
+    # --- Retry on Network Error ---
+    kecamatan-buffer:
+      buffering:
+        retryExpression: "IsNetworkError() && Attempts() <= 2"

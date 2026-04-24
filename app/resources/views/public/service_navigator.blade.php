@@ -61,7 +61,7 @@
                 <div class="sn-node-grid" id="snNodeGrid">
                     @foreach($rootNodes as $node)
                     <button class="sn-node-card"
-                            onclick="selectNode({{ $node->id }}, '{{ addslashes($node->name) }}', {{ $node->is_leaf ? 'true' : 'false' }})">
+                            onclick="selectNode({{ $node->id }}, '{{ addslashes($node->name) }}', {{ $node->is_leaf ? 'true' : 'false' }}, {{ $node->show_identity_form ? 'true' : 'false' }}, '{{ addslashes($node->requirement_text) }}')">
                         <div class="sn-node-card-icon">
                             <i class="fas {{ $node->ikon ?? 'fa-folder' }}"></i>
                         </div>
@@ -84,10 +84,10 @@
             </div>
 
             {{-- ─── PANEL: Leaf Form (tampil saat node is_leaf=true) ─── --}}
-            <div id="snLeafPanel" class="d-none">
+            <div id="snLeafPanel" class="hidden">
 
                 {{-- Expert SOP Box --}}
-                <div id="snSopBox" class="sn-sop-box d-none">
+                <div id="snSopBox" class="sn-sop-box hidden">
                     <div class="sn-sop-label">
                         <i class="fas fa-info-circle"></i> Petunjuk & Persyaratan
                     </div>
@@ -156,10 +156,22 @@
                     </div>
 
                     {{-- Pernyataan --}}
-                    <label class="sn-agreement">
-                        <input type="checkbox" name="is_agreed" required>
-                        <span>Saya menyatakan data yang diberikan adalah benar dan saya setuju untuk diproses demi keperluan administrasi.</span>
-                    </label>
+                    <div class="sn-form-section">
+                        <div class="sn-form-section-label">
+                            <i class="fas fa-file-signature"></i> Konfirmasi & Pernyataan
+                        </div>
+                        <div class="sn-agreement-wrapper">
+                            <label class="sn-agreement-label">
+                                <input type="checkbox" name="is_agreed" required class="sn-checkbox">
+                                <div class="sn-agreement-text">
+                                    Saya menyatakan bahwa seluruh data dan dokumen yang saya lampirkan adalah <strong>benar, sah, dan sesuai dengan aslinya</strong>.
+                                    <button type="button" class="sn-link-detail" onclick="openStatementDetail()">
+                                        Baca Detail Pernyataan <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
 
                     {{-- Submit --}}
                     <button type="submit" class="sn-submit-btn" id="snSubmitBtn">
@@ -179,6 +191,37 @@
     </a>
 
 </div>{{-- /sn-wrapper --}}
+
+{{-- ═══════════════════════════════════════════════════
+     STATEMENT DETAIL MODAL
+═══════════════════════════════════════════════════ --}}
+<div class="sn-modal-overlay" id="snStatementModal">
+    <div class="sn-modal statement">
+        <div class="sn-modal-icon info">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h2 class="sn-modal-h2">Pakta Integritas Pemohon</h2>
+        <div class="sn-statement-scroll">
+            <div class="sn-statement-item">
+                <div class="sn-statement-num">1</div>
+                <p>Saya menjamin bahwa setiap informasi tulisan dan dokumen elektronik (scan/foto) yang saya unggah adalah <strong>asli</strong> dan tidak dimanipulasi.</p>
+            </div>
+            <div class="sn-statement-item">
+                <div class="sn-statement-num">2</div>
+                <p>Saya memahami bahwa pemalsuan dokumen atau pemberian data palsu dapat berakibat pada pembatalan pengajuan dan dapat diproses sesuai hukum yang berlaku.</p>
+            </div>
+            <div class="sn-statement-item">
+                <div class="sn-statement-num">3</div>
+                <p>Saya memberikan izin kepada petugas untuk memverifikasi data saya dengan sistem kependudukan atau instansi terkait lainnya.</p>
+            </div>
+            <div class="sn-statement-item">
+                <div class="sn-statement-num">4</div>
+                <p>Saya bertanggung jawab penuh atas segala akibat hukum yang timbul jika di kemudian hari ditemukan ketidaksesuaian data yang saya kirimkan.</p>
+            </div>
+        </div>
+        <button type="button" class="sn-modal-btn primary" onclick="closeStatementDetail()">Saya Mengerti</button>
+    </div>
+</div>
 
 {{-- ═══════════════════════════════════════════════════
      SUCCESS MODAL
@@ -230,6 +273,8 @@
     --shadow-md: 0 4px 16px rgba(0,0,0,.08);
     --shadow-lg: 0 10px 40px rgba(0,0,0,.12);
 }
+
+.hidden { display: none !important; }
 
 * { box-sizing: border-box; }
 
@@ -593,6 +638,96 @@
 .sn-submit-btn:active { transform: translateY(0); }
 .sn-submit-btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
 
+/* ── Agreement Section ────────────────────────────── */
+.sn-agreement-wrapper {
+    padding: 12px 0;
+}
+.sn-agreement-label {
+    display: flex;
+    gap: 14px;
+    cursor: pointer;
+    background: var(--surface-2);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    transition: all .2s;
+}
+.sn-agreement-label:hover {
+    border-color: var(--primary);
+    background: #fff;
+}
+.sn-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+.sn-agreement-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-main);
+    font-weight: 500;
+}
+.sn-link-detail {
+    display: block;
+    margin-top: 8px;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+}
+.sn-link-detail:hover {
+    text-decoration: underline;
+    color: var(--primary);
+}
+
+/* ── Statement Modal Detail ───────────────────────── */
+.sn-modal.statement {
+    max-width: 500px;
+}
+.sn-modal-icon.info {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+.sn-statement-scroll {
+    text-align: left;
+    margin-bottom: 24px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0 4px;
+}
+.sn-statement-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.sn-statement-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+.sn-statement-item p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0;
+}
+
 /* ── Floating WA Button ───────────────────────────── */
 .sn-wa-float {
     position: fixed; bottom: 24px; right: 20px; z-index: 50;
@@ -677,11 +812,21 @@
 
 /* ── Responsive ───────────────────────────────────── */
 @media(max-width:640px) {
-    .sn-hero { padding: 70px 0 36px; }
+    .sn-hero { padding: 60px 0 32px; }
+    .sn-hero-title-row { flex-direction: column; text-align: center; gap: 12px; }
+    .sn-hero-icon { margin: 0 auto; }
+    .sn-breadcrumb { justify-content: center; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; }
+    
+    .sn-main { padding: 20px 12px; }
+    .sn-node-card { padding: 14px; gap: 12px; }
+    .sn-node-card-icon { width: 36px; height: 36px; font-size: 16px; }
+    .sn-node-card-label { font-size: 14px; }
+    
     .sn-form-grid { grid-template-columns: 1fr; }
     .sn-field.col-span-2 { grid-column: span 1; }
-    .sn-modal { padding: 32px 20px; }
-    .sn-pin-code { font-size: 28px; }
+    
+    .sn-modal { padding: 32px 20px; border-radius: 20px; }
+    .sn-pin-code { font-size: 26px; }
 }
 /* SOP Box */
 .sn-sop-box {
@@ -836,7 +981,7 @@ async function selectNode(nodeId, nodeName, isLeaf, showIdentity = true, sopText
 // ── Load children via AJAX ────────────────────────────────
 async function loadChildren(nodeId) {
     showLoading();
-    const res  = await fetch(`/api/layanan/nodes/${nodeId}/children`);
+    const res  = await fetch(`/api/public/layanan/nodes/${nodeId}/children`);
     const data = await res.json();
 
     updateProgress(history.length / TOTAL_STEPS * 60);
@@ -869,7 +1014,7 @@ async function loadChildren(nodeId) {
 // ── Load leaf form ────────────────────────────────────────
 async function loadLeafForm(nodeId, nodeName, showIdentity = true, sopText = '') {
     showLoading();
-    const res  = await fetch(`/api/layanan/nodes/${nodeId}/requirements`);
+    const res  = await fetch(`/api/public/layanan/nodes/${nodeId}/requirements`);
     const data = await res.json();
     const reqs = data.requirements || [];
 
@@ -880,20 +1025,20 @@ async function loadLeafForm(nodeId, nodeName, showIdentity = true, sopText = '')
     const sopBox = document.getElementById('snSopBox');
     const sopEl  = document.getElementById('snSopText');
     if (sopText) {
-        sopBox.classList.remove('d-none');
+        sopBox.classList.remove('hidden');
         sopEl.textContent = unescapeNodeData(sopText);
     } else {
-        sopBox.classList.add('d-none');
+        sopBox.classList.add('hidden');
     }
 
     // Toggle Identity Form
     const idSection = document.getElementById('snIdentitySection');
     const idInputs  = idSection?.querySelectorAll('input, select');
     if (showIdentity) {
-        idSection?.classList.remove('d-none');
+        idSection?.classList.remove('hidden');
         idInputs?.forEach(input => input.setAttribute('required', ''));
     } else {
-        idSection?.classList.add('d-none');
+        idSection?.classList.add('hidden');
         idInputs?.forEach(input => input.removeAttribute('required'));
     }
 
@@ -958,12 +1103,12 @@ function goBack(toIndex) {
 
 // ── Panel Toggle ──────────────────────────────────────────
 function showNodePanel() {
-    document.getElementById('snNodePanel').classList.remove('d-none');
-    document.getElementById('snLeafPanel').classList.add('d-none');
+    document.getElementById('snNodePanel').classList.remove('hidden');
+    document.getElementById('snLeafPanel').classList.add('hidden');
 }
 function showLeafPanel() {
-    document.getElementById('snNodePanel').classList.add('d-none');
-    document.getElementById('snLeafPanel').classList.remove('d-none');
+    document.getElementById('snNodePanel').classList.add('hidden');
+    document.getElementById('snLeafPanel').classList.remove('hidden');
     document.getElementById('snLeafPanel').classList.add('sn-anim');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -1019,6 +1164,13 @@ function copyPin() {
         btn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
         setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i> Salin PIN', 1500);
     });
+}
+
+function openStatementDetail() {
+    document.getElementById('snStatementModal').classList.add('show');
+}
+function closeStatementDetail() {
+    document.getElementById('snStatementModal').classList.remove('show');
 }
 
 // ── Global keyframe spin ───────────────────────────────────

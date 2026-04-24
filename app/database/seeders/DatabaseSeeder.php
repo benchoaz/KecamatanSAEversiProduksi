@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             VillageSeeder::class,
             RoleSeeder::class,
+            AppProfileSeeder::class,
             AdminUserSeeder::class,
                 // MenuSeeder::class,
                 // AspekSeeder::class,

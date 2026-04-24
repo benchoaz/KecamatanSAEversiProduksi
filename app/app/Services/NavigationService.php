@@ -32,6 +32,11 @@ class NavigationService
                 ->get();
 
             return $menus->filter(function ($menu) use ($user) {
+                // Super Admin and Operator Kecamatan can see everything
+                if ($user->hasRole('Super Admin') || $user->hasRole('Operator Kecamatan')) {
+                    return true;
+                }
+
                 // If menu has a specific permission, user must have it
                 if ($menu->permission_name && !$user->can($menu->permission_name)) {
                     // Check if they at least have access to one of the submenus
