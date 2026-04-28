@@ -95,6 +95,20 @@
             </div>
         @endif
 
+        <!-- Seksi Backup & Recovery -->
+        @if(auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('Operator Kecamatan'))
+            <div class="nav-section">
+                <span class="nav-section-title">BACKUP & RECOVERY</span>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="{{ route('kecamatan.settings.backup.index') }}" class="nav-link">
+                            <span class="nav-icon"><i class="fas fa-cloud-arrow-up"></i></span>
+                            <span class="nav-text">Pengaturan Backup</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        @endif
 
     </nav>
 

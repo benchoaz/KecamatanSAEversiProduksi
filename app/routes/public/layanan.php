@@ -23,14 +23,15 @@ Route::post('/layanan/check', [PublicServiceController::class, 'checkStatus'])
 Route::get('/layanan/apply/{type}', [App\Http\Controllers\Public\LayananController::class, 'showForm'])
     ->name('apply.form');
 
-// Direct aliases for the chatbot/landing page links
-Route::get('/ktp', fn() => redirect()->route('apply.form', 'ktp'))->name('apply.ktp');
-Route::get('/kk', fn() => redirect()->route('apply.form', 'kk'))->name('apply.kk');
-Route::get('/akta', fn() => redirect()->route('apply.form', 'akta'))->name('apply.akta');
-Route::get('/sktm', fn() => redirect()->route('apply.form', 'sktm'))->name('apply.sktm');
-Route::get('/domisili', fn() => redirect()->route('apply.form', 'domisili'))->name('apply.domisili');
-Route::get('/nikah', fn() => redirect()->route('apply.form', 'nikah'))->name('apply.nikah');
-Route::get('/bpjs', fn() => redirect()->route('apply.form', 'bpjs'))->name('apply.bpjs');
+// Direct aliases — semua redirect ke form baru (node-based) di /layanan/{slug}
+// Ini menyatukan dua jalur (/ktp dan /layanan/ktp) menjadi satu jalur saja.
+Route::get('/ktp', fn() => redirect('/layanan/ktp', 301))->name('apply.ktp');
+Route::get('/kk', fn() => redirect('/layanan/kk', 301))->name('apply.kk');
+Route::get('/akta', fn() => redirect('/layanan/akta', 301))->name('apply.akta');
+Route::get('/sktm', fn() => redirect('/layanan/sktm', 301))->name('apply.sktm');
+Route::get('/domisili', fn() => redirect('/layanan/domisili', 301))->name('apply.domisili');
+Route::get('/nikah', fn() => redirect('/layanan/nikah', 301))->name('apply.nikah');
+Route::get('/bpjs', fn() => redirect('/layanan/bpjs', 301))->name('apply.bpjs');
 
 Route::post('/layanan/apply', [App\Http\Controllers\Public\LayananController::class, 'store'])
     ->name('apply.store');

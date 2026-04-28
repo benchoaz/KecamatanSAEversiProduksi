@@ -13,6 +13,11 @@ return new class extends Migration
     public function up(): void
     {
         if (DB::getDriverName() === 'pgsql') {
+            // Drop existing constraints first to avoid "Check Violation"
+            DB::statement("ALTER TABLE work_directory DROP CONSTRAINT IF EXISTS work_directory_data_source_check");
+            DB::statement("ALTER TABLE work_directory DROP CONSTRAINT IF EXISTS work_directory_status_check");
+            DB::statement("ALTER TABLE work_directory DROP CONSTRAINT IF EXISTS work_directory_job_type_check");
+            
             DB::statement("ALTER TABLE work_directory ALTER COLUMN job_type TYPE VARCHAR(255)");
             DB::statement("ALTER TABLE work_directory ALTER COLUMN status TYPE VARCHAR(255)");
             DB::statement("ALTER TABLE work_directory ALTER COLUMN status SET DEFAULT 'pending'");

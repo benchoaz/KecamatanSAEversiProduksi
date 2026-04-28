@@ -19,7 +19,7 @@ class BackupSetting extends Page implements HasForms
 
     protected static string $view = 'filament.admin.pages.backup-setting';
 
-    protected static ?string $navigationGroup = 'Pengaturan Sistem';
+    protected static ?string $navigationGroup = 'Konfigurasi Sistem';
     
     protected static ?string $navigationLabel = 'Pengaturan Backup';
     

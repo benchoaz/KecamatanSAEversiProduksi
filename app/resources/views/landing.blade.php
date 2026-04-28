@@ -211,12 +211,14 @@
             height: 100%;
             display: flex;
             align-items: center;
-            padding-top: 5rem; /* Default mobile padding */
+            padding-top: 8rem; /* Increased for mobile to clear info banner */
+            padding-bottom: 3rem;
         }
 
         @media (min-width: 1024px) {
             .hero-content {
                 padding-top: 2.5rem; /* Desktop padding adjustment */
+                padding-bottom: 0;
             }
         }
 
@@ -292,10 +294,10 @@
 
                         <!-- Right: Visual Balance (Regional Leader Photo) -->
                         <div class="w-full lg:w-2/5 flex justify-center lg:justify-end relative order-first lg:order-last mb-6 lg:mb-0">
-                            <div class="text-reveal delay-300 relative group scale-90 md:scale-95 lg:scale-100">
+                            <div class="text-reveal delay-300 relative group scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100">
                                 <div class="absolute -inset-10 bg-emerald-100 rounded-full blur-3xl opacity-50 animate-pulse"></div>
                                 <div class="relative bg-white/20 backdrop-blur-md p-2.5 md:p-4 rounded-[2.5rem] md:rounded-[3.5rem] border border-white/50 shadow-2xl transition-all duration-700 hover:rotate-2">
-                                    <div class="aspect-[4/5] w-[180px] sm:w-[240px] md:w-[280px] lg:w-[320px] rounded-[2rem] md:rounded-[3rem] overflow-hidden border-4 border-white shadow-inner bg-slate-100">
+                                    <div class="aspect-[4/5] w-[160px] sm:w-[240px] md:w-[280px] lg:w-[320px] rounded-[2rem] md:rounded-[3rem] overflow-hidden border-4 border-white shadow-inner bg-slate-100">
                                         @if($appProfile->hero_image_path)
                                             <img src="{{ asset('storage/' . $appProfile->hero_image_path) }}" 
                                                  alt="{{ $appProfile->hero_image_alt ?? 'Pimpinan' }}"
@@ -923,17 +925,18 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @forelse($latestBerita as $item)
-                    <div class="group cursor-pointer">
-                        <div class="relative overflow-hidden rounded-2xl mb-4 aspect-[4/3]">
-                            @if($item->thumbnail)
-                                <img src="{{ asset('storage/' . $item->thumbnail) }}" alt="{{ $item->judul }}"
-                                    class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out">
-                            @else
-                                <div class="w-full h-full bg-slate-100 flex items-center justify-center">
-                                    <i class="fas fa-image text-slate-300 text-3xl"></i>
-                                </div>
-                            @endif
-                            <div class="absolute top-3 left-3">
+                    <div class="group bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden hover:shadow-2xl transition-all duration-500 flex flex-col h-full">
+                        {{-- Image Wrapper with Background Pattern --}}
+                        <div class="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                            <div class="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-100 animate-pulse"></div>
+                            
+                            <img src="{{ $item->thumbnail_url }}" 
+                                 alt="{{ $item->judul }}"
+                                 onerror="this.src='https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800'; this.onerror=null;"
+                                 class="relative z-10 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                            
+                            {{-- Badge: Positioned more elegantly --}}
+                            <div class="absolute top-4 left-4 z-20">
                                 @php
                                     $catColors = [
                                         'Pemerintahan' => 'bg-blue-600',
@@ -944,31 +947,38 @@
                                     ];
                                     $color = $catColors[$item->kategori] ?? $catColors['default'];
                                 @endphp
-                                <span
-                                    class="{{ $color }} text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-sm uppercase tracking-wider">
+                                <span class="{{ $color }} text-white text-[9px] font-black px-3 py-1.5 rounded-xl shadow-lg uppercase tracking-widest backdrop-blur-md bg-opacity-90">
                                     {{ $item->kategori }}
                                 </span>
                             </div>
+
+                            {{-- Bottom Gradient Overlay --}}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-15"></div>
                         </div>
 
-                        <div class="space-y-2">
-                            <div
-                                class="flex items-center text-[11px] font-medium text-slate-500 uppercase tracking-wide gap-2">
+                        {{-- Content --}}
+                        <div class="p-8 flex-grow flex flex-col">
+                            <div class="flex items-center text-[10px] font-black text-slate-400 uppercase tracking-widest gap-2 mb-4">
                                 <span class="text-rose-600">{{ $item->author->nama_lengkap ?? 'Admin' }}</span>
-                                <span>•</span>
+                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
                                 <span>{{ $item->published_at ? $item->published_at->diffForHumans() : '-' }}</span>
                             </div>
 
-                            <h3
-                                class="text-lg font-bold text-gray-900 leading-snug group-hover:text-rose-600 transition-colors line-clamp-2">
+                            <h3 class="text-lg font-black text-slate-800 leading-tight mb-4 group-hover:text-rose-600 transition-colors line-clamp-2">
                                 <a href="{{ route('public.berita.show', $item->slug) }}">
                                     {{ $item->judul }}
                                 </a>
                             </h3>
 
-                            <p class="text-sm text-slate-600 line-clamp-2 leading-relaxed">
-                                {{ Str::limit($item->ringkasan, 90) }}
+                            <p class="text-xs text-slate-500 line-clamp-3 leading-relaxed mb-6 font-medium">
+                                {{ Str::limit($item->ringkasan, 120) }}
                             </p>
+
+                            <div class="mt-auto pt-6 border-t border-slate-50">
+                                <a href="{{ route('public.berita.show', $item->slug) }}" class="text-[10px] font-black text-rose-600 uppercase tracking-widest flex items-center gap-2 group/btn">
+                                    Baca Selengkapnya <i class="fas fa-arrow-right group-hover/btn:translate-x-1 transition-transform"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 @empty

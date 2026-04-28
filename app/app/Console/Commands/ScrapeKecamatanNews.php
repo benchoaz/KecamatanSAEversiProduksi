@@ -66,9 +66,21 @@ class ScrapeKecamatanNews extends Command
 
             $count = 0;
             foreach ($cards as $card) {
-                // Extract Thumbnail
-                $imgNode = $xpath->query(".//img[contains(@class, 'img-thumb')]", $card)->item(0);
-                $thumbnail = $imgNode ? $imgNode->getAttribute('src') : null;
+                // Extract Thumbnail (Robust approach)
+                $imgNode = $xpath->query(".//img", $card)->item(0);
+                $thumbnail = null;
+                
+                if ($imgNode) {
+                    // 1. Priority: data-src (lazy loading), then src
+                    $thumbnail = $imgNode->getAttribute('data-src') ?: $imgNode->getAttribute('src');
+                    
+                    // 2. Try to get higher resolution if it's a thumbnail (common pattern in many CMS)
+                    // Removing suffixes like -150x150, -300x200 etc.
+                    if ($thumbnail) {
+                        $thumbnail = preg_replace('/-\d+x\d+\.(jpg|jpeg|png|webp)$/i', '.$1', $thumbnail);
+                    }
+                }
+
                 if ($thumbnail && !Str::startsWith($thumbnail, 'http')) {
                     $thumbnail = rtrim($baseUrl, '/') . '/' . ltrim($thumbnail, '/');
                 }

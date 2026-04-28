@@ -11,6 +11,7 @@ use App\Models\Desa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use App\Traits\HasWhatsAppNotifications;
@@ -44,22 +45,28 @@ class LayananController extends Controller
                 ->get();
         }
 
+        // Bangun requirements dari attachment_requirements (berlaku untuk semua mode)
+        $masterRequirements = !empty($layanan->attachment_requirements)
+            ? collect($layanan->attachment_requirements)->values()->map(fn($r, $i) => [
+                'id'             => 999000 + $i,
+                'label'          => (string) $r,
+                'type'           => 'file_upload',
+                'is_required'    => true,
+                'description'    => null,
+                'accepted_types' => 'jpg,png,pdf',
+                'max_size_mb'    => 5
+            ])->values()->all()
+            : [];
+
         return view('public.service_navigator', [
-            'layanan'          => $layanan,
-            'rootNodes'        => $nodes ?? [],
-            'desas'            => $desas,
-            'directSubmission' => !$layanan->has_nodes,
-            'requirements'     => (!$layanan->has_nodes && !empty($layanan->attachment_requirements))
-                ? collect($layanan->attachment_requirements)->map(fn($r, $i) => [
-                    'id'             => 999000 + $i, // virtual ID
-                    'label'          => (string) $r,
-                    'type'           => 'file_upload',
-                    'is_required'    => true,
-                    'description'    => null,
-                    'accepted_types' => 'jpg,png,pdf',
-                    'max_size_mb'    => 5
-                ])
-                : []
+            'layanan'              => $layanan,
+            'rootNodes'            => $nodes ?? [],
+            'desas'                => $desas,
+            'directSubmission'     => !$layanan->has_nodes,
+            // Untuk layanan tanpa node: tampilkan langsung
+            // Untuk layanan dengan node: requirements ditampilkan sebagai "syarat umum" di bawah node
+            'requirements'         => !$layanan->has_nodes ? $masterRequirements : [],
+            'masterRequirements'   => $masterRequirements,
         ]);
     }
 
@@ -90,7 +97,7 @@ class LayananController extends Controller
             'nama_pemohon' => 'required|string|max:255',
             'nik' => 'required|string|size:16',
             'whatsapp' => 'required|string|min:10',
-            'desa_id' => 'required|exists:desas,id',
+            'desa_id' => 'required|exists:desa,id',
             'uraian' => 'nullable|string|max:1000',
             'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
@@ -162,7 +169,7 @@ class LayananController extends Controller
             'nama_pemohon'       => $showIdentity ? 'required|string|max:255' : 'nullable|string|max:255',
             'nik'                => $showIdentity ? 'required|string|size:16|regex:/^[0-9]+$/' : 'nullable|string|size:16|regex:/^[0-9]+$/',
             'whatsapp'           => $showIdentity ? 'required|string|min:9|max:15|regex:/^[0-9+]+$/' : 'nullable|string|min:9|max:15|regex:/^[0-9+]+$/',
-            'desa_id'            => $showIdentity ? 'required|exists:desas,id' : 'nullable|exists:desas,id',
+            'desa_id'            => $showIdentity ? 'required|exists:desa,id' : 'nullable|exists:desa,id',
             'uraian'             => 'nullable|string|max:1000',
             'is_agreed'          => 'required|accepted',
             'attachments.*'      => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
@@ -180,17 +187,18 @@ class LayananController extends Controller
                 }
 
                 // Format WhatsApp (normalize to 62xxx)
-                $wa = preg_replace('/[^0-9]/', '', $request->whatsapp);
+                $wa = preg_replace('/[^0-9]/', '', $request->whatsapp ?? '');
                 if (str_starts_with($wa, '0')) $wa = '62' . substr($wa, 1);
                 if (!str_starts_with($wa, '62')) $wa = '62' . $wa;
 
-                $service = PublicService::create([
+                // Build service data — cek kolom service_node_id agar tidak error
+                // jika migration belum dijalankan di server
+                $serviceData = [
                     'uuid'          => (string) Str::uuid(),
                     'category'      => PublicService::CATEGORY_PELAYANAN,
-                    'jenis_layanan' => $node 
+                    'jenis_layanan' => $node
                         ? $layanan->nama_layanan . ' — ' . $node->name
                         : $layanan->nama_layanan,
-                    'service_node_id' => $node->id ?? null,
                     'nama_pemohon'  => $request->nama_pemohon,
                     'nik'           => $request->nik,
                     'whatsapp'      => $wa,
@@ -201,19 +209,38 @@ class LayananController extends Controller
                     'source'        => 'web_portal',
                     'is_agreed'     => true,
                     'ip_address'    => $request->ip(),
-                ]);
+                ];
+
+                // Hanya tambahkan service_node_id jika kolom sudah ada di DB
+                if (Schema::hasColumn('public_services', 'service_node_id')) {
+                    $serviceData['service_node_id'] = $node?->id;
+                }
+
+                $service = PublicService::create($serviceData);
 
                 // Handle attachments (dengan requirement_id per file)
                 if ($request->hasFile('attachments')) {
                     $reqIds = $request->input('attachment_req_ids', []);
                     $labels = $request->input('attachment_labels', []);
 
+                    // Pre-validate requirement IDs to prevent FK violations
+                    // (VPS may have different service_requirements IDs than form expects)
+                    $validReqIds = [];
+                    if (!empty($reqIds)) {
+                        $validReqIds = \DB::table('service_requirements')
+                            ->whereIn('id', array_filter($reqIds))
+                            ->pluck('id')
+                            ->flip()
+                            ->all();
+                    }
+
                     foreach ($request->file('attachments') as $idx => $file) {
                         $path = $file->store('public_services/' . $service->id, 'local');
+                        $reqId = $reqIds[$idx] ?? null;
 
                         PublicServiceAttachment::create([
                             'public_service_id' => $service->id,
-                            'requirement_id'    => $reqIds[$idx] ?? null,
+                            'requirement_id'    => (isset($validReqIds[$reqId]) ? $reqId : null),
                             'label'             => $labels[$idx] ?? 'Lampiran ' . ($idx + 1),
                             'file_path'         => $path,
                             'original_name'     => $file->getClientOriginalName(),

@@ -869,6 +869,7 @@ let currentNodeId = null;
 const rootNodes = @json($rootNodes);
 const directSubmission = @json($directSubmission ?? false);
 const directRequirements = @json($requirements ?? []);
+const masterRequirements = @json($masterRequirements ?? []); // dari attachment_requirements admin
 
 if (directSubmission) {
     initDirectSubmission();
@@ -1016,7 +1017,17 @@ async function loadLeafForm(nodeId, nodeName, showIdentity = true, sopText = '')
     showLoading();
     const res  = await fetch(`/api/public/layanan/nodes/${nodeId}/requirements`);
     const data = await res.json();
-    const reqs = data.requirements || [];
+    let reqs = data.requirements || [];
+
+    // Gabungkan dengan masterRequirements (dari attachment_requirements admin)
+    // Pastikan tidak duplikat berdasarkan label
+    if (masterRequirements.length > 0) {
+        const existingLabels = reqs.map(r => r.label.toLowerCase());
+        const additionalReqs = masterRequirements.filter(
+            r => !existingLabels.includes(r.label.toLowerCase())
+        );
+        reqs = [...reqs, ...additionalReqs];
+    }
 
     document.getElementById('snNodeId').value = nodeId;
     document.getElementById('snJenisLayanan').value = nodeName;
@@ -1129,6 +1140,44 @@ function hideLoading() {}
 document.getElementById('snForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const btn = document.getElementById('snSubmitBtn');
+
+    // ── Validasi frontend sebelum kirim ─────────────────────
+    // 1. Cek field teks/select yang wajib diisi
+    const identitySection = document.getElementById('snIdentitySection');
+    if (identitySection && !identitySection.classList.contains('hidden')) {
+        const requiredInputs = identitySection.querySelectorAll('input[required], select[required]');
+        for (const input of requiredInputs) {
+            if (!input.value || !input.value.trim()) {
+                const label = input.closest('.sn-field-group')?.querySelector('label')?.textContent?.trim()
+                           || input.placeholder
+                           || input.name;
+                alert(`⚠️ Field "${label}" wajib diisi!`);
+                input.focus();
+                return;
+            }
+        }
+    }
+
+    // 2. Cek field agreement (checkbox)
+    const agreeCheck = this.querySelector('input[name="is_agreed"]');
+    if (agreeCheck && !agreeCheck.checked) {
+        alert('⚠️ Anda harus menyetujui pernyataan sebelum mengirim permohonan.');
+        agreeCheck.focus();
+        return;
+    }
+
+    // 3. Cek file upload yang wajib
+    const requiredFileInputs = document.querySelectorAll('#snUploadSlots input[type="file"][required]');
+    for (const fileInput of requiredFileInputs) {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            const label = fileInput.dataset.label || 'Berkas pendukung';
+            alert(`⚠️ "${label}" wajib diunggah!`);
+            fileInput.closest('.sn-upload-slot')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+    }
+
+    // ── Kirim ke server ──────────────────────────────────────
     btn.disabled = true;
     btn.innerHTML = `<span style="display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></span> <span>Mengirim...</span>`;
 
@@ -1150,7 +1199,7 @@ document.getElementById('snForm').addEventListener('submit', async function(e) {
         }
     } catch(err) {
         console.error(err);
-        alert('Terjadi kesalahan sistem.');
+        alert('Terjadi kesalahan sistem. Silakan coba lagi atau hubungi petugas.');
     } finally {
         btn.disabled = false;
         btn.innerHTML = `<i class="fas fa-paper-plane"></i> <span>Kirim Permohonan</span>`;

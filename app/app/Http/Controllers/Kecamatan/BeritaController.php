@@ -131,7 +131,7 @@ class BeritaController extends Controller
     }
 
     /**
-     * Soft delete berita.
+     * Soft delete berita (Arsip).
      */
     public function destroy($id)
     {
@@ -139,9 +139,30 @@ class BeritaController extends Controller
         $this->authorize('delete', $berita);
         $berita->delete();
 
-        $this->logAudit('delete', $berita);
+        $this->logAudit('archive', $berita);
 
-        return redirect()->route('kecamatan.berita.index')->with('success', 'Berita berhasil dihapus (Arsip).');
+        return redirect()->route('kecamatan.berita.index')->with('success', 'Berita berhasil diarsipkan.');
+    }
+
+    /**
+     * Permanent delete berita (Hapus Selamanya).
+     * HANYA Super Admin.
+     */
+    public function forceDestroy($id)
+    {
+        $berita = Berita::withTrashed()->findOrFail($id);
+        $this->authorize('forceDelete', $berita);
+        
+        // Hapus file thumbnail jika ada
+        if ($berita->thumbnail) {
+            Storage::disk('public')->delete($berita->thumbnail);
+        }
+
+        $this->logAudit('permanent_delete', $berita);
+        
+        $berita->forceDelete();
+
+        return redirect()->route('kecamatan.berita.index')->with('success', 'Berita berhasil dihapus secara permanen.');
     }
 
     /**
@@ -168,20 +189,25 @@ class BeritaController extends Controller
 
     /**
      * Helper untuk pencatatan Audit Log.
+     * Dibungkus try-catch agar tidak memicu Error 500 jika tabel log bermasalah.
      */
     private function logAudit($action, $model, $oldValues = null)
     {
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => $action,
-            'model_type' => get_class($model),
-            'model_id' => $model->id,
-            'details' => "Aksi $action pada modul Berita: " . $model->judul,
-            'old_values' => $oldValues,
-            'new_values' => $model->getAttributes(),
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'domain' => 'kecamatan'
-        ]);
+        try {
+            AuditLog::create([
+                'user_id' => auth()->id(),
+                'action' => $action,
+                'model_type' => get_class($model),
+                'model_id' => $model->id,
+                'details' => "Aksi $action pada modul Berita: " . $model->judul,
+                'old_values' => $oldValues,
+                'new_values' => $model->getAttributes(),
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'domain' => 'kecamatan'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Gagal mencatat Audit Log: " . $e->getMessage());
+        }
     }
 }

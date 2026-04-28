@@ -199,12 +199,10 @@
         </div>
 
         <!-- Featured Image -->
-        @if($berita->thumbnail)
-            <div class="mb-12 rounded-3xl overflow-hidden shadow-lg">
-                <img src="{{ asset('storage/' . $berita->thumbnail) }}" alt="{{ $berita->judul }}"
-                    class="w-full h-auto object-cover max-h-[500px]">
-            </div>
-        @endif
+        <div class="mb-12 rounded-3xl overflow-hidden shadow-lg">
+            <img src="{{ $berita->thumbnail_url }}" alt="{{ $berita->judul }}"
+                class="w-full h-auto object-cover max-h-[500px]">
+        </div>
 
         <!-- Content -->
         <article

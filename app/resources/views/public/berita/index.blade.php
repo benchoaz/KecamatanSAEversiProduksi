@@ -150,7 +150,7 @@
                 <div
                     class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden md:flex flex-row-reverse group cursor-pointer hover:shadow-xl transition-all duration-300">
                     <div class="md:w-3/5 overflow-hidden relative">
-                        <img src="{{ $highlight->thumbnail ? (Str::startsWith($highlight->thumbnail, 'http') ? $highlight->thumbnail : asset('storage/' . $highlight->thumbnail)) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=1000' }}"
+                        <img src="{{ $highlight->thumbnail_url }}"
                             alt="{{ $highlight->judul }}"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                         @if($highlight->desa)
@@ -190,7 +190,7 @@
                         <div
                             class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden group hover:shadow-md transition-all">
                             <div class="relative aspect-video overflow-hidden">
-                                <img src="{{ $item->thumbnail ? (Str::startsWith($item->thumbnail, 'http') ? $item->thumbnail : asset('storage/' . $item->thumbnail)) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=1000' }}"
+                                <img src="{{ $item->thumbnail_url }}"
                                     alt="{{ $item->judul }}"
                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 <div class="absolute top-4 left-4">

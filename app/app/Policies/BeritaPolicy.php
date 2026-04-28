@@ -9,13 +9,24 @@ use Illuminate\Auth\Access\Response;
 class BeritaPolicy
 {
     /**
+     * Perform pre-authorization checks.
+     */
+    public function before(User $user, string $ability): bool|null
+    {
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view any models.
      * (Internal List)
      */
     public function viewAny(User $user): bool
     {
-        // Hanya Operator Kecamatan & Super Admin yang boleh lihat list internal/draft
-        return $user->hasRole('Operator Kecamatan') || $user->hasRole('Super Admin');
+        return $user->hasRole('Operator Kecamatan') || $user->isSuperAdmin();
     }
 
     /**
@@ -24,8 +35,7 @@ class BeritaPolicy
      */
     public function view(User $user, Berita $berita): bool
     {
-        // Operator Kecamatan bisa lihat semua status (draft/published)
-        return $user->hasRole('Operator Kecamatan') || $user->hasRole('Super Admin');
+        return $user->hasRole('Operator Kecamatan') || $user->isSuperAdmin();
     }
 
     /**
@@ -33,7 +43,7 @@ class BeritaPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('Operator Kecamatan') || $user->hasRole('Super Admin');
+        return $user->hasRole('Operator Kecamatan') || $user->isSuperAdmin();
     }
 
     /**
@@ -41,7 +51,7 @@ class BeritaPolicy
      */
     public function update(User $user, Berita $berita): bool
     {
-        return $user->hasRole('Operator Kecamatan') || $user->hasRole('Super Admin');
+        return $user->hasRole('Operator Kecamatan') || $user->isSuperAdmin();
     }
 
     /**
@@ -49,7 +59,8 @@ class BeritaPolicy
      */
     public function delete(User $user, Berita $berita): bool
     {
-        return $user->hasRole('Operator Kecamatan') || $user->hasRole('Super Admin');
+        // HANYA Super Admin yang boleh menghapus berita
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -57,7 +68,7 @@ class BeritaPolicy
      */
     public function restore(User $user, Berita $berita): bool
     {
-        return $user->hasRole('Super Admin'); // Hanya Super Admin yang boleh restore
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -65,6 +76,6 @@ class BeritaPolicy
      */
     public function forceDelete(User $user, Berita $berita): bool
     {
-        return $user->hasRole('Super Admin'); // Hanya Super Admin
+        return $user->isSuperAdmin();
     }
 }

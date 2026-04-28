@@ -15,10 +15,12 @@ class OwnerHandler
     {
         $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
         
+        $kecamatan = env('KECAMATAN_NAME', 'Besuk');
+
         return [
             'success' => true,
             'intent' => 'owner_portal_link',
-            'reply' => "🌟 *Halo Warga Kreatif!* 🌟\n\n" .
+            'reply' => "🌟 *Halo Warga {$kecamatan}!* 🌟\n\n" .
                 "Ingin mengubah jam buka Jasa atau mengelola produk UMKM Anda? Sekarang makin gampang lho!\n\n" .
                 "Klik tautan pribadi di bawah ini untuk akses cepat ke Dashboard Anda:\n" .
                 "🌐 {$baseUrl}/portal-warga/masuk\n\n" .

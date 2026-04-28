@@ -285,6 +285,7 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             Route::get('/{id}/edit', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'edit'])->name('edit');
             Route::put('/{id}', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'update'])->name('update');
             Route::delete('/{id}', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'destroy'])->name('destroy');
+            Route::delete('/{id}/force', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'forceDestroy'])->name('force-destroy');
             Route::patch('/{id}/toggle-status', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'toggleStatus'])->name('toggle-status');
 
             // Sub-Modul: Banner Iklan
