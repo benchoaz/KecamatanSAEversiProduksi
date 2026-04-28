@@ -121,6 +121,7 @@ services:
       kecamatan-network:
         aliases:
           - dashboard-kecamatan
+          - dashboard-kecamatan-nginx
     depends_on:
       app:
         condition: service_healthy
@@ -233,7 +234,8 @@ services:
     image: devlikeapro/waha:latest
     container_name: waha-kecamatan
     restart: unless-stopped
-    profiles: ["automation"]
+    ports:
+      - "3000:3000"
     environment:
       - WHATSAPP_API_TOKEN=${WAHA_API_KEY}
       - WAHA_API_KEY=${WAHA_API_KEY}
@@ -255,6 +257,7 @@ services:
       - "traefik.http.routers.waha.entrypoints=websecure"
       - "traefik.http.routers.waha.tls.certresolver=myresolver"
       - "traefik.http.routers.waha.priority=10"
+      - "traefik.http.routers.waha.service=waha"
       - "traefik.http.services.waha.loadbalancer.server.port=3000"
       # Middleware chain: redirect slash → strip prefix → basic auth
       - "traefik.http.routers.waha.middlewares=waha-slash@docker,waha-strip@docker,waha-auth@docker"
@@ -284,7 +287,8 @@ services:
     image: n8nio/n8n:latest
     container_name: kecamatan-n8n
     restart: unless-stopped
-    profiles: ["automation"]
+    ports:
+      - "5678:5678"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=false
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
@@ -292,13 +296,11 @@ services:
       - WAHA_API_KEY=${WAHA_API_KEY}
       - DASHBOARD_API_TOKEN=${DASHBOARD_API_TOKEN}
       - DASHBOARD_URL=http://dashboard-kecamatan
-      - N8N_HOST=${DOMAIN:-kecamatanbesuk.my.id}
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=https
-      # N8N_PATH memberitahu n8n bahwa ia di-mount di /n8n/
-      # Sehingga semua asset, redirect, dan webhook URL sudah include /n8n/
-      - N8N_PATH=/n8n/
-      - WEBHOOK_URL=https://${DOMAIN:-kecamatanbesuk.my.id}/n8n/
+      # - N8N_HOST=${DOMAIN:-kecamatanbesuk.my.id}
+      # - N8N_PORT=5678
+      # - N8N_PROTOCOL=https
+      # - N8N_PATH=/n8n/
+      # - WEBHOOK_URL=https://${DOMAIN:-kecamatanbesuk.my.id}/n8n/
     volumes:
       - n8n_data:/home/node/.n8n
     labels:
@@ -310,6 +312,7 @@ services:
       - "traefik.http.routers.n8n.entrypoints=websecure"
       - "traefik.http.routers.n8n.tls.certresolver=myresolver"
       - "traefik.http.routers.n8n.priority=10"
+      - "traefik.http.routers.n8n.service=n8n"
       - "traefik.http.services.n8n.loadbalancer.server.port=5678"
       # Middleware: rate limit + BasicAuth (sama seperti WAHA)
       - "traefik.http.routers.n8n.middlewares=kecamatan-rate@file,n8n-auth@docker"

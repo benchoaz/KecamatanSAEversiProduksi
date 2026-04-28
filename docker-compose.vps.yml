@@ -1,0 +1,171 @@
+services:
+  # ============================================================
+  # Reverse Proxy & SSL (Traefik v2.10)
+  # ============================================================
+  gateway:
+    image: traefik:latest
+    container_name: traefik-gateway
+    restart: unless-stopped
+    stop_grace_period: 30s
+    command:
+      - "--log.level=INFO"
+      - "--api.insecure=false"
+      - "--ping=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.file.filename=/etc/traefik/dynamic_conf.yml"
+      - "--providers.file.watch=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL:-benchoaz@gmail.com}"
+      - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./gateway/dynamic_conf.yml:/etc/traefik/dynamic_conf.yml:ro
+      - ./gateway/acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - kecamatan-network
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================
+  # Application Core (Laravel)
+  # ============================================================
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      target: production
+    container_name: kecamatan-app
+    restart: unless-stopped
+    working_dir: /var/www
+    env_file: ./app/.env
+    volumes:
+      - ./app/storage:/var/www/storage:rw
+    networks:
+      - kecamatan-network
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "php-fpm", "-t"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nginx:
+    image: nginx:alpine
+    container_name: kecamatan-nginx
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kecamatan.rule=Host(`${DOMAIN:-kecamatanbesuk.my.id}`)"
+      - "traefik.http.routers.kecamatan.entrypoints=websecure"
+      - "traefik.http.routers.kecamatan.tls.certresolver=myresolver"
+      - "traefik.http.routers.kecamatan.priority=1"
+      - "traefik.http.routers.kecamatan.service=kecamatan"
+      - "traefik.http.services.kecamatan.loadbalancer.server.port=80"
+      - "traefik.http.routers.kecamatan.middlewares=kecamatan-compress@file,kecamatan-headers@file,kecamatan-rate@file"
+    volumes:
+      - ./app/public:/var/www/public:ro
+      - ./app/storage:/var/www/storage:ro
+      - ./app/docker/nginx/conf.d:/etc/nginx/conf.d:ro
+    networks:
+      kecamatan-network:
+        aliases:
+          - dashboard-kecamatan
+    depends_on:
+      app:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: postgres:17-alpine
+    container_name: kecamatan-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dashboard_kecamatan
+      POSTGRES_USER: ${DB_USERNAME:-user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - kecamatan-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-user} -d dashboard_kecamatan"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: kecamatan-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - kecamatan-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  scheduler:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      target: production
+    container_name: kecamatan-scheduler
+    restart: unless-stopped
+    working_dir: /var/www
+    env_file: ./app/.env
+    command: >
+      sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
+    volumes:
+      - ./app/storage:/var/www/storage:rw
+    networks:
+      - kecamatan-network
+    depends_on:
+      app:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  kecamatan-network:
+    name: kecamatan-network
+    driver: bridge
+
+volumes:
+  pgdata:
+  redis_data:
