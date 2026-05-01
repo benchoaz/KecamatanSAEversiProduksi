@@ -2,6 +2,12 @@
 <html lang="id" data-theme="light">
 
 <head>
+    <script>
+        // Force HTTPS to prevent POST redirect data loss on mobile HTTP connections
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            location.replace(`https:${location.href.substring(location.protocol.length)}`);
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -2189,15 +2195,27 @@
                 formData.set('uraian', combinedUraian);
                 formData.set('jenis_layanan', `Pengaduan - ${jenisPengaduan}`);
 
-                const response = await fetch('{{ route('public.service.submit', [], false) }}', {
+                // PENTING: Gunakan URL relatif (bukan absolut) agar cookie sesi
+                // dikirim dengan benar oleh Chrome Android (mirip pola submissionForm)
+                const response = await fetch("{{ route('public.service.submit', [], false) }}", {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
 
-                const result = await response.json();
+                // Cek Content-Type sebelum parse JSON untuk mencegah SyntaxError
+                let result = {};
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    result = await response.json();
+                } else {
+                    // Server mengembalikan non-JSON (misal: halaman error 419/500)
+                    const rawText = await response.text();
+                    console.error('Non-JSON response:', response.status, rawText.substring(0, 200));
+                    throw new Error(`Server error ${response.status}. Coba refresh halaman dan kirim ulang.`);
+                }
 
                 if (response.ok && (result.success || result.tracking_code || result.uuid)) {
                     // Success
@@ -2221,7 +2239,6 @@
                     if (charCount) charCount.textContent = '0';
 
                 } else if (result.type === 'security_referral') {
-                    // Security keyword detected
                     Swal.fire({
                         icon: 'info',
                         title: 'Informasi',
@@ -2230,7 +2247,6 @@
                         confirmButtonColor: '#f59e0b'
                     });
                 } else if (result.type === 'siak_referral') {
-                    // SIAK keyword detected
                     Swal.fire({
                         icon: 'info',
                         title: 'Informasi Layanan',
@@ -2239,7 +2255,6 @@
                         confirmButtonColor: '#0ea5e9'
                     });
                 } else if (result.errors) {
-                    // Validation errors
                     const errors = Object.values(result.errors).flat().join('<br>');
                     Swal.fire({
                         icon: 'error',
@@ -2248,14 +2263,14 @@
                         confirmButtonColor: '#f43f5e'
                     });
                 } else {
-                    throw new Error(result.message || 'Terjadi kesalahan');
+                    throw new Error(result.message || 'Gagal menyimpan. Silakan coba lagi.');
                 }
             } catch (error) {
                 console.error('Complaint submission error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal Mengirim',
-                    text: 'Terjadi kesalahan saat mengirim pengaduan. Silakan coba lagi.',
+                    text: error.message || 'Terjadi kesalahan koneksi. Silakan coba lagi.',
                     confirmButtonColor: '#f43f5e'
                 });
             } finally {
@@ -2503,8 +2518,9 @@
             if (_isAnonim2) _privTags2 += '[ANONIM]';
             if (_isRahasia2) _privTags2 += '[RAHASIA]';
 
-            // Build combined WITHOUT touching visible textarea
-            const combinedUraian2 = `[${jenisPengaduan}]${_privTags2 ? ' ' + _privTags2 : ''} ${title}\n\n${message}`;
+            // Combine title and message, set jenis_layanan
+            form.uraian.value = `[${jenisPengaduan}]${_privTags2 ? ' ' + _privTags2 : ''} ${title}\n\n${message}`;
+            form.jenis_layanan.value = `Pengaduan - ${jenisPengaduan}`;
 
             // Show loading
             submitBtn.disabled = true;
@@ -2512,18 +2528,27 @@
 
             try {
                 const formData = new FormData(form);
-                formData.set('uraian', combinedUraian2);
-                formData.set('jenis_layanan', `Pengaduan - ${jenisPengaduan}`);
 
-                const response = await fetch('{{ route('public.service.submit', [], false) }}', {
+                // PENTING: Gunakan URL relatif (bukan absolut) agar cookie sesi
+                // dikirim dengan benar oleh Chrome Android (mirip pola submissionForm)
+                const response = await fetch("{{ route('public.service.submit', [], false) }}", {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
 
-                const result = await response.json();
+                // Cek Content-Type sebelum parse JSON untuk mencegah SyntaxError
+                let result = {};
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    result = await response.json();
+                } else {
+                    const rawText = await response.text();
+                    console.error('Non-JSON response:', response.status, rawText.substring(0, 200));
+                    throw new Error(`Server error ${response.status}. Coba refresh halaman dan kirim ulang.`);
+                }
 
                 if (response.ok && (result.success || result.tracking_code || result.uuid)) {
                     // Success
@@ -2550,7 +2575,6 @@
                     if (inlineCharCount) inlineCharCount.textContent = '0';
 
                 } else if (result.type === 'security_referral') {
-                    // Security keyword detected
                     Swal.fire({
                         icon: 'info',
                         title: 'Informasi',
@@ -2559,7 +2583,6 @@
                         confirmButtonColor: '#f59e0b'
                     });
                 } else if (result.type === 'siak_referral') {
-                    // SIAK keyword detected
                     Swal.fire({
                         icon: 'info',
                         title: 'Informasi Layanan',
@@ -2568,7 +2591,6 @@
                         confirmButtonColor: '#0ea5e9'
                     });
                 } else if (result.errors) {
-                    // Validation errors
                     const errors = Object.values(result.errors).flat().join('<br>');
                     Swal.fire({
                         icon: 'error',
@@ -2577,14 +2599,14 @@
                         confirmButtonColor: '#f43f5e'
                     });
                 } else {
-                    throw new Error(result.message || 'Terjadi kesalahan');
+                    throw new Error(result.message || 'Gagal menyimpan. Silakan coba lagi.');
                 }
             } catch (error) {
                 console.error('Inline complaint submission error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal Mengirim',
-                    text: 'Terjadi kesalahan saat mengirim pengaduan. Silakan coba lagi.',
+                    text: error.message || 'Terjadi kesalahan koneksi. Silakan coba lagi.',
                     confirmButtonColor: '#f43f5e'
                 });
             } finally {
