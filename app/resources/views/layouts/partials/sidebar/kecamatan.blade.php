@@ -29,27 +29,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('kecamatan.pelayanan.layanan.index') }}"
-                        class="nav-link {{ request()->is('kecamatan/pelayanan/layanan*') ? 'active' : '' }}">
-                        <span class="nav-icon"><i class="fas fa-concierge-bell"></i></span>
-                        <span class="nav-text">Daftar Layanan (Node)</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('kecamatan.users.index') }}"
-                        class="nav-link {{ request()->is('kecamatan/users*') ? 'active' : '' }}">
-                        <span class="nav-icon"><i class="fas fa-users-cog"></i></span>
-                        <span class="nav-text">Manajemen User (Advanced)</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="{{ route('filament.admin.pages.dashboard') }}"
                         class="nav-link {{ request()->is('admin*') ? 'active' : '' }}">
                         <span class="nav-icon"><i class="fas fa-tools"></i></span>
                         <span class="nav-text">Panel Manajemen (Baru)</span>
                     </a>
                 </li>
-
             </ul>
         </div>
 

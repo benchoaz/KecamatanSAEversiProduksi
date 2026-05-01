@@ -64,11 +64,25 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Password Awal</label>
-                                    <input type="password" name="password"
-                                        class="form-control @error('password') is-invalid @enderror" required>
-                                    <div class="form-text x-small">Minimal 6 karakter. Harap berikan kepada user secara
-                                        personal.</div>
-                                    @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    <div class="input-group">
+                                        <input type="password" name="password" id="password_input"
+                                            class="form-control @error('password') is-invalid @enderror" required placeholder="Min. 6 karakter">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password_input', this)" title="Tampilkan/Sembunyikan">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    @error('password') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Konfirmasi Password</label>
+                                    <div class="input-group">
+                                        <input type="password" name="password_confirmation" id="password_confirm_input"
+                                            class="form-control" required placeholder="Ulangi password">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password_confirm_input', this)" title="Tampilkan/Sembunyikan">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text x-small">Harap berikan password kepada user secara personal.</div>
                                 </div>
                             </div>
                         </div>
@@ -294,6 +308,20 @@
             function uncheckAllVisible() {
                 const activePane = document.querySelector('.tab-pane.active');
                 activePane.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+            }
+
+            function togglePassword(inputId, btnElement) {
+                const input = document.getElementById(inputId);
+                const icon = btnElement.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
             }
         </script>
     @endpush

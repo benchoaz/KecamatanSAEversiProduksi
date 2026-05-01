@@ -28,8 +28,8 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
     Route::get('/settings/profile', [ApplicationProfileController::class, 'index'])->name('settings.profile');
     Route::put('/settings/profile', [ApplicationProfileController::class, 'update'])->name('settings.profile.update');
 
-    // Standardized Pelayanan Module
-    Route::prefix('pelayanan')->name('pelayanan.')->group(function () {
+    // Standardized Pelayanan Module (Akses: Seksi Pelayanan Umum)
+    Route::middleware(['permission:view_seksi_pelayanan'])->prefix('pelayanan')->name('pelayanan.')->group(function () {
         Route::get('/inbox', [PelayananController::class, 'inbox'])->name('inbox');
         Route::get('/pengaduan', [PelayananController::class, 'pengaduanIndex'])->name('pengaduan');
         Route::get('/pengaduan/{id}', [PelayananController::class, 'pengaduanShow'])->name('pengaduan.show');
@@ -76,8 +76,8 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
     // Announcements
     Route::resource('announcements', AnnouncementController::class);
 
-    // UMKM & Jasa (Layanan Publik)
-    Route::prefix('umkm')->name('umkm.')->group(function () {
+    // UMKM & Jasa (Layanan Publik) (Akses: Seksi Ekbang & Pembangunan)
+    Route::middleware(['permission:view_seksi_ekbang'])->prefix('umkm')->name('umkm.')->group(function () {
         Route::get('/', [LayananPublikController::class, 'umkmIndex'])->name('index');
         Route::get('/create', [LayananPublikController::class, 'umkmCreate'])->name('create');
         Route::post('/', [LayananPublikController::class, 'umkmStore'])->name('store');
@@ -89,8 +89,8 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
         Route::post('/{id}/toggle-verify', [LayananPublikController::class, 'umkmToggleVerify'])->name('toggle-verify');
     });
 
-    // Jasa Management (Parallel to UMKM)
-    Route::prefix('jasa')->name('jasa.')->group(function () {
+    // Jasa Management (Parallel to UMKM) (Akses: Seksi Ekbang & Pembangunan)
+    Route::middleware(['permission:view_seksi_ekbang'])->prefix('jasa')->name('jasa.')->group(function () {
         Route::get('/create', [LayananPublikController::class, 'jasaCreate'])->name('create');
         Route::post('/', [LayananPublikController::class, 'jasaStore'])->name('store');
         Route::get('/{id}/handover', [LayananPublikController::class, 'jasaHandover'])->name('handover');
@@ -123,8 +123,8 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             Route::get('/perencanaan/foto/{id}', [\App\Http\Controllers\Kecamatan\FileController::class, 'perencanaanFoto'])->name('perencanaan-foto');
         });
 
-        // Pemerintahan (Monitoring Side)
-        Route::prefix('pemerintahan')->name('pemerintahan.')->group(function () {
+        // Pemerintahan (Monitoring Side) (Akses: Seksi Pemerintahan)
+        Route::middleware(['permission:view_seksi_pemerintahan'])->prefix('pemerintahan')->name('pemerintahan.')->group(function () {
             Route::get('/', [PemerintahanController::class, 'index'])->name('index');
             Route::get('/export-audit', [PemerintahanController::class, 'exportAudit'])->name('export');
 
@@ -197,8 +197,8 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             Route::get('/workflow/download',     [WahaN8nController::class, 'downloadN8nWorkflow'])->name('workflow.download');
         });
 
-        // Ekbang (Monitoring Side)
-        Route::middleware(['menu.toggle:ekbang'])->prefix('ekbang')->name('ekbang.')->group(function () {
+        // Ekbang (Monitoring Side) (Akses: Seksi Ekbang & Pembangunan)
+        Route::middleware(['menu.toggle:ekbang', 'permission:view_seksi_ekbang'])->prefix('ekbang')->name('ekbang.')->group(function () {
             Route::get('/', [EkbangController::class, 'index'])->name('index');
             Route::get('/export-audit', [EkbangController::class, 'exportAudit'])->name('export');
             Route::get('/dana-desa', [EkbangController::class, 'danaDesa'])->name('dana-desa.index');
@@ -208,8 +208,8 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             Route::get('/audit', [EkbangController::class, 'audit'])->name('audit.index');
         });
 
-        // Pembangunan & BLT (Monitoring Side)
-        Route::middleware(['menu.toggle:ekbang'])->prefix('pembangunan')->name('pembangunan.')->group(function () {
+        // Pembangunan & BLT (Monitoring Side) (Akses: Seksi Ekbang & Pembangunan)
+        Route::middleware(['menu.toggle:ekbang', 'permission:view_seksi_ekbang'])->prefix('pembangunan')->name('pembangunan.')->group(function () {
             Route::get('/', [PembangunanController::class, 'index'])->name('index');
             Route::get('/{id}/detail', [PembangunanController::class, 'show'])->name('show');
             Route::get('/blt', [PembangunanController::class, 'bltIndex'])->name('blt.index');
@@ -232,8 +232,8 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             });
         });
 
-        // Kesejahteraan Rakyat
-        Route::prefix('kesra')->name('kesra.')->group(function () {
+        // Kesejahteraan Rakyat (Akses: Seksi Kesejahteraan Rakyat)
+        Route::middleware(['permission:view_seksi_kesra'])->prefix('kesra')->name('kesra.')->group(function () {
             Route::get('/', [KesraController::class, 'index'])->name('index');
             Route::get('/export-audit', [KesraController::class, 'exportAudit'])->name('export');
             Route::get('/bansos', [KesraController::class, 'bansosIndex'])->name('bansos.index');
@@ -245,8 +245,8 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             Route::post('/process/{id}', [KesraController::class, 'process'])->name('process');
         });
 
-        // Trantibum Module - Isolated with role-based access
-        Route::middleware(['module.role:trantibum'])->prefix('trantibum')->name('trantibum.')->group(function () {
+        // Trantibum Module - Isolated with role-based access (Akses: Seksi Trantibum & Linmas)
+        Route::middleware(['module.role:trantibum', 'permission:view_seksi_trantibum'])->prefix('trantibum')->name('trantibum.')->group(function () {
             Route::get('/', [TrantibumController::class, 'index'])->name('index');
             Route::get('/kejadian', [TrantibumController::class, 'kejadian'])->name('kejadian');
             Route::get('/relawan', [TrantibumController::class, 'relawan'])->name('relawan');
@@ -279,8 +279,8 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             Route::get('/{auditLog}', [\App\Http\Controllers\Kecamatan\AuditLogController::class, 'show'])->name('show');
         });
 
-        // Modul Master Data
-        Route::prefix('master')->name('master.')->group(function () {
+        // Modul Master Data (Akses: Seksi Pemerintahan)
+        Route::middleware(['permission:view_seksi_pemerintahan'])->prefix('master')->name('master.')->group(function () {
             Route::resource('desa', DesaMasterController::class)->except(['show']);
         });
 

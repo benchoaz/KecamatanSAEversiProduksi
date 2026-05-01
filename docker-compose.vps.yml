@@ -59,6 +59,7 @@ services:
       - ./app/app/Http/Controllers:/var/www/app/Http/Controllers
       - ./app/app/Traits:/var/www/app/Traits
       - ./app/app/Services/WhatsApp:/var/www/app/Services/WhatsApp
+      - ./app/app/Services/NavigationService.php:/var/www/app/Services/NavigationService.php
       - ./app/.env:/var/www/.env
     networks:
       - kecamatan-network
@@ -159,6 +160,7 @@ services:
       - ./app/app/Http/Controllers:/var/www/app/Http/Controllers
       - ./app/app/Traits:/var/www/app/Traits
       - ./app/app/Services/WhatsApp:/var/www/app/Services/WhatsApp
+      - ./app/app/Services/NavigationService.php:/var/www/app/Services/NavigationService.php
       - ./app/.env:/var/www/.env
     networks:
       - kecamatan-network

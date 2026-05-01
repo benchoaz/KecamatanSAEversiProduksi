@@ -46,7 +46,7 @@ class UserManagementController extends Controller
         $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:150',
             'username' => 'required|string|unique:users,username|max:50',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:6|confirmed',
             'role_id' => 'required|exists:roles,id',
             'desa_id' => 'nullable|exists:desa,id',
             'status' => 'required|in:aktif,nonaktif',
@@ -67,10 +67,20 @@ class UserManagementController extends Controller
         $validated['password'] = Hash::make($request->password);
         $user = User::create($validated);
 
-        // Sync extra permissions if provided
-        if ($request->has('permissions')) {
-            $user->syncPermissions($request->permissions);
+        // Sync extra permissions - filter null/empty values first
+        $permissions = array_values(array_filter($request->input('permissions', []), fn($p) => !empty(trim($p ?? ''))));
+        
+        // Auto-create permission records AND flush Spatie internal cache
+        foreach ($permissions as $permName) {
+            \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $permName, 'guard_name' => 'web']);
         }
+        // Force Spatie to reload permissions from DB (clears its in-memory cache)
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        
+        $user->syncPermissions($permissions);
+
+        // Clear navigation cache
+        app(\App\Services\NavigationService::class)->clearCache($user->id);
 
         return redirect()->route('kecamatan.users.index')
             ->with('success', 'User berhasil ditambahkan ke sistem.');
@@ -93,7 +103,7 @@ class UserManagementController extends Controller
             'role_id' => 'required|exists:roles,id',
             'desa_id' => 'nullable|exists:desa,id',
             'status' => 'required|in:aktif,nonaktif',
-            'password' => 'nullable|string|min:6',
+            'password' => 'nullable|string|min:6|confirmed',
         ]);
 
         $role = Role::find($request->role_id);
@@ -116,10 +126,20 @@ class UserManagementController extends Controller
         // Username is immutable (not included in validated/update)
         $user->update($validated);
 
-        // Sync extra permissions if provided
-        if ($request->has('permissions')) {
-            $user->syncPermissions($request->permissions);
+        // Sync extra permissions - filter null/empty values first
+        $permissions = array_values(array_filter($request->input('permissions', []), fn($p) => !empty(trim($p ?? ''))));
+        
+        // Auto-create permission records AND flush Spatie internal cache
+        foreach ($permissions as $permName) {
+            \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $permName, 'guard_name' => 'web']);
         }
+        // Force Spatie to reload permissions from DB (clears its in-memory cache)
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        
+        $user->syncPermissions($permissions);
+
+        // Clear navigation cache
+        app(\App\Services\NavigationService::class)->clearCache($user->id);
 
         return redirect()->route('kecamatan.users.index')
             ->with('success', 'Data user berhasil diperbarui.');

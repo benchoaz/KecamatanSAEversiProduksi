@@ -32,27 +32,38 @@ class NavigationService
                 ->get();
 
             return $menus->filter(function ($menu) use ($user) {
-                // Super Admin and Operator Kecamatan can see everything
-                if ($user->hasRole('Super Admin') || $user->hasRole('Operator Kecamatan')) {
+                // Super Admin can see everything
+                if ($user->hasRole('Super Admin')) {
                     return true;
                 }
 
                 // If menu has a specific permission, user must have it
                 if ($menu->permission_name && !$user->can($menu->permission_name)) {
-                    // Check if they at least have access to one of the submenus
+                    // Check if they at least have explicit access to one of the submenus
                     $hasAllowedSubMenu = $menu->subMenus->some(fn($sub) => 
-                        !$sub->permission_name || $user->can($sub->permission_name)
+                        $sub->permission_name && $user->can($sub->permission_name)
                     );
                     
-                    if (!$hasAllowedSubMenu) return false;
+                    if (!$hasAllowedSubMenu) {
+                        return false;
+                    }
                 }
 
                 // Filter submenus based on permissions
-                $menu->setRelation('subMenus', $menu->subMenus->filter(function ($sub) use ($user) {
-                    return !$sub->permission_name || $user->can($sub->permission_name);
+                $menu->setRelation('subMenus', $menu->subMenus->filter(function ($sub) use ($user, $menu) {
+                    // If submenu has specific permission, check it
+                    if ($sub->permission_name) {
+                        return $user->can($sub->permission_name);
+                    }
+                    // If no specific permission, it MUST inherit parent's permission
+                    if ($menu->permission_name) {
+                        return $user->can($menu->permission_name);
+                    }
+                    return true;
                 }));
 
-                return true;
+                // Hide parent menu if all its submenus are filtered out
+                return $menu->subMenus->count() > 0 || !$menu->permission_name;
             });
         });
     }
