@@ -33,7 +33,7 @@
         },
         {
             "parameters": {
-                "url": "={{ 'http://dashboard-kecamatan-nginx/api/v1/external' + $json.endpoint + '?q=' + encodeURIComponent($json.keyword) }}",
+                "url": "={{ 'https://kecamatanbesuk.my.id/api/v1/external' + $json.endpoint + '?q=' + encodeURIComponent($json.keyword) }}",
                 "authentication": "genericCredentialType",
                 "genericAuthType": "httpHeaderAuth",
                 "options": {}

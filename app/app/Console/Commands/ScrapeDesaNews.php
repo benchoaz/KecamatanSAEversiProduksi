@@ -53,7 +53,7 @@ class ScrapeDesaNews extends Command
             $this->info("Fetching news from {$desa->nama_desa} ({$apiUrl})");
 
             try {
-                $response = Http::timeout(10)->get($apiUrl);
+                $response = Http::withoutVerifying()->timeout(10)->get($apiUrl);
 
                 if (!$response->successful()) {
                     $this->error("Failed to fetch from {$domain}. Status: " . $response->status());

@@ -178,6 +178,13 @@ Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,
             Route::delete('/{apiToken}', [\App\Http\Controllers\ApiTokenController::class, 'destroy'])->name('destroy');
         });
 
+        // Backup & Recovery
+        Route::prefix('settings/backup')->name('settings.backup.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Kecamatan\BackupController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Kecamatan\BackupController::class, 'update'])->name('update');
+        });
+
+
         // WAHA & n8n Management - Bot Number
         Route::prefix('settings/waha-n8n')->name('settings.waha-n8n.')->group(function () {
             Route::get('/',                      [WahaN8nController::class, 'index'])->name('index');

@@ -85,7 +85,7 @@
             <div class="lg:col-span-3">
                 <h5 class="text-white font-black text-xs uppercase tracking-[0.2em] mb-10 flex items-center gap-3">
                     <span class="w-8 h-px bg-teal-500"></span>
-                    Navigasi
+                    Navigasi Cepat
                 </h5>
                 <ul class="space-y-5">
                     <li>
@@ -93,7 +93,7 @@
                             class="text-slate-400 hover:text-white transition-all flex items-center gap-3 group">
                             <i
                                 class="fas fa-chevron-right text-[10px] text-teal-500 group-hover:translate-x-1 transition-transform"></i>
-                            <span class="font-bold text-sm">Beranda</span>
+                            <span class="font-bold text-sm">Beranda Utama</span>
                         </a>
                     </li>
                     <li>
@@ -101,23 +101,23 @@
                             class="text-slate-400 hover:text-white transition-all flex items-center gap-3 group">
                             <i
                                 class="fas fa-chevron-right text-[10px] text-teal-500 group-hover:translate-x-1 transition-transform"></i>
-                            <span class="font-bold text-sm">Layanan Publik</span>
+                            <span class="font-bold text-sm">Portal Layanan</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ request()->is('/') ? '#berita' : '/#berita' }}"
+                        <a href="{{ route('economy.index') }}"
                             class="text-slate-400 hover:text-white transition-all flex items-center gap-3 group">
                             <i
                                 class="fas fa-chevron-right text-[10px] text-teal-500 group-hover:translate-x-1 transition-transform"></i>
-                            <span class="font-bold text-sm">Berita & Informasi</span>
+                            <span class="font-bold text-sm">Pusat Ekonomi</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('economy.index', ['tab' => 'jasa']) }}"
+                        <a href="{{ route('public.tracking') }}"
                             class="text-slate-400 hover:text-white transition-all flex items-center gap-3 group">
                             <i
                                 class="fas fa-chevron-right text-[10px] text-teal-500 group-hover:translate-x-1 transition-transform"></i>
-                            <span class="font-bold text-sm">Ekonomi & Jasa</span>
+                            <span class="font-bold text-sm">Tracking Berkas</span>
                         </a>
                     </li>
                 </ul>

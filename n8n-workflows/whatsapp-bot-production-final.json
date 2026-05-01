@@ -77,13 +77,13 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "http://dashboard-kecamatan-nginx/api/whatsapp/handle",
+                "url": "http://dashboard-kecamatan/api/whatsapp/handle",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
                         {
                             "name": "Authorization",
-                            "value": "Bearer waha_secret_key_2024"
+                            "value": "=Bearer {{ $env.DASHBOARD_API_TOKEN }}"
                         },
                         {
                             "name": "Accept",

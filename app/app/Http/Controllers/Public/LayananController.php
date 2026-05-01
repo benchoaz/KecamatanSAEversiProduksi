@@ -174,6 +174,8 @@ class LayananController extends Controller
             'is_agreed'          => 'required|accepted',
             'attachments.*'      => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'attachment_req_ids' => 'nullable|array',
+            'applicant_name'     => 'nullable|string|max:255',
+            'applicant_nik'      => 'nullable|string|size:16',
         ]);
 
         try {
@@ -210,6 +212,14 @@ class LayananController extends Controller
                     'is_agreed'     => true,
                     'ip_address'    => $request->ip(),
                 ];
+
+                // Append additional applicant info to Uraian if present
+                if ($request->applicant_name || $request->applicant_nik) {
+                    $extraInfo = "\n\n--- DATA PEMOHON (ORANG TUA/WALI) ---\n";
+                    $extraInfo .= "Nama: " . ($request->applicant_name ?? '-') . "\n";
+                    $extraInfo .= "NIK: " . ($request->applicant_nik ?? '-') . "\n";
+                    $serviceData['uraian'] = ($serviceData['uraian'] ?? '') . $extraInfo;
+                }
 
                 // Hanya tambahkan service_node_id jika kolom sudah ada di DB
                 if (Schema::hasColumn('public_services', 'service_node_id')) {

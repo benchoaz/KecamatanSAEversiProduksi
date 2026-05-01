@@ -52,12 +52,15 @@ class WahaN8nSetting extends Model
         'bot_number',
         'bot_status',
         'qr_code',
+        'operator_number',
+        'is_operator_notification_enabled',
     ];
 
     protected $casts = [
-        'is_waha_connected'       => 'boolean',
-        'is_n8n_connected'        => 'boolean',
-        'bot_enabled'             => 'boolean',
+        'is_waha_connected'                => 'boolean',
+        'is_n8n_connected'                 => 'boolean',
+        'bot_enabled'                      => 'boolean',
+        'is_operator_notification_enabled' => 'boolean',
         'connection_details'      => 'array',
         'last_connection_check'   => 'datetime',
         'generic_http_headers'    => 'array',

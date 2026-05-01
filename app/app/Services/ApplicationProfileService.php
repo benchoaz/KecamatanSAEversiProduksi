@@ -99,7 +99,6 @@ class ApplicationProfileService
     public function getWhatsappBotUrl($text = "Halo, saya butuh informasi.")
     {
         $number = $this->getWhatsappBotNumber();
-        if (!$number) {
             return '#';
         }
 
@@ -112,5 +111,36 @@ class ApplicationProfileService
     public function clearCache()
     {
         Cache::forget($this->cacheKey);
+    }
+
+    /**
+     * Resolve the public URL dynamically.
+     */
+    public function getPublicUrl()
+    {
+        // 1. Get from Cache first
+        $profile = $this->getProfile();
+        $url = $profile->public_url;
+
+        // 2. If Cache is empty or stuck on localhost, FORCE read from DB directly
+        if (empty($url) || str_contains($url, 'localhost')) {
+            $direct = AppProfile::select('public_url')->first();
+                $url = $direct->public_url;
+            }
+        }
+
+        // 3. Final Fallback: Only use request host if DB is truly empty
+        if (empty($url) || str_contains($url, 'localhost')) {
+            $host = request()->getHost();
+                $scheme = request()->isSecure() ? 'https' : 'http';
+                $url = $scheme . '://' . $host;
+            }
+        }
+        
+        if (empty($url) || str_contains($url, 'localhost')) {
+            $url = config('app.url', 'https://kecamatanbesuk.my.id');
+        }
+
+        return rtrim($url, '/');
     }
 }

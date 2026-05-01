@@ -63,6 +63,7 @@ class ApplicationProfileController extends Controller
             'whatsapp_bot_menu.*.description' => 'nullable|string|max:255',
             'whatsapp_bot_menu.*.action' => 'nullable|string|max:100',
             'whatsapp_bot_menu.*.enabled' => 'nullable',
+            'is_operator_notification_enabled' => 'nullable|in:0,1,on',
         ]);
 
         $profile = AppProfile::first() ?? new AppProfile();
@@ -90,6 +91,7 @@ class ApplicationProfileController extends Controller
             'map_latitude',
             'map_longitude',
             'public_url',
+            'is_operator_notification_enabled',
         ]);
         $data['hero_image_active'] = $request->has('hero_image_active') ? true : false;
         $data['is_menu_pengaduan_active'] = $request->has('is_menu_pengaduan_active') ? true : false;
@@ -97,6 +99,7 @@ class ApplicationProfileController extends Controller
         $data['is_menu_berita_active'] = $request->has('is_menu_berita_active') ? true : false;
         $data['is_menu_pelayanan_active'] = $request->has('is_menu_pelayanan_active') ? true : false;
         $data['is_menu_statistik_active'] = $request->has('is_menu_statistik_active') ? true : false;
+        $data['is_operator_notification_enabled'] = $request->has('is_operator_notification_enabled') ? true : false;
         $data['updated_by'] = auth()->id();
 
         // Process whatsapp_bot_menu: normalize enabled field (checkbox only sends when checked)

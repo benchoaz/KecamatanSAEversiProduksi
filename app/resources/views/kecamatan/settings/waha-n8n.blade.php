@@ -70,6 +70,22 @@
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label text-slate-700 fw-semibold">
+                                <i class="fas fa-user-shield text-primary me-1"></i>
+                                Nomor WhatsApp Operator (Admin)
+                            </label>
+                            <input type="text" name="operator_number"
+                                value="{{ old('operator_number', $settings->operator_number ? '0' . substr(preg_replace('/^62/', '', $settings->operator_number), 0) : '') }}"
+                                class="form-control bg-white border-slate-200 rounded-3 @error('operator_number') is-invalid @enderror"
+                                placeholder="08xxxxxxxxxx">
+                            @error('operator_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text text-slate-400">
+                                Nomor ini akan menerima notifikasi setiap ada warga yang mengajukan layanan/pengaduan. (Mengambil nomor dari Profil jika kosong)
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label text-slate-700 fw-semibold d-block">Status Bot</label>
                             <div class="d-flex align-items-center gap-3 mt-1">
                                 <div class="form-check form-switch">

@@ -66,9 +66,12 @@ class WhatsappController extends Controller
         // Check if this is a direct WAHA webhook format (data.from and data.body)
         elseif ($request->has('data.from') && $request->has('data.body')) {
             $wahaData = $request->input('data');
-            $phone = $wahaData['from'];
-            // Strip @c.us or @s.whatsapp.net suffix from phone number
-            $phone = preg_replace('/@(c\.us|s\.whatsapp\.net)$/', '', $phone);
+            $phone = $wahaData['participant'] ?? $wahaData['author'] ?? $wahaData['from'];
+            $phone = explode('@', $phone)[0];
+            $phone = preg_replace('/[^0-9]/', '', $phone);
+            if (str_starts_with($phone, '0')) {
+                $phone = '62' . substr($phone, 1);
+            }
             $message = $wahaData['body'] ?? $wahaData['text'] ?? '';
 
             \Log::info('WAHA webhook format detected, transforming data', [

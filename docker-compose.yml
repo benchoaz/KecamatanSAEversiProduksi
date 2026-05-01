@@ -1,36 +1,26 @@
 services:
   # ============================================================
   # Reverse Proxy & SSL (Traefik v2.10)
-  # Fix: added network flag, healthcheck, stop_grace_period
   # ============================================================
   gateway:
     image: traefik:latest
     container_name: traefik-gateway
     restart: unless-stopped
-    stop_grace_period: 30s        # ← Beri OS waktu release port 80/443 saat restart
+    stop_grace_period: 30s
     command:
       - "--log.level=INFO"
       - "--api.insecure=false"
-      # Ping endpoint — untuk healthcheck internal
       - "--ping=true"
-      # Docker provider — WAJIB set network agar Traefik temukan IP yang benar
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
-      # File provider — hanya untuk shared middlewares
       - "--providers.file.filename=/etc/traefik/dynamic_conf.yml"
       - "--providers.file.watch=true"
-      # Entrypoints
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
       - "--entrypoints.websecure.address=:443"
-      # Timeouts — mencegah hang saat restart
-      - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=60s"
-      - "--entrypoints.websecure.transport.respondingTimeouts.writeTimeout=60s"
-      - "--entrypoints.websecure.transport.respondingTimeouts.idleTimeout=180s"
-      # ACME/SSL — TLS Challenge saja (konsisten, tidak konflik HTTP challenge)
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL:-benchoaz@gmail.com}"
       - "--certificatesresolvers.myresolver.acme.storage=/acme.json"
@@ -45,14 +35,6 @@ services:
       - kecamatan-network
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    deploy:
-      resources:
-        limits:
-          memory: 128M
     logging:
       driver: "json-file"
       options:
@@ -73,6 +55,7 @@ services:
     env_file: ./app/.env
     volumes:
       - ./app/storage:/var/www/storage:rw
+      - ./app/.env:/var/www/.env
     networks:
       - kecamatan-network
     depends_on:
@@ -80,19 +63,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 768M
-        reservations:
-          memory: 256M
     healthcheck:
       test: ["CMD", "php-fpm", "-t"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
     logging:
       driver: "json-file"
       options:
@@ -105,13 +77,12 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kecamatan.rule=Host(`${DOMAIN:-kecamatanbesuk.my.id}`)"
+      - "traefik.http.routers.kecamatan.rule=Host(`kecamatanbesuk.my.id`)"
       - "traefik.http.routers.kecamatan.entrypoints=websecure"
       - "traefik.http.routers.kecamatan.tls.certresolver=myresolver"
       - "traefik.http.routers.kecamatan.priority=1"
       - "traefik.http.routers.kecamatan.service=kecamatan"
       - "traefik.http.services.kecamatan.loadbalancer.server.port=80"
-      # Gunakan @file suffix — referensi middleware dari file provider
       - "traefik.http.routers.kecamatan.middlewares=kecamatan-compress@file,kecamatan-headers@file,kecamatan-rate@file"
     volumes:
       - ./app/public:/var/www/public:ro
@@ -121,14 +92,9 @@ services:
       kecamatan-network:
         aliases:
           - dashboard-kecamatan
-          - dashboard-kecamatan-nginx
     depends_on:
       app:
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 128M
     logging:
       driver: "json-file"
       options:
@@ -149,14 +115,6 @@ services:
       - kecamatan-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-user} -d dashboard_kecamatan"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    deploy:
-      resources:
-        limits:
-          memory: 512M
     logging:
       driver: "json-file"
       options:
@@ -174,13 +132,6 @@ services:
       - kecamatan-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    deploy:
-      resources:
-        limits:
-          memory: 192M
     logging:
       driver: "json-file"
       options:
@@ -200,133 +151,12 @@ services:
       sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
     volumes:
       - ./app/storage:/var/www/storage:rw
+      - ./app/.env:/var/www/.env
     networks:
       - kecamatan-network
     depends_on:
       app:
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # ============================================================
-  # WhatsApp & Automation (Optional — profile: automation)
-  # Deploy dengan: docker compose --profile automation up -d
-  #
-  # URL Akses:
-  #   WAHA Dashboard : https://DOMAIN/waha/dashboard
-  #   WAHA API       : https://DOMAIN/waha/api
-  #   n8n Editor     : https://DOMAIN/n8n/
-  #   n8n Webhook    : https://DOMAIN/n8n/webhook/<id>
-  #
-  # Keamanan berlapis:
-  #   Layer 1 — HTTPS via Traefik (TLS cert Let's Encrypt)
-  #   Layer 2 — BasicAuth via Traefik (set ADMIN_AUTH di .env)
-  #   Layer 3 — Auth bawaan WAHA/n8n (username/password service)
-  # ============================================================
-  waha:
-    image: devlikeapro/waha:latest
-    container_name: waha-kecamatan
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      - WHATSAPP_API_TOKEN=${WAHA_API_KEY}
-      - WAHA_API_KEY=${WAHA_API_KEY}
-      - WAHA_SESSION_DATA_SAVE=true
-      - WAHA_DASHBOARD_USERNAME=${WAHA_DASHBOARD_USERNAME}
-      - WAHA_DASHBOARD_PASSWORD=${WAHA_DASHBOARD_PASSWORD}
-      - WHATSAPP_SWAGGER_USERNAME=${WAHA_DASHBOARD_USERNAME}
-      - WHATSAPP_SWAGGER_PASSWORD=${WAHA_DASHBOARD_PASSWORD}
-      # Webhook internal (container-to-container, tanpa prefix /waha)
-      - WAHA_WEBHOOK_ENDPOINT=http://kecamatan-n8n:5678/webhook/whatsapp-primary
-      - WAHA_WEBHOOK_EVENTS=message,message.any,session.status
-      - WAHA_RESTART_ALL_SESSIONS=true
-    volumes:
-      - waha_sessions:/app/.sessions
-    labels:
-      - "traefik.enable=true"
-      # ── Router utama untuk WAHA ──
-      - "traefik.http.routers.waha.rule=Host(`${DOMAIN:-kecamatanbesuk.my.id}`) && PathPrefix(`/waha`)"
-      - "traefik.http.routers.waha.entrypoints=websecure"
-      - "traefik.http.routers.waha.tls.certresolver=myresolver"
-      - "traefik.http.routers.waha.priority=10"
-      - "traefik.http.routers.waha.service=waha"
-      - "traefik.http.services.waha.loadbalancer.server.port=3000"
-      # Middleware chain: redirect slash → strip prefix → basic auth
-      - "traefik.http.routers.waha.middlewares=waha-slash@docker,waha-strip@docker,waha-auth@docker"
-      # ── Middleware: Redirect /waha → /waha/ (pastikan trailing slash) ──
-      - "traefik.http.middlewares.waha-slash.redirectregex.regex=^(https://[^/]+/waha)$$"
-      - "traefik.http.middlewares.waha-slash.redirectregex.replacement=$${1}/"
-      - "traefik.http.middlewares.waha-slash.redirectregex.permanent=true"
-      # ── Middleware: Strip /waha prefix sebelum dikirim ke WAHA container ──
-      - "traefik.http.middlewares.waha-strip.stripprefix.prefixes=/waha"
-      # ── Middleware: BasicAuth layer 2 (password di-generate via htpasswd) ──
-      # Generate: htpasswd -nb admin password | sed 's/\$$/$$$$/'  lalu isi ADMIN_AUTH
-      - "traefik.http.middlewares.waha-auth.basicauth.users=${ADMIN_AUTH:-admin:$$apr1$$xyz$$placeholder}"
-      - "traefik.http.middlewares.waha-auth.basicauth.realm=SILAP Admin Area"
-    networks:
-      - kecamatan-network
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  n8n:
-    image: n8nio/n8n:latest
-    container_name: kecamatan-n8n
-    restart: unless-stopped
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=false
-      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
-      - N8N_ENV_VARS_ALLOWED=WAHA_API_KEY,DASHBOARD_API_TOKEN,DASHBOARD_URL
-      - WAHA_API_KEY=${WAHA_API_KEY}
-      - DASHBOARD_API_TOKEN=${DASHBOARD_API_TOKEN}
-      - DASHBOARD_URL=http://dashboard-kecamatan
-      # - N8N_HOST=${DOMAIN:-kecamatanbesuk.my.id}
-      # - N8N_PORT=5678
-      # - N8N_PROTOCOL=https
-      # - N8N_PATH=/n8n/
-      # - WEBHOOK_URL=https://${DOMAIN:-kecamatanbesuk.my.id}/n8n/
-    volumes:
-      - n8n_data:/home/node/.n8n
-    labels:
-      - "traefik.enable=true"
-      # ── Router utama untuk n8n ──
-      # PENTING: n8n TIDAK menggunakan strip prefix
-      # karena N8N_PATH=/n8n/ sudah mengkonfigurasi n8n untuk handle path ini sendiri
-      - "traefik.http.routers.n8n.rule=Host(`${DOMAIN:-kecamatanbesuk.my.id}`) && PathPrefix(`/n8n`)"
-      - "traefik.http.routers.n8n.entrypoints=websecure"
-      - "traefik.http.routers.n8n.tls.certresolver=myresolver"
-      - "traefik.http.routers.n8n.priority=10"
-      - "traefik.http.routers.n8n.service=n8n"
-      - "traefik.http.services.n8n.loadbalancer.server.port=5678"
-      # Middleware: rate limit + BasicAuth (sama seperti WAHA)
-      - "traefik.http.routers.n8n.middlewares=kecamatan-rate@file,n8n-auth@docker"
-      # ── Middleware: BasicAuth layer 2 ──
-      - "traefik.http.middlewares.n8n-auth.basicauth.users=${ADMIN_AUTH:-admin:$$apr1$$xyz$$placeholder}"
-      - "traefik.http.middlewares.n8n-auth.basicauth.realm=SILAP Admin Area"
-    networks:
-      - kecamatan-network
-    depends_on:
-      - waha
-    deploy:
-      resources:
-        limits:
-          memory: 1G
     logging:
       driver: "json-file"
       options:
@@ -341,5 +171,3 @@ networks:
 volumes:
   pgdata:
   redis_data:
-  n8n_data:
-  waha_sessions:

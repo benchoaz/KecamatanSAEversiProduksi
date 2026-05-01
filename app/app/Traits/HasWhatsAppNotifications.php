@@ -102,6 +102,66 @@ trait HasWhatsAppNotifications
                 'model_id' => $model->id ?? 'unknown',
             ]);
             return false;
+        } finally {
+            // 3. OPERATOR NOTIFICATION (Extra)
+            // Jika ini pengajuan baru ('submission'), kirim juga ke Operator/Admin agar cepat respon
+            if ($type === 'submission') {
+                $this->sendToOperator($model);
+            }
+        }
+    }
+
+    /**
+     * Send summary notification to Operator/Admin
+     */
+    protected function sendToOperator($model): void
+    {
+        try {
+            $profile = appProfile();
+            
+            // Check if operator notifications are enabled (now on Profile page)
+            if ($profile && !$profile->is_operator_notification_enabled) {
+                Log::info("Operator notification skipped: disabled in profile settings");
+                return;
+            }
+
+            $operatorPhone = $profile ? $this->normalizePhone($profile->whatsapp_complaint) : null;
+
+            if (!$operatorPhone) {
+                // Fallback: check WahaN8nSetting if profile is empty
+                $settings = WahaN8nSetting::getSettings();
+                $operatorPhone = $settings ? $this->normalizePhone($settings->operator_number) : null;
+            }
+
+            if (!$operatorPhone) return;
+
+            $regionName = strtoupper(appProfile()->region_name ?? 'KECAMATAN');
+            $typeLabel  = ($model->category === PublicService::CATEGORY_PENGADUAN) ? '📢 PENGADUAN' : '📝 LAYANAN';
+            
+            $baseUrl = appProfile()->public_url ?: config('app.url', 'https://localhost');
+            $adminUrl = rtrim($baseUrl, '/') . "/kecamatan/pelayanan/" . $model->id;
+            
+            $reportId = ($model->category === PublicService::CATEGORY_PENGADUAN) ? "LAPOR-{$model->tracking_code}" : $model->tracking_code;
+            $msg = "🚨 *NOTIFIKASI OPERATOR BARU*\n";
+            $msg .= "ID: `{$reportId}`\n";
+            $msg .= "──────────────────\n";
+            $msg .= "👤 *Nama:* {$model->nama_pemohon}\n";
+            $msg .= "📞 *WhatsApp:* {$model->whatsapp}\n";
+            $msg .= "📂 *Kategori:* " . ($model->getCategoryLabelAttribute() ?? '-') . "\n";
+            $msg .= "📑 *Judul:* " . ($model->jenis_layanan ?? '-') . "\n";
+            $msg .= "📝 *Isi:* " . (str_replace("[" . ($model->jenis_pengaduan ?? "") . "]", "", $model->uraian) ?? '-') . "\n";
+            $msg .= "──────────────────\n\n";
+            $msg .= "🔗 *Klik untuk Proses:*\n";
+            $msg .= "{$adminUrl}\n\n";
+            $msg .= "Layanan Digital Kecamatan {$regionName}";
+
+            // Kirim menggunakan provider aktif
+            $provider = \App\Services\WhatsApp\WhatsAppManager::driver();
+            $provider->sendMessage($operatorPhone, $msg);
+
+            Log::info("Operator notification sent", ['phone' => $operatorPhone]);
+        } catch (\Exception $e) {
+            Log::error("Failed to send operator notification", ['error' => $e->getMessage()]);
         }
     }
 

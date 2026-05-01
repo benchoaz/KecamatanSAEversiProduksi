@@ -2175,16 +2175,19 @@
             if (_isAnonim) _privTags += '[ANONIM]';
             if (_isRahasia) _privTags += '[RAHASIA]';
 
-            // Combine title and message, set jenis_layanan
-            form.uraian.value = `[${jenisPengaduan}]${_privTags ? ' ' + _privTags : ''} ${title}\n\n${message}`;
-            form.jenis_layanan.value = `Pengaduan - ${jenisPengaduan}`;
+            // Build combined uraian string WITHOUT touching the visible textarea
+            // This prevents [Aspirasi] from appearing in the textarea on any click
+            const combinedUraian = `[${jenisPengaduan}]${_privTags ? ' ' + _privTags : ''} ${title}\n\n${message}`;
 
             // Show loading
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim...';
 
             try {
+                // Use FormData and override uraian & jenis_layanan directly
                 const formData = new FormData(form);
+                formData.set('uraian', combinedUraian);
+                formData.set('jenis_layanan', `Pengaduan - ${jenisPengaduan}`);
 
                 const response = await fetch('{{ route('public.service.submit', [], false) }}', {
                     method: 'POST',
@@ -2500,9 +2503,8 @@
             if (_isAnonim2) _privTags2 += '[ANONIM]';
             if (_isRahasia2) _privTags2 += '[RAHASIA]';
 
-            // Combine title and message, set jenis_layanan
-            form.uraian.value = `[${jenisPengaduan}]${_privTags2 ? ' ' + _privTags2 : ''} ${title}\n\n${message}`;
-            form.jenis_layanan.value = `Pengaduan - ${jenisPengaduan}`;
+            // Build combined WITHOUT touching visible textarea
+            const combinedUraian2 = `[${jenisPengaduan}]${_privTags2 ? ' ' + _privTags2 : ''} ${title}\n\n${message}`;
 
             // Show loading
             submitBtn.disabled = true;
@@ -2510,6 +2512,8 @@
 
             try {
                 const formData = new FormData(form);
+                formData.set('uraian', combinedUraian2);
+                formData.set('jenis_layanan', `Pengaduan - ${jenisPengaduan}`);
 
                 const response = await fetch('{{ route('public.service.submit', [], false) }}', {
                     method: 'POST',

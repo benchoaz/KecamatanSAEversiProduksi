@@ -35,6 +35,7 @@ require __DIR__ . '/public/warga.php';
 
 // Route Aliases for Landing Page compatibility
 Route::get('/tracking', [PublicServiceController::class, 'trackingPage'])->name('public.tracking');
+Route::get('/lacak-berkas', function() { return redirect()->route('public.tracking'); });
 Route::post('/service/submit', [PublicServiceController::class, 'submit'])->name('public.service.submit');
 
 

@@ -169,7 +169,7 @@
         },
         {
             "parameters": {
-                "url": "={{'http://dashboard-kecamatan-nginx/api/v1/external' + $json.endpoint + '?q=' + encodeURIComponent($json.keyword)}}",
+                "url": "={{'https://kecamatanbesuk.my.id/api/v1/external' + $json.endpoint + '?q=' + encodeURIComponent($json.keyword)}}",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
@@ -218,7 +218,7 @@
         },
         {
             "parameters": {
-                "url": "={{'http://dashboard-kecamatan-nginx/api/v1/external/loker/search?q=' + encodeURIComponent($json.keyword)}}",
+                "url": "={{'https://kecamatanbesuk.my.id/api/v1/external/loker/search?q=' + encodeURIComponent($json.keyword)}}",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
@@ -300,7 +300,7 @@
         },
         {
             "parameters": {
-                "url": "http://dashboard-kecamatan-nginx/api/v1/external/owner/verify-pin",
+                "url": "https://kecamatanbesuk.my.id/api/v1/external/owner/verify-pin",
                 "method": "POST",
                 "sendHeaders": true,
                 "headerParameters": {
@@ -357,7 +357,7 @@
         },
         {
             "parameters": {
-                "url": "http://dashboard-kecamatan-nginx/api/v1/external/owner/toggle-listing",
+                "url": "https://kecamatanbesuk.my.id/api/v1/external/owner/toggle-listing",
                 "method": "POST",
                 "sendHeaders": true,
                 "headerParameters": {

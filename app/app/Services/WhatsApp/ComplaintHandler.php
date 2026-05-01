@@ -14,8 +14,7 @@ class ComplaintHandler
      */
     protected function getComplaintFormUrl(?string $name = null, ?string $phone = null, ?string $category = null): string
     {
-        $profile = app(AppProfile::class);
-        $baseUrl = $profile->public_base_url ?? $profile->app_url ?? config('app.url', 'https://localhost');
+        $baseUrl = appProfile()->public_url ?? config("app.url");
         $url = rtrim($baseUrl, '/') . '/#pengaduan';
 
         // Add pre-filled parameters if provided
@@ -81,15 +80,19 @@ class ComplaintHandler
 
         // Get user's current phone number
         $userPhone = $session->phone;
+        $userPhone = preg_replace("/[^0-9]/", "", explode("@", $userPhone)[0]);
+
+        
+        $phoneMsg = "Mohon masukkan nomor WhatsApp Anda yang aktif agar kami dapat menghubungi Anda.\n(Contoh: *08123456789*)";
+        if (strlen($userPhone) >= 9 && strlen($userPhone) <= 15 && str_starts_with($userPhone, "62")) {
+            $phoneMsg = "Nomor WhatsApp yang terdeteksi: *{$userPhone}*\n\nApakah nomor ini benar? Ketik *YA* jika benar, atau ketik nomor lain jika ingin diganti.";
+        }
 
         return [
-            'success' => true,
-            'intent' => 'complaint_name_received',
-            'reply' => "Terima kasih *{$messageTrim}*.\n\n" .
-                "Nomor WhatsApp yang dapat kami hubungi: *{$userPhone}*\n\n" .
-                "Apakah nomor ini benar untuk dihubungi?\n\n" .
-                "Ketik *YA* jika benar, atau ketik nomor WhatsApp lain yang ingin dihubungi.",
-            'state_update' => 'WAITING_COMPLAINT_WA',
+            "success" => true,
+            "intent" => "complaint_name_received",
+            "reply" => "Terima kasih *{$messageTrim}*.\n\n" . $phoneMsg,
+            "state_update" => "WAITING_COMPLAINT_WA",
         ];
     }
 
@@ -186,7 +189,7 @@ class ComplaintHandler
             "Ketik *MENU* untuk kembali.";
 
         // Replace placeholder with region name
-        $profile = app(AppProfile::class);
+        $profile = appProfile();
         $regionName = $profile->region_name ?? 'kecamatan kami';
         $reply = str_replace('{@region}', $regionName, $reply);
 

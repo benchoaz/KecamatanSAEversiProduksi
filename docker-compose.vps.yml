@@ -55,6 +55,11 @@ services:
     env_file: ./app/.env
     volumes:
       - ./app/storage:/var/www/storage:rw
+      - ./app/resources/views:/var/www/resources/views
+      - ./app/app/Http/Controllers:/var/www/app/Http/Controllers
+      - ./app/app/Traits:/var/www/app/Traits
+      - ./app/app/Services/WhatsApp:/var/www/app/Services/WhatsApp
+      - ./app/.env:/var/www/.env
     networks:
       - kecamatan-network
     depends_on:
@@ -76,7 +81,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kecamatan.rule=Host(`${DOMAIN:-kecamatanbesuk.my.id}`)"
+      - "traefik.http.routers.kecamatan.rule=Host(`kecamatanbesuk.my.id`)"
       - "traefik.http.routers.kecamatan.entrypoints=websecure"
       - "traefik.http.routers.kecamatan.tls.certresolver=myresolver"
       - "traefik.http.routers.kecamatan.priority=1"
@@ -150,6 +155,11 @@ services:
       sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
     volumes:
       - ./app/storage:/var/www/storage:rw
+      - ./app/resources/views:/var/www/resources/views
+      - ./app/app/Http/Controllers:/var/www/app/Http/Controllers
+      - ./app/app/Traits:/var/www/app/Traits
+      - ./app/app/Services/WhatsApp:/var/www/app/Services/WhatsApp
+      - ./app/.env:/var/www/.env
     networks:
       - kecamatan-network
     depends_on:

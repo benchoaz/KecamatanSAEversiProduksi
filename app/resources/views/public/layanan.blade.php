@@ -4,7 +4,9 @@
 
 @section('content')
     @php
-        $waRaw = preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot ?? '628123456789');
+        // Use the official service phone number for the help button
+        $waRaw = preg_replace('/[^0-9]/', '', appProfile()->phone ?? '6281232232532');
+        // Ensure format is 62...
         $waAdminLink = str_starts_with($waRaw, '0') ? '62' . substr($waRaw, 1) : $waRaw;
     @endphp
     <div class="min-h-screen bg-gradient-to-tr from-slate-50 via-teal-50/20 to-blue-50/20 py-12 md:py-20">

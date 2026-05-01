@@ -44,6 +44,7 @@ class AppProfile extends Model
         'map_latitude',
         'map_longitude',
         'updated_by',
+        'is_operator_notification_enabled',
         // Bot Settings
         'public_url',
         'whatsapp_bot_menu',

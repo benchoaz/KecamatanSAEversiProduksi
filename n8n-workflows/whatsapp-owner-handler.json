@@ -86,7 +86,7 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "http://dashboard-kecamatan-nginx/api/v1/external/owner/verify-pin",
+                "url": "https://kecamatanbesuk.my.id/api/v1/external/owner/verify-pin",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
@@ -155,7 +155,7 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "http://dashboard-kecamatan-nginx/api/v1/external/owner/toggle-listing",
+                "url": "https://kecamatanbesuk.my.id/api/v1/external/owner/toggle-listing",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [

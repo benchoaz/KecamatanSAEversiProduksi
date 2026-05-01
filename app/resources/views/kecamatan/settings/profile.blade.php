@@ -543,13 +543,26 @@
                                                     placeholder="(0335) 123456">
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label text-slate-700 fw-semibold">WhatsApp Pengaduan
-                                                    (Lapor!)</label>
-                                                <input type="text" name="whatsapp_complaint"
-                                                    value="{{ old('whatsapp_complaint', $profile->whatsapp_complaint) }}"
-                                                    class="form-control bg-white border-slate-200 rounded-3 text-sm"
-                                                    placeholder="08123456789">
+                                    <label class="form-label text-slate-700 fw-semibold">WhatsApp Pengaduan (Lapor!)</label>
+                                    <input type="text" name="whatsapp_complaint" value="{{ old('whatsapp_complaint', $profile->whatsapp_complaint) }}" class="form-control bg-white border-slate-200 rounded-3 @error('whatsapp_complaint') is-invalid @enderror" placeholder="08xxxxxxxxxx">
+                                    @error('whatsapp_complaint')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <div class="mt-3">
+                                        <label class="form-label text-slate-700 fw-semibold d-block">Notifikasi WhatsApp Admin</label>
+                                        <div class="d-flex align-items-center gap-3 mt-1">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="is_operator_notification_enabled" value="1" {{ ($profile->is_operator_notification_enabled ?? true) ? 'checked' : '' }} style="width: 50px; height: 25px;">
                                             </div>
+                                            <span class="text-slate-600">
+                                                {{ ($profile->is_operator_notification_enabled ?? true) ? 'Notifikasi On' : 'Notifikasi Off' }}
+                                            </span>
+                                        </div>
+                                        <div class="form-text text-slate-400 small mt-1">
+                                            Aktifkan untuk menerima pesan WhatsApp otomatis setiap ada warga yang mengajukan layanan/pengaduan.
+                                        </div>
+                                    </div>
+                                </div>
                                             <div class="col-md-6">
                                                 <label class="form-label text-slate-700 fw-semibold">Buka: Senin -
                                                     Kamis</label>

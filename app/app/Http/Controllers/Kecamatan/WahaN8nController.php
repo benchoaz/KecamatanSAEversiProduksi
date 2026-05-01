@@ -35,9 +35,12 @@ class WahaN8nController extends Controller
             'whatsapp_bot_menu.*.description' => 'nullable|string|max:255',
             'whatsapp_bot_menu.*.action'      => 'nullable|string|max:100',
             'whatsapp_bot_menu.*.enabled'     => 'nullable',
+            'operator_number'                 => 'nullable|string|max:20',
+            'is_operator_notification_enabled'=> 'nullable|boolean',
         ]);
 
         $validated['bot_enabled'] = $request->has('bot_enabled') ? true : false;
+        $validated['is_operator_notification_enabled'] = $request->has('is_operator_notification_enabled') ? true : false;
 
         if (!empty($validated['bot_number'])) {
             $phone = preg_replace('/[^0-9]/', '', $validated['bot_number']);
@@ -49,15 +52,29 @@ class WahaN8nController extends Controller
             $validated['bot_number'] = $phone;
         }
 
+        if (!empty($validated['operator_number'])) {
+            $phone = preg_replace('/[^0-9]/', '', $validated['operator_number']);
+            if (str_starts_with($phone, '0')) {
+                $phone = '62' . substr($phone, 1);
+            } elseif (!str_starts_with($phone, '62')) {
+                $phone = '62' . $phone;
+            }
+            $validated['operator_number'] = $phone;
+        }
+
         $settings = WahaN8nSetting::first();
         if ($settings) {
             $settings->update([
                 'bot_number' => $validated['bot_number'] ?? null,
+                'operator_number' => $validated['operator_number'] ?? null,
+                'is_operator_notification_enabled' => $validated['is_operator_notification_enabled'],
                 'bot_enabled' => $validated['bot_enabled'],
             ]);
         } else {
             WahaN8nSetting::create([
                 'bot_number' => $validated['bot_number'] ?? null,
+                'operator_number' => $validated['operator_number'] ?? null,
+                'is_operator_notification_enabled' => $validated['is_operator_notification_enabled'],
                 'bot_enabled' => $validated['bot_enabled'],
             ]);
         }

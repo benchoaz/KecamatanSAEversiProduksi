@@ -60,8 +60,12 @@
                 <p class="sn-panel-hint" id="snPanelHint">Silakan pilih jenis layanan yang Anda butuhkan:</p>
                 <div class="sn-node-grid" id="snNodeGrid">
                     @foreach($rootNodes as $node)
-                    <button class="sn-node-card"
-                            onclick="selectNode({{ $node->id }}, '{{ addslashes($node->name) }}', {{ $node->is_leaf ? 'true' : 'false' }}, {{ $node->show_identity_form ? 'true' : 'false' }}, '{{ addslashes($node->requirement_text) }}')">
+                    <button class="sn-node-card sn-root-node"
+                            data-id="{{ $node->id }}"
+                            data-name="{{ $node->name }}"
+                            data-leaf="{{ $node->is_leaf ? 'true' : 'false' }}"
+                            data-identity="{{ $node->show_identity_form ? 'true' : 'false' }}"
+                            data-sop="{{ $node->requirement_text ?? '' }}">
                         <div class="sn-node-card-icon">
                             <i class="fas {{ $node->ikon ?? 'fa-folder' }}"></i>
                         </div>
@@ -104,18 +108,18 @@
                     <input type="hidden" name="master_layanan_id" value="{{ $layanan->id }}">
                     <input type="hidden" name="jenis_layanan" id="snJenisLayanan" value="{{ $layanan->nama_layanan }}">
 
-                    {{-- ── Bagian 1: Identitas ── --}}
+                    {{-- ── Bagian 1: Identitas (Dinamis: Anak atau Pemohon Utama) ── --}}
                     <div class="sn-form-section" id="snIdentitySection">
-                        <div class="sn-form-section-label">
+                        <div class="sn-form-section-label" id="snMainIdLabel">
                             <i class="fas fa-user-circle"></i> Data Pemohon
                         </div>
                         <div class="sn-form-grid">
                             <div class="sn-field col-span-2">
-                                <label class="sn-label">Nama Lengkap <span>*</span></label>
+                                <label class="sn-label" id="snMainNameLabel">Nama Lengkap <span>*</span></label>
                                 <input type="text" name="nama_pemohon" class="sn-input" placeholder="Sesuai KTP" required>
                             </div>
                             <div class="sn-field">
-                                <label class="sn-label">NIK (16 digit) <span>*</span></label>
+                                <label class="sn-label" id="snMainNikLabel">NIK (16 digit) <span>*</span></label>
                                 <input type="tel" name="nik" class="sn-input" placeholder="35XXXXXXXXXXXXXX"
                                        minlength="16" maxlength="16" pattern="\d{16}" required>
                             </div>
@@ -134,6 +138,24 @@
                                     <option value="{{ $d->id }}">{{ $d->nama_desa }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ── Bagian Tambahan: Data Pemohon (jika Identitas Utama adalah Anak) ── --}}
+                    <div class="sn-form-section hidden" id="snApplicantSection">
+                        <div class="sn-form-section-label">
+                            <i class="fas fa-id-card-alt"></i> Data Orang Tua / Wali (Pemohon)
+                        </div>
+                        <p class="sn-panel-hint" style="margin-top:-10px; margin-bottom:15px; font-size:12px;">Silakan isi data diri Anda sebagai orang tua/wali yang mengajukan permohonan untuk anak tersebut.</p>
+                        <div class="sn-form-grid">
+                            <div class="sn-field">
+                                <label class="sn-label">Nama Orang Tua / Wali <span>*</span></label>
+                                <input type="text" name="applicant_name" id="snApplicantName" class="sn-input" placeholder="Nama Lengkap Anda">
+                            </div>
+                            <div class="sn-field">
+                                <label class="sn-label">NIK Orang Tua / Wali <span>*</span></label>
+                                <input type="tel" name="applicant_nik" id="snApplicantNik" class="sn-input" placeholder="NIK 16 Digit Anda" maxlength="16">
                             </div>
                         </div>
                     </div>
@@ -877,6 +899,22 @@ if (directSubmission) {
     updateProgress(0);
 }
 
+// ── Event delegation untuk node clicks ─────────────────────
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.sn-node-card');
+    if (!btn) return;
+    
+    const id = btn.dataset.id;
+    const name = btn.dataset.name;
+    const isLeaf = btn.dataset.leaf === 'true' || btn.dataset.leaf === '1';
+    const showIdentity = btn.dataset.identity !== 'false';
+    const sop = btn.dataset.sop || '';
+    
+    if (id && name) {
+        selectNode(parseInt(id), name, isLeaf, showIdentity, sop);
+    }
+});
+
 // Helper untuk escape data node agar aman di atribut HTML onclick
 function escapeNodeData(str) {
     if (!str) return "";
@@ -885,7 +923,11 @@ function escapeNodeData(str) {
 
 function unescapeNodeData(str) {
     if (!str) return "";
-    return decodeURIComponent(str);
+    try {
+        return decodeURIComponent(str);
+    } catch(e) {
+        return str;
+    }
 }
 
 function initDirectSubmission() {
@@ -967,7 +1009,10 @@ function renderRequirements(reqs) {
 }
 
 // ── Pilih node ────────────────────────────────────────────
-async function selectNode(nodeId, nodeName, isLeaf, showIdentity = true, sopText = '') {
+async function selectNode(nodeId, encodedNodeName, isLeaf, showIdentity = true, encodedSopText = '') {
+    const nodeName = unescapeNodeData(encodedNodeName);
+    const sopText = unescapeNodeData(encodedSopText);
+
     history.push({ id: nodeId, name: nodeName });
     updateBreadcrumb();
 
@@ -989,13 +1034,17 @@ async function loadChildren(nodeId) {
 
     const grid = document.getElementById('snNodeGrid');
     grid.innerHTML = data.children.map(n => `
-        <button class="sn-node-card sn-anim"
-                onclick="selectNode(${n.id}, '${escapeNodeData(n.name)}', ${n.is_leaf}, ${n.show_identity_form}, '${escapeNodeData(n.requirement_text||'')}')">
+        <button class="sn-node-card sn-anim sn-dynamic-node"
+                data-id="${n.id}"
+                data-name="${n.name}"
+                data-leaf="${n.is_leaf}"
+                data-identity="${n.show_identity_form}"
+                data-sop="${n.requirement_text || ''}">
             <div class="sn-node-card-icon">
                 <i class="fas ${n.ikon || 'fa-folder'}"></i>
             </div>
             <div class="sn-node-card-text">
-                <span class="sn-node-card-label">${unescapeNodeData(escapeNodeData(n.name))}</span>
+                <span class="sn-node-card-label">${n.name}</span>
                 ${n.description ? `<span class="sn-node-card-desc">${n.description}</span>` : ''}
             </div>
             <div class="sn-node-card-arrow">
@@ -1037,9 +1086,52 @@ async function loadLeafForm(nodeId, nodeName, showIdentity = true, sopText = '')
     const sopEl  = document.getElementById('snSopText');
     if (sopText) {
         sopBox.classList.remove('hidden');
-        sopEl.textContent = unescapeNodeData(sopText);
+        sopEl.textContent = sopText;
     } else {
         sopBox.classList.add('hidden');
+    }
+
+    // Dynamic Labels for Anak
+    const isAnak = (nodeName || "").toLowerCase().includes('anak') || (nodeName || "").toLowerCase().includes('lahir');
+    const idSectionEl = document.getElementById('snIdentitySection');
+    const applicantSectionEl = document.getElementById('snApplicantSection');
+    
+    if (idSectionEl) {
+        const idLabel = document.getElementById('snMainIdLabel');
+        const nameLabel = document.getElementById('snMainNameLabel');
+        const nikLabel = document.getElementById('snMainNikLabel');
+        const nameInput = document.querySelector('input[name="nama_pemohon"]');
+        
+        const applicantNameInput = document.getElementById('snApplicantName');
+        const applicantNikInput = document.getElementById('snApplicantNik');
+        
+        if (isAnak) {
+            // Utama adalah Anak
+            if (idLabel) idLabel.innerHTML = '<i class="fas fa-child"></i> Data Anak (Subjek Layanan)';
+            if (nameLabel) nameLabel.innerHTML = 'Nama Lengkap Anak <span>*</span>';
+            if (nameInput) nameInput.placeholder = 'Nama Lengkap Anak';
+            if (nikLabel) nikLabel.innerHTML = 'NIK Anak (jika ada) / NIK Kepala Keluarga <span>*</span>';
+            
+            // Munculkan bagian Pemohon (Orang Tua)
+            if (applicantSectionEl) {
+                applicantSectionEl.classList.remove('hidden');
+                if (applicantNameInput) applicantNameInput.setAttribute('required', 'required');
+                if (applicantNikInput) applicantNikInput.setAttribute('required', 'required');
+            }
+        } else {
+            // Utama adalah Pemohon
+            if (idLabel) idLabel.innerHTML = '<i class="fas fa-user-circle"></i> Data Pemohon';
+            if (nameLabel) nameLabel.innerHTML = 'Nama Lengkap <span>*</span>';
+            if (nameInput) nameInput.placeholder = 'Sesuai KTP';
+            if (nikLabel) nikLabel.innerHTML = 'NIK (16 digit) <span>*</span>';
+            
+            // Sembunyikan bagian Pemohon tambahan
+            if (applicantSectionEl) {
+                applicantSectionEl.classList.add('hidden');
+                if (applicantNameInput) applicantNameInput.removeAttribute('required');
+                if (applicantNikInput) applicantNikInput.removeAttribute('required');
+            }
+        }
     }
 
     // Toggle Identity Form
@@ -1093,11 +1185,15 @@ function goBack(toIndex) {
         // Kembali ke root
         const grid = document.getElementById('snNodeGrid');
         grid.innerHTML = rootNodes.map(n => `
-            <button class="sn-node-card sn-anim"
-                    onclick="selectNode(${n.id}, '${escapeNodeData(n.name)}', ${n.is_leaf}, ${n.show_identity_form}, '${escapeNodeData(n.requirement_text||'')}')">
+            <button class="sn-node-card sn-anim sn-dynamic-node"
+                    data-id="${n.id}"
+                    data-name="${n.name}"
+                    data-leaf="${n.is_leaf}"
+                    data-identity="${n.show_identity_form}"
+                    data-sop="${n.requirement_text || ''}">
                 <div class="sn-node-card-icon"><i class="fas ${n.ikon}"></i></div>
                 <div class="sn-node-card-text">
-                    <span class="sn-node-card-label">${unescapeNodeData(escapeNodeData(n.name))}</span>
+                    <span class="sn-node-card-label">${n.name}</span>
                     ${n.description ? `<span class="sn-node-card-desc">${n.description}</span>` : ''}
                 </div>
                 <div class="sn-node-card-arrow">

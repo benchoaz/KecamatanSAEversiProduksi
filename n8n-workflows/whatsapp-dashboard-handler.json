@@ -60,7 +60,7 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "http://dashboard-kecamatan-nginx/api/cek-berkas",
+                "url": "https://kecamatanbesuk.my.id/api/cek-berkas",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [

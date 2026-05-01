@@ -101,7 +101,7 @@
                 <span class="nav-section-title">BACKUP & RECOVERY</span>
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a href="{{ route('kecamatan.settings.backup.index') }}" class="nav-link">
+                        <a href="{{ route('filament.admin.pages.backup-setting') }}" class="nav-link">
                             <span class="nav-icon"><i class="fas fa-cloud-arrow-up"></i></span>
                             <span class="nav-text">Pengaturan Backup</span>
                         </a>
