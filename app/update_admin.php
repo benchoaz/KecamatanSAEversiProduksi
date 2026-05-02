@@ -13,12 +13,8 @@ $kernel->bootstrap();
 $username = 'admin';
 $password = 'admin123';
 
-// 1. Get or Create Super Admin Legacy Role
-$column = \Illuminate\Support\Facades\Schema::hasColumn('roles', 'nama_role') ? 'nama_role' : 'name';
-$legacyRole = LegacyRole::where($column, 'Super Admin')->first();
-if (!$legacyRole) {
-    $legacyRole = LegacyRole::create([$column => 'Super Admin']);
-}
+// 1. Get or Create Super Admin Role (Spatie/Legacy shared)
+$legacyRole = LegacyRole::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
 
 // 2. Create or Update User
 $user = User::updateOrCreate(
