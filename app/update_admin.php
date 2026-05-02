@@ -13,15 +13,23 @@ $kernel->bootstrap();
 $username = 'admin';
 $password = 'admin123';
 
-// 1. Get or Create Super Admin Role (Spatie/Legacy shared)
-$legacyRole = SpatieRole::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
+// 1. Get or Create Super Admin Role using DB query builder to avoid model issues
+$legacyRoleId = \Illuminate\Support\Facades\DB::table('roles')->where('name', 'Super Admin')->value('id');
+if (!$legacyRoleId) {
+    $legacyRoleId = \Illuminate\Support\Facades\DB::table('roles')->insertGetId([
+        'name' => 'Super Admin',
+        'guard_name' => 'web',
+        'created_at' => now(),
+        'updated_at' => now()
+    ]);
+}
 
 // 2. Create or Update User
 $user = User::updateOrCreate(
     ['username' => $username],
     [
         'password' => Hash::make($password),
-        'role_id' => $legacyRole->id,
+        'role_id' => $legacyRoleId,
         'status' => 'aktif',
         'nama_lengkap' => 'Administrator Pusat'
     ]
