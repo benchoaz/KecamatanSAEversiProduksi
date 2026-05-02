@@ -99,6 +99,7 @@ class ApplicationProfileService
     public function getWhatsappBotUrl($text = "Halo, saya butuh informasi.")
     {
         $number = $this->getWhatsappBotNumber();
+        if (empty($number)) {
             return '#';
         }
 
@@ -125,20 +126,29 @@ class ApplicationProfileService
         // 2. If Cache is empty or stuck on localhost, FORCE read from DB directly
         if (empty($url) || str_contains($url, 'localhost')) {
             $direct = AppProfile::select('public_url')->first();
+            if ($direct) {
                 $url = $direct->public_url;
             }
         }
 
-        // 3. Final Fallback: Only use request host if DB is truly empty
+        // 3. If still localhost or empty, use APP_URL from config
+        $configUrl = config('app.url');
+        if ((empty($url) || str_contains($url, 'localhost')) && !empty($configUrl) && !str_contains($configUrl, 'localhost')) {
+            $url = $configUrl;
+        }
+
+        // 4. Final Fallback: Use request host if available
         if (empty($url) || str_contains($url, 'localhost')) {
             $host = request()->getHost();
+            if ($host && !str_contains($host, 'localhost') && $host !== '127.0.0.1') {
                 $scheme = request()->isSecure() ? 'https' : 'http';
                 $url = $scheme . '://' . $host;
             }
         }
         
+        // Absolute fallback for Besuk region if everything fails
         if (empty($url) || str_contains($url, 'localhost')) {
-            $url = config('app.url', 'https://kecamatanbesuk.my.id');
+            $url = 'https://kecamatanbesuk.my.id';
         }
 
         return rtrim($url, '/');

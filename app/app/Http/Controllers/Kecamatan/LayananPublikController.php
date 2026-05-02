@@ -325,7 +325,7 @@ class LayananPublikController extends Controller
 
         UmkmAdminLog::create([
             'umkm_id' => $umkm->id,
-            'action' => $umkm->is_verified ? 'verify' : 'unverify',
+            'action' => $umkm->is_verified ? 'verify' : 'deactivate',
             'actor' => 'admin',
             'notes' => "Unit usaha {$status} oleh kecamatan.",
         ]);

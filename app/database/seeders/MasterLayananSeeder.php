@@ -25,6 +25,7 @@ class MasterLayananSeeder extends Seeder
                 'warna_bg' => 'bg-blue-50',
                 'warna_text' => 'text-blue-600',
                 'is_active' => true,
+                'has_nodes' => true,
                 'urutan' => 1
             ],
             [
@@ -36,6 +37,7 @@ class MasterLayananSeeder extends Seeder
                 'warna_bg' => 'bg-green-50',
                 'warna_text' => 'text-green-600',
                 'is_active' => true,
+                'has_nodes' => true,
                 'urutan' => 2
             ],
             [

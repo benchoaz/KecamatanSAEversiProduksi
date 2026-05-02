@@ -37,6 +37,7 @@ require __DIR__ . '/public/warga.php';
 Route::get('/tracking', [PublicServiceController::class, 'trackingPage'])->name('public.tracking');
 Route::get('/lacak-berkas', function() { return redirect()->route('public.tracking'); });
 Route::post('/service/submit', [PublicServiceController::class, 'submit'])->name('public.service.submit');
+Route::post('/service/feedback/{uuid}', [PublicServiceController::class, 'submitFeedback'])->name('public.service.feedback');
 
 
 // Receipt Routes

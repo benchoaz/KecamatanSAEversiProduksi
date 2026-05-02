@@ -404,26 +404,75 @@
                 @endif
 
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden border border-slate-100">
-                    <div class="card-body p-4 text-center">
-                        <div
-                            class="w-12 h-12 bg-slate-100 rounded-circle d-flex align-items-center justify-center text-slate-400 mx-auto mb-3">
-                            <i class="fas fa-user-shield"></i>
+                    <div class="card-body p-4">
+                        <h6 class="mb-3 fw-bold fs-6 text-slate-800"><i class="fas fa-history text-slate-400 me-2"></i>Riwayat Aktivitas</h6>
+                        <div class="timeline-compact">
+                            <div class="timeline-item pb-3 border-start border-slate-100 ps-4 position-relative">
+                                <div class="dot bg-emerald-500"></div>
+                                <p class="mb-0 small fw-bold text-slate-800">Berkas Diterima</p>
+                                <p class="text-[10px] text-slate-400 mb-0">{{ $complaint->created_at->format('d M Y, H:i') }}</p>
+                            </div>
+                            @foreach($complaint->histories as $history)
+                                <div class="timeline-item pb-3 border-start border-slate-100 ps-4 position-relative">
+                                    <div class="dot bg-blue-500"></div>
+                                    <p class="mb-0 small fw-bold text-slate-800">{{ $history->status_to_label ?? $history->status_to }}</p>
+                                    <p class="text-[10px] text-slate-400 mb-1">{{ $history->created_at->format('d M Y, H:i') }} • {{ $history->user?->nama_lengkap ?? $history->user?->username ?? 'System' }}</p>
+                                    @if($history->comment)
+                                        <div class="p-2 bg-slate-50 rounded-3 border border-slate-100 text-[10px] text-slate-600">
+                                            {{ $history->comment }}
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
                         </div>
-                        <p class="text-[10px] text-slate-400 uppercase fw-bold tracking-wider mb-1">Dikelola Oleh</p>
-                        <p class="fw-bold text-slate-800 mb-1 small">
-                            {{ $complaint->handler ? $complaint->handler->name : 'Belum Diproses' }}
-                        </p>
-                        @if($complaint->handled_at)
-                            <p class="text-[10px] text-slate-400 mb-0">
-                                Update: {{ $complaint->handled_at->format('d M Y, H:i') }} WIB</p>
-                        @endif
                     </div>
                 </div>
+
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden border border-slate-100 mt-4">
+                    <div class="card-body p-4">
+                        <h6 class="mb-3 fw-bold fs-6 text-slate-800"><i class="fas fa-comment-medical text-slate-400 me-2"></i>Tambah Catatan Aktivitas</h6>
+                        <form action="{{ route('kecamatan.pelayanan.history-comment', $complaint->id) }}" method="POST">
+                            @csrf
+                            <textarea name="comment" class="form-control border-slate-200 rounded-3 text-sm mb-3" rows="3" placeholder="Contoh: Berkas fisik telah diverifikasi, menunggu tanda tangan Camat..."></textarea>
+                            <button type="submit" class="btn btn-primary w-full rounded-3 py-2 text-sm fw-bold shadow-sm">
+                                <i class="fas fa-save me-2"></i>Simpan Catatan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                @if($complaint->rating)
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden border border-amber-100 bg-amber-50/20 mt-4">
+                        <div class="card-body p-4 text-center">
+                            <h6 class="mb-2 fw-bold small text-amber-900">Survei Kepuasan Warga</h6>
+                            <div class="flex justify-center gap-1 mb-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star {{ $i <= $complaint->rating ? 'text-amber-400' : 'text-slate-200' }}"></i>
+                                @endfor
+                            </div>
+                            <p class="text-xs text-slate-700 italic mb-0">"{{ $complaint->citizen_feedback ?? 'Tidak ada komentar' }}"</p>
+                            <p class="text-[10px] text-slate-400 mt-2">Diterima pada: {{ $complaint->feedback_at->format('d M Y, H:i') }}</p>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
 
     <style>
+        .timeline-compact .timeline-item:last-child {
+            border-left: 0 !important;
+        }
+        .timeline-compact .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: absolute;
+            left: -5px;
+            top: 5px;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px #f1f5f9;
+        }
         .attachment-preview {
             width: 100px;
             height: 100px;

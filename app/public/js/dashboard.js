@@ -91,26 +91,27 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Submenu Toggle (Accordion) - Optimized
-    document.querySelectorAll('.has-submenu > .nav-link').forEach(trigger => {
-        trigger.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+    // Submenu Toggle (Accordion) - Optimized with Event Delegation
+    document.addEventListener('click', function (e) {
+        const trigger = e.target.closest('.has-submenu > .nav-link');
+        if (!trigger) return;
 
-            const parent = this.parentElement;
-            const isOpen = parent.classList.contains('open');
+        e.preventDefault();
+        e.stopPropagation();
 
-            // Optional: Close other submenus (Accordion style)
-            document.querySelectorAll('.has-submenu.open').forEach(openedItem => {
-                if (openedItem !== parent) {
-                    openedItem.classList.remove('open');
-                }
-            });
+        const parent = trigger.parentElement;
+        const isOpen = parent.classList.contains('open');
 
-            // Toggle current
-            parent.classList.toggle('open');
-            console.log('Submenu toggle:', parent.querySelector('.nav-text').innerText, '->', !isOpen);
+        // Optional: Close other submenus (Accordion style)
+        document.querySelectorAll('.has-submenu.open').forEach(openedItem => {
+            if (openedItem !== parent) {
+                openedItem.classList.remove('open');
+            }
         });
+
+        // Toggle current
+        parent.classList.toggle('open');
+        console.log('Submenu toggle:', trigger.querySelector('.nav-text').innerText, '->', !isOpen);
     });
 
     // -------------------------------------------------------------------------

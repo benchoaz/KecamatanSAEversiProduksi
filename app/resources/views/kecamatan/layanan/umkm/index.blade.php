@@ -117,40 +117,55 @@
                                         </td>
                                         <td class="px-4 py-3">
                                             @if($item->ownership_status == 'pending_transfer')
-                                                <span class="badge bg-amber-50 text-amber-600 border border-amber-100 rounded-pill px-2 py-1 fw-bold text-[10px] uppercase">
+                                                <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill px-2 py-1 fw-bold text-[10px] uppercase">
                                                     <i class="fas fa-clock me-1"></i> Butuh Serah Terima
                                                 </span>
                                             @else
-                                                <span class="badge bg-{{ $item->status_badge }}-50 text-{{ $item->status_badge == 'success' ? 'emerald' : ($item->status_badge == 'warning' ? 'amber' : 'slate') }}-600 border border-{{ $item->status_badge == 'success' ? 'emerald' : ($item->status_badge == 'warning' ? 'amber' : 'slate') }}-100 rounded-pill px-2 py-1 fw-bold text-[10px] uppercase">
+                                                @php
+                                                    $badgeClass = match($item->status) {
+                                                        'aktif' => 'bg-success text-white',
+                                                        'pending' => 'bg-warning text-dark',
+                                                        default => 'bg-secondary text-white'
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $badgeClass }} rounded-pill px-2 py-1 fw-bold text-[10px] uppercase shadow-sm">
                                                     {{ $item->status_label }}
                                                 </span>
                                             @endif
                                         </td>
                                         <td class="px-4 py-3 text-end">
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm btn-light border-0 shadow-sm rounded-circle dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                    <i class="fas fa-ellipsis-v text-slate-400"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
-                                                    <li>
-                                                        <form action="{{ route('kecamatan.umkm.toggle-verify', $item->id) }}" method="POST">
-                                                            @csrf
-                                                            <button type="submit" class="dropdown-item rounded-3 mb-1 text-sm font-medium {{ $item->is_verified ? 'text-slate-600' : 'text-primary' }}">
-                                                                <i class="fas {{ $item->is_verified ? 'fa-certificate' : 'fa-check-circle' }} me-2"></i> 
-                                                                {{ $item->is_verified ? 'Batal Verifikasi' : 'Verifikasi (Centang Biru)' }}
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                    <li><a class="dropdown-item rounded-3 mb-1 text-sm font-medium" href="{{ route('kecamatan.umkm.handover', $item->id) }}"><i class="fas fa-key text-amber-500 me-2"></i> Reset Akses / Link</a></li>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li><a class="dropdown-item rounded-3 mb-1 text-sm font-medium" href="{{ route('kecamatan.umkm.edit', $item->id) }}"><i class="fas fa-edit text-slate-400 me-2"></i> Koreksi Admin</a></li>
-                                                    <li>
-                                                        <form action="{{ route('kecamatan.umkm.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Nonaktifkan UMKM ini?')">
-                                                            @csrf @method('DELETE')
-                                                            <button type="submit" class="dropdown-item rounded-3 text-sm font-medium text-rose-600"><i class="fas fa-ban text-rose-400 me-2"></i> Nonaktifkan</button>
-                                                        </form>
-                                                    </li>
-                                                </ul>
+                                            <div class="d-flex justify-content-end gap-1">
+                                                {{-- Quick Action: Verify --}}
+                                                <form action="{{ route('kecamatan.umkm.toggle-verify', $item->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm {{ $item->is_verified ? 'btn-success' : 'btn-outline-primary' }} rounded-3 shadow-sm" title="{{ $item->is_verified ? 'Batal Verifikasi' : 'Verifikasi (Centang Biru)' }}">
+                                                        <i class="fas {{ $item->is_verified ? 'fa-certificate' : 'fa-check-circle' }}"></i>
+                                                    </button>
+                                                </form>
+
+                                                {{-- Quick Action: Edit (Koreksi Admin) --}}
+                                                <a href="{{ route('kecamatan.umkm.edit', $item->id) }}" class="btn btn-sm btn-outline-slate rounded-3 shadow-sm" title="Koreksi Data Admin">
+                                                    <i class="fas fa-edit text-slate-500"></i>
+                                                </a>
+
+                                                {{-- Quick Action: Access Link --}}
+                                                <a href="{{ route('kecamatan.umkm.handover', $item->id) }}" class="btn btn-sm btn-outline-amber rounded-3 shadow-sm" title="Kirim Link Akses / Reset Token">
+                                                    <i class="fas fa-key text-amber-600"></i>
+                                                </a>
+
+                                                <div class="dropdown d-inline">
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport">
+                                                        <i class="fas fa-ellipsis-h text-slate-400"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
+                                                        <li>
+                                                            <form action="{{ route('kecamatan.umkm.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Nonaktifkan UMKM ini?')">
+                                                                @csrf @method('DELETE')
+                                                                <button type="submit" class="dropdown-item rounded-3 text-sm font-medium text-rose-600"><i class="fas fa-ban text-rose-400 me-2"></i> Nonaktifkan</button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -191,37 +206,44 @@
                                         </td>
                                         <td class="px-4 py-3">
                                             @php
-                                                $statusColor = $item->status == 'active' ? 'emerald' : 'slate';
+                                                $statusColor = $item->status == 'active' ? 'success' : 'secondary';
                                             @endphp
-                                            <span class="badge bg-{{ $statusColor }}-50 text-{{ $statusColor }}-600 border border-{{ $statusColor }}-100 rounded-pill px-2 py-1 fw-bold text-[10px] uppercase">
+                                            <span class="badge bg-{{ $statusColor }} rounded-pill px-2 py-1 fw-bold text-[10px] uppercase shadow-sm">
                                                 {{ $item->status == 'active' ? 'Aktif' : 'Nonaktif' }}
                                             </span>
                                         </td>
                                         <td class="px-4 py-3 text-end">
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm btn-light border-0 shadow-sm rounded-circle dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                    <i class="fas fa-ellipsis-v text-slate-400"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
-                                                    <li>
-                                                        <form action="{{ route('kecamatan.jasa.toggle-verify', $item->id) }}" method="POST">
-                                                            @csrf
-                                                            <button type="submit" class="dropdown-item rounded-3 mb-1 text-sm font-medium {{ $item->is_verified ? 'text-slate-600' : 'text-primary' }}">
-                                                                <i class="fas {{ $item->is_verified ? 'fa-certificate' : 'fa-check-circle' }} me-2"></i> 
-                                                                {{ $item->is_verified ? 'Batal Verifikasi' : 'Verifikasi (Centang Biru)' }}
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                    <li><a class="dropdown-item rounded-3 mb-1 text-sm font-medium" href="{{ route('kecamatan.jasa.handover', $item->id) }}"><i class="fas fa-key text-amber-500 me-2"></i> Reset Akses / Link</a></li>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li><a class="dropdown-item rounded-3 mb-1 text-sm font-medium" href="{{ route('kecamatan.jasa.edit', $item->id) }}"><i class="fas fa-edit text-slate-400 me-2"></i> Koreksi Admin</a></li>
-                                                    <li>
-                                                        <form action="{{ route('kecamatan.jasa.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus Jasa ini?')">
-                                                            @csrf @method('DELETE')
-                                                            <button type="submit" class="dropdown-item rounded-3 text-sm font-medium text-rose-600"><i class="fas fa-trash text-rose-400 me-2"></i> Hapus Jasa</button>
-                                                        </form>
-                                                    </li>
-                                                </ul>
+                                            <div class="d-flex justify-content-end gap-1">
+                                                {{-- Quick Action: Verify --}}
+                                                <form action="{{ route('kecamatan.jasa.toggle-verify', $item->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm {{ $item->is_verified ? 'btn-success' : 'btn-outline-primary' }} rounded-3 shadow-sm" title="{{ $item->is_verified ? 'Batal Verifikasi' : 'Verifikasi (Centang Biru)' }}">
+                                                        <i class="fas {{ $item->is_verified ? 'fa-certificate' : 'fa-check-circle' }}"></i>
+                                                    </button>
+                                                </form>
+
+                                                {{-- Quick Action: Edit --}}
+                                                <a href="{{ route('kecamatan.jasa.edit', $item->id) }}" class="btn btn-sm btn-outline-slate rounded-3 shadow-sm" title="Koreksi Data">
+                                                    <i class="fas fa-edit text-slate-500"></i>
+                                                </a>
+
+                                                <a href="{{ route('kecamatan.jasa.handover', $item->id) }}" class="btn btn-sm btn-outline-amber rounded-3 shadow-sm" title="Kirim Link Akses">
+                                                    <i class="fas fa-key text-amber-600"></i>
+                                                </a>
+
+                                                <div class="dropdown d-inline">
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport">
+                                                        <i class="fas fa-ellipsis-h text-slate-400"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
+                                                        <li>
+                                                            <form action="{{ route('kecamatan.jasa.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus Jasa ini?')">
+                                                                @csrf @method('DELETE')
+                                                                <button type="submit" class="dropdown-item rounded-3 text-sm font-medium text-rose-600"><i class="fas fa-trash text-rose-400 me-2"></i> Hapus Jasa</button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>

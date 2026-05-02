@@ -55,6 +55,7 @@ services:
     env_file: ./app/.env
     volumes:
       - ./app/storage:/var/www/storage:rw
+      - ./app/resources/views:/var/www/resources/views:rw
       - ./app/.env:/var/www/.env
     networks:
       - kecamatan-network
@@ -170,4 +171,8 @@ networks:
 
 volumes:
   pgdata:
+    external: true
+    name: kecamatansaeversikabupaten_pgdata
   redis_data:
+    external: true
+    name: kecamatansaeversikabupaten_redis_data

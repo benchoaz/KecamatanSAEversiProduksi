@@ -203,6 +203,20 @@
     </div>
 
     <div class="flex flex-col gap-3">
+        <div class="p-6 bg-amber-50 rounded-3xl border border-amber-100 mb-4">
+            <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Bagaimana pengalaman pengajuan Anda?</p>
+            <div class="flex justify-center gap-2 mb-4">
+                @for($i=1; $i<=5; $i++)
+                    <button type="button" onclick="setQuickRating({{ $i }})" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="{{ $i }}">
+                        <i class="fas fa-star"></i>
+                    </button>
+                @endfor
+            </div>
+            <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback()" class="btn btn-sm bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase hidden">
+                Kirim Penilaian <i class="fas fa-paper-plane ml-1"></i>
+            </button>
+        </div>
+
         <a href="{{ route('layanan') }}" id="redirect-btn" class="btn bg-slate-900 border-0 text-white rounded-2xl h-16 font-black normal-case text-lg shadow-xl shadow-slate-900/20">
             Cek Status Sekarang <i class="fas fa-arrow-right ml-2 text-sm"></i>
         </a>
@@ -313,6 +327,7 @@
             const data = await response.json();
 
             if(data.success) {
+                submittedUuid = data.uuid;
                 document.getElementById('tracking-pin-display').innerText = data.tracking_code;
                 document.getElementById('redirect-btn').href = data.redirect;
                 successModal.showModal();
@@ -329,6 +344,51 @@
     });
 
     window.onload = updateNav;
+
+    // Quick Survey Logic
+    let quickRating = 0;
+    let submittedUuid = '';
+
+    window.setQuickRating = (r) => {
+        quickRating = r;
+        document.querySelectorAll('.quick-star').forEach(btn => {
+            const val = parseInt(btn.getAttribute('data-val'));
+            btn.classList.toggle('text-amber-400', val <= r);
+            btn.classList.toggle('text-slate-300', val > r);
+        });
+        document.getElementById('btnSendQuickFeedback').classList.remove('hidden');
+    }
+
+    window.submitQuickFeedback = async () => {
+        if(!quickRating || !submittedUuid) return;
+        
+        const btn = document.getElementById('btnSendQuickFeedback');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading loading-spinner loading-xs"></span>';
+
+        try {
+            const response = await fetch(`/service/feedback/${submittedUuid}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ rating: quickRating, citizen_feedback: 'Pengisian form awal' })
+            });
+
+            if(response.ok) {
+                btn.parentElement.innerHTML = `
+                    <div class="text-center animate__animated animate__heartBeat">
+                        <i class="fas fa-check-circle text-emerald-500 text-2xl mb-2"></i>
+                        <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Terima kasih atas penilaian Anda!</p>
+                    </div>
+                `;
+            }
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerText = 'Gagal Mengirim';
+        }
+    }
 </script>
 
 <style>

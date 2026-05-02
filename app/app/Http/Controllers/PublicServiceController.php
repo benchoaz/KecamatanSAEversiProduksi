@@ -345,6 +345,17 @@ class PublicServiceController extends Controller
             'created_at' => $service->created_at->format('d M Y, H:i'),
             'public_response' => $service->effective_public_response,
             'completion_type' => $service->completion_type,
+            'rating' => $service->rating,
+            'citizen_feedback' => $service->citizen_feedback,
+            'feedback_at' => $service->feedback_at ? $service->feedback_at->format('d M Y, H:i') : null,
+            'histories' => $service->histories->map(function($h) {
+                return [
+                    'status_to' => $h->status_to_label,
+                    'comment' => $h->comment,
+                    'created_at' => $h->created_at->format('d M Y, H:i'),
+                    'action_type' => $h->action_type
+                ];
+            }),
         ];
 
         // Digital completion
@@ -439,6 +450,37 @@ class PublicServiceController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
             ], 500);
         }
+    }
+
+    /**
+     * Submit feedback/rating for a completed service
+     */
+    public function submitFeedback(Request $request, $uuid)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'citizen_feedback' => 'nullable|string|max:500',
+        ]);
+
+        $service = PublicService::where('uuid', $uuid)
+            ->where('status', PublicService::STATUS_SELESAI)
+            ->firstOrFail();
+
+        // Prevent double feedback
+        if ($service->feedback_at) {
+            return response()->json(['message' => 'Anda sudah memberikan penilaian untuk layanan ini.'], 422);
+        }
+
+        $service->update([
+            'rating' => $request->rating,
+            'citizen_feedback' => $request->citizen_feedback,
+            'feedback_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Terima kasih atas penilaian Anda! Masukan Anda sangat berarti bagi peningkatan layanan kami.'
+        ]);
     }
 }
 

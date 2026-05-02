@@ -53,37 +53,9 @@ services:
       - APP_URL=https://localhost
     volumes:
       - ./app:/var/www:rw
+      - /var/www/vendor
       - ./app/storage:/var/www/storage:rw
 
-  waha:
-    ports:
-      - "3000:3000"                      # Akses langsung: http://localhost:3000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.waha-local.rule=(Host(`localhost`) || Host(`127.0.0.1`)) && PathPrefix(`/waha`)"
-      - "traefik.http.routers.waha-local.entrypoints=web,websecure"
-      - "traefik.http.routers.waha-local.tls=true"
-      - "traefik.http.routers.waha-local.priority=10"
-      - "traefik.http.routers.waha-local.service=waha-local"
-      - "traefik.http.routers.waha-local.middlewares=waha-strip@docker"
-      - "traefik.http.services.waha-local.loadbalancer.server.port=3000"
-    environment:
-      - WAHA_DASHBOARD_USERNAME=admin
-      - WAHA_DASHBOARD_PASSWORD=admin123
-
-  n8n:
-    ports:
-      - "5678:5678"                      # Akses langsung: http://localhost:5678
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.n8n-local.rule=(Host(`localhost`) || Host(`127.0.0.1`)) && PathPrefix(`/n8n`)"
-      - "traefik.http.routers.n8n-local.entrypoints=web,websecure"
-      - "traefik.http.routers.n8n-local.tls=true"
-      - "traefik.http.routers.n8n-local.priority=10"
-      - "traefik.http.routers.n8n-local.service=n8n-local"
-      - "traefik.http.services.n8n-local.loadbalancer.server.port=5678"
-    environment:
-      - N8N_HOST=localhost
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=http://localhost:5678/
+networks:
+  kecamatan-network:
+    name: kecamatan-network

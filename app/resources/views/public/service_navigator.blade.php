@@ -262,6 +262,24 @@
                 <i class="fas fa-copy"></i> Salin PIN
             </button>
         </div>
+        <div class="sn-feedback-quick" style="background:#fffbeb; border:1px solid #fef3c7; border-radius:16px; padding:16px; margin:20px 0;">
+            <p style="font-size:10px; font-weight:800; color:#b45309; text-transform:uppercase; margin-bottom:10px;">Bagaimana pengalaman pengajuan Anda?</p>
+            <div style="display:flex; justify-content:center; gap:8px; margin-bottom:12px;">
+                @for($i=1; $i<=5; $i++)
+                <button type="button" onclick="setQuickRating({{ $i }})" class="quick-star" data-val="{{ $i }}" style="width:36px; height:36px; border-radius:10px; border:none; background:#fff; color:#cbd5e1; box-shadow:0 1px 2px rgba(0,0,0,0.05); cursor:pointer;">
+                    <i class="fas fa-star"></i>
+                </button>
+                @endfor
+            </div>
+            <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback()" style="display:none; width:100%; padding:8px; background:#f59e0b; color:#fff; border:none; border-radius:10px; font-size:11px; font-weight:800; text-transform:uppercase; cursor:pointer;">
+                Kirim Penilaian <i class="fas fa-paper-plane"></i>
+            </button>
+            <div id="quickFeedbackSuccess" style="display:none; text-align:center;">
+                <i class="fas fa-check-circle" style="color:#10b981; font-size:20px; margin-bottom:4px;"></i>
+                <p style="font-size:10px; font-weight:800; color:#059669; text-transform:uppercase; margin:0;">Terima kasih!</p>
+            </div>
+        </div>
+
         <a href="{{ route('layanan') }}" class="sn-modal-btn primary">
             Cek Status Sekarang <i class="fas fa-arrow-right"></i>
         </a>
@@ -1286,6 +1304,7 @@ document.getElementById('snForm').addEventListener('submit', async function(e) {
         });
         const data = await res.json();
         if (data.success) {
+            window.submittedUuid = data.uuid;
             document.getElementById('snPinDisplay').textContent = data.tracking_code;
             updateProgress(100);
             const modal = document.getElementById('snSuccessModal');
@@ -1301,6 +1320,43 @@ document.getElementById('snForm').addEventListener('submit', async function(e) {
         btn.innerHTML = `<i class="fas fa-paper-plane"></i> <span>Kirim Permohonan</span>`;
     }
 });
+
+let quickRating = 0;
+window.setQuickRating = (r) => {
+    quickRating = r;
+    document.querySelectorAll('.quick-star').forEach(btn => {
+        const val = parseInt(btn.getAttribute('data-val'));
+        btn.style.color = val <= r ? '#f59e0b' : '#cbd5e1';
+    });
+    document.getElementById('btnSendQuickFeedback').style.display = 'block';
+}
+
+window.submitQuickFeedback = async () => {
+    if(!quickRating || !window.submittedUuid) return;
+    
+    const btn = document.getElementById('btnSendQuickFeedback');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+
+    try {
+        const response = await fetch(`/service/feedback/${window.submittedUuid}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ rating: quickRating, citizen_feedback: 'Pengisian form awal (Navigator)' })
+        });
+
+        if(response.ok) {
+            btn.style.display = 'none';
+            document.getElementById('quickFeedbackSuccess').style.display = 'block';
+        }
+    } catch (e) {
+        btn.disabled = false;
+        btn.innerText = 'Gagal';
+    }
+}
 
 function copyPin() {
     const pin = document.getElementById('snPinDisplay').textContent;

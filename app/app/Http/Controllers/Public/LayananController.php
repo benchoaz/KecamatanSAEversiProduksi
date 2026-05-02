@@ -146,6 +146,7 @@ class LayananController extends Controller
                     'success' => true,
                     'message' => 'Permohonan berhasil dikirim!',
                     'tracking_code' => $service->tracking_code,
+                    'uuid' => $service->uuid,
                     'redirect' => route('layanan') . '?q=' . $service->tracking_code
                 ]);
             });
@@ -265,6 +266,7 @@ class LayananController extends Controller
                 return response()->json([
                     'success'       => true,
                     'tracking_code' => $service->tracking_code,
+                    'uuid'          => $service->uuid,
                     'redirect'      => route('layanan') . '?q=' . $service->tracking_code,
                 ]);
             });

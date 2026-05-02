@@ -28,19 +28,55 @@
                         <span class="nav-text">Beranda Pusat</span>
                     </a>
                 </li>
+            </ul>
+        </div>
+        
+        <div class="nav-section">
+            <span class="nav-section-title">PELAYANAN PUBLIK</span>
+            <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="{{ route('filament.admin.pages.dashboard') }}"
-                        class="nav-link {{ request()->is('admin*') ? 'active' : '' }}">
-                        <span class="nav-icon"><i class="fas fa-tools"></i></span>
-                        <span class="nav-text">Panel Manajemen (Baru)</span>
+                    <a href="{{ route('kecamatan.pelayanan.inbox') }}"
+                        class="nav-link {{ request()->fullUrlIs(route('kecamatan.pelayanan.inbox')) ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-inbox"></i></span>
+                        <span class="nav-text">Inbox Terpadu</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('kecamatan.pelayanan.pengaduan') }}"
+                        class="nav-link {{ request()->is('kecamatan/pelayanan/pengaduan*') ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-bullhorn"></i></span>
+                        <span class="nav-text">Pengaduan Masyarakat</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('kecamatan.pelayanan.statistics') }}"
+                        class="nav-link {{ request()->is('kecamatan/pelayanan/statistics*') ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
+                        <span class="nav-text">Statistik Layanan</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('kecamatan.pelayanan.feedback.index') }}"
+                        class="nav-link {{ request()->is('kecamatan/pelayanan/feedback*') ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-star-half-alt"></i></span>
+                        <span class="nav-text">Hasil Survei (Feedback)</span>
                     </a>
                 </li>
             </ul>
         </div>
 
-
-
-
+        <div class="nav-section">
+            <span class="nav-section-title">EKBANG</span>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{{ route('kecamatan.pelayanan.inbox', ['category' => 'ekonomi']) }}"
+                        class="nav-link {{ request()->fullUrlIs(route('kecamatan.pelayanan.inbox', ['category' => 'ekonomi']) . '*') ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-store"></i></span>
+                        <span class="nav-text">Manajemen UMKM & Jasa</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
 
         {{-- Dynamic Menus Section --}}
         @if(isset($dynamicMenus) && $dynamicMenus->count() > 0)
@@ -68,7 +104,7 @@
                             </li>
                         @else
                             <li class="nav-item">
-                                <a href="{{ $menu->slug ? '#'.$menu->slug : '#' }}"
+                                <a href="{{ $menu->route_name ? route($menu->route_name) : ($menu->slug ? '#'.$menu->slug : '#') }}"
                                    class="nav-link {{ request()->is($menu->slug.'*') ? 'active' : '' }}">
                                     <span class="nav-icon"><i class="{{ $menu->icon ?? 'fas fa-circle' }}"></i></span>
                                     <span class="nav-text">{{ $menu->name }}</span>
@@ -76,21 +112,6 @@
                             </li>
                         @endif
                     @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <!-- Seksi Backup & Recovery -->
-        @if(auth()->user()->hasRole('Super Admin') || auth()->user()->hasRole('Operator Kecamatan'))
-            <div class="nav-section">
-                <span class="nav-section-title">BACKUP & RECOVERY</span>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="{{ route('filament.admin.pages.backup-setting') }}" class="nav-link">
-                            <span class="nav-icon"><i class="fas fa-cloud-arrow-up"></i></span>
-                            <span class="nav-text">Pengaturan Backup</span>
-                        </a>
-                    </li>
                 </ul>
             </div>
         @endif

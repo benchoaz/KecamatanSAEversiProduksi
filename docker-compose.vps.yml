@@ -82,7 +82,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kecamatan.rule=Host(`kecamatanbesuk.my.id`)"
+      - "traefik.http.routers.kecamatan.rule=Host(`kecamatanbesuk.web.id`)"
       - "traefik.http.routers.kecamatan.entrypoints=websecure"
       - "traefik.http.routers.kecamatan.tls.certresolver=myresolver"
       - "traefik.http.routers.kecamatan.priority=1"

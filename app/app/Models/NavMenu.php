@@ -15,6 +15,7 @@ class NavMenu extends Model
         'name',
         'icon',
         'slug',
+        'route_name',
         'order',
         'permission_name',
         'is_active',

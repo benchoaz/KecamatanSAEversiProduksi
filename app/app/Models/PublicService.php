@@ -53,7 +53,13 @@ class PublicService extends Model
         'is_agreed' => 'boolean',
         'handled_at' => 'datetime',
         'ready_at' => 'datetime',
+        'feedback_at' => 'datetime',
     ];
+
+    public function histories()
+    {
+        return $this->hasMany(PublicServiceHistory::class, 'public_service_id')->orderBy('created_at', 'desc');
+    }
 
     /**
      * The "booting" method of the model.

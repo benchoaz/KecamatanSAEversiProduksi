@@ -143,6 +143,20 @@ class PelayananController extends Controller
 
         $complaint->update($updateData);
 
+        // LOG HISTORY
+        \App\Models\PublicServiceHistory::create([
+            'public_service_id' => $complaint->id,
+            'user_id' => auth()->id(),
+            'status_from' => $oldStatus,
+            'status_to' => $request->status,
+            'comment' => $request->internal_notes,
+            'action_type' => 'status_update',
+            'metadata' => [
+                'public_response' => $publicResponse,
+                'completion_type' => $request->completion_type
+            ]
+        ]);
+
         // EXTRA HOOK FOR UMKM & JASA: Activate the WorkDirectory record!
         if (in_array($complaint->category, [PublicService::CATEGORY_UMKM, PublicService::CATEGORY_PEKERJAAN])) {
             $workDir = \App\Models\WorkDirectory::where('contact_phone', $complaint->whatsapp)
@@ -187,6 +201,10 @@ class PelayananController extends Controller
             'pending' => PublicService::where('status', PublicService::STATUS_MENUNGGU)->count(),
             'processed' => PublicService::where('status', PublicService::STATUS_DIPROSES)->count(),
             'completed' => PublicService::where('status', PublicService::STATUS_SELESAI)->count(),
+
+            // Feedback Metrics
+            'avg_rating' => PublicService::whereNotNull('rating')->avg('rating') ?? 0,
+            'feedback_count' => PublicService::whereNotNull('feedback_at')->count(),
 
             // New sectoral metrics
             'umkm_total' => Umkm::count(),
@@ -469,11 +487,60 @@ class PelayananController extends Controller
 
         $pengaduan->update($updateData);
 
+        // LOG HISTORY
+        \App\Models\PublicServiceHistory::create([
+            'public_service_id' => $pengaduan->id,
+            'user_id' => auth()->id(),
+            'status_from' => $oldStatus,
+            'status_to' => $request->status,
+            'comment' => $request->internal_notes,
+            'action_type' => 'status_update',
+            'metadata' => [
+                'public_response' => $request->public_response
+            ]
+        ]);
+
         // Kirim notifikasi WhatsApp jika diminta dan status berubah
         if ($request->boolean('send_whatsapp', true) && $pengaduan->whatsapp && $oldStatus !== $request->status) {
             $this->sendWaNotification($pengaduan, 'status_update');
         }
 
         return redirect()->back()->with('success', 'Status pengaduan berhasil diperbarui dan notifikasi WhatsApp terkirim.');
+    }
+
+    /**
+     * Feedback & Survey Results
+     */
+    public function feedbackIndex(Request $request)
+    {
+        $feedbacks = PublicService::whereNotNull('rating')
+            ->with(['desa', 'handler'])
+            ->orderBy('feedback_at', 'desc')
+            ->paginate(20);
+
+        return view('kecamatan.pelayanan.feedback.index', compact('feedbacks'));
+    }
+
+    /**
+     * Add manual comment to service history
+     */
+    public function addHistoryComment(Request $request, $id)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:1000',
+        ]);
+
+        $service = PublicService::findOrFail($id);
+
+        \App\Models\PublicServiceHistory::create([
+            'public_service_id' => $service->id,
+            'user_id' => auth()->id(),
+            'status_from' => $service->status,
+            'status_to' => $service->status,
+            'comment' => $request->comment,
+            'action_type' => 'manual_comment',
+        ]);
+
+        return redirect()->back()->with('success', 'Catatan aktivitas berhasil ditambahkan.');
     }
 }
