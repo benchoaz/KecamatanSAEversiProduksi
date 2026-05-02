@@ -51,6 +51,11 @@ class NavigationService
 
                 // Filter submenus based on permissions
                 $menu->setRelation('subMenus', $menu->subMenus->filter(function ($sub) use ($user, $menu) {
+                    // Admin bypass for submenus
+                    if ($user->username === 'admin' || $user->hasRole('Super Admin')) {
+                        return true;
+                    }
+
                     // If submenu has specific permission, check it
                     if ($sub->permission_name) {
                         return $user->can($sub->permission_name);
