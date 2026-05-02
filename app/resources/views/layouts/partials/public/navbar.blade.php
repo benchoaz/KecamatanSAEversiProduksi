@@ -30,6 +30,10 @@
                 <li><a href="{{ request()->is('/') ? '#berita' : '/#berita' }}" class="py-3 font-bold text-slate-600">Berita</a></li>
                 @endif
                 
+                <li><a href="{{ request()->is('/') ? '#pengumuman' : '/#pengumuman' }}" class="py-3 font-bold text-slate-600">Pengumuman</a></li>
+                <li><a href="{{ request()->is('/') ? '#faq' : '/#faq' }}" class="py-3 font-bold text-slate-600">FAQ</a></li>
+                <li><a href="{{ request()->is('/') ? '#buku-tamu' : '/#buku-tamu' }}" class="py-3 font-bold text-slate-600">Buku Tamu</a></li>
+                
                 <div class="mt-4 pt-4 border-t border-slate-50">
                     @if(appProfile()->is_menu_pengaduan_active)
                     <button onclick="document.getElementById('complaintModal').showModal()" class="btn btn-sm btn-error btn-outline w-full rounded-xl">
@@ -88,6 +92,15 @@
                     class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Berita</a>
             </li>
             @endif
+            <li><a href="{{ request()->is('/') ? '#pengumuman' : '/#pengumuman' }}"
+                    class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Pengumuman</a>
+            </li>
+            <li><a href="{{ request()->is('/') ? '#faq' : '/#faq' }}"
+                    class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">FAQ</a>
+            </li>
+            <li><a href="{{ request()->is('/') ? '#buku-tamu' : '/#buku-tamu' }}"
+                    class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Buku Tamu</a>
+            </li>
         </ul>
     </div>
     <div class="navbar-end gap-2">

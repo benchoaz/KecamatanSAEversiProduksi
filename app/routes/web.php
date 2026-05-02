@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 // Root Landing Page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/test-ping', function() { return 'pong'; });
+
+// Public Visitor (Buku Tamu)
+Route::post('/public/visitor', [\App\Http\Controllers\Kecamatan\PelayananController::class, 'visitorStore'])->name('public.visitor.store');
 // Laporan Demografi & Statistik (Separate Pages)
 Route::prefix('statistik')->group(function () {
     Route::get('/', [LandingController::class, 'statistik'])->name('landing.statistik.index');

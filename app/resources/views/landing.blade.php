@@ -548,7 +548,7 @@
     </div>
 
     <!-- Section: Info Hari Ini (Restored & Spaced) -->
-    <div class="container mx-auto px-6 relative z-10 mt-12 mb-12">
+    <div id="pengumuman" class="container mx-auto px-6 relative z-10 mt-12 mb-12">
         <div
             class="bg-white/80 backdrop-blur-md py-8 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-white/50">
             <div class="px-6 md:px-10">
@@ -1100,6 +1100,72 @@
     </div>
 
     <!-- Premium SEO Optimized Footer -->
+    <!-- Section: Buku Tamu Digital (Public) -->
+    <div id="buku-tamu" class="py-24 bg-slate-50 border-t border-slate-100">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100">
+                <div class="flex flex-col md:flex-row">
+                    <!-- Left: Promo -->
+                    <div class="md:w-1/3 bg-teal-600 p-12 text-white flex flex-col justify-center">
+                        <div class="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center text-3xl mb-6">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h2 class="text-3xl font-black mb-4 leading-tight">Buku Tamu Digital</h2>
+                        <p class="text-teal-100 text-sm leading-relaxed font-medium">
+                            Silakan isi daftar kehadiran Anda saat berkunjung ke Kantor {{ appProfile()->region_level }} {{ appProfile()->region_name }}.
+                        </p>
+                    </div>
+                    <!-- Right: Form -->
+                    <div class="md:w-2/3 p-12">
+                        <form action="{{ route('public.visitor.store') }}" method="POST" class="space-y-6">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Nama Lengkap</label>
+                                    <input type="text" name="nama" required class="input input-bordered w-full rounded-2xl bg-slate-50 border-slate-200 focus:border-teal-500 font-bold text-slate-700" placeholder="Contoh: Budi Santoso">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Nomor WhatsApp</label>
+                                    <input type="text" name="no_hp" required class="input input-bordered w-full rounded-2xl bg-slate-50 border-slate-200 focus:border-teal-500 font-bold text-slate-700" placeholder="08xxxxxxxxxx">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Desa Asal</label>
+                                    <select name="desa_asal_id" class="select select-bordered w-full rounded-2xl bg-slate-50 border-slate-200 focus:border-teal-500 font-bold text-slate-700">
+                                        <option value="">Pilih Desa (Jika di Wilayah {{ appProfile()->region_name }})</option>
+                                        @foreach($desas as $desa)
+                                            <option value="{{ $desa->id }}">{{ $desa->nama_desa }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Tujuan / Bidang</label>
+                                    <select name="tujuan_bidang" required class="select select-bordered w-full rounded-2xl bg-slate-50 border-slate-200 focus:border-teal-500 font-bold text-slate-700">
+                                        <option value="">Pilih Bidang Tujuan</option>
+                                        <option value="Pemerintahan">Seksi Pemerintahan</option>
+                                        <option value="Ekbang">Seksi Ekbang & Pembangunan</option>
+                                        <option value="Kesra">Seksi Kesejahteraan Rakyat</option>
+                                        <option value="Trantibum">Seksi Trantibum & Linmas</option>
+                                        <option value="Pelayanan">Seksi Pelayanan Umum</option>
+                                        <option value="Lainnya">Lainnya</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Keperluan</label>
+                                <textarea name="keperluan" required class="textarea textarea-bordered w-full rounded-2xl bg-slate-50 border-slate-200 focus:border-teal-500 font-bold text-slate-700 h-24" placeholder="Jelaskan maksud dan tujuan kunjungan Anda..."></textarea>
+                            </div>
+                            <button type="submit" class="btn bg-teal-600 hover:bg-teal-700 text-white border-0 rounded-2xl w-full h-14 font-black shadow-xl shadow-teal-900/10 transition-all">
+                                Kirim Daftar Kehadiran <i class="fas fa-paper-plane ml-2"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @include('layouts.partials.public.footer')
 
 
@@ -1138,7 +1204,7 @@
     </div>
 
     <!-- Floating Action Button (Chatbot) -->
-    <div class="fixed bottom-5 right-5 z-[60] group">
+    <div id="faq" class="fixed bottom-5 right-5 z-[60] group">
         <div class="absolute bottom-full right-0 mb-3 hidden group-hover:block transition-all animate-bounce">
             <span
                 class="bg-teal-600 text-white text-xs px-3 py-1 rounded-full shadow-lg whitespace-nowrap italic">Asisten Digital</span>
@@ -3162,6 +3228,24 @@
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
                 },
+            });
+
+            // Handle Hash for Modals (FAQ & Lapor)
+            const hash = window.location.hash;
+            if (hash === '#faq') {
+                const modal = document.getElementById('publicServiceModal');
+                if (modal) modal.showModal();
+            } else if (hash === '#lapor') {
+                const modal = document.getElementById('complaintModal');
+                if (modal) modal.showModal();
+            }
+            
+            // Listen for hash changes
+            window.addEventListener('hashchange', function() {
+                if (window.location.hash === '#faq') {
+                    const modal = document.getElementById('publicServiceModal');
+                    if (modal) modal.showModal();
+                }
             });
         });
     </script>
