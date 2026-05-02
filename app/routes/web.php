@@ -29,16 +29,11 @@ Route::prefix('statistik')->group(function () {
     Route::get('/kesehatan', [LandingController::class, 'statKesehatan'])->name('landing.statistik.kesehatan');
     Route::get('/kesejahteraan', [LandingController::class, 'statKesejahteraan'])->name('landing.statistik.kesejahteraan');
 });
-Route::post('/logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])
+Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])
     ->name('logout');
 
-// Add GET logout fallback to prevent 405 errors
-Route::get('/logout', function () {
-    auth()->logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect('/');
-});
+// Fallback GET logout to prevent 405 errors and redirect to landing page
+Route::get('/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
 Route::get('/berita', [\App\Http\Controllers\PublicBeritaController::class, 'index'])->name('public.berita.index');
 Route::get('/berita/{slug}', [\App\Http\Controllers\PublicBeritaController::class, 'show'])->name('public.berita.show');
 // Public Service & Economy Routes
