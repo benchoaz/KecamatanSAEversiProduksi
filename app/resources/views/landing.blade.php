@@ -138,25 +138,7 @@
         }
 
         * {
-        /* NUCLEAR FIX: Restore interactivity and brightness */
-        html, body {
-            background-color: #f8fafc !important;
-            color: #1e293b !important;
-            pointer-events: auto !important;
-            overflow: auto !important;
-        }
-
-        .navbar {
-            pointer-events: auto !important;
-            z-index: 9999 !important;
-        }
-
-        /* Hide all stray backdrops and broken modals */
-        .modal-backdrop, .modal:not([open]), [class*="backdrop"] {
-            display: none !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            z-index: -1 !important;
+            text-decoration: none !important;
         }
     </style>
 
@@ -3146,21 +3128,6 @@
                 dialog.close();
             });
 
-            // NUCLEAR CLEANUP: Kill all blocking overlays
-            const killOverlays = () => {
-                document.querySelectorAll('.fixed.inset-0, .absolute.inset-0, .modal-backdrop, [class*="backdrop"]').forEach(el => {
-                    // Don't kill the hero or navbar or essential UI
-                    if (!el.closest('.hero-swiper') && !el.closest('.navbar') && !el.closest('.z-[60]')) {
-                        el.remove();
-                    }
-                });
-                document.body.classList.remove('modal-open');
-                document.documentElement.style.pointerEvents = 'auto';
-                document.body.style.pointerEvents = 'auto';
-            };
-
-            killOverlays();
-            setInterval(killOverlays, 1000); // Repeat every second to prevent re-appearance
         })();
     </script>
 

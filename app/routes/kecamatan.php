@@ -21,7 +21,7 @@ use App\Http\Controllers\Kecamatan\BeritaController;
 use App\Http\Controllers\Pemerintahan\AparaturController; // Keep for now or move
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'role:Operator Kecamatan,Super Admin,pelayanan_admin,Admin Pelayanan,umkm_admin,trantibum_admin,loker_admin'])->prefix('kecamatan')->name('kecamatan.')->group(function () {
+Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(function () {
     Route::get('/', function () {
         return redirect()->route('kecamatan.dashboard');
     });
