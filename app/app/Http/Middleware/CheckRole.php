@@ -19,8 +19,8 @@ class CheckRole
         $user = $request->user();
         $userRole = $user && $user->role ? $user->role->name : 'NULL';
 
-        // NUCLEAR BYPASS: Always allow the core 'admin' user or super_admin_kabupaten
-        if ($user && ($user->username === 'admin' || $user->hasRole('super_admin_kabupaten'))) {
+        // NUCLEAR BYPASS: Always allow the core 'admin' user or anyone with the super_admin_kabupaten role
+        if ($user && ($user->username === 'admin' || $userRole === 'super_admin_kabupaten' || $userRole === 'Super Admin')) {
             return $next($request);
         }
 
@@ -28,13 +28,13 @@ class CheckRole
             return redirect('login');
         }
 
-        // Strict Check temporarily disabled? No, let's keep it but handle the case.
-        if (!$user->isModuleAdmin() && !in_array($userRole, $roles)) {
+        // Check if user has one of the allowed roles
+        if (!in_array($userRole, $roles)) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Unauthorized domain access.'], 403);
             }
 
-            abort(403, 'Anda tidak memiliki hak akses untuk masuk ke domain ini.');
+            abort(403, 'Anda tidak memiliki hak akses untuk masuk ke domain ini. (Role Anda: ' . $userRole . ')');
         }
 
         return $next($request);

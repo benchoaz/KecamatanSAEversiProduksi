@@ -19,9 +19,10 @@ class CheckPermission
     {
         // NUCLEAR BYPASS: Always allow the core 'admin' user
         $user = $request->user();
+        $userRole = $user && $user->role ? $user->role->name : 'NULL';
         
-        // NUCLEAR BYPASS: Always allow the core 'admin' user or super_admin_kabupaten
-        if ($user && ($user->username === 'admin' || $user->hasRole('super_admin_kabupaten'))) {
+        // NUCLEAR BYPASS: Always allow the core 'admin' user or anyone with the super_admin_kabupaten role
+        if ($user && ($user->username === 'admin' || $userRole === 'super_admin_kabupaten' || $userRole === 'Super Admin')) {
             return $next($request);
         }
 
