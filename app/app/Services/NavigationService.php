@@ -28,12 +28,21 @@ class NavigationService
 
         // Temporarily disabled cache for debugging
         $menus = NavMenu::where('target_dashboard', $dashboard)
-            ->where('is_active', true)
+            ->where(function($q) {
+                $q->where('is_active', true)->orWhere('is_active', 1);
+            })
             ->with(['subMenus' => function ($query) {
-                $query->where('is_active', true);
+                $query->where(function($q) {
+                    $q->where('is_active', true)->orWhere('is_active', 1);
+                });
             }])
             ->orderBy('order')
             ->get();
+
+        \Log::info('NavigationService: Found raw menus', [
+            'count' => $menus->count(),
+            'menu_ids' => $menus->pluck('id')->toArray()
+        ]);
 
             return $menus->filter(function ($menu) use ($user) {
                 // Super Admin can see everything

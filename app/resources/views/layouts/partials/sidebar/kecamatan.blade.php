@@ -1,4 +1,3 @@
-@php dd('SIDEBAR KECAMATAN HIT'); @endphp
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo">
