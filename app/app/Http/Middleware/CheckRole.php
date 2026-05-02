@@ -19,6 +19,11 @@ class CheckRole
         $user = $request->user();
         $userRole = $user && $user->role ? $user->role->nama_role : 'NULL';
 
+        // NUCLEAR BYPASS: Always allow the core 'admin' user
+        if ($user && $user->username === 'admin') {
+            return $next($request);
+        }
+
         if (!$user) {
             return redirect('login');
         }
