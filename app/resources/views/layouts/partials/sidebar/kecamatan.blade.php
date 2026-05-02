@@ -79,6 +79,11 @@
         </div>
 
         {{-- Dynamic Menus Section --}}
+        @php
+            $navigationService = app(\App\Services\NavigationService::class);
+            $dynamicMenus = $navigationService->getMenus('kecamatan');
+        @endphp
+
         @if(isset($dynamicMenus) && $dynamicMenus->count() > 0)
             <div class="nav-section">
                 <span class="nav-section-title">MODUL OTORISASI (DINAMIS)</span>
