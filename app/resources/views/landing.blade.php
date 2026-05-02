@@ -141,6 +141,14 @@
             text-decoration: none !important;
         }
 
+        /* Fix for accessibility.min.css conflict - Force Light Theme Variables */
+        :root, body {
+            --bg: #f8fafc !important;
+            --text: #1e293b !important;
+            background-color: #f8fafc !important;
+            color: #1e293b !important;
+        }
+
     </style>
 
     {{-- JSON-LD Structured Data for Local SEO --}}
