@@ -44,6 +44,8 @@ class NavigationService
             'menu_ids' => $menus->pluck('id')->toArray()
         ]);
 
+        dd($menus);
+
             return $menus->filter(function ($menu) use ($user) {
                 // Super Admin can see everything
                 if ($user->hasRole('Super Admin') || $user->username === 'admin') {
