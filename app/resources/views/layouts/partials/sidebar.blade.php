@@ -1,4 +1,8 @@
 <aside class="sidebar" id="sidebar">
+    @php
+        $user = auth()->user();
+        $isCoreAdmin = $user && $user->username === 'admin';
+    @endphp
     <!-- Logo Section -->
     <div class="sidebar-header">
         <div class="logo">
@@ -40,7 +44,7 @@
                         <span class="nav-text">Dashboard</span>
                     </a>
                 </li>
-                @canany(['submission.verify', 'submission.approve'])
+                @if($isCoreAdmin || auth()->user()->canany(['submission.verify', 'submission.approve']))
                     <li class="nav-item">
                         <a href="{{ route('kecamatan.verifikasi.index') }}"
                             class="nav-link {{ request()->routeIs('kecamatan.verifikasi.*') ? 'active' : '' }}">
@@ -130,7 +134,7 @@
 
         <!-- Domain Menus -->
         @auth
-            @if(auth()->user()->isOperatorKecamatan())
+            @if($isCoreAdmin || auth()->user()->isOperatorKecamatan())
                 <div class="nav-section">
                     <span class="nav-section-title">Bidang Kesra (Pasal 439)</span>
                     <ul class="nav-menu">
@@ -186,7 +190,7 @@
                     </ul>
                 </div>
             @else
-                @canany(['dashboard.view_desa', 'dashboard.view_kecamatan'])
+                @if($isCoreAdmin || auth()->user()->canany(['dashboard.view_desa', 'dashboard.view_kecamatan']))
                     <div class="nav-section">
                         <span class="nav-section-title">Seksi</span>
                         <ul class="nav-menu">
@@ -272,11 +276,11 @@
 
         @auth
             <!-- Settings (Admin & Kecamatan) -->
-            @if(auth()->user()->isSuperAdmin() || auth()->user()->isOperatorKecamatan())
+            @if($isCoreAdmin || auth()->user()->isSuperAdmin() || auth()->user()->isOperatorKecamatan())
                 <div class="nav-section">
                     <span class="nav-section-title">Pengaturan</span>
                     <ul class="nav-menu">
-                        @if(auth()->user()->isSuperAdmin())
+                        @if($isCoreAdmin || auth()->user()->isSuperAdmin())
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <span class="nav-icon"><i class="fas fa-cog"></i></span>
