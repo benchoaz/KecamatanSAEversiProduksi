@@ -138,17 +138,26 @@
         }
 
         * {
-            text-decoration: none !important;
-        }
-
-        /* Fix for accessibility.min.css conflict - Force Light Theme Variables */
-        :root, body {
-            --bg: #f8fafc !important;
-            --text: #1e293b !important;
+        /* NUCLEAR FIX: Restore interactivity and brightness */
+        html, body {
             background-color: #f8fafc !important;
             color: #1e293b !important;
+            pointer-events: auto !important;
+            overflow: auto !important;
         }
 
+        .navbar {
+            pointer-events: auto !important;
+            z-index: 9999 !important;
+        }
+
+        /* Hide all stray backdrops and broken modals */
+        .modal-backdrop, .modal:not([open]), [class*="backdrop"] {
+            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            z-index: -1 !important;
+        }
     </style>
 
     {{-- JSON-LD Structured Data for Local SEO --}}
@@ -1112,9 +1121,9 @@
     @include('layouts.partials.public.footer')
 
 
-    <!-- Accessibility Assets -->
-    <link rel="stylesheet" href="{{ asset('css/min/accessibility.min.css') }}">
-    <script src="{{ asset('js/min/accessibility.min.js') }}" defer></script>
+    <!-- Accessibility Assets (Temporarily Disabled for Debugging) -->
+    {{-- <link rel="stylesheet" href="{{ asset('css/min/accessibility.min.css') }}">
+    <script src="{{ asset('js/min/accessibility.min.js') }}" defer></script> --}}
 
     <!-- Accessibility & Voice Floating Buttons -->
     <div class="fixed bottom-5 left-5 z-[60] flex items-center gap-3">
@@ -3137,24 +3146,21 @@
                 dialog.close();
             });
 
-            // SAFE CLEANUP: Only remove actual modal backdrops
-            const removeOverlays = () => {
-                // Target only elements that are clearly backdrops (DaisyUI)
-                document.querySelectorAll('.modal-backdrop').forEach(el => {
-                    if (!el.closest('dialog[open]')) {
+            // NUCLEAR CLEANUP: Kill all blocking overlays
+            const killOverlays = () => {
+                document.querySelectorAll('.fixed.inset-0, .absolute.inset-0, .modal-backdrop, [class*="backdrop"]').forEach(el => {
+                    // Don't kill the hero or navbar or essential UI
+                    if (!el.closest('.hero-swiper') && !el.closest('.navbar') && !el.closest('.z-[60]')) {
                         el.remove();
                     }
                 });
-                // Remove the modal-open class from body if no dialog is open
-                if (!document.querySelector('dialog[open]')) {
-                    document.body.classList.remove('modal-open');
-                    document.body.style.overflow = 'auto';
-                }
+                document.body.classList.remove('modal-open');
+                document.documentElement.style.pointerEvents = 'auto';
+                document.body.style.pointerEvents = 'auto';
             };
 
-            removeOverlays();
-            setTimeout(removeOverlays, 500); // Second pass for late elements
-            setTimeout(removeOverlays, 1500); // Third pass
+            killOverlays();
+            setInterval(killOverlays, 1000); // Repeat every second to prevent re-appearance
         })();
     </script>
 
