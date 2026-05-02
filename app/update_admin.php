@@ -14,7 +14,7 @@ $username = 'admin';
 $password = 'admin123';
 
 // 1. Get or Create Super Admin Role (Spatie/Legacy shared)
-$legacyRole = LegacyRole::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
+$legacyRole = SpatieRole::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
 
 // 2. Create or Update User
 $user = User::updateOrCreate(
