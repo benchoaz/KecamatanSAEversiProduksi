@@ -140,6 +140,23 @@
         * {
             text-decoration: none !important;
         }
+
+        /* HARD FIX: Prevent accidental dark overlays on page load */
+        .modal-backdrop, 
+        .modal:not([open]) {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        .modal[open] + .modal-backdrop,
+        .modal[open] ~ .modal-backdrop {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
     </style>
 
     {{-- JSON-LD Structured Data for Local SEO --}}
@@ -3128,17 +3145,22 @@
                 dialog.close();
             });
 
-            // CRITICAL: Remove DaisyUI modal backdrop elements
-            document.querySelectorAll('.modal-backdrop, [class*="modal-"][class*="backdrop"]').forEach(function (backdrop) {
-                backdrop.remove();
-            });
+            // HARD CLEANUP: Remove any persistent overlays
+            const removeOverlays = () => {
+                document.querySelectorAll('.modal-backdrop, [class*="backdrop"], .fixed.inset-0').forEach(el => {
+                    // Only remove if it's not a legitimate fixed button or part of an open modal
+                    if (!el.closest('dialog[open]') && !el.classList.contains('z-[60]')) {
+                        el.remove();
+                    }
+                });
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = 'auto';
+                document.body.style.pointerEvents = 'auto';
+            };
 
-            // Also remove any fixed position overlays that might be blocking
-            document.querySelectorAll('.fixed.inset-0, .fixed.top-0.left-0.right-0.bottom-0').forEach(function (overlay) {
-                if (overlay.style.zIndex > 999 || overlay.classList.contains('backdrop')) {
-                    overlay.remove();
-                }
-            });
+            removeOverlays();
+            setTimeout(removeOverlays, 500); // Second pass for late elements
+            setTimeout(removeOverlays, 1500); // Third pass
         })();
     </script>
 
