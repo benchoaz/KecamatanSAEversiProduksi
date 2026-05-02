@@ -12,12 +12,21 @@ class ApplicationProfileService
     public function getProfile()
     {
         return Cache::rememberForever($this->cacheKey, function () {
-            return AppProfile::first() ?? new AppProfile([
-                'app_name' => 'Kecamatan SAE',
-                'region_name' => 'Kecamatan Besuk',
-                'region_level' => 'kecamatan',
-                'tagline' => 'Solusi Administrasi Terpadu',
-            ]);
+            try {
+                return AppProfile::first() ?? new AppProfile([
+                    'app_name' => 'Kecamatan SAE',
+                    'region_name' => 'Kecamatan Besuk',
+                    'region_level' => 'kecamatan',
+                    'tagline' => 'Solusi Administrasi Terpadu',
+                ]);
+            } catch (\Exception $e) {
+                return new AppProfile([
+                    'app_name' => 'Kecamatan SAE',
+                    'region_name' => 'Kecamatan Besuk',
+                    'region_level' => 'kecamatan',
+                    'tagline' => 'Solusi Administrasi Terpadu',
+                ]);
+            }
         });
     }
 
@@ -125,9 +134,13 @@ class ApplicationProfileService
 
         // 2. If Cache is empty or stuck on localhost, FORCE read from DB directly
         if (empty($url) || str_contains($url, 'localhost')) {
-            $direct = AppProfile::select('public_url')->first();
-            if ($direct) {
-                $url = $direct->public_url;
+            try {
+                $direct = AppProfile::select('public_url')->first();
+                if ($direct) {
+                    $url = $direct->public_url;
+                }
+            } catch (\Exception $e) {
+                // Ignore error during initial migration
             }
         }
 

@@ -11,6 +11,9 @@ use App\Http\Controllers\Desa\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->name('desa.')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('desa.dashboard');
+    });
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // User Profile
