@@ -86,6 +86,48 @@
             </ul>
         </div>
 
+        <!-- Seksi Pelayanan Umum (Restored) -->
+        <div class="nav-section">
+            <span class="nav-section-title">Seksi Pelayanan Umum</span>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{{ route('kecamatan.announcements.index') }}"
+                        class="nav-link {{ request()->routeIs('kecamatan.announcements.*') ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-bullhorn"></i></span>
+                        <span class="nav-text">Pengumuman</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('kecamatan.pelayanan.layanan.index') }}"
+                        class="nav-link {{ request()->routeIs('kecamatan.pelayanan.layanan.*') ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-list-check"></i></span>
+                        <span class="nav-text">Daftar Layanan</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('kecamatan.pelayanan.statistics') }}"
+                        class="nav-link {{ request()->routeIs('kecamatan.pelayanan.statistics') ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                        <span class="nav-text">Statistik</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('kecamatan.pelayanan.faq.index') }}"
+                        class="nav-link {{ request()->routeIs('kecamatan.pelayanan.faq.*') ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-question-circle"></i></span>
+                        <span class="nav-text">FAQ</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('kecamatan.pelayanan.visitor.index') }}"
+                        class="nav-link {{ request()->routeIs('kecamatan.pelayanan.visitor.*') ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-book"></i></span>
+                        <span class="nav-text">Buku Tamu</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
         <!-- Domain Menus -->
         @auth
             @if(auth()->user()->isOperatorKecamatan())
