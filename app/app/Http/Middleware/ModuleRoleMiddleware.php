@@ -48,6 +48,12 @@ class ModuleRoleMiddleware
         }
 
         $user = $request->user();
+        
+        // NUCLEAR BYPASS: Always allow the core 'admin' user
+        if ($user && $user->username === 'admin') {
+            return $next($request);
+        }
+
         $userRole = $user->role->nama_role ?? null;
 
         // Get allowed roles for this module

@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
         view()->composer(['kecamatan.trantibum.*', 'layouts.trantibum'], function ($view) {
             if (auth()->check()) {
                 $userRole = auth()->user()->role->name ?? auth()->user()->role->nama_role ?? null;
-                $allowedRoles = ['trantibum_admin', 'Super Admin', 'Operator Kecamatan'];
+                $allowedRoles = ['trantibum_admin', 'Super Admin', 'Operator Kecamatan', 'super_admin_kabupaten'];
 
                 if (in_array($userRole, $allowedRoles)) {
                     $moduleService = app(ModuleSettingsService::class);
