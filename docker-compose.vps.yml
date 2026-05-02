@@ -54,7 +54,7 @@ services:
     working_dir: /var/www
     env_file: ./app/.env
     volumes:
-      - ./app:/var/www
+      - ./app/routes:/var/www/routes
       - ./app/storage:/var/www/storage:rw
       - ./app/resources/views:/var/www/resources/views
       - ./app/app/Http/Controllers:/var/www/app/Http/Controllers
