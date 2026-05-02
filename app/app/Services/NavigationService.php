@@ -14,22 +14,26 @@ class NavigationService
      * @param string $dashboard 'kecamatan' or 'desa'
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getMenus(string $dashboard)
+    public function getMenus($dashboard = 'kecamatan')
     {
         $user = auth()->user();
-        if (!$user) return collect();
+        if (!$user) return collect([]);
 
-        // Use caching to optimize performance for thousands of users
-        $cacheKey = "nav_menu_{$user->id}_{$dashboard}";
-        
-        return Cache::remember($cacheKey, 3600, function () use ($user, $dashboard) {
-            $menus = NavMenu::where('target_dashboard', $dashboard)
-                ->where('is_active', true)
-                ->with(['subMenus' => function ($query) {
-                    $query->where('is_active', true);
-                }])
-                ->orderBy('order')
-                ->get();
+        // DEBUG LOGGING
+        \Log::info('NavigationService: Generating menus for user', [
+            'username' => $user->username,
+            'role' => $user->role->nama_role ?? 'NONE',
+            'dashboard' => $dashboard
+        ]);
+
+        // Temporarily disabled cache for debugging
+        $menus = NavMenu::where('target_dashboard', $dashboard)
+            ->where('is_active', true)
+            ->with(['subMenus' => function ($query) {
+                $query->where('is_active', true);
+            }])
+            ->orderBy('order')
+            ->get();
 
             return $menus->filter(function ($menu) use ($user) {
                 // Super Admin can see everything
@@ -70,7 +74,6 @@ class NavigationService
                 // Hide parent menu if all its submenus are filtered out
                 return $menu->subMenus->count() > 0 || !$menu->permission_name;
             });
-        });
     }
 
     /**
