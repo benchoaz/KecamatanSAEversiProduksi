@@ -26,10 +26,10 @@ class ModuleRoleMiddleware
      * Module to role mapping
      */
     protected array $moduleRoles = [
-        'trantibum' => ['trantibum_admin', 'Super Admin', 'Operator Kecamatan'],
-        'umkm' => ['umkm_admin', 'Super Admin', 'Operator Kecamatan'],
-        'loker' => ['umkm_admin', 'Super Admin', 'Operator Kecamatan'],
-        'pelayanan' => ['pelayanan_admin', 'Super Admin', 'Operator Kecamatan'],
+        'trantibum' => ['trantibum_admin', 'Super Admin', 'Operator Kecamatan', 'super_admin_kabupaten'],
+        'umkm' => ['umkm_admin', 'Super Admin', 'Operator Kecamatan', 'super_admin_kabupaten'],
+        'loker' => ['umkm_admin', 'Super Admin', 'Operator Kecamatan', 'super_admin_kabupaten'],
+        'pelayanan' => ['pelayanan_admin', 'Super Admin', 'Operator Kecamatan', 'super_admin_kabupaten'],
     ];
 
     /**
@@ -49,19 +49,19 @@ class ModuleRoleMiddleware
 
         $user = $request->user();
         
-        // NUCLEAR BYPASS: Always allow the core 'admin' user
-        if ($user && $user->username === 'admin') {
+        // NUCLEAR BYPASS: Always allow the core 'admin' user or super_admin_kabupaten
+        if ($user && ($user->username === 'admin' || $user->hasRole('super_admin_kabupaten'))) {
             return $next($request);
         }
 
-        $userRole = $user->role->nama_role ?? null;
+        $userRole = $user->role->name ?? null;
 
         // Get allowed roles for this module
         $allowedRoles = $this->moduleRoles[$module] ?? [];
 
         // If no mapping exists, default to Super Admin and Operator Kecamatan only
         if (empty($allowedRoles)) {
-            $allowedRoles = ['Super Admin', 'Operator Kecamatan'];
+            $allowedRoles = ['Super Admin', 'Operator Kecamatan', 'super_admin_kabupaten'];
         }
 
         // Check if user has an allowed role

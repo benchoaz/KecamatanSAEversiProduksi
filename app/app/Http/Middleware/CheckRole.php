@@ -17,10 +17,10 @@ class CheckRole
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         $user = $request->user();
-        $userRole = $user && $user->role ? $user->role->nama_role : 'NULL';
+        $userRole = $user && $user->role ? $user->role->name : 'NULL';
 
-        // NUCLEAR BYPASS: Always allow the core 'admin' user
-        if ($user && $user->username === 'admin') {
+        // NUCLEAR BYPASS: Always allow the core 'admin' user or super_admin_kabupaten
+        if ($user && ($user->username === 'admin' || $user->hasRole('super_admin_kabupaten'))) {
             return $next($request);
         }
 

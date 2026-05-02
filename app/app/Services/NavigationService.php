@@ -22,7 +22,7 @@ class NavigationService
         // DEBUG LOGGING
         \Log::info('NavigationService: Generating menus for user', [
             'username' => $user->username,
-            'role' => $user->role->nama_role ?? 'NONE',
+            'role' => $user->role->name ?? 'NONE',
             'dashboard' => $dashboard
         ]);
 
@@ -44,11 +44,9 @@ class NavigationService
             'menu_ids' => $menus->pluck('id')->toArray()
         ]);
 
-        dd($menus);
-
             return $menus->filter(function ($menu) use ($user) {
                 // Super Admin can see everything
-                if ($user->hasRole('Super Admin') || $user->username === 'admin') {
+                if ($user->username === 'admin' || $user->hasRole('super_admin_kabupaten') || $user->hasRole('Super Admin')) {
                     return true;
                 }
 
@@ -67,7 +65,7 @@ class NavigationService
                 // Filter submenus based on permissions
                 $menu->setRelation('subMenus', $menu->subMenus->filter(function ($sub) use ($user, $menu) {
                     // Admin bypass for submenus
-                    if ($user->username === 'admin' || $user->hasRole('Super Admin')) {
+                    if ($user->username === 'admin' || $user->hasRole('super_admin_kabupaten') || $user->hasRole('Super Admin')) {
                         return true;
                     }
 
