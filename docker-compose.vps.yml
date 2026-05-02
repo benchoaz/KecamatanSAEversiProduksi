@@ -60,6 +60,7 @@ services:
       - ./app/app/Traits:/var/www/app/Traits
       - ./app/app/Services/WhatsApp:/var/www/app/Services/WhatsApp
       - ./app/app/Services/NavigationService.php:/var/www/app/Services/NavigationService.php
+      - ./app/app/Services/ApplicationProfileService.php:/var/www/app/Services/ApplicationProfileService.php
       - ./app/.env:/var/www/.env
     networks:
       - kecamatan-network
