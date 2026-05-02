@@ -6,6 +6,7 @@ use App\Models\NavMenu;
 use App\Models\NavSubMenu;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class NavigationSeeder extends Seeder
 {
@@ -17,6 +18,7 @@ class NavigationSeeder extends Seeder
 
         $this->seedKecamatanMenus();
         $this->seedDesaMenus();
+        $this->assignPermissionsToRoles();
     }
 
     private function seedKecamatanMenus()
@@ -123,5 +125,32 @@ class NavigationSeeder extends Seeder
             'permission_name' => $permission,
             'is_active' => true
         ]);
+    }
+
+    private function assignPermissionsToRoles()
+    {
+        $allPermissions = Permission::all()->pluck('name')->toArray();
+        
+        // Roles to get all kecamatan permissions
+        $kecamatanRoles = ['admin_kecamatan', 'verifikator_kecamatan', 'super_admin_kabupaten'];
+        foreach ($kecamatanRoles as $roleName) {
+            $role = Role::where('name', $roleName)->first();
+            if ($role) {
+                // Filter permissions that start with 'view_' or other relevant prefixes
+                $role->givePermissionTo($allPermissions);
+            }
+        }
+
+        // Roles to get desa permissions
+        $desaRoles = ['operator_desa', 'kepala_desa'];
+        foreach ($desaRoles as $roleName) {
+            $role = Role::where('name', $roleName)->first();
+            if ($role) {
+                $desaPerms = array_filter($allPermissions, function($p) {
+                    return str_starts_with($p, 'view_desa');
+                });
+                $role->givePermissionTo($desaPerms);
+            }
+        }
     }
 }
