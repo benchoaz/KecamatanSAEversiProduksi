@@ -14,9 +14,9 @@ $username = 'admin';
 $password = 'admin123';
 
 // 1. Get or Create Super Admin Legacy Role
-$legacyRole = LegacyRole::where('nama_role', 'Super Admin')->orWhere('name', 'Super Admin')->first();
+$column = \Illuminate\Support\Facades\Schema::hasColumn('roles', 'nama_role') ? 'nama_role' : 'name';
+$legacyRole = LegacyRole::where($column, 'Super Admin')->first();
 if (!$legacyRole) {
-    $column = \Illuminate\Support\Facades\Schema::hasColumn('roles', 'nama_role') ? 'nama_role' : 'name';
     $legacyRole = LegacyRole::create([$column => 'Super Admin']);
 }
 
