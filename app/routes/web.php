@@ -62,8 +62,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();
 
-        // Kecamatan Level Roles
-        if ($user->hasRole('Super Admin') ||
+        // FAIL-SAFE: Always allow 'admin' to access Kecamatan Dashboard
+        if ($user->username === 'admin' || 
+            $user->hasRole('Super Admin') ||
             $user->hasRole('Operator Kecamatan') ||
             $user->isModuleAdmin()) {
             return redirect()->route('kecamatan.dashboard');

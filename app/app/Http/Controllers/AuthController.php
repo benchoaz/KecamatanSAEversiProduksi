@@ -40,13 +40,8 @@ class AuthController extends Controller
                 $request->session()->regenerate();
                 $request->session()->regenerateToken(); // Ensure fresh CSRF token
 
-                // Prevent redirects to admin panel to avoid 419 errors
-                $intendedUrl = $request->session()->pull('url.intended', route('dashboard'));
-                if (str_contains($intendedUrl, '/admin/')) {
-                    $intendedUrl = route('dashboard');
-                }
-
-                return redirect($intendedUrl);
+                // Force redirect to dashboard to ensure they don't get stuck on landing page
+                return redirect()->route('dashboard');
             }
 
             RateLimiter::hit($throttleKey, 60);
