@@ -141,22 +141,6 @@
             text-decoration: none !important;
         }
 
-        /* HARD FIX: Prevent accidental dark overlays on page load */
-        .modal-backdrop, 
-        .modal:not([open]) {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-
-        .modal[open] + .modal-backdrop,
-        .modal[open] ~ .modal-backdrop {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            pointer-events: auto !important;
-        }
     </style>
 
     {{-- JSON-LD Structured Data for Local SEO --}}
@@ -3145,17 +3129,19 @@
                 dialog.close();
             });
 
-            // HARD CLEANUP: Remove any persistent overlays
+            // SAFE CLEANUP: Only remove actual modal backdrops
             const removeOverlays = () => {
-                document.querySelectorAll('.modal-backdrop, [class*="backdrop"], .fixed.inset-0').forEach(el => {
-                    // Only remove if it's not a legitimate fixed button or part of an open modal
-                    if (!el.closest('dialog[open]') && !el.classList.contains('z-[60]')) {
+                // Target only elements that are clearly backdrops (DaisyUI)
+                document.querySelectorAll('.modal-backdrop').forEach(el => {
+                    if (!el.closest('dialog[open]')) {
                         el.remove();
                     }
                 });
-                document.body.classList.remove('modal-open');
-                document.body.style.overflow = 'auto';
-                document.body.style.pointerEvents = 'auto';
+                // Remove the modal-open class from body if no dialog is open
+                if (!document.querySelector('dialog[open]')) {
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = 'auto';
+                }
             };
 
             removeOverlays();
