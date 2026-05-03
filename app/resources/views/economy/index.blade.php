@@ -478,16 +478,107 @@
         </div>
     </div>
 @endsection
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('q') && urlParams.get('q').length > 0) {
-            setTimeout(() => {
-                const tabsElement = document.getElementById('economy-tabs');
-                if (tabsElement) {
-                    tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 500);
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('q') && urlParams.get('q').length > 0) {
+                setTimeout(() => {
+                    const tabsElement = document.getElementById('economy-tabs');
+                    if (tabsElement) {
+                        tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 500);
+            }
+
+            {{-- Auto-show feedback survey if just registered --}}
+            @if(session('new_submission_uuid'))
+                const submissionUuid = "{{ session('new_submission_uuid') }}";
+                setTimeout(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pendaftaran Berhasil! 🎉',
+                        html: `<p class="text-sm text-slate-600 mb-3">Terima kasih telah mendaftarkan usaha/jasa Anda. Data Anda sedang dalam antrean verifikasi.</p>
+                               <div class="bg-teal-50 p-3 rounded-lg mb-4 text-center">
+                                   <p class="text-[10px] text-teal-600 font-bold uppercase tracking-widest">NO. PENDAFTARAN</p>
+                                   <p class="text-lg font-black text-teal-700">${submissionUuid}</p>
+                               </div>
+                               
+                               <div id="quickFeedbackSection" class="p-4 bg-amber-50 rounded-2xl border border-amber-100 mb-4 text-center">
+                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Bagaimana pengalaman pendaftaran Anda?</p>
+                                    <div class="flex justify-center gap-2 mb-4">
+                                        <button type="button" onclick="setQuickRating(1)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="1"><i class="fas fa-star"></i></button>
+                                        <button type="button" onclick="setQuickRating(2)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="2"><i class="fas fa-star"></i></button>
+                                        <button type="button" onclick="setQuickRating(3)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="3"><i class="fas fa-star"></i></button>
+                                        <button type="button" onclick="setQuickRating(4)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="4"><i class="fas fa-star"></i></button>
+                                        <button type="button" onclick="setQuickRating(5)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="5"><i class="fas fa-star"></i></button>
+                                    </div>
+                                    <div id="feedbackCommentSection">
+                                        <textarea id="quick_feedback_comment" placeholder="Ada saran untuk sistem pendaftaran kami? (Opsional)" 
+                                            class="textarea textarea-bordered w-full bg-white/50 rounded-2xl text-xs mb-3 focus:border-amber-400 transition-all h-20"></textarea>
+                                        <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback('${submissionUuid}')" class="btn btn-sm w-full bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase">
+                                            Kirim Penilaian <i class="fas fa-paper-plane ml-1"></i>
+                                        </button>
+                                    </div>
+                               </div>`,
+                        confirmButtonColor: '#0d9488',
+                        confirmButtonText: 'Selesai'
+                    });
+                }, 800);
+            @endif
+        });
+
+        // --- QUICK FEEDBACK LOGIC ---
+        let quickRating = 0;
+        window.setQuickRating = (r) => {
+            quickRating = r;
+            document.querySelectorAll('.quick-star').forEach(btn => {
+                const val = parseInt(btn.getAttribute('data-val'));
+                btn.classList.toggle('text-amber-400', val <= r);
+                btn.classList.toggle('text-slate-300', val > r);
+            });
         }
-    });
-</script>
+
+        window.submitQuickFeedback = async (uuid) => {
+            if(!quickRating || !uuid) return;
+            
+            const btn = document.getElementById('btnSendQuickFeedback');
+            const comment = document.getElementById('quick_feedback_comment').value;
+            const originalHtml = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i>';
+
+            try {
+                const response = await fetch(`/service/feedback/${uuid}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ 
+                        rating: quickRating, 
+                        citizen_feedback: comment || 'Feedback dari Pendaftaran Ekonomi Web' 
+                    })
+                });
+
+                if(response.ok) {
+                    document.getElementById('quickFeedbackSection').innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle text-emerald-500 text-3xl mb-3"></i>
+                            <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Terima kasih atas penilaian Anda!</p>
+                        </div>
+                    `;
+                } else {
+                    const errData = await response.json();
+                    alert(errData.message || 'Gagal mengirim penilaian.');
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Terjadi kesalahan jaringan.');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+    </script>

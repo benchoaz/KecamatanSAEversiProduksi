@@ -42,14 +42,14 @@ class AiHandler
         $systemPrompt .= "{$knowledgeBase}\n\n";
 
         $systemPrompt .= "INSTRUKSI KHUSUS:\n";
-        $systemPrompt .= "1. TUGAS UTAMA: Menjawab pertanyaan seputar pelayanan publik, administrasi, dan informasi resmi kecamatan berdasarkan DATA LAYANAN di atas.\n";
-        $systemPrompt .= "2. LAYANAN DARURAT & PENGADUAN:\n";
-        $systemPrompt .= "   - Korupsi/Pungli: Arahkan ke SP4N LAPOR (https://www.lapor.go.id/)\n";
+        $systemPrompt .= "1. TUGAS UTAMA: Menjawab pertanyaan seputar pelayanan publik, administrasi, dan informasi resmi kecamatan.\n";
+        $systemPrompt .= "2. LAYANAN DARURAT (PRIORITAS TINGGI): Situasi darurat ADALAH dalam lingkup tugas Anda. Jika warga menanyakan kebakaran, kecelakaan, atau bantuan medis, JAWAB SEGERA dengan:\n";
         $systemPrompt .= "   - Kebakaran: Hubungi 112\n";
+        $systemPrompt .= "   - Ambulans/Medis/Kecelakaan: Hubungi 119 atau PSC: (0298) 343 0000 / WA: 081 8181 91 119\n";
         $systemPrompt .= "   - Keamanan/Polisi: Hubungi 110\n";
-        $systemPrompt .= "   - Ambulans/Darurat: Hubungi 119 atau PSC: (0298) 343 0000 / WA: 081 8181 91 119.\n";
+        $systemPrompt .= "   - Korupsi/Pungli: Arahkan ke https://www.lapor.go.id\n";
         $systemPrompt .= "   - Sertakan tagar: #PSC119 #SMES #ResponCepat #MelangkahBersamaSelamatkanJiwa\n";
-        $systemPrompt .= "3. PENOLAKAN HALUS (OUT OF SCOPE): Jika pertanyaan di luar tupoksi, sampaikan maaf dengan sangat sopan. Contoh: 'Mohon maaf sekali Bapak/Ibu, kapasitas saya terbatas pada layanan publik {$regionName}. Mungkin ada hal terkait administrasi yang bisa saya bantu?'\n";
+        $systemPrompt .= "3. PENOLAKAN HALUS (OUT OF SCOPE): Hanya tolak pertanyaan yang benar-benar tidak berhubungan dengan warga/kecamatan (misal: gosip artis, politik luar negeri). Pertanyaan darurat TIDAK BOLEH ditolak.\n";
         $systemPrompt .= "4. FORMAT JAWABAN: Singkat, padat, gunakan bold (*) untuk poin penting. Selalu akhiri dengan tawaran bantuan tambahan yang ramah.\n";
         $systemPrompt .= "5. JAM KERJA: Senin-Kamis ({$profile->office_hours_mon_thu}), Jumat ({$profile->office_hours_fri}).\n";
 

@@ -50,6 +50,12 @@ class IntentHandler
             return $this->getMainMenu();
         }
 
+        // 2. EMERGENCY DETECTOR: Handle emergency keywords immediately
+        $emergencyKeywords = ['kebakaran', 'api', 'ambulance', 'ambulans', 'kecelakaan', 'darurat', 'polisi', 'maling', 'trantibum', 'korupsi', 'pungli'];
+        if ($this->matchesIntent($messageLower, $emergencyKeywords)) {
+            return $this->handleEmergencyResponse($messageLower);
+        }
+
         // 2. STATE NAVIGATION: Handle Nested Menus
         if ($state && str_starts_with($state, 'NAV_PATH:')) {
             $path = str_replace('NAV_PATH:', '', $state);
@@ -592,6 +598,37 @@ class IntentHandler
             'intent' => 'administrasi_submenu',
             'reply' => $reply,
             'state_update' => 'ADM_SUBMENU',
+        ];
+    }
+
+    /**
+     * Handle emergency situations with direct contact numbers
+     */
+    protected function handleEmergencyResponse(string $message): array
+    {
+        $reply = "🚨 *LAYANAN DARURAT CEPAT*\n\n";
+        
+        if (str_contains($message, 'kebakaran')) {
+            $reply .= "🔥 *KEBAKARAN:* Segera hubungi *112*\n\n";
+        } elseif (str_contains($message, 'korupsi') || str_contains($message, 'pungli')) {
+            $reply .= "⚖️ *ADUAN KORUPSI/PUNGLI:* Silakan lapor melalui SP4N LAPOR:\n👉 https://www.lapor.go.id\n\n";
+        } elseif (str_contains($message, 'polisi') || str_contains($message, 'maling') || str_contains($message, 'trantibum')) {
+            $reply .= "👮 *KEAMANAN (Polisi):* Hubungi *110*\n\n";
+        } elseif (str_contains($message, 'ambulance') || str_contains($message, 'ambulans') || str_contains($message, 'kecelakaan')) {
+            $reply .= "🚑 *AMBULANCE / KECELAKAAN:* Hubungi *119*\n\n";
+        }
+
+        $reply .= "🆘 *KONTAK DARURAT LAINNYA:*\n";
+        $reply .= "☎️ Telp: (0298) 343 0000\n";
+        $reply .= "🟢 WA: 081 8181 91 119\n\n";
+        $reply .= "#PSC119 #SMES #ResponCepat #MelangkahBersamaSelamatkanJiwa\n\n";
+        $reply .= "Ketik *MENU* untuk layanan lainnya.";
+
+        return [
+            'success' => true,
+            'intent' => 'emergency',
+            'reply' => $reply,
+            'state_update' => null,
         ];
     }
 }

@@ -11,6 +11,8 @@ use App\Models\WahaN8nSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class EconomyController extends Controller
 {
@@ -183,7 +185,7 @@ class EconomyController extends Controller
         ]);
 
         // Create Public Service entry for Inbox
-        PublicService::create([
+        $publicService = PublicService::create([
             'uuid' => (string) Str::uuid(),
             'desa_id' => $request->desa_id,
             'nama_pemohon' => $workDir->display_name,
@@ -200,7 +202,9 @@ class EconomyController extends Controller
 
         $message = $request->job_type == 'umkm' ? 'Terima kasih. Data UMKM/Usaha Anda akan ditampilkan setelah diverifikasi.' : 'Terima kasih. Data pekerjaan/jasa Anda akan ditampilkan setelah diverifikasi.';
         
-        return redirect()->route('economy.index', ['tab' => 'jasa'])->with('success', $message);
+        return redirect()->route('economy.index', ['tab' => 'jasa'])
+            ->with('success', $message)
+            ->with('new_submission_uuid', $publicService->uuid);
     }
 
     /**
