@@ -979,11 +979,83 @@ function initDirectSubmission() {
     const layananName = @json($layanan->nama_layanan);
     document.getElementById('snJenisLayanan').value = layananName;
     
+    // Check if it's a child-related service
+    toggleChildFields(layananName);
+
     // Render requirements from array
     renderRequirements(directRequirements);
     
     updateProgress(75);
     showLeafPanel();
+}
+
+function toggleChildFields(nodeName) {
+    const isAnak = (nodeName || "").toLowerCase().includes('anak') || 
+                   (nodeName || "").toLowerCase().includes('lahir') || 
+                   (nodeName || "").toLowerCase().includes('akta');
+    
+    const idSectionEl = document.getElementById('snIdentitySection');
+    const applicantSectionEl = document.getElementById('snApplicantSection');
+    
+    if (idSectionEl) {
+        const idLabel = document.getElementById('snMainIdLabel');
+        const nameLabel = document.getElementById('snMainNameLabel');
+        const nikLabel = document.getElementById('snMainNikLabel');
+        const nameInput = document.querySelector('input[name="nama_pemohon"]');
+        
+        const applicantNameInput = document.getElementById('snApplicantName');
+        const applicantNikInput = document.getElementById('snApplicantNik');
+        const childDetailEl = document.getElementById('snChildDetailSection');
+        
+        // Child specific inputs
+        const childGender = document.getElementById('snChildGender');
+        const childPob = document.getElementById('snChildPob');
+        const childDob = document.getElementById('snChildDob');
+        
+        if (isAnak) {
+            // Utama adalah Anak
+            if (idLabel) idLabel.innerHTML = '<i class="fas fa-child"></i> Data Anak (Subjek Akta)';
+            if (nameLabel) nameLabel.innerHTML = 'Nama Lengkap Anak <span>*</span>';
+            if (nameInput) nameInput.placeholder = 'Nama Lengkap Anak';
+            if (nikLabel) nikLabel.innerHTML = 'NIK Anak (jika ada) / NIK Kepala Keluarga <span>*</span>';
+            
+            // Munculkan bagian detail kelahiran
+            if (childDetailEl) {
+                childDetailEl.classList.remove('hidden');
+                if (childGender) childGender.setAttribute('required', 'required');
+                if (childPob) childPob.setAttribute('required', 'required');
+                if (childDob) childDob.setAttribute('required', 'required');
+            }
+
+            // Munculkan bagian Pemohon (Orang Tua)
+            if (applicantSectionEl) {
+                applicantSectionEl.classList.remove('hidden');
+                if (applicantNameInput) applicantNameInput.setAttribute('required', 'required');
+                if (applicantNikInput) applicantNikInput.setAttribute('required', 'required');
+            }
+        } else {
+            // Utama adalah Pemohon
+            if (idLabel) idLabel.innerHTML = '<i class="fas fa-user-circle"></i> Data Pemohon';
+            if (nameLabel) nameLabel.innerHTML = 'Nama Lengkap <span>*</span>';
+            if (nameInput) nameInput.placeholder = 'Sesuai KTP';
+            if (nikLabel) nikLabel.innerHTML = 'NIK (16 digit) <span>*</span>';
+            
+            // Sembunyikan bagian detail kelahiran
+            if (childDetailEl) {
+                childDetailEl.classList.add('hidden');
+                if (childGender) childGender.removeAttribute('required');
+                if (childPob) childPob.removeAttribute('required');
+                if (childDob) childDob.removeAttribute('required');
+            }
+
+            // Sembunyikan bagian Pemohon tambahan
+            if (applicantSectionEl) {
+                applicantSectionEl.classList.add('hidden');
+                if (applicantNameInput) applicantNameInput.removeAttribute('required');
+                if (applicantNikInput) applicantNikInput.removeAttribute('required');
+            }
+        }
+    }
 }
 
 function renderRequirements(reqs) {
@@ -1135,70 +1207,8 @@ async function loadLeafForm(nodeId, nodeName, showIdentity = true, sopText = '')
         sopBox.classList.add('hidden');
     }
 
-    // Dynamic Labels for Anak
-    const isAnak = (nodeName || "").toLowerCase().includes('anak') || (nodeName || "").toLowerCase().includes('lahir');
-    const idSectionEl = document.getElementById('snIdentitySection');
-    const applicantSectionEl = document.getElementById('snApplicantSection');
-    
-    if (idSectionEl) {
-        const idLabel = document.getElementById('snMainIdLabel');
-        const nameLabel = document.getElementById('snMainNameLabel');
-        const nikLabel = document.getElementById('snMainNikLabel');
-        const nameInput = document.querySelector('input[name="nama_pemohon"]');
-        
-        const applicantNameInput = document.getElementById('snApplicantName');
-        const applicantNikInput = document.getElementById('snApplicantNik');
-        const childDetailEl = document.getElementById('snChildDetailSection');
-        
-        // Child specific inputs
-        const childGender = document.getElementById('snChildGender');
-        const childPob = document.getElementById('snChildPob');
-        const childDob = document.getElementById('snChildDob');
-        
-        if (isAnak) {
-            // Utama adalah Anak
-            if (idLabel) idLabel.innerHTML = '<i class="fas fa-child"></i> Data Anak (Subjek Akta)';
-            if (nameLabel) nameLabel.innerHTML = 'Nama Lengkap Anak <span>*</span>';
-            if (nameInput) nameInput.placeholder = 'Nama Lengkap Anak';
-            if (nikLabel) nikLabel.innerHTML = 'NIK Anak (jika ada) / NIK Kepala Keluarga <span>*</span>';
-            
-            // Munculkan bagian detail kelahiran
-            if (childDetailEl) {
-                childDetailEl.classList.remove('hidden');
-                if (childGender) childGender.setAttribute('required', 'required');
-                if (childPob) childPob.setAttribute('required', 'required');
-                if (childDob) childDob.setAttribute('required', 'required');
-            }
-
-            // Munculkan bagian Pemohon (Orang Tua)
-            if (applicantSectionEl) {
-                applicantSectionEl.classList.remove('hidden');
-                if (applicantNameInput) applicantNameInput.setAttribute('required', 'required');
-                if (applicantNikInput) applicantNikInput.setAttribute('required', 'required');
-            }
-        } else {
-            // Utama adalah Pemohon
-            if (idLabel) idLabel.innerHTML = '<i class="fas fa-user-circle"></i> Data Pemohon';
-            if (nameLabel) nameLabel.innerHTML = 'Nama Lengkap <span>*</span>';
-            if (nameInput) nameInput.placeholder = 'Sesuai KTP';
-            if (nikLabel) nikLabel.innerHTML = 'NIK (16 digit) <span>*</span>';
-            
-            // Sembunyikan bagian detail kelahiran
-            if (childDetailEl) {
-                childDetailEl.classList.add('hidden');
-                if (childGender) childGender.removeAttribute('required');
-                if (childPob) childPob.removeAttribute('required');
-                if (childDob) childDob.removeAttribute('required');
-            }
-
-            // Sembunyikan bagian Pemohon tambahan
-            if (applicantSectionEl) {
-                applicantSectionEl.classList.add('hidden');
-                if (applicantNameInput) applicantNameInput.removeAttribute('required');
-                if (applicantNikInput) applicantNikInput.removeAttribute('required');
-            }
-        }
-    }
+    // Toggle Child Specific Fields & Labels
+    toggleChildFields(nodeName);
 
     // Toggle Identity Form
     const idSection = document.getElementById('snIdentitySection');
