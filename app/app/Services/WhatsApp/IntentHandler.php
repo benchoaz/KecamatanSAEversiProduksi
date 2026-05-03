@@ -447,11 +447,11 @@ class IntentHandler
     protected function defaultBotMenu(): array
     {
         return [
-            ['number' => '1', 'label' => 'ADMINISTRASI',  'description' => 'Cek Syarat dan Status Berkas',      'action' => 'administrasi',   'enabled' => true],
-            ['number' => '2', 'label' => 'PRODUK UMKM',   'description' => 'Belanja Produk & Olahan Warga Lokal','action' => 'umkm_produk',    'enabled' => true],
-            ['number' => '3', 'label' => 'CARI JASA',      'description' => 'Tukang, ART, Ojek, Tenaga Harian', 'action' => 'jasa',           'enabled' => true],
-            ['number' => '4', 'label' => 'PENGADUAN',      'description' => 'Aspirasi dan Laporan Warga',        'action' => 'pengaduan',      'enabled' => true],
-            ['number' => '5', 'label' => 'KELOLA PROFIL',  'description' => 'Kelola Data Jasa / Toko UMKM Anda','action' => 'kelola_profil',  'enabled' => true],
+            ['number' => '1', 'label' => 'LAYANAN DAN BERKAS',    'description' => 'Cek Syarat dan Lacak Berkas Anda',    'action' => 'administrasi',   'enabled' => true],
+            ['number' => '2', 'label' => 'BELANJA PRODUK LOKAL',  'description' => 'Etalase UMKM dan Produk Unggulan',    'action' => 'umkm_produk',    'enabled' => true],
+            ['number' => '3', 'label' => 'JASA DAN TENAGA AHLI',  'description' => 'Cari Tukang, Ojek, dan Tenaga Harian','action' => 'jasa',           'enabled' => true],
+            ['number' => '4', 'label' => 'PENGADUAN DAN ASPIRASI','description' => 'Sampaikan Laporan atau Saran Anda',   'action' => 'pengaduan',      'enabled' => true],
+            ['number' => '5', 'label' => 'DAFTARKAN TOKO ATAU JASA','description' => 'Kelola Profil Usaha dan Jasa Anda', 'action' => 'kelola_profil',  'enabled' => true],
         ];
     }
 
