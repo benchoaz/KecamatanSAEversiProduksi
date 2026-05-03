@@ -175,8 +175,15 @@ class LayananController extends Controller
             'is_agreed'          => 'required|accepted',
             'attachments.*'      => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'attachment_req_ids' => 'nullable|array',
+            
+            // Applicant Extra Info
             'applicant_name'     => 'nullable|string|max:255',
             'applicant_nik'      => 'nullable|string|size:16',
+            
+            // Child Extra Info
+            'child_gender'       => 'nullable|string|max:20',
+            'child_pob'          => 'nullable|string|max:255',
+            'child_dob'          => 'nullable|date',
         ]);
 
         try {
@@ -184,65 +191,64 @@ class LayananController extends Controller
                 $layanan = MasterLayanan::findOrFail($request->master_layanan_id);
                 $node    = $request->node_id ? ServiceNode::find($request->node_id) : null;
 
-                // Security: Ensure node belongs to the service
                 if ($node && $node->master_layanan_id != $layanan->id) {
                     abort(403, 'Akses node tidak valid untuk layanan ini.');
                 }
 
-                // Format WhatsApp (normalize to 62xxx)
                 $wa = preg_replace('/[^0-9]/', '', $request->whatsapp ?? '');
                 if (str_starts_with($wa, '0')) $wa = '62' . substr($wa, 1);
-                if (!str_starts_with($wa, '62')) $wa = '62' . $wa;
+                if (!str_starts_with($wa, '62') && !empty($wa)) $wa = '62' . $wa;
 
-                // Build service data — cek kolom service_node_id agar tidak error
-                // jika migration belum dijalankan di server
                 $serviceData = [
                     'uuid'          => (string) Str::uuid(),
                     'category'      => PublicService::CATEGORY_PELAYANAN,
-                    'jenis_layanan' => $node
-                        ? $layanan->nama_layanan . ' — ' . $node->name
-                        : $layanan->nama_layanan,
+                    'jenis_layanan' => $node ? $layanan->nama_layanan . ' — ' . $node->name : $layanan->nama_layanan,
                     'nama_pemohon'  => $request->nama_pemohon,
                     'nik'           => $request->nik,
                     'whatsapp'      => $wa,
                     'desa_id'       => $request->desa_id,
-                    'uraian'        => $request->uraian
-                        ?? 'Pengajuan online: ' . ($node ? $layanan->nama_layanan . ' — ' . $node->name : $layanan->nama_layanan),
+                    'uraian'        => $request->uraian ?? 'Pengajuan online: ' . ($node ? $layanan->nama_layanan . ' — ' . $node->name : $layanan->nama_layanan),
                     'status'        => PublicService::STATUS_MENUNGGU,
                     'source'        => 'web_portal',
                     'is_agreed'     => true,
                     'ip_address'    => $request->ip(),
                 ];
 
-                // Append additional applicant info to Uraian if present
-                if ($request->applicant_name || $request->applicant_nik) {
-                    $extraInfo = "\n\n--- DATA PEMOHON (ORANG TUA/WALI) ---\n";
-                    $extraInfo .= "Nama: " . ($request->applicant_name ?? '-') . "\n";
-                    $extraInfo .= "NIK: " . ($request->applicant_nik ?? '-') . "\n";
-                    $serviceData['uraian'] = ($serviceData['uraian'] ?? '') . $extraInfo;
+                // Build rich Uraian with extra data
+                $extraUraian = "";
+                
+                // Child Data (if birth service)
+                if ($request->child_gender || $request->child_pob || $request->child_dob) {
+                    $extraUraian .= "\n\n--- DETAIL SUBJEK (ANAK) ---\n";
+                    $extraUraian .= "Jenis Kelamin: " . ($request->child_gender ?? '-') . "\n";
+                    $extraUraian .= "Tempat Lahir: " . ($request->child_pob ?? '-') . "\n";
+                    $extraUraian .= "Tanggal Lahir: " . ($request->child_dob ?? '-') . "\n";
                 }
 
-                // Hanya tambahkan service_node_id jika kolom sudah ada di DB
+                // Applicant Data (if child is main subject)
+                if ($request->applicant_name || $request->applicant_nik) {
+                    $extraUraian .= "\n\n--- DATA PEMOHON (ORANG TUA/WALI) ---\n";
+                    $extraUraian .= "Nama: " . ($request->applicant_name ?? '-') . "\n";
+                    $extraUraian .= "NIK: " . ($request->applicant_nik ?? '-') . "\n";
+                }
+
+                if (!empty($extraUraian)) {
+                    $serviceData['uraian'] = ($serviceData['uraian'] ?? '') . $extraUraian;
+                }
+
                 if (Schema::hasColumn('public_services', 'service_node_id')) {
                     $serviceData['service_node_id'] = $node?->id;
                 }
 
                 $service = PublicService::create($serviceData);
 
-                // Handle attachments (dengan requirement_id per file)
                 if ($request->hasFile('attachments')) {
                     $reqIds = $request->input('attachment_req_ids', []);
                     $labels = $request->input('attachment_labels', []);
 
-                    // Pre-validate requirement IDs to prevent FK violations
-                    // (VPS may have different service_requirements IDs than form expects)
                     $validReqIds = [];
                     if (!empty($reqIds)) {
-                        $validReqIds = \DB::table('service_requirements')
-                            ->whereIn('id', array_filter($reqIds))
-                            ->pluck('id')
-                            ->flip()
-                            ->all();
+                        $validReqIds = \DB::table('service_requirements')->whereIn('id', array_filter($reqIds))->pluck('id')->flip()->all();
                     }
 
                     foreach ($request->file('attachments') as $idx => $file) {
@@ -260,7 +266,6 @@ class LayananController extends Controller
                     }
                 }
 
-                // Kirim notifikasi WhatsApp
                 $this->sendWaNotification($service, 'submission');
 
                 return response()->json([
@@ -272,10 +277,7 @@ class LayananController extends Controller
             });
         } catch (\Exception $e) {
             \Log::error('Node Submission Error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.',
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()], 500);
         }
     }
 

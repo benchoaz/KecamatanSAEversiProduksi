@@ -12,7 +12,9 @@ files_to_sync = [
     'app/app/Services/WhatsApp/IntentHandler.php',
     'app/app/Services/WhatsApp/ComplaintHandler.php',
     'app/app/Services/WhatsApp/AiHandler.php',
-    'app/resources/views/layouts/kecamatan.blade.php'
+    'app/resources/views/layouts/kecamatan.blade.php',
+    'app/resources/views/public/service_navigator.blade.php',
+    'app/app/Http/Controllers/Public/LayananController.php'
 ]
 
 def run_ssh_cmd(cmd):
@@ -33,10 +35,14 @@ def run_ssh_cmd(cmd):
                 break
         return output.decode(errors='ignore')
 
-print("--- Starting Full Sync (Bot + UI) ---")
+print("--- Starting Full Sync (Bot + UI + Services) ---")
 
 for f in files_to_sync:
     local_path = f"/home/beni/ProjectkuKecamatanSAEKab/KecamatanSAE/KecamatanSAEversiProduksi/{f}"
+    if not os.path.exists(local_path):
+        print(f"File {f} not found locally. Skipping.")
+        continue
+        
     with open(local_path, 'r') as file:
         content = file.read()
     

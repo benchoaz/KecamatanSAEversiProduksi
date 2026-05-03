@@ -140,6 +140,28 @@
                                 </select>
                             </div>
                         </div>
+
+                        {{-- ── Sub-Section: Detail Kelahiran (Hanya tampil jika isAnak) ── --}}
+                        <div id="snChildDetailSection" class="hidden" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #e2e8f0;">
+                            <div class="sn-form-grid">
+                                <div class="sn-field">
+                                    <label class="sn-label">Jenis Kelamin Anak <span>*</span></label>
+                                    <select name="child_gender" id="snChildGender" class="sn-input sn-select">
+                                        <option value="">— Pilih —</option>
+                                        <option value="Laki-laki">Laki-laki</option>
+                                        <option value="Perempuan">Perempuan</option>
+                                    </select>
+                                </div>
+                                <div class="sn-field">
+                                    <label class="sn-label">Tempat Lahir Anak <span>*</span></label>
+                                    <input type="text" name="child_pob" id="snChildPob" class="sn-input" placeholder="Kota/Kabupaten">
+                                </div>
+                                <div class="sn-field col-span-2">
+                                    <label class="sn-label">Tanggal Lahir Anak <span>*</span></label>
+                                    <input type="date" name="child_dob" id="snChildDob" class="sn-input">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- ── Bagian Tambahan: Data Pemohon (jika Identitas Utama adalah Anak) ── --}}
@@ -1126,14 +1148,28 @@ async function loadLeafForm(nodeId, nodeName, showIdentity = true, sopText = '')
         
         const applicantNameInput = document.getElementById('snApplicantName');
         const applicantNikInput = document.getElementById('snApplicantNik');
+        const childDetailEl = document.getElementById('snChildDetailSection');
+        
+        // Child specific inputs
+        const childGender = document.getElementById('snChildGender');
+        const childPob = document.getElementById('snChildPob');
+        const childDob = document.getElementById('snChildDob');
         
         if (isAnak) {
             // Utama adalah Anak
-            if (idLabel) idLabel.innerHTML = '<i class="fas fa-child"></i> Data Anak (Subjek Layanan)';
+            if (idLabel) idLabel.innerHTML = '<i class="fas fa-child"></i> Data Anak (Subjek Akta)';
             if (nameLabel) nameLabel.innerHTML = 'Nama Lengkap Anak <span>*</span>';
             if (nameInput) nameInput.placeholder = 'Nama Lengkap Anak';
             if (nikLabel) nikLabel.innerHTML = 'NIK Anak (jika ada) / NIK Kepala Keluarga <span>*</span>';
             
+            // Munculkan bagian detail kelahiran
+            if (childDetailEl) {
+                childDetailEl.classList.remove('hidden');
+                if (childGender) childGender.setAttribute('required', 'required');
+                if (childPob) childPob.setAttribute('required', 'required');
+                if (childDob) childDob.setAttribute('required', 'required');
+            }
+
             // Munculkan bagian Pemohon (Orang Tua)
             if (applicantSectionEl) {
                 applicantSectionEl.classList.remove('hidden');
@@ -1147,6 +1183,14 @@ async function loadLeafForm(nodeId, nodeName, showIdentity = true, sopText = '')
             if (nameInput) nameInput.placeholder = 'Sesuai KTP';
             if (nikLabel) nikLabel.innerHTML = 'NIK (16 digit) <span>*</span>';
             
+            // Sembunyikan bagian detail kelahiran
+            if (childDetailEl) {
+                childDetailEl.classList.add('hidden');
+                if (childGender) childGender.removeAttribute('required');
+                if (childPob) childPob.removeAttribute('required');
+                if (childDob) childDob.removeAttribute('required');
+            }
+
             // Sembunyikan bagian Pemohon tambahan
             if (applicantSectionEl) {
                 applicantSectionEl.classList.add('hidden');
