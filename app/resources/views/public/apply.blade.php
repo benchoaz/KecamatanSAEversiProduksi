@@ -213,7 +213,7 @@
                 @endfor
             </div>
             
-            <div id="feedbackCommentSection" class="hidden animate__animated animate__fadeIn">
+            <div id="feedbackCommentSection" class="animate__animated animate__fadeIn">
                 <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan? (Opsional)" 
                     class="textarea textarea-bordered w-full bg-white/50 rounded-2xl text-xs mb-3 focus:border-amber-400 transition-all h-20"></textarea>
                 <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback()" class="btn btn-sm w-full bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase">
@@ -334,7 +334,11 @@
             if(data.success) {
                 submittedUuid = data.uuid;
                 document.getElementById('tracking-pin-display').innerText = data.tracking_code;
-                document.getElementById('redirect-btn').href = data.redirect;
+                
+                // Add PIN and Phone to the redirect link for auto-fill
+                const phone = form.querySelector('[name="whatsapp"]').value;
+                document.getElementById('redirect-btn').href = `{{ route('public.tracking') }}?q=${data.tracking_code}&wa=${phone}`;
+                
                 successModal.showModal();
             } else {
                 alert(data.message || 'Gagal mengirim pengajuan.');
@@ -361,7 +365,6 @@
             btn.classList.toggle('text-amber-400', val <= r);
             btn.classList.toggle('text-slate-300', val > r);
         });
-        document.getElementById('feedbackCommentSection').classList.remove('hidden');
     }
 
     window.submitQuickFeedback = async () => {

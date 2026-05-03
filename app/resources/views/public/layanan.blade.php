@@ -193,9 +193,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const query = urlParams.get('q');
+            const wa = urlParams.get('wa');
+            
             if (query) {
                 document.getElementById('identifier').value = query;
                 handleIdentifierChange(query);
+                
+                if (wa) {
+                    document.getElementById('whatsapp_verify').value = wa;
+                }
+
                 setTimeout(() => {
                     document.getElementById('trackingForm').dispatchEvent(new Event('submit'));
                 }, 500);
@@ -522,11 +529,11 @@
                 } else {
                     const errData = await response.json();
                     alert(errData.message || 'Gagal mengirim penilaian.');
-                    btn.disabled = false;
-                    btn.innerHTML = 'Kirim Penilaian';
                 }
             } catch (e) {
-                alert('Gagal mengirim penilaian.');
+                console.error(e);
+                alert('Gagal mengirim penilaian. Silakan cek koneksi Anda.');
+            } finally {
                 btn.disabled = false;
                 btn.innerHTML = 'Kirim Penilaian';
             }

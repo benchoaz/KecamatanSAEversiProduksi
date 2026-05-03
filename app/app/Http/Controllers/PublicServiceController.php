@@ -258,23 +258,35 @@ class PublicServiceController extends Controller
             }
 
             $service = PublicService::where('tracking_code', $identifier)
-                ->with(['desa', 'handler'])
+                ->orWhere('uuid', $identifier)
+                ->with(['desa', 'handler', 'histories'])
                 ->first();
 
             if ($service) {
-                // Verify WA number match (normalized)
-                $ownerPhone = $this->portalService->normalizePhone($service->whatsapp);
-                $searchPhone = $this->portalService->normalizePhone($inputWa);
+                // If it's a tracking_code (PIN), we usually need WA verification
+                // but let's make it auto-verify if $inputWa is provided
+                if ($inputWa) {
+                    $ownerPhone = $this->portalService->normalizePhone($service->whatsapp);
+                    $searchPhone = $this->portalService->normalizePhone($inputWa);
 
-                if (!str_contains($ownerPhone, $searchPhone)) {
+                    if (!str_contains($ownerPhone, $searchPhone) && !str_contains($searchPhone, substr($ownerPhone, -4))) {
+                        return response()->json([
+                            'found' => false,
+                            'auth_required' => true,
+                            'message' => 'Kombinasi PIN dan Nomor WhatsApp tidak cocok. Masukkan 4 digit terakhir nomor WA Anda.'
+                        ], 403);
+                    }
+                } else {
+                    // PIN entered but no WA provided yet
                     return response()->json([
                         'found' => false,
-                        'message' => 'Kombinasi PIN dan Nomor WhatsApp tidak cocok.'
+                        'auth_required' => true,
+                        'message' => 'Untuk keamanan, masukkan Nomor WhatsApp yang digunakan saat mendaftar.'
                     ], 403);
                 }
 
                 $response = $this->buildStatusResponse($service);
-                cache()->put($cacheKey, $response, 300); // 5 min cache
+                cache()->put($cacheKey, $response, 300);
                 return response()->json($response);
             }
         }
