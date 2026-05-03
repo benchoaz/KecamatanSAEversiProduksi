@@ -43,6 +43,70 @@
             0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
+        /* Background & Sidebar Putih - User Request */
+        body, .app-container, .main-content, .page-content, .header, .premium-welcome, .welcome-banner {
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            color: #334155 !important;
+        }
+        .premium-welcome h1, .premium-welcome h2, .premium-welcome p, 
+        .premium-welcome span, .premium-welcome .text-slate-400,
+        .premium-welcome .text-slate-200, .premium-welcome .text-white {
+            color: #1e293b !important;
+        }
+        .sidebar {
+            background-color: #ffffff !important;
+            border-right: 1px solid #e2e8f0 !important;
+        }
+        .sidebar-header, .sidebar-nav, .sidebar-footer {
+            background-color: #ffffff !important;
+        }
+        .logo-title, .logo-subtitle, .nav-text, .nav-section-title, .user-name, .logo-icon i {
+            color: #1e293b !important;
+        }
+        .logo-icon {
+            background-color: #ffffff !important;
+            box-shadow: none !important;
+        }
+        .nav-icon i {
+            color: #64748b !important;
+        }
+        .nav-link:hover .nav-text, .nav-link:hover .nav-icon i {
+            color: #0f172a !important;
+        }
+        .nav-section-title {
+            opacity: 0.7;
+            font-weight: 800;
+        }
+        .user-card {
+            background-color: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        .user-name {
+            color: #1e293b !important;
+            font-weight: 700;
+        }
+        /* Active Link adjustment */
+        .nav-link.active {
+            background-color: #f1f5f9 !important;
+            color: #1e293b !important;
+            border-radius: 12px;
+        }
+        .nav-link.active .nav-icon i, .nav-link.active .nav-text {
+            color: #1e293b !important;
+        }
+        /* Hide decorative background blobs */
+        .premium-welcome::before, 
+        .premium-welcome .bg-info, 
+        .premium-welcome .bg-primary,
+        .premium-welcome .position-absolute.top-0.right-0.w-100.h-100.opacity-10,
+        .premium-welcome .position-absolute.end-0.bottom-0.opacity-5 {
+            display: none !important;
+        }
+        /* Adjust border */
+        .premium-welcome, .welcome-banner {
+            border: 1px solid #e2e8f0 !important;
+        }
         .alert-emerald {
             background-color: var(--success-50);
             border: 1px solid rgba(22, 163, 74, 0.1) !important;
@@ -74,6 +138,26 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+        }
+        /* Custom Scrollbar Lebih Tebal - User Request */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1 !important;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8 !important;
+        }
+        /* Untuk Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
         }
     </style>
     @stack('styles')

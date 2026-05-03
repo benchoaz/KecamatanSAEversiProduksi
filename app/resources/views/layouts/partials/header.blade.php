@@ -1,6 +1,6 @@
 <header class="header border-0 shadow-sm px-4">
     <div class="header-left">
-        <button class="menu-toggle shadow-sm rounded-3 border-0 bg-white text-primary-900" id="menuToggle">
+        <button class="menu-toggle shadow-sm rounded-3 border-0 bg-white text-primary-900 d-flex align-items-center justify-content-center" id="menuToggle" style="width: 42px; height: 42px; padding: 0;">
             <i class="fas fa-bars-staggered"></i>
         </button>
 

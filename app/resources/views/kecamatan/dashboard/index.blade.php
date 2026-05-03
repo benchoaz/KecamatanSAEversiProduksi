@@ -6,18 +6,9 @@
     <div class="dashboard container-fluid px-4 py-4">
         <!-- Modern Formal Welcome Section -->
         <div class="welcome-banner premium-welcome p-5 rounded-5 mb-5 position-relative overflow-hidden shadow-2xl animate-entrance"
-            style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid rgba(255,255,255,0.05);">
+            style="background: #ffffff; border: 1px solid #e2e8f0;">
 
-            {{-- Animated Background Objects --}}
-            <div class="position-absolute top-0 right-0 w-100 h-100 opacity-10 pointer-events-none">
-                <div
-                    class="position-absolute top-0 end-0 translate-middle w-50 h-100 bg-info rounded-circle blur-3xl opacity-20">
-                </div>
-                <div
-                    class="position-absolute bottom-0 start-0 translate-middle w-50 h-100 bg-primary rounded-circle blur-3xl opacity-20">
-                </div>
-            </div>
-
+            {{-- Animated Background Objects Removed for White Theme --}}
             <div class="position-relative z-2">
                 <div class="d-flex align-items-center gap-3 mb-4">
                     <span
@@ -39,15 +30,9 @@
                 <div class="row align-items-center">
                     <div class="col-lg-8">
                         <div class="d-flex align-items-center gap-4 mb-2">
-                            <div class="welcome-avatar">
-                                <div
-                                    class="w-16 h-16 rounded-3xl bg-gradient-to-br from-info to-primary flex items-center justify-center text-white shadow-xl">
-                                    <i class="fas fa-user-tie fa-2xl"></i>
-                                </div>
-                            </div>
                             <div>
                                 <h1 class="display-5 fw-black text-white mb-1 tracking-tight">
-                                    Selamat Datang, <span class="text-info">{{ auth()->user()->nama_lengkap }}</span>
+                                    <span class="text-info">{{ auth()->user()->nama_lengkap }}</span>
                                 </h1>
                                 <p class="text-slate-400 fs-5 mb-0 font-medium">
                                     Pusat Kendali Operasional Administrasi <span
@@ -60,89 +45,72 @@
                 </div>
             </div>
 
-            <!-- Icon Background -->
-            <div class="position-absolute end-0 bottom-0 opacity-5 mb-n5 me-n4 z-1">
-                <i class="fas fa-landmark fa-12x text-white"></i>
-            </div>
+
         </div>
 
-        <!-- Metric Cards -->
-        <div class="row g-4 mb-5">
-            <div class="col-xl-3 col-md-6 animate-entrance" style="animation-delay: 0.1s">
-                <div class="card border-0 glass-card-v2 shadow-premium rounded-5 h-100 overflow-hidden stat-item group">
-                    <div class="card-body p-4 d-flex align-items-center gap-4">
-                        <div class="flex-shrink-0 bg-primary-50 text-primary-600 rounded-4xl d-flex align-items-center justify-content-center shadow-sm group-hover:bg-primary-600 group-hover:text-white transition-all duration-500"
-                            style="width: 70px; height: 70px;">
-                            <i class="fas fa-users-viewfinder fa-2x"></i>
-                        </div>
-                        <div>
-                            <span class="d-block text-tertiary small fw-black text-uppercase tracking-[0.2em] mb-1">Total
-                                Penduduk</span>
-                            <div class="d-flex align-items-baseline gap-2">
-                                <h2 class="mb-0 fw-black text-primary-900 stat-value tracking-tighter"
-                                    data-count="{{ $stats['total_penduduk'] ?? 0 }}">0</h2>
-                                <span class="text-success small fw-bold"><i class="fas fa-chart-line"></i></span>
+        <!-- Metric Cards - Clean & Premium Layout - User Request -->
+        <div class="row g-3 g-md-4 mb-5">
+            <!-- Total Penduduk -->
+            <div class="col-6 col-xl-3 animate-entrance" style="animation-delay: 0.1s">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden" style="background: white; border: 1px solid #f1f5f9 !important;">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="bg-primary-50 text-primary-600 rounded-3 d-flex align-items-center justify-content-center"
+                                style="width: 42px; height: 42px;">
+                                <i class="fas fa-users fa-lg"></i>
                             </div>
+                            <span class="text-tertiary small fw-black text-uppercase tracking-wider">Penduduk</span>
                         </div>
-                        </div>
-                    </div>
-                    <div class="h-1 w-100 bg-primary opacity-10"></div>
-                    <div class="px-4 py-2 bg-slate-50 border-top border-slate-100">
-                        <span class="text-[10px] fw-black text-slate-400 uppercase tracking-widest">
-                            <i class="fas fa-globe me-1"></i> Sumber: tatadesa.com
-                        </span>
+                        <h3 class="mb-0 fw-black text-primary-900 stat-value" data-count="{{ $stats['total_penduduk'] ?? 0 }}">0</h3>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 animate-entrance" style="animation-delay: 0.2s">
-                <div class="card border-0 glass-card-v2 shadow-premium rounded-5 h-100 overflow-hidden stat-item group">
-                    <div class="card-body p-4 d-flex align-items-center gap-4">
-                        <div class="flex-shrink-0 bg-success-50 text-success-600 rounded-4xl d-flex align-items-center justify-content-center shadow-sm group-hover:bg-success-600 group-hover:text-white transition-all duration-500"
-                            style="width: 70px; height: 70px;">
-                            <i class="fas fa-file-circle-check fa-2x"></i>
+
+            <!-- Permohonan -->
+            <div class="col-6 col-xl-3 animate-entrance" style="animation-delay: 0.2s">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden" style="background: white; border: 1px solid #f1f5f9 !important;">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="bg-success-50 text-success-600 rounded-3 d-flex align-items-center justify-content-center"
+                                style="width: 42px; height: 42px;">
+                                <i class="fas fa-file-alt fa-lg"></i>
+                            </div>
+                            <span class="text-tertiary small fw-black text-uppercase tracking-wider">Izin</span>
                         </div>
-                        <div>
-                            <span
-                                class="d-block text-tertiary small fw-black text-uppercase tracking-[0.2em] mb-1">Permohonan</span>
-                            <h2 class="mb-0 fw-black text-primary-900 stat-value tracking-tighter"
-                                data-count="{{ $stats['laporan_masuk'] ?? 0 }}">0</h2>
-                        </div>
+                        <h3 class="mb-0 fw-black text-primary-900 stat-value" data-count="{{ $stats['laporan_masuk'] ?? 0 }}">0</h3>
                     </div>
-                    <div class="h-1 w-100 bg-success opacity-10"></div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 animate-entrance" style="animation-delay: 0.3s">
-                <div class="card border-0 glass-card-v2 shadow-premium rounded-5 h-100 overflow-hidden stat-item group">
-                    <div class="card-body p-4 d-flex align-items-center gap-4">
-                        <div class="flex-shrink-0 bg-info-50 text-info-500 rounded-4xl d-flex align-items-center justify-content-center shadow-sm group-hover:bg-info-500 group-hover:text-white transition-all duration-500"
-                            style="width: 70px; height: 70px;">
-                            <i class="fas fa-map-location-dot fa-2x"></i>
+
+            <!-- Jumlah Desa -->
+            <div class="col-6 col-xl-3 animate-entrance" style="animation-delay: 0.3s">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden" style="background: white; border: 1px solid #f1f5f9 !important;">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="bg-info-50 text-info-500 rounded-3 d-flex align-items-center justify-content-center"
+                                style="width: 42px; height: 42px;">
+                                <i class="fas fa-map fa-lg"></i>
+                            </div>
+                            <span class="text-tertiary small fw-black text-uppercase tracking-wider">Desa</span>
                         </div>
-                        <div>
-                            <span class="d-block text-tertiary small fw-black text-uppercase tracking-[0.2em] mb-1">Jumlah
-                                Desa</span>
-                            <h2 class="mb-0 fw-black text-primary-900 stat-value tracking-tighter"
-                                data-count="{{ $stats['jumlah_desa'] ?? 0 }}">0</h2>
-                        </div>
+                        <h3 class="mb-0 fw-black text-primary-900 stat-value" data-count="{{ $stats['jumlah_desa'] ?? 0 }}">0</h3>
                     </div>
-                    <div class="h-1 w-100 bg-info opacity-10"></div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 animate-entrance" style="animation-delay: 0.4s">
-                <div class="card border-0 glass-card-v2 shadow-premium rounded-5 h-100 overflow-hidden stat-item group">
-                    <div class="card-body p-4 d-flex align-items-center gap-4">
-                        <div class="flex-shrink-0 bg-warning-50 text-warning-500 rounded-4xl d-flex align-items-center justify-content-center shadow-sm group-hover:bg-warning-500 group-hover:text-white transition-all duration-500"
-                            style="width: 70px; height: 70px;">
-                            <i class="fas fa-eye fa-2x"></i>
+
+            <!-- Visitor -->
+            <div class="col-6 col-xl-3 animate-entrance" style="animation-delay: 0.4s">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden" style="background: white; border: 1px solid #f1f5f9 !important;">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <div class="bg-warning-50 text-warning-500 rounded-3 d-flex align-items-center justify-content-center"
+                                style="width: 42px; height: 42px;">
+                                <i class="fas fa-eye fa-lg"></i>
+                            </div>
+                            <span class="text-tertiary small fw-black text-uppercase tracking-wider">Tamu</span>
                         </div>
-                        <div>
-                            <span class="d-block text-tertiary small fw-black text-uppercase tracking-[0.2em] mb-1">Visitor
-                                Hari Ini</span>
-                            <h2 class="mb-0 fw-black text-primary-900 stat-value tracking-tighter"
-                                data-count="{{ $stats['pengunjung_hari_ini'] ?? 0 }}">0</h2>
-                        </div>
+                        <h3 class="mb-0 fw-black text-primary-900 stat-value" data-count="{{ $stats['pengunjung_hari_ini'] ?? 0 }}">0</h3>
                     </div>
-                    <div class="h-1 w-100 bg-warning opacity-10"></div>
                 </div>
             </div>
         </div>
@@ -449,6 +417,20 @@
         .fw-black {
             font-weight: 900 !important;
         }
+
+        /* Override Force untuk Teks di Banner Putih */
+        .premium-welcome * {
+            color: #1e293b !important;
+        }
+        .premium-welcome .badge {
+            border-color: #cbd5e1 !important;
+            background-color: #f1f5f9 !important;
+        }
+        .premium-welcome .welcome-avatar div {
+            background-color: #0f172a !important;
+        }
+        .premium-welcome .welcome-avatar i {
+            color: #ffffff !important;
     </style>
 @endpush
 

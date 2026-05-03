@@ -15,95 +15,101 @@ class AiHandler
 {
     /**
      * Handle the incoming message using AI if active.
-     * Returns null if AI is inactive or disabled, forcing the system to use traditional fallback.
+     * 
+     * @param string $phone
+     * @param string $message
+     * @return array|null
      */
     public function handle(string $phone, string $message): ?array
     {
         $profile = AppProfile::first();
         
-        // Jika belum dikonfigurasi atau AI dimatikan, kembalikan null agar ditangani oleh fallback tradisional
         if (!$profile || !$profile->is_ai_active) {
             return null;
         }
 
-        // 1. Memori AI (Ingat Nama)
+        // 1. Memori AI (Ingat Nama & Konteks Percakapan)
         $userName = 'Belum diketahui';
+        $history = [];
         $memory = null;
+        
         if ($phone) {
             $phoneClean = preg_replace('/[^0-9]/', '', $phone);
             $memory = AiMemory::firstOrCreate(['phone_number' => $phoneClean]);
             $userName = $memory->user_name ?? 'Belum diketahui';
+            
+            // Load rolling context (History)
+            if (!empty($memory->context)) {
+                $history = json_decode($memory->context, true) ?: [];
+            }
         }
 
-        $regionName = $profile->region_name ?? 'Kecamatan SAE';
-        
-        // Ambil Pengetahuan dari Database (Service & FAQ)
+        $regionName = $profile->region_name ?? 'Kecamatan Besuk';
         $knowledgeBase = $this->getDynamicKnowledge();
         
-        // Prompt Baru Berdasarkan Instruksi User
-        $systemPrompt = "Anda adalah AI Chatbot resmi layanan publik yang mewakili {$regionName}.\n\n";
-        $systemPrompt .= "TUJUAN UTAMA:\n";
-        $systemPrompt .= "Memberikan pelayanan prima, cepat, tepat, sopan, dan profesional kepada masyarakat, dengan tetap mengikuti alur workflow sistem yang telah ditentukan.\n\n";
+        // PROMPT MANUSIAWI & EMPATI
+        $systemPrompt = "Anda adalah 'SAE-Bot', asisten virtual resmi yang ramah dan cerdas dari {$regionName}.\n\n";
+        $systemPrompt .= "KEPRIBADIAN ANDA:\n";
+        $systemPrompt .= "- Anda adalah sosok yang melayani dengan tulus, sabar, dan penuh empati.\n";
+        $systemPrompt .= "- Gunakan sapaan yang hangat seperti 'Bapak/Ibu', 'Kakak', atau langsung menyapa nama jika sudah tahu.\n";
+        $systemPrompt .= "- Hindari jawaban yang terlalu kaku seperti robot. Gunakan variasi kalimat yang natural.\n";
+        $systemPrompt .= "- Jika user bertanya hal yang sama, jangan mengulang jawaban yang sama persis, gunakan pendekatan berbeda.\n\n";
         
-        $systemPrompt .= "GAYA KOMUNIKASI:\n";
-        $systemPrompt .= "- Gunakan bahasa Indonesia formal, sopan, dan mudah dipahami\n";
-        $systemPrompt .= "- Nada ramah, tidak kaku, tidak bertele-tele\n";
-        $systemPrompt .= "- Hindari bahasa teknis yang sulit dimengerti masyarakat umum\n";
-        $systemPrompt .= "- Berikan kesan 'melayani dengan empati'\n\n";
+        $systemPrompt .= "TUJUAN:\n";
+        $systemPrompt .= "Membantu warga mendapatkan informasi layanan publik dengan cepat dan akurat sesuai data resmi.\n\n";
         
-        $systemPrompt .= "ATURAN UTAMA:\n";
-        $systemPrompt .= "1. SELALU ikuti struktur workflow yang tersedia dalam sistem\n";
-        $systemPrompt .= "2. Jangan memberikan jawaban di luar menu/alur yang sudah ditentukan\n";
-        $systemPrompt .= "3. Jika user keluar konteks, arahkan kembali ke pilihan layanan\n";
-        $systemPrompt .= "4. Jika data belum lengkap, minta dengan jelas dan sopan\n";
-        $systemPrompt .= "5. Jika terjadi error/sistem tidak tersedia, beri alternatif solusi\n\n";
-        
-        $systemPrompt .= "PENANGANAN KONDISI KHUSUS:\n";
-        $systemPrompt .= "[1] KEDARURATAN (Kecelakaan, Bencana, Kebakaran): Respon cepat, singkat, arahkan ke 112 atau 119.\n";
-        $systemPrompt .= "[2] KRIMINAL: Arahkan ke kepolisian (110).\n";
-        $systemPrompt .= "[3] KESEHATAN: Saran umum, arahkan ke faskes terdekat.\n\n";
-        
-        $systemPrompt .= "DATA LAYANAN & INFORMASI RESMI (Gunakan data ini sebagai referensi utama):\n";
+        $systemPrompt .= "DATA RESMI & FAQ (Gunakan ini sebagai sumber kebenaran):\n";
         $systemPrompt .= "{$knowledgeBase}\n\n";
 
-        $systemPrompt .= "KONTEKS PENGGUNA SAAT INI:\n";
-        $systemPrompt .= "- Nama Pengguna: {$userName}\n";
+        $systemPrompt .= "IDENTITAS PENGGUNA:\n";
+        $systemPrompt .= "- Nama: {$userName}\n";
         
         if ($userName === 'Belum diketahui') {
-            $systemPrompt .= "- INSTRUKSI MEMORI: Jika pengguna memberitahu namanya, Anda WAJIB menyapa mereka dengan nama tersebut di respon ini. SANGAT PENTING: Untuk membantu sistem mengingat, jika user memberitahu namanya, Anda HARUS menyertakan tag [SET_NAME:nama_pengguna] di paling akhir jawaban Anda (contoh: [SET_NAME:Budi]).\n";
+            $systemPrompt .= "- Jika pengguna memberitahu namanya, Anda WAJIB menyapa mereka dengan nama tersebut dan menyertakan tag [SET_NAME:nama] di akhir jawaban.\n";
         } else {
-            $systemPrompt .= "- INSTRUKSI MEMORI: Gunakan nama {$userName} untuk menyapa pengguna agar lebih akrab namun tetap sopan.\n";
+            $systemPrompt .= "- Selalu sapa pengguna dengan nama {$userName} agar percakapan lebih akrab.\n";
         }
         
-        $systemPrompt .= "\nBATASAN: Jangan beropini, jangan bercanda, jangan keluar dari konteks pelayanan publik.\n";
-        $systemPrompt .= "PRIORITAS: Kecepatan respon > Kejelasan informasi > Kepatuhan workflow > Kesopanan";
+        $systemPrompt .= "\nBATASAN: Jangan beropini di luar tugas layanan publik. Jika tidak tahu, arahkan untuk menghubungi kantor kecamatan secara langsung.\n";
+        $systemPrompt .= "PRIORITAS: Kecepatan > Empati > Akurasi Data.";
 
         $provider = $profile->ai_provider ?? 'gemini';
-        $reply = "Maaf, terjadi kesalahan saat menghubungi server AI.";
+        $reply = "Maaf, sedang ada kendala koneksi dengan otak AI saya.";
 
         try {
+            // Persiapkan Pesan dengan Konteks (History)
             if ($provider === 'gemini') {
-                $reply = $this->askGemini($profile->google_api_key, $systemPrompt, $message);
+                $reply = $this->askGemini($profile->google_api_key, $systemPrompt, $message, $history);
             } elseif ($provider === 'openai') {
-                $reply = $this->askOpenAI($profile->openai_api_key, $systemPrompt, $message);
+                $reply = $this->askOpenAI($profile->openai_api_key, $systemPrompt, $message, $history);
             } elseif (in_array($provider, ['deepseek', 'xai', 'openrouter', 'dashscope'])) {
-                $reply = $this->askOpenAICompatible($provider, $profile, $systemPrompt, $message);
+                $reply = $this->askOpenAICompatible($provider, $profile, $systemPrompt, $message, $history);
             } else {
                 return null;
             }
             
-            // Post-Processing: Deteksi & Simpan Nama (Memory)
+            // 2. Post-Processing: Deteksi Nama
             if (preg_match('/\[SET_NAME:(.*?)\]/', $reply, $matches)) {
                 $detectedName = trim($matches[1]);
                 if ($memory && !empty($detectedName)) {
                     $memory->user_name = $detectedName;
-                    $memory->save();
-                    Log::info("AI Memory Updated (Service): Name '{$detectedName}' stored for phone {$phoneClean}");
+                    $userName = $detectedName;
                 }
                 $reply = str_replace($matches[0], '', $reply);
             }
 
-            // Berhasil mendapat jawaban AI
+            // 3. Update Memory Context (Rolling Window - Max 5 Exchanges)
+            if ($memory) {
+                $history[] = ['role' => 'user', 'content' => $message];
+                $history[] = ['role' => 'assistant', 'content' => trim($reply)];
+                
+                // Simpan hanya 10 item terakhir (5 pasang tanya-jawab)
+                $history = array_slice($history, -10);
+                
+                $memory->context = json_encode($history);
+                $memory->save();
+            }
+
             return [
                 'success' => true,
                 'intent' => 'ai_assistant',
@@ -117,15 +123,31 @@ class AiHandler
         }
     }
 
-    private function askGemini($apiKey, $systemPrompt, $message)
+    private function askGemini($apiKey, $systemPrompt, $message, $history = [])
     {
         if (empty($apiKey)) throw new \Exception("Google API Key belum diisi.");
 
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
         
+        $contents = [];
+        
+        // Add History to Contents
+        foreach ($history as $h) {
+            $contents[] = [
+                'role' => $h['role'] === 'assistant' ? 'model' : 'user',
+                'parts' => [['text' => $h['content']]]
+            ];
+        }
+        
+        // Add Current Message
+        $contents[] = [
+            'role' => 'user',
+            'parts' => [['text' => $message]]
+        ];
+
         $response = Http::timeout(15)->post($url, [
             'system_instruction' => ['parts' => [['text' => $systemPrompt]]],
-            'contents' => ['parts' => [['text' => $message]]]
+            'contents' => $contents
         ]);
 
         if ($response->successful()) {
@@ -135,18 +157,25 @@ class AiHandler
         throw new \Exception("Gemini Error: " . $response->body());
     }
 
-    private function askOpenAI($apiKey, $systemPrompt, $message)
+    private function askOpenAI($apiKey, $systemPrompt, $message, $history = [])
     {
         if (empty($apiKey)) throw new \Exception("OpenAI API Key belum diisi.");
+
+        $messages = [['role' => 'system', 'content' => $systemPrompt]];
+        
+        // Add History
+        foreach ($history as $h) {
+            $messages[] = ['role' => $h['role'], 'content' => $h['content']];
+        }
+        
+        // Add Current Message
+        $messages[] = ['role' => 'user', 'content' => $message];
 
         $response = Http::withHeaders(['Authorization' => "Bearer {$apiKey}"])
             ->timeout(15)
             ->post('https://api.openai.com/v1/chat/completions', [
                 'model' => 'gpt-3.5-turbo',
-                'messages' => [
-                    ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => $message],
-                ]
+                'messages' => $messages
             ]);
 
         if ($response->successful()) {
@@ -156,7 +185,7 @@ class AiHandler
         throw new \Exception("OpenAI Error: " . $response->body());
     }
 
-    private function askOpenAICompatible($provider, $profile, $systemPrompt, $message)
+    private function askOpenAICompatible($provider, $profile, $systemPrompt, $message, $history = [])
     {
         $apiKey = '';
         $baseUrl = '';
@@ -182,15 +211,22 @@ class AiHandler
 
         if (empty($apiKey)) throw new \Exception("API Key untuk {$provider} kosong.");
 
+        $messages = [['role' => 'system', 'content' => $systemPrompt]];
+        
+        // Add History
+        foreach ($history as $h) {
+            $messages[] = ['role' => $h['role'], 'content' => $h['content']];
+        }
+        
+        // Add Current Message
+        $messages[] = ['role' => 'user', 'content' => $message];
+
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$apiKey}",
             'HTTP-Referer' => config('app.url'),
         ])->timeout(15)->post($baseUrl, [
             'model' => $model,
-            'messages' => [
-                ['role' => 'system', 'content' => $systemPrompt],
-                ['role' => 'user', 'content' => $message],
-            ]
+            'messages' => $messages
         ]);
 
         if ($response->successful()) {
