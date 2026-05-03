@@ -222,127 +222,86 @@ class PublicServiceController extends Controller
     }
 
     /**
-     * Check Status via WA or UUID
+     * Check Status via WA, PIN or UUID
      */
     public function checkStatus(Request $request)
     {
         $request->validate([
             'identifier' => 'required|string',
-            'whatsapp' => 'nullable|string', // Recommended for PIN tracking
+            'whatsapp' => 'nullable|string', 
         ]);
 
-        $identifier = $request->identifier;
-        $inputWa = $request->whatsapp;
-        $cleanIdentifier = preg_replace('/[^0-9]/', '', $identifier);
+        try {
+            $identifier = trim($request->identifier);
+            $inputWa = $request->whatsapp ? preg_replace('/[^0-9]/', '', $request->whatsapp) : null;
+            $cleanInput = preg_replace('/[^0-9]/', '', $identifier);
 
-        // Try to find by Tracking PIN, UUID or WhatsApp
-        // MUST be in category 'pelayanan' as per user request (focus on files/docs)
+            // 1. Build Universal Query
+            $query = PublicService::query();
 
-        // Check if it looks like a PIN (6 digits)
-        if (preg_match('/^[0-9]{6}$/', $identifier)) {
-            // Try cache first for PIN lookup
-            $cacheKey = 'tracking:pin:' . $identifier;
-            $cached = cache()->get($cacheKey);
-
-            if ($cached) {
-                return response()->json($cached);
+            // Check for UUID format
+            if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $identifier)) {
+                $query->where('uuid', $identifier);
+            } 
+            // Check for PIN (6 digits)
+            elseif (preg_match('/^[0-9]{6}$/', $identifier)) {
+                $query->where('tracking_code', $identifier);
+            }
+            // Check for Phone (>= 9 digits)
+            elseif (strlen($cleanInput) >= 9) {
+                $suffix = substr($cleanInput, -10);
+                $query->where(function($q) use ($suffix, $cleanInput) {
+                    $q->where('whatsapp_suffix', $suffix)
+                      ->orWhere('whatsapp', 'like', "%$cleanInput%");
+                });
+            } else {
+                return response()->json(['found' => false, 'message' => 'Format identitas tidak dikenali.'], 400);
             }
 
-            // Security check: REQUIRE WhatsApp number match for PIN lookup to prevent enumeration
-            if (!$inputWa) {
-                return response()->json([
-                    'found' => false,
-                    'auth_required' => true,
-                    'message' => 'Untuk keamanan, silakan masukkan juga nomor WhatsApp yang Anda gunakan saat mendaftar.'
-                ], 403);
-            }
-
-            $service = PublicService::where('tracking_code', $identifier)
-                ->orWhere('uuid', $identifier)
-                ->orWhere('whatsapp', 'like', "%$identifier%")
-                ->with(['desa', 'handler', 'histories'])
+            $service = $query->with(['desa', 'handler', 'histories'])
                 ->latest()
                 ->first();
 
-            if ($service) {
-                // If the identifier matches the phone number exactly, we can bypass PIN check
-                // OR if it's a PIN search, we check the WhatsApp verification
-                $isPhoneSearch = (str_contains($service->whatsapp, $identifier) && strlen($identifier) >= 10);
+            if (!$service) {
+                return response()->json([
+                    'found' => false, 
+                    'message' => 'Berkas tidak ditemukan. Mohon periksa kembali PIN atau nomor WhatsApp Anda.'
+                ], 404);
+            }
 
-                if ($inputWa || $isPhoneSearch) {
-                    $ownerPhone = $this->portalService->normalizePhone($service->whatsapp);
-                    $searchPhone = $this->portalService->normalizePhone($inputWa ?: $identifier);
+            // 2. Security Verification
+            // Skip verification if searching directly by full WhatsApp number
+            $isPhoneSearch = (strlen($cleanInput) >= 10 && str_contains($service->whatsapp, $cleanInput));
+            
+            if (!$isPhoneSearch && !$inputWa) {
+                return response()->json([
+                    'found' => false,
+                    'auth_required' => true,
+                    'message' => 'Untuk keamanan, masukkan Nomor WhatsApp yang digunakan saat mendaftar.'
+                ], 403);
+            }
 
-                    if (!str_contains($ownerPhone, $searchPhone) && !str_contains($searchPhone, substr($ownerPhone, -4))) {
-                        return response()->json([
-                            'found' => false,
-                            'auth_required' => true,
-                            'message' => 'Kombinasi PIN dan Nomor WhatsApp tidak cocok. Masukkan 4 digit terakhir nomor WA Anda.'
-                        ], 403);
-                    }
-                } else {
-                    // PIN entered but no WA provided yet
+            if ($inputWa) {
+                $ownerPhone = preg_replace('/[^0-9]/', '', $service->whatsapp);
+                // Match either full number or last 4 digits
+                if (!str_contains($ownerPhone, $inputWa) && !str_contains($inputWa, substr($ownerPhone, -4))) {
                     return response()->json([
                         'found' => false,
                         'auth_required' => true,
-                        'message' => 'Untuk keamanan, masukkan Nomor WhatsApp yang digunakan saat mendaftar.'
+                        'message' => 'Kombinasi data tidak cocok. Pastikan nomor WA sudah benar.'
                     ], 403);
                 }
-
-                $response = $this->buildStatusResponse($service);
-                cache()->put($cacheKey, $response, 300);
-                return response()->json($response);
-            }
-        }
-
-        // Try UUID
-        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $identifier)) {
-            $cacheKey = 'tracking:uuid:' . $identifier;
-            $cached = cache()->get($cacheKey);
-
-            if ($cached) {
-                return response()->json($cached);
             }
 
-            $service = PublicService::where('uuid', $identifier)
-                ->with(['desa', 'handler'])
-                ->first();
+            return response()->json($this->buildStatusResponse($service));
 
-            if ($service) {
-                $response = $this->buildStatusResponse($service);
-                cache()->put($cacheKey, $response, 300);
-                return response()->json($response);
-            }
-        }
-
-        // For phone number search - use indexed suffix column
-        if (strlen($cleanIdentifier) >= 9) {
-            $suffix = substr($cleanIdentifier, -10);
-
-            // First try exact suffix match (fastest with index)
-            $query = PublicService::where('category', PublicService::CATEGORY_PELAYANAN)
-                ->where(function ($q) use ($suffix) {
-                    $q->where('whatsapp_suffix', $suffix)
-                        ->orWhere('whatsapp', 'LIKE', '%' . $suffix);
-                });
-        } else {
-            $query = PublicService::where('category', PublicService::CATEGORY_PELAYANAN)
-                ->where('whatsapp', $identifier);
-        }
-
-        $service = $query->with(['desa', 'handler'])
-            ->latest()
-            ->first();
-
-        if (!$service) {
+        } catch (\Exception $e) {
+            \Log::error("Tracking Error: " . $e->getMessage(), ['input' => $request->all()]);
             return response()->json([
-                'found' => false,
-                'message' => 'Berkas tidak ditemukan. Pastikan nomor WA atau ID berkas sudah benar.'
-            ], 404);
+                'found' => false, 
+                'message' => 'Gagal memuat status berkas. Silakan coba beberapa saat lagi.'
+            ], 500);
         }
-
-        // Build response
-        return response()->json($this->buildStatusResponse($service));
     }
 
     /**

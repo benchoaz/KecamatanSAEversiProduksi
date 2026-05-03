@@ -87,6 +87,20 @@ class WahaN8nController extends Controller
         }
 
         $profileData['public_url'] = $validated['public_url'] ?? null;
+        
+        // Save AI Settings to Profile
+        if ($request->has('ai_provider')) {
+            $profileData['ai_provider'] = $request->input('ai_provider');
+            if ($request->filled('google_api_key')) $profileData['google_api_key'] = $request->input('google_api_key');
+            if ($request->filled('openai_api_key')) $profileData['openai_api_key'] = $request->input('openai_api_key');
+            if ($request->filled('anthropic_api_key')) $profileData['anthropic_api_key'] = $request->input('anthropic_api_key');
+            if ($request->filled('deepseek_api_key')) $profileData['deepseek_api_key'] = $request->input('deepseek_api_key');
+            if ($request->filled('xai_api_key')) $profileData['xai_api_key'] = $request->input('xai_api_key');
+            if ($request->filled('openrouter_api_key')) $profileData['openrouter_api_key'] = $request->input('openrouter_api_key');
+            if ($request->filled('dashscope_api_key')) $profileData['dashscope_api_key'] = $request->input('dashscope_api_key');
+            if ($request->filled('zhipu_api_key')) $profileData['zhipu_api_key'] = $request->input('zhipu_api_key');
+            $profileData['is_ai_active'] = $request->has('is_ai_active');
+        }
 
         if ($request->has('whatsapp_bot_menu')) {
             $menuItems = $request->input('whatsapp_bot_menu', []);

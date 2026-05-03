@@ -14,6 +14,7 @@ class IntentHandler
     protected ComplaintHandler $complaintHandler;
     protected OwnerHandler $ownerHandler;
     protected \App\Services\FaqSearchService $faqSearchService;
+    protected AiHandler $aiHandler;
 
     public function __construct(
         StatusHandler $statusHandler,
@@ -22,7 +23,8 @@ class IntentHandler
         JasaHandler $jasaHandler,
         ComplaintHandler $complaintHandler,
         OwnerHandler $ownerHandler,
-        \App\Services\FaqSearchService $faqSearchService
+        \App\Services\FaqSearchService $faqSearchService,
+        AiHandler $aiHandler
     ) {
         $this->statusHandler = $statusHandler;
         $this->syaratHandler = $syaratHandler;
@@ -31,6 +33,7 @@ class IntentHandler
         $this->complaintHandler = $complaintHandler;
         $this->ownerHandler = $ownerHandler;
         $this->faqSearchService = $faqSearchService;
+        $this->aiHandler = $aiHandler;
     }
 
     /**
@@ -206,7 +209,14 @@ class IntentHandler
             ];
         }
 
-        // Unknown intent
+        // --- AI SMART FALLBACK ---
+        // Jika sistem tidak mengerti perintahnya, tanyakan ke AI (jika AI menyala)
+        $aiResponse = $this->aiHandler->handle($phone, $message);
+        if ($aiResponse !== null) {
+            return $aiResponse;
+        }
+
+        // Unknown intent (Jika AI mati atau error)
         return [
             'success' => true,
             'intent' => 'unknown',

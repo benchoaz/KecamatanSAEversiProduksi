@@ -615,6 +615,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                             {{-- Section Bot WhatsApp was moved to WahaN8n settings --}}
 
                             <div class="d-flex justify-content-end mt-5 pt-3 border-top border-light">

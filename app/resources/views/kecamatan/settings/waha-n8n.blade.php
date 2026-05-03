@@ -100,6 +100,70 @@
                             <hr class="my-4 text-light">
                         </div>
 
+                        <!-- Konfigurasi Asisten AI -->
+                        <div class="col-md-12 mt-2 mb-2" id="ai-settings-container">
+                            <div class="p-4 border border-indigo-100 bg-indigo-50 bg-opacity-30 rounded-4 shadow-sm">
+                                <div class="d-flex align-items-center justify-content-between mb-4 border-bottom border-indigo-200 pb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-brain text-indigo-600 fs-5"></i>
+                                        <h6 class="mb-0 fw-bold text-indigo-900">Otak Asisten AI (Otomatis Menjawab Pesan)</h6>
+                                    </div>
+                                    <div class="form-check form-switch mb-0">
+                                        <label class="form-check-label small fw-bold me-2" for="is_ai_active">Aktifkan AI</label>
+                                        <input class="form-check-input" type="checkbox" name="is_ai_active" id="is_ai_active" value="1" {{ ($profile->is_ai_active ?? true) ? 'checked' : '' }} style="width: 2.5em; height: 1.25em;">
+                                    </div>
+                                </div>
+
+                                <div class="row g-4">
+                                    <div class="col-md-12">
+                                        <label class="form-label text-slate-700 fw-semibold">Pilih Provider AI</label>
+                                        <select name="ai_provider" class="form-select bg-white border-slate-200 rounded-3 text-sm">
+                                            <option value="gemini" {{ ($profile->ai_provider ?? 'gemini') == 'gemini' ? 'selected' : '' }}>Google Gemini (Rekomendasi - Cepat & Murah)</option>
+                                            <option value="openai" {{ ($profile->ai_provider ?? '') == 'openai' ? 'selected' : '' }}>OpenAI (ChatGPT)</option>
+                                            <option value="anthropic" {{ ($profile->ai_provider ?? '') == 'anthropic' ? 'selected' : '' }}>Anthropic (Claude)</option>
+                                            <option value="deepseek" {{ ($profile->ai_provider ?? '') == 'deepseek' ? 'selected' : '' }}>DeepSeek</option>
+                                            <option value="xai" {{ ($profile->ai_provider ?? '') == 'xai' ? 'selected' : '' }}>xAI (Grok)</option>
+                                            <option value="openrouter" {{ ($profile->ai_provider ?? '') == 'openrouter' ? 'selected' : '' }}>OpenRouter</option>
+                                            <option value="dashscope" {{ ($profile->ai_provider ?? '') == 'dashscope' ? 'selected' : '' }}>Alibaba DashScope (Qwen)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label text-slate-700 small fw-bold"><i class="fab fa-google text-danger"></i> Google API Key (Gemini)</label>
+                                        <div class="input-group">
+                                            <input type="password" id="gemini_api_key" name="google_api_key" value="{{ old('google_api_key', $profile->google_api_key) }}" class="form-control bg-white border-slate-200 text-sm" placeholder="AIzaSy...">
+                                            <button type="button" class="btn btn-outline-success" onclick="testApiKey('gemini')"><i class="fas fa-check-circle"></i> Test</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-slate-700 small fw-bold">OpenAI API Key (ChatGPT)</label>
+                                        <div class="input-group">
+                                            <input type="password" id="openai_api_key" name="openai_api_key" value="{{ old('openai_api_key', $profile->openai_api_key) }}" class="form-control bg-white border-slate-200 text-sm" placeholder="sk-...">
+                                            <button type="button" class="btn btn-outline-success" onclick="testApiKey('openai')"><i class="fas fa-check-circle"></i> Test</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-slate-700 small fw-bold">DeepSeek API Key</label>
+                                        <div class="input-group">
+                                            <input type="password" id="deepseek_api_key" name="deepseek_api_key" value="{{ old('deepseek_api_key', $profile->deepseek_api_key) }}" class="form-control bg-white border-slate-200 text-sm" placeholder="sk-...">
+                                            <button type="button" class="btn btn-outline-success" onclick="testApiKey('deepseek')"><i class="fas fa-check-circle"></i> Test</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-slate-700 small fw-bold">xAI API Key (Grok)</label>
+                                        <div class="input-group">
+                                            <input type="password" id="xai_api_key" name="xai_api_key" value="{{ old('xai_api_key', $profile->xai_api_key) }}" class="form-control bg-white border-slate-200 text-sm" placeholder="xai-...">
+                                            <button type="button" class="btn btn-outline-success" onclick="testApiKey('xai')"><i class="fas fa-check-circle"></i> Test</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <hr class="my-4 text-light">
+                        </div>
+
                         {{-- =====================================================
                              BOT WHATSAPP SETTINGS (Moved from Profile)
                         ===================================================== --}}
@@ -599,8 +663,43 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         menuContainer.addEventListener('change', (e) => {
             if (e.target.closest('.menu-item-row')) updateBotPreview();
-        });
-    }
 });
+
+function testApiKey(provider) {
+    const keyInput = document.getElementById(`${provider}_api_key`);
+    const key = keyInput ? keyInput.value : '';
+    
+    if (!key) {
+        Swal.fire('Oopss!', 'Silakan masukkan API Key terlebih dahulu sebelum menguji.', 'warning');
+        return;
+    }
+    
+    Swal.fire({
+        title: 'Mengecek Koneksi...',
+        text: 'Sedang menghubungi server ' + provider.toUpperCase(),
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
+
+    fetch('/api/settings/ai/test', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ provider: provider, api_key: key })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Berhasil!', `Koneksi ke ${provider.toUpperCase()} sukses! API Key siap digunakan.`, 'success');
+        } else {
+            Swal.fire('Gagal', data.message || 'API Key tidak valid.', 'error');
+        }
+    })
+    .catch(e => {
+        Swal.fire('Error', 'Gagal menghubungi server lokal.', 'error');
+    });
+}
 </script>
 @endpush

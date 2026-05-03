@@ -92,10 +92,12 @@ Route::prefix('whatsapp')->middleware(['api.token', 'throttle:60,1'])->group(fun
 // Global health check for n8n (compatibility alias)
 Route::get('/health', [WhatsappController::class, 'health'])->name('api.health');
 
+// AI Assistant Webhook for n8n
+use App\Http\Controllers\Api\AiAssistantController;
+Route::post('/webhook/ai-chat', [AiAssistantController::class, 'handleChat'])->name('api.webhook.aichat');
 
-
-
-
+// API Key Tester
+Route::post('/settings/ai/test', [\App\Http\Controllers\ApplicationProfileController::class, 'testApiKey'])->name('api.settings.ai.test');
 
 
 

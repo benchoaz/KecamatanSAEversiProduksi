@@ -48,10 +48,31 @@ class AppProfile extends Model
         // Bot Settings
         'public_url',
         'whatsapp_bot_menu',
+        
+        // AI Settings
+        'ai_provider',
+        'openai_api_key',
+        'google_api_key',
+        'anthropic_api_key',
+        'xai_api_key',
+        'deepseek_api_key',
+        'dashscope_api_key',
+        'zhipu_api_key',
+        'openrouter_api_key',
+        'alpha_vantage_api_key',
     ];
 
     protected $casts = [
         'whatsapp_bot_menu' => 'array',
+        'openai_api_key' => 'encrypted',
+        'google_api_key' => 'encrypted',
+        'anthropic_api_key' => 'encrypted',
+        'xai_api_key' => 'encrypted',
+        'deepseek_api_key' => 'encrypted',
+        'dashscope_api_key' => 'encrypted',
+        'zhipu_api_key' => 'encrypted',
+        'openrouter_api_key' => 'encrypted',
+        'alpha_vantage_api_key' => 'encrypted',
     ];
 
     public function editor()

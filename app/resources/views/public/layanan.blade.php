@@ -189,7 +189,7 @@
         </div>
     </div>
 
-        // Fungsi utama pelacakan
+    <script>
         window.doTrack = async function() {
             const idInput = document.getElementById('identifier');
             const waInput = document.getElementById('whatsapp_verify');
@@ -198,17 +198,12 @@
             const resultContent = document.getElementById('resultContent');
             const verificationField = document.getElementById('verificationField');
 
-            if (!idInput.value.trim()) {
-                alert('Silakan masukkan PIN atau No. WhatsApp.');
-                return;
-            }
+            if (!idInput || !idInput.value.trim()) return;
 
-            // Loading state
             btn.disabled = true;
-            btn.innerHTML = `<span class="loading loading-spinner loading-md"></span> <span class="ml-3">Mencari Berkas...</span>`;
-            
+            const originalBtnHtml = btn.innerHTML;
+            btn.innerHTML = `<span class="loading loading-spinner loading-md"></span> <span class="ml-3">Mencari...</span>`;
             resultContainer.classList.add('hidden');
-            resultContent.innerHTML = '';
 
             try {
                 const response = await fetch('{{ route('public.tracking.check') }}', {
@@ -230,13 +225,11 @@
                     waInput.required = true;
                     waInput.focus();
                     resultContent.innerHTML = `
-                        <div class="p-8 bg-amber-50 rounded-[2rem] border border-amber-200 text-amber-800 font-bold flex items-center gap-4">
+                        <div class="p-8 bg-amber-50 rounded-[2rem] border border-amber-200 text-amber-800 font-bold flex items-center gap-4 animate__animated animate__headShake">
                             <div class="w-12 h-12 bg-amber-200 rounded-2xl flex items-center justify-center flex-shrink-0">
                                 <i class="fas fa-key text-xl"></i>
                             </div>
-                            <div class="text-sm">
-                                \${data.message}
-                            </div>
+                            <div class="text-sm">${data.message}</div>
                         </div>
                     `;
                     resultContainer.classList.remove('hidden');
@@ -246,26 +239,26 @@
                     renderNotFound(data.message);
                 }
             } catch (error) {
-                console.error(error);
+                console.error('Tracking Error:', error);
                 renderError();
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `Lacak Sekarang <i class="fas fa-arrow-right ml-2"></i>`;
+                btn.innerHTML = originalBtnHtml;
             }
         };
 
         function handleIdentifierChange(val) {
             const trimmed = val.trim();
-            const verificationField = document.getElementById('verificationField');
-            const whatsappVerify = document.getElementById('whatsapp_verify');
+            const vf = document.getElementById('verificationField');
+            const wv = document.getElementById('whatsapp_verify');
+            if (!vf || !wv) return;
 
             if (/^[0-9]{6}$/.test(trimmed)) {
-                verificationField.classList.remove('hidden');
-                verificationField.classList.add('animate__animated', 'animate__fadeInDown');
-                whatsappVerify.required = true;
+                vf.classList.remove('hidden');
+                wv.required = true;
             } else {
-                verificationField.classList.add('hidden');
-                whatsappVerify.required = false;
+                vf.classList.add('hidden');
+                wv.required = false;
             }
         }
 
@@ -279,20 +272,13 @@
 
             if (idInput) {
                 idInput.addEventListener('input', (e) => handleIdentifierChange(e.target.value));
-            }
-
-            if (q && idInput) {
-                idInput.value = q;
-                handleIdentifierChange(q);
-                
-                if (wa && waInput) {
-                    waInput.value = wa;
+                if (q) {
+                    // idInput.value is already set by blade, but we ensure it
+                    idInput.value = q;
+                    handleIdentifierChange(q);
+                    if (wa && waInput) waInput.value = wa;
+                    setTimeout(() => window.doTrack(), 200);
                 }
-
-                // Auto-trigger
-                setTimeout(() => {
-                    window.doTrack();
-                }, 400);
             }
         });
 
@@ -304,19 +290,19 @@
                 <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-teal-900/5 animate__animated animate__fadeInUp">
                     <div class="flex flex-col md:flex-row justify-between items-start gap-8 mb-10 pb-10 border-b border-slate-50">
                         <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 rounded-[1.5rem] bg-\${data.status_color}-100 text-\${data.status_color}-600 flex items-center justify-center text-2xl shadow-inner">
-                                <i class="fas \${getStatusIcon(data.status)}"></i>
+                            <div class="w-16 h-16 rounded-[1.5rem] bg-${data.status_color}-100 text-${data.status_color}-600 flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fas ${getStatusIcon(data.status)}"></i>
                             </div>
                             <div>
                                 <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 block mb-2">STATUS BERKAS</span>
-                                <h4 class="text-2xl font-black text-\${data.status_color}-700">\${data.status_label}</h4>
+                                <h4 class="text-2xl font-black text-${data.status_color}-700">${data.status_label}</h4>
                             </div>
                         </div>
                         <div class="bg-slate-50 px-8 py-5 rounded-[1.5rem] border border-slate-100 w-full md:w-auto">
                             <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 block mb-2">ID TRACKING</span>
                             <div class="flex items-center gap-3">
-                                <code class="text-lg font-black text-slate-800 tracking-wider">#\${data.tracking_code || data.uuid.substring(0,8)}</code>
-                                <button onclick="copyToClipboard('\${data.tracking_code || data.uuid}')" class="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-teal-600" title="Salin ID">
+                                <code class="text-lg font-black text-slate-800 tracking-wider">#${data.tracking_code || data.uuid.substring(0,8)}</code>
+                                <button onclick="copyToClipboard('${data.tracking_code || data.uuid}')" class="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-teal-600" title="Salin ID">
                                     <i class="far fa-copy"></i>
                                 </button>
                             </div>
@@ -327,52 +313,51 @@
                         <div class="space-y-6">
                             <div class="group">
                                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Jenis Layanan</span>
-                                <p class="text-lg font-black text-slate-800">\${data.jenis_layanan}</p>
+                                <p class="text-lg font-black text-slate-800">${data.jenis_layanan}</p>
                             </div>
                             <div class="group">
                                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Waktu Pengajuan</span>
-                                <p class="text-sm font-bold text-slate-600">\${data.created_at}</p>
+                                <p class="text-sm font-bold text-slate-600">${data.created_at}</p>
                             </div>
                         </div>
                         
                         <div class="space-y-6">
-                            \${data.public_response ? \`
+                            ${data.public_response ? `
                                 <div class="p-6 bg-slate-900 rounded-[2rem] text-white relative overflow-hidden">
                                     <div class="absolute top-0 right-0 w-20 h-20 bg-teal-500/10 rounded-bl-full"></div>
                                     <span class="text-[10px] font-black text-teal-400 uppercase tracking-widest block mb-3 relative">Pesan Petugas:</span>
-                                    <p class="text-sm text-slate-300 leading-relaxed font-medium relative italic">"\${data.public_response}"</p>
+                                    <p class="text-sm text-slate-300 leading-relaxed font-medium relative italic">"${data.public_response}"</p>
                                 </div>
-                            \` : \`
+                            ` : `
                                 <div class="p-6 bg-slate-50 rounded-[2rem] border border-dashed border-slate-200 text-center">
                                     <p class="text-xs text-slate-400 font-medium italic">Menunggu respon lanjutan dari petugas...</p>
                                 </div>
-                            \`}
+                            `}
                         </div>
                     </div>
 
-                    \${data.download_url ? \`
+                    ${data.download_url ? `
                         <div class="mt-12">
-                            <a href="\${data.download_url}" target="_blank" class="btn btn-lg h-18 w-full bg-emerald-600 hover:bg-emerald-700 text-white border-0 rounded-[1.5rem] font-black text-lg shadow-xl shadow-emerald-900/20 group">
+                            <a href="${data.download_url}" target="_blank" class="btn btn-lg h-18 w-full bg-emerald-600 hover:bg-emerald-700 text-white border-0 rounded-[1.5rem] font-black text-lg shadow-xl shadow-emerald-900/20 group">
                                 <i class="fas fa-cloud-download-alt mr-3 group-hover:translate-y-1 transition-transform"></i>
                                 Download Berkas Digital
                             </a>
                         </div>
-                    \` : ''}
+                    ` : ''}
 
-                    \${data.pickup_info ? \`
+                    ${data.pickup_info ? `
                         <div class="mt-10 p-8 bg-amber-50 rounded-[2rem] border border-amber-100 flex items-start gap-6">
                             <div class="w-14 h-14 bg-amber-200 text-amber-700 rounded-2xl flex flex-shrink-0 items-center justify-center text-xl">
                                 <i class="fas fa-map-marked-alt"></i>
                             </div>
                             <div>
                                 <h5 class="text-sm font-black text-amber-900 mb-2 uppercase tracking-widest">Pengambilan Fisik</h5>
-                                <p class="text-sm text-slate-700 font-bold mb-1">Siap: \${data.pickup_info.ready_at || 'Segera'}</p>
-                                <p class="text-xs text-slate-500 font-medium leading-relaxed">\${data.pickup_info.pickup_notes || 'Silakan datang ke kantor kecamatan dengan membawa berkas asli.'}</p>
+                                <p class="text-sm text-slate-700 font-bold mb-1">Siap: ${data.pickup_info.ready_at || 'Segera'}</p>
+                                <p class="text-xs text-slate-500 font-medium leading-relaxed">${data.pickup_info.pickup_notes || 'Silakan datang ke kantor kecamatan dengan membawa berkas asli.'}</p>
                             </div>
                         </div>
-                    \` : ''}
+                    ` : ''}
 
-                    {{-- Feedback UI --}}
                     <div class="mt-12">
                         <h5 class="text-sm font-black text-slate-800 mb-6 uppercase tracking-widest flex items-center gap-3">
                             <i class="fas fa-history text-teal-500"></i>
@@ -382,20 +367,20 @@
                             <div class="relative pl-8 pb-8">
                                 <div class="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-emerald-500 border-4 border-white shadow-sm"></div>
                                 <p class="text-xs font-black text-slate-800 mb-1">Berkas Diterima Sistem</p>
-                                <p class="text-[10px] text-slate-400 font-bold">\${data.created_at}</p>
+                                <p class="text-[10px] text-slate-400 font-bold">${data.created_at}</p>
                             </div>
-                            \${data.histories.map(h => \`
+                            ${data.histories.map(h => `
                                 <div class="relative pl-8 pb-8">
                                     <div class="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-teal-500 border-4 border-white shadow-sm"></div>
-                                    <p class="text-xs font-black text-slate-800 mb-1">\${h.status_to}</p>
-                                    <p class="text-[10px] text-slate-400 font-bold mb-2">\${h.created_at}</p>
-                                    \${h.comment ? \`
+                                    <p class="text-xs font-black text-slate-800 mb-1">${h.status_to}</p>
+                                    <p class="text-[10px] text-slate-400 font-bold mb-2">${h.created_at}</p>
+                                    ${h.comment ? `
                                         <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-[11px] text-slate-500 font-medium leading-relaxed italic">
-                                            "\${h.comment}"
+                                            "${h.comment}"
                                         </div>
-                                    \` : ''}
+                                    ` : ''}
                                 </div>
-                            \`).join('')}
+                            `).join('')}
                         </div>
                     </div>
 
@@ -420,39 +405,39 @@
         function renderFeedback(data) {
             return `
                 <div class="mt-12 pt-10 border-t border-slate-100" id="feedbackSection">
-                    \${data.feedback_at ? \`
+                    ${data.feedback_at ? `
                         <div class="bg-teal-50/50 p-8 rounded-[2rem] border border-teal-100 relative overflow-hidden">
                             <div class="absolute top-4 right-6 text-teal-100 text-6xl opacity-20"><i class="fas fa-quote-right"></i></div>
                             <div class="flex justify-between items-center mb-6">
                                 <div class="flex gap-1">
-                                    \${Array.from({length: 5}, (_, i) => \`
-                                        <i class="fas fa-star \${i < data.rating ? 'text-amber-400' : 'text-slate-200'} text-lg"></i>
-                                    \`).join('')}
+                                    ${Array.from({length: 5}, (_, i) => `
+                                        <i class="fas fa-star ${i < data.rating ? 'text-amber-400' : 'text-slate-200'} text-lg"></i>
+                                    `).join('')}
                                 </div>
-                                <span class="text-[10px] font-black text-teal-400 uppercase tracking-widest">\${data.feedback_at}</span>
+                                <span class="text-[10px] font-black text-teal-400 uppercase tracking-widest">${data.feedback_at}</span>
                             </div>
-                            <p class="text-slate-600 font-bold italic text-sm">"\${data.citizen_feedback || 'Pelayanan memuaskan.'}"</p>
+                            <p class="text-slate-600 font-bold italic text-sm">"${data.citizen_feedback || 'Pelayanan memuaskan.'}"</p>
                         </div>
-                    \` : \`
+                    ` : `
                         <div class="text-center bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100">
                             <h4 class="text-lg font-black text-slate-800 mb-2">Bantu Kami Meningkatkan Layanan</h4>
                             <p class="text-xs font-medium text-slate-400 mb-8 uppercase tracking-widest">Berikan Rating Kepuasan Anda</p>
                             
                             <div class="flex justify-center gap-4 mb-8">
-                                \${[1,2,3,4,5].map(s => \`
-                                    <button type="button" onclick="setRating(\${s})" class="star-btn w-12 h-12 rounded-2xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all duration-300 text-xl" data-value="\${s}">
+                                ${[1,2,3,4,5].map(s => `
+                                    <button type="button" onclick="setRating(${s})" class="star-btn w-12 h-12 rounded-2xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all duration-300 text-xl" data-value="${s}">
                                         <i class="fas fa-star"></i>
                                     </button>
-                                \`).join('')}
+                                `).join('')}
                             </div>
 
                             <textarea id="feedback_comment" placeholder="Ada saran atau masukan untuk kami? (Opsional)" class="textarea textarea-lg w-full rounded-[1.5rem] bg-white border-slate-200 text-sm focus:border-teal-500 min-h-[120px] mb-6 p-6"></textarea>
                             
-                            <button type="button" onclick="submitFeedback('\${data.uuid}')" id="btnSubmitFeedback" class="btn btn-lg h-16 w-full bg-slate-900 hover:bg-black text-white border-0 rounded-2xl font-black text-sm uppercase tracking-widest">
+                            <button type="button" onclick="submitFeedback('${data.uuid}')" id="btnSubmitFeedback" class="btn btn-lg h-16 w-full bg-slate-900 hover:bg-black text-white border-0 rounded-2xl font-black text-sm uppercase tracking-widest">
                                 Kirim Penilaian
                             </button>
                         </div>
-                    \`}
+                    `}
                 </div>
             `;
         }
@@ -460,38 +445,35 @@
         function renderNotFound(message) {
             const resultContent = document.getElementById('resultContent');
             const resultContainer = document.getElementById('resultContainer');
-            resultContent.innerHTML = \`
+            resultContent.innerHTML = `
                 <div class="p-12 text-center bg-rose-50 rounded-[3rem] border border-rose-100 animate__animated animate__shakeX">
                     <div class="w-20 h-20 bg-white rounded-3xl text-rose-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-rose-900/5">
                         <i class="fas fa-search-minus text-3xl"></i>
                     </div>
                     <h4 class="text-2xl font-black text-slate-800 mb-3">Berkas Tidak Ditemukan</h4>
                     <p class="text-sm font-medium text-slate-500 leading-relaxed max-w-sm mx-auto">
-                        \${message || 'Mohon periksa kembali nomor WA atau PIN Lacak Anda. Pastikan berkas sudah terdaftar di sistem kami.'}
+                        ${message || 'Mohon periksa kembali nomor WA atau PIN Lacak Anda.'}
                     </p>
                     <button onclick="document.getElementById('identifier').focus()" class="mt-8 text-xs font-black text-rose-600 hover:text-rose-700 uppercase tracking-widest border-b-2 border-rose-200">Coba ID Lain</button>
                 </div>
-            \`;
+            `;
             resultContainer.classList.remove('hidden');
         }
 
         function renderError() {
-            document.getElementById('resultContent').innerHTML = \`
+            document.getElementById('resultContent').innerHTML = `
                 <div class="alert alert-error rounded-2xl font-bold shadow-xl">
                     <i class="fas fa-exclamation-triangle"></i>
                     Gagal menghubungi server. Silakan muat ulang halaman.
                 </div>
-            \`;
+            `;
             document.getElementById('resultContainer').classList.remove('hidden');
         }
 
         window.copyToClipboard = (text) => {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('ID Lacak berhasil disalin!');
-            });
+            navigator.clipboard.writeText(text).then(() => alert('ID Lacak berhasil disalin!'));
         }
 
-        // Star Rating Logic
         let currentRating = 0;
         window.setRating = (r) => {
             currentRating = r;
@@ -508,24 +490,16 @@
         }
 
         window.submitFeedback = async (uuid) => {
-            if (currentRating === 0) {
-                alert('Silakan pilih rating bintang.');
-                return;
-            }
-
+            if (currentRating === 0) return alert('Silakan pilih rating bintang.');
             const comment = document.getElementById('feedback_comment').value;
             const btn = document.getElementById('btnSubmitFeedback');
-            
             btn.disabled = true;
-            btn.innerHTML = \`<span class="loading loading-spinner loading-sm"></span>\`;
+            btn.innerHTML = `<span class="loading loading-spinner loading-sm"></span>`;
 
             try {
-                const response = await fetch(\`/service/feedback/\${uuid}\`, {
+                const response = await fetch(`/service/feedback/${uuid}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                     body: JSON.stringify({ rating: currentRating, citizen_feedback: comment })
                 });
 
@@ -540,12 +514,12 @@
                         </div>
                     `;
                 } else {
-                    const errData = await response.json();
-                    alert(errData.message || 'Gagal mengirim penilaian.');
+                    const d = await response.json();
+                    alert(d.message || 'Gagal mengirim penilaian.');
                 }
             } catch (e) {
                 console.error(e);
-                alert('Gagal mengirim penilaian. Silakan cek koneksi Anda.');
+                alert('Gagal mengirim penilaian.');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = 'Kirim Penilaian';

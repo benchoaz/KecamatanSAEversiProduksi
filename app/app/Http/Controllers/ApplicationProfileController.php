@@ -64,6 +64,16 @@ class ApplicationProfileController extends Controller
             'whatsapp_bot_menu.*.action' => 'nullable|string|max:100',
             'whatsapp_bot_menu.*.enabled' => 'nullable',
             'is_operator_notification_enabled' => 'nullable|in:0,1,on',
+            'ai_provider' => 'nullable|string',
+            'openai_api_key' => 'nullable|string',
+            'google_api_key' => 'nullable|string',
+            'anthropic_api_key' => 'nullable|string',
+            'xai_api_key' => 'nullable|string',
+            'deepseek_api_key' => 'nullable|string',
+            'dashscope_api_key' => 'nullable|string',
+            'zhipu_api_key' => 'nullable|string',
+            'openrouter_api_key' => 'nullable|string',
+            'alpha_vantage_api_key' => 'nullable|string',
         ]);
 
         $profile = AppProfile::first() ?? new AppProfile();
@@ -92,6 +102,16 @@ class ApplicationProfileController extends Controller
             'map_longitude',
             'public_url',
             'is_operator_notification_enabled',
+            'ai_provider',
+            'openai_api_key',
+            'google_api_key',
+            'anthropic_api_key',
+            'xai_api_key',
+            'deepseek_api_key',
+            'dashscope_api_key',
+            'zhipu_api_key',
+            'openrouter_api_key',
+            'alpha_vantage_api_key',
         ]);
         $data['hero_image_active'] = $request->has('hero_image_active') ? true : false;
         $data['is_menu_pengaduan_active'] = $request->has('is_menu_pengaduan_active') ? true : false;
@@ -172,5 +192,55 @@ class ApplicationProfileController extends Controller
             'status' => 'success',
             'message' => 'Status fitur ' . $menu->nama_menu . ' berhasil diperbarui.'
         ]);
+    }
+
+    public function testApiKey(Request $request)
+    {
+        $provider = $request->input('provider');
+        $apiKey = $request->input('api_key');
+
+        if (empty($apiKey)) {
+            return response()->json(['success' => false, 'message' => 'API Key kosong.']);
+        }
+
+        try {
+            if ($provider === 'gemini') {
+                $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
+                $response = \Illuminate\Support\Facades\Http::timeout(10)->post($url, [
+                    'contents' => [['parts' => [['text' => 'Pesan percobaan uji koneksi. Balas OK.']]]]
+                ]);
+                if ($response->successful()) return response()->json(['success' => true]);
+                return response()->json(['success' => false, 'message' => 'Kunci Gemini tidak valid.']);
+            } 
+            elseif ($provider === 'openai') {
+                $response = \Illuminate\Support\Facades\Http::withHeaders(['Authorization' => "Bearer {$apiKey}"])
+                    ->timeout(10)->post('https://api.openai.com/v1/chat/completions', [
+                        'model' => 'gpt-3.5-turbo',
+                        'messages' => [['role' => 'user', 'content' => 'Test']]
+                    ]);
+                if ($response->successful()) return response()->json(['success' => true]);
+                return response()->json(['success' => false, 'message' => 'Kunci OpenAI tidak valid.']);
+            }
+            // For Deepseek, xAI, OpenRouter, DashScope
+            else {
+                $baseUrl = '';
+                if ($provider === 'deepseek') $baseUrl = 'https://api.deepseek.com/chat/completions';
+                elseif ($provider === 'xai') $baseUrl = 'https://api.x.ai/v1/chat/completions';
+                elseif ($provider === 'openrouter') $baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
+                elseif ($provider === 'dashscope') $baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+                
+                if (!$baseUrl) return response()->json(['success' => false, 'message' => 'Provider tidak valid.']);
+
+                $response = \Illuminate\Support\Facades\Http::withHeaders(['Authorization' => "Bearer {$apiKey}"])
+                    ->timeout(10)->post($baseUrl, [
+                        'model' => $provider === 'deepseek' ? 'deepseek-chat' : 'grok-beta',
+                        'messages' => [['role' => 'user', 'content' => 'Test']]
+                    ]);
+                if ($response->successful()) return response()->json(['success' => true]);
+                return response()->json(['success' => false, 'message' => "Kunci {$provider} tidak valid."]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal menghubungi server: ' . $e->getMessage()]);
+        }
     }
 }
