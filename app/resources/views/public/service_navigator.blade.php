@@ -1313,7 +1313,7 @@ document.getElementById('snForm').addEventListener('submit', async function(e) {
             
             // Auto-fill redirect link
             const phone = this.querySelector('input[name="whatsapp"]').value;
-            document.getElementById('snRedirectBtn').href = `{{ route('public.tracking') }}?q=${data.tracking_code}&wa=${phone}`;
+            document.getElementById('snRedirectBtn').href = `{{ route('public.tracking') }}?identifier=${data.tracking_code}&whatsapp_verify=${phone}`;
             
             updateProgress(100);
             const modal = document.getElementById('snSuccessModal');

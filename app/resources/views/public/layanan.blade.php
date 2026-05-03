@@ -190,26 +190,31 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const query = urlParams.get('q') || urlParams.get('identifier');
-            const wa = urlParams.get('wa') || urlParams.get('whatsapp_verify');
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const q = params.get('q') || params.get('identifier');
+            const wa = params.get('wa') || params.get('whatsapp_verify') || params.get('wa_verify');
             
-            if (query) {
-                const identifierEl = document.getElementById('identifier');
-                const whatsappEl = document.getElementById('whatsapp_verify');
+            const idInput = document.getElementById('identifier');
+            const waInput = document.getElementById('whatsapp_verify');
+            const form = document.getElementById('trackingForm');
+
+            if (q && idInput) {
+                idInput.value = q;
+                if (typeof handleIdentifierChange === 'function') {
+                    handleIdentifierChange(q);
+                }
                 
-                identifierEl.value = query;
-                handleIdentifierChange(query);
-                
-                if (wa) {
-                    whatsappEl.value = wa;
+                if (wa && waInput) {
+                    waInput.value = wa;
                 }
 
-                // Auto-trigger submission if we have data in URL
+                // Langsung submit setelah jeda singkat
                 setTimeout(() => {
-                    document.getElementById('trackingForm').dispatchEvent(new Event('submit', { cancelable: true }));
-                }, 500);
+                    if (form) {
+                        form.dispatchEvent(new Event('submit', { cancelable: true }));
+                    }
+                }, 300);
             }
         });
 
