@@ -65,7 +65,8 @@
             color: #1e293b !important;
         }
         .logo-icon {
-            background-color: #ffffff !important;
+            background: transparent !important;
+            background-color: transparent !important;
             box-shadow: none !important;
         }
         .nav-icon i {
