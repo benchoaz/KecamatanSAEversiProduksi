@@ -32,7 +32,7 @@
                     <div class="glass-card bg-white/70 backdrop-blur-xl rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl shadow-slate-200/50 p-1 md:p-2 border border-white/50 overflow-hidden relative group">
                         <div class="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                         
-                        <div class="relative bg-white/50 rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 border border-white">
+                        <div class="relative bg-white/50 rounded-[2rem] md:rounded-[3rem] p-4 md:p-12 border border-white">
                             <form id="trackingForm" class="space-y-8">
                                 <div class="space-y-6">
                                     <div class="form-control w-full">
@@ -287,7 +287,7 @@
             const resultContainer = document.getElementById('resultContainer');
 
             const html = `
-                <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-teal-900/5 animate__animated animate__fadeInUp">
+                <div class="bg-white p-5 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-teal-900/5 animate__animated animate__fadeInUp">
                     <div class="flex flex-col md:flex-row justify-between items-start gap-8 mb-10 pb-10 border-b border-slate-50">
                         <div class="flex items-center gap-6">
                             <div class="w-16 h-16 rounded-[1.5rem] bg-${data.status_color}-100 text-${data.status_color}-600 flex items-center justify-center text-2xl shadow-inner">
@@ -298,7 +298,7 @@
                                 <h4 class="text-2xl font-black text-${data.status_color}-700">${data.status_label}</h4>
                             </div>
                         </div>
-                        <div class="bg-slate-50 px-8 py-5 rounded-[1.5rem] border border-slate-100 w-full md:w-auto">
+                        <div class="bg-slate-50 px-4 md:px-8 py-4 md:py-5 rounded-[1.5rem] border border-slate-100 w-full md:w-auto">
                             <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 block mb-2">ID TRACKING</span>
                             <div class="flex items-center gap-3">
                                 <code class="text-lg font-black text-slate-800 tracking-wider">#${data.tracking_code || data.uuid.substring(0,8)}</code>
@@ -309,7 +309,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
                         <div class="space-y-6">
                             <div class="group">
                                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Jenis Layanan</span>
@@ -406,7 +406,7 @@
             return `
                 <div class="mt-12 pt-10 border-t border-slate-100" id="feedbackSection">
                     ${data.feedback_at ? `
-                        <div class="bg-teal-50/50 p-8 rounded-[2rem] border border-teal-100 relative overflow-hidden">
+                        <div class="bg-teal-50/50 p-6 md:p-8 rounded-[2rem] border border-teal-100 relative overflow-hidden">
                             <div class="absolute top-4 right-6 text-teal-100 text-6xl opacity-20"><i class="fas fa-quote-right"></i></div>
                             <div class="flex justify-between items-center mb-6">
                                 <div class="flex gap-1">
@@ -419,19 +419,19 @@
                             <p class="text-slate-600 font-bold italic text-sm">"${data.citizen_feedback || 'Pelayanan memuaskan.'}"</p>
                         </div>
                     ` : `
-                        <div class="text-center bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100">
+                        <div class="text-center bg-slate-50 p-6 md:p-10 rounded-[2.5rem] border border-slate-100">
                             <h4 class="text-lg font-black text-slate-800 mb-2">Bantu Kami Meningkatkan Layanan</h4>
                             <p class="text-xs font-medium text-slate-400 mb-8 uppercase tracking-widest">Berikan Rating Kepuasan Anda</p>
                             
-                            <div class="flex justify-center gap-4 mb-8">
+                            <div class="flex justify-center gap-2 md:gap-4 mb-8">
                                 ${[1,2,3,4,5].map(s => `
-                                    <button type="button" onclick="setRating(${s})" class="star-btn w-12 h-12 rounded-2xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all duration-300 text-xl" data-value="${s}">
+                                    <button type="button" onclick="setRating(${s})" class="star-btn w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all duration-300 text-lg" data-value="${s}">
                                         <i class="fas fa-star"></i>
                                     </button>
                                 `).join('')}
                             </div>
 
-                            <textarea id="feedback_comment" placeholder="Ada saran atau masukan untuk kami? (Opsional)" class="textarea textarea-lg w-full rounded-[1.5rem] bg-white border-slate-200 text-sm focus:border-teal-500 min-h-[120px] mb-6 p-6"></textarea>
+                            <textarea id="feedback_comment" placeholder="Ada saran atau masukan untuk kami? (Opsional)" class="textarea textarea-lg w-full rounded-[1.5rem] bg-white border-slate-200 text-sm focus:border-teal-500 min-h-[120px] mb-6 p-4 md:p-6"></textarea>
                             
                             <button type="button" onclick="submitFeedback('${data.uuid}')" id="btnSubmitFeedback" class="btn btn-lg h-16 w-full bg-slate-900 hover:bg-black text-white border-0 rounded-2xl font-black text-sm uppercase tracking-widest">
                                 Kirim Penilaian
