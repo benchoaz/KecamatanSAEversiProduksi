@@ -9,11 +9,76 @@
                 <h1 class="text-slate-900 fw-bold fs-3 mb-1">FAQ Administrasi</h1>
                 <p class="text-slate-400 small mb-0">Kelola jawaban otomatis untuk pertanyaan administratif masyarakat.</p>
             </div>
-            <button class="btn btn-primary rounded-3 px-4 fw-bold shadow-sm" data-bs-toggle="modal"
-                data-bs-target="#addFaqModal">
-                <i class="fas fa-plus me-2"></i> Tambah FAQ
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary rounded-3 px-4 fw-bold shadow-sm" id="btnSyncFaq">
+                    <i class="fas fa-sync-alt me-2"></i> Sync dari Layanan
+                </button>
+                <button class="btn btn-primary rounded-3 px-4 fw-bold shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#addFaqModal">
+                    <i class="fas fa-plus me-2"></i> Tambah FAQ
+                </button>
+            </div>
         </div>
+
+        <script>
+            document.getElementById('btnSyncFaq').addEventListener('click', function() {
+                const btn = this;
+                const originalHtml = btn.innerHTML;
+
+                Swal.fire({
+                    title: 'Sinkronisasi FAQ',
+                    text: "Sistem akan memperbarui FAQ Adminduk berdasarkan Daftar Layanan terbaru. Lanjutkan?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0ea5e9',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Ya, Sinkronkan!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Loading state
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Mensinkronkan...';
+
+                        fetch("{{ route('kecamatan.pelayanan.faq.sync') }}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonColor: '#0ea5e9'
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                throw new Error(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                title: 'Gagal!',
+                                text: error.message || 'Terjadi kesalahan sistem.',
+                                icon: 'error',
+                                confirmButtonColor: '#0ea5e9'
+                            });
+                        })
+                        .finally(() => {
+                            btn.disabled = false;
+                            btn.innerHTML = originalHtml;
+                        });
+                    }
+                });
+            });
+        </script>
 
         @if(session('success'))
             <div class="alert alert-emerald border-0 shadow-sm rounded-4 p-3 mb-4 animate__animated animate__fadeIn">

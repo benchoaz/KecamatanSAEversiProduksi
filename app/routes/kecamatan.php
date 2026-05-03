@@ -49,6 +49,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
         Route::prefix('faq')->name('faq.')->group(function () {
             Route::get('/', [PelayananController::class, 'faqIndex'])->name('index');
             Route::post('/', [PelayananController::class, 'faqStore'])->name('store');
+            Route::post('/sync', [PelayananController::class, 'faqSync'])->name('sync');
             Route::put('/{id}', [PelayananController::class, 'faqUpdate'])->name('update');
         });
 

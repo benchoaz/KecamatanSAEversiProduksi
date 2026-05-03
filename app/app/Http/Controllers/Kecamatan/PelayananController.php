@@ -306,6 +306,25 @@ class PelayananController extends Controller
             ->with('success', 'FAQ berhasil ditambahkan.');
     }
 
+    /**
+     * Sync FAQ from Master Layanan (Triggered via UI)
+     */
+    public function faqSync()
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('faq:sync-services');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'FAQ berhasil disinkronkan dengan Daftar Layanan terbaru.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal sinkronisasi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function faqUpdate(Request $request, $id)
     {
         $faq = PelayananFaq::findOrFail($id);
