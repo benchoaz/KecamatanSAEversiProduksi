@@ -59,8 +59,13 @@
                 <div class="card border-0 shadow-premium rounded-4 overflow-hidden">
                     <div class="card-header bg-white py-4 px-4 border-bottom border-light">
                         <div class="d-flex align-items-center gap-2 text-slate-900">
-                            <i class="fas fa-cog text-primary"></i>
-                            <h5 class="mb-0 fw-bold">Konfigurasi Identitas & Media</h5>
+                            <div class="p-2 bg-blue-50 text-blue-600 rounded-3">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">Identitas & Branding</h5>
+                                <p class="text-[11px] text-slate-400 mb-0">Atur nama resmi dan slogan wilayah Anda.</p>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body p-4">
@@ -106,77 +111,81 @@
                                 <div class="col-md-12 mt-4">
                                     <div class="p-4 bg-slate-50 border border-slate-200 rounded-4">
                                         <div class="row align-items-center">
-                                            <div class="col-md-2 text-center border-end border-slate-200">
-                                                @if($profile->logo_path)
-                                                    <img src="{{ asset('storage/' . $profile->logo_path) }}"
-                                                        class="img-fluid mb-3 d-block mx-auto"
-                                                        style="max-height: 120px; width: auto; max-width: 100%; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));">
-                                                @else
-                                                    <div class="p-3 rounded-3 mb-3 d-inline-block">
-                                                        <i class="fas fa-landmark text-slate-200 fa-3x"></i>
-                                                    </div>
-                                                @endif
-                                                <span class="d-block text-[10px] fw-bold text-slate-400 uppercase">Logo
-                                                    Sistem</span>
+                                            <div class="col-md-3 text-center border-end border-slate-200">
+                                                <div class="position-relative d-inline-block">
+                                                    @if($profile->logo_path)
+                                                        <img id="logo_preview" src="{{ asset('storage/' . $profile->logo_path) }}"
+                                                            class="img-fluid mb-2 d-block mx-auto rounded-3"
+                                                            style="max-height: 100px; width: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+                                                    @else
+                                                        <div id="logo_placeholder" class="p-4 bg-white border border-dashed border-slate-300 rounded-3 mb-2 d-inline-block">
+                                                            <i class="fas fa-image text-slate-200 fa-3x"></i>
+                                                        </div>
+                                                        <img id="logo_preview" src="#" class="img-fluid mb-2 d-none mx-auto rounded-3" style="max-height: 100px; width: auto;">
+                                                    @endif
+                                                </div>
+                                                <span class="d-block text-[10px] fw-bold text-slate-400 uppercase">Logo Sistem</span>
                                             </div>
-                                            <div class="col-md-10 ps-md-4">
-                                                <label class="form-label text-slate-700 fw-semibold">Ganti Logo
-                                                    Wilayah</label>
-                                                <input type="file" name="logo_path"
+                                            <div class="col-md-9 ps-md-4">
+                                                <label class="form-label text-slate-700 fw-semibold">Ganti Logo Wilayah</label>
+                                                <input type="file" name="logo_path" onchange="previewImage(this, 'logo_preview', 'logo_placeholder')"
                                                     class="form-control bg-white border-slate-200 rounded-3 @error('logo_path') is-invalid @enderror">
-                                                @error('logo_path')
-                                                    <div class="invalid-feedback d-block">
-                                                        {{ $message }}
-                                                    </div>
-                                                @enderror
-                                                <p class="text-[11px] text-slate-400 mt-2 mb-0 italic">Format JPG/PNG,
-                                                    maksimal 2MB.</p>
+                                                <div class="d-flex gap-2 mt-2">
+                                                    <span class="badge bg-slate-100 text-slate-600 border border-slate-200 font-normal">PNG/JPG</span>
+                                                    <span class="badge bg-slate-100 text-slate-600 border border-slate-200 font-normal">Max 2MB</span>
+                                                    <span class="badge bg-blue-50 text-blue-600 border border-blue-100 font-normal">Transparan Disarankan</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Landing Page Visuals -->
                                 <div class="col-md-12 mt-4">
                                     <div class="p-4 border border-teal-100 bg-teal-50 bg-opacity-30 rounded-4">
                                         <div class="d-flex align-items-center gap-2 mb-4">
-                                            <i class="fas fa-images text-teal-600"></i>
-                                            <h6 class="mb-0 fw-bold text-teal-900 border-bottom border-teal-200 pb-1">Media
-                                                Visual Landing Page</h6>
+                                            <div class="p-2 bg-teal-100 text-teal-600 rounded-3">
+                                                <i class="fas fa-images"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold text-teal-900">Galeri Landing Page</h6>
+                                                <p class="text-[10px] text-teal-600 mb-0">Foto potensi wisata dan budaya wilayah.</p>
+                                            </div>
                                         </div>
 
                                         <div class="row g-4">
                                             <div class="col-md-6">
-                                                <label class="form-label text-slate-700 small fw-bold">Visual
-                                                    Pariwisata</label>
-                                                @if($profile->image_pariwisata)
-                                                    <div
-                                                        class="mb-2 rounded-3 overflow-hidden shadow-sm position-relative ratio ratio-16x9">
-                                                        <img src="{{ asset('storage/' . $profile->image_pariwisata) }}"
+                                                <label class="form-label text-slate-700 small fw-bold">Visual Pariwisata</label>
+                                                <div class="mb-2 rounded-3 overflow-hidden shadow-sm position-relative ratio ratio-16x9 bg-white border">
+                                                    @if($profile->image_pariwisata)
+                                                        <img id="pariwisata_preview" src="{{ asset('storage/' . $profile->image_pariwisata) }}"
                                                             class="object-fit-cover w-100 h-100" alt="Visual Pariwisata">
-                                                    </div>
-                                                @endif
-                                                <input type="file" name="image_pariwisata"
+                                                    @else
+                                                        <div id="pariwisata_placeholder" class="d-flex align-items-center justify-content-center h-100 text-slate-200">
+                                                            <i class="fas fa-camera fa-2x"></i>
+                                                        </div>
+                                                        <img id="pariwisata_preview" src="#" class="object-fit-cover w-100 h-100 d-none">
+                                                    @endif
+                                                </div>
+                                                <input type="file" name="image_pariwisata" onchange="previewImage(this, 'pariwisata_preview', 'pariwisata_placeholder')"
                                                     class="form-control form-control-sm border-slate-200">
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label text-slate-700 small fw-bold">Visual Festival
-                                                    Budaya</label>
-                                                @if($profile->image_festival)
-                                                    <div
-                                                        class="mb-2 rounded-3 overflow-hidden shadow-sm position-relative ratio ratio-16x9">
-                                                        <img src="{{ asset('storage/' . $profile->image_festival) }}"
+                                                <label class="form-label text-slate-700 small fw-bold">Visual Festival Budaya</label>
+                                                <div class="mb-2 rounded-3 overflow-hidden shadow-sm position-relative ratio ratio-16x9 bg-white border">
+                                                    @if($profile->image_festival)
+                                                        <img id="festival_preview" src="{{ asset('storage/' . $profile->image_festival) }}"
                                                             class="object-fit-cover w-100 h-100" alt="Visual Festival">
-                                                    </div>
-                                                @endif
-                                                <input type="file" name="image_festival"
+                                                    @else
+                                                        <div id="festival_placeholder" class="d-flex align-items-center justify-content-center h-100 text-slate-200">
+                                                            <i class="fas fa-camera fa-2x"></i>
+                                                        </div>
+                                                        <img id="festival_preview" src="#" class="object-fit-cover w-100 h-100 d-none">
+                                                    @endif
+                                                </div>
+                                                <input type="file" name="image_festival" onchange="previewImage(this, 'festival_preview', 'festival_placeholder')"
                                                     class="form-control form-control-sm border-slate-200">
                                             </div>
                                         </div>
-                                        <p class="text-[10px] text-teal-700 mt-3 mb-0">
-                                            <i class="fas fa-info-circle me-1"></i> Visual ini ditampilkan pada bagian
-                                            "Potensi Wilayah". Rekomendasi 5MB/file.
-                                        </p>
                                     </div>
                                 </div>
 
@@ -184,10 +193,13 @@
                                 <div class="col-md-12 mt-4">
                                     <div class="p-4 border border-slate-200 bg-slate-50 rounded-4">
                                         <div class="d-flex align-items-center gap-2 mb-4">
-                                            <i class="fas fa-eye text-slate-600"></i>
-                                            <h6 class="mb-0 fw-bold text-slate-900 border-bottom border-slate-200 pb-1">
-                                                Kontrol
-                                                Visibilitas Menu Landing Page</h6>
+                                            <div class="p-2 bg-emerald-100 text-emerald-600 rounded-3">
+                                                <i class="fas fa-eye"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold text-emerald-900">Kendali Fitur Portal</h6>
+                                                <p class="text-[10px] text-emerald-600 mb-0">Aktifkan atau nonaktifkan modul layanan publik.</p>
+                                            </div>
                                         </div>
 
                                         <div class="row g-4">
@@ -388,31 +400,31 @@
                                                 <div class="row g-4 align-items-center">
                                                     <div class="col-md-4">
                                                         <div
-                                                            class="bg-white p-2 rounded-4 shadow-sm border border-slate-100 text-center">
+                                                            class="bg-white p-2 rounded-4 shadow-sm border border-slate-100 text-center position-relative">
                                                             @if(isset($profile) && $profile->hero_image_path)
-                                                                <img src="{{ asset('storage/' . $profile->hero_image_path) }}"
+                                                                <img id="hero_preview" src="{{ asset('storage/' . $profile->hero_image_path) }}"
                                                                     class="img-fluid rounded-4 w-100 object-fit-contain bg-slate-50"
                                                                     style="max-height: 200px;" alt="Leader Preview">
                                                             @else
-                                                                <div class="bg-slate-50 rounded-4 d-flex flex-column align-items-center justify-content-center"
+                                                                <div id="hero_placeholder" class="bg-slate-50 rounded-4 d-flex flex-column align-items-center justify-content-center"
                                                                     style="height: 180px;">
                                                                     <i class="fas fa-user-slash fa-2x text-slate-200 mb-2"></i>
                                                                     <span
                                                                         class="text-[10px] fw-bold text-slate-400 uppercase">Input
                                                                         Foto</span>
                                                                 </div>
+                                                                <img id="hero_preview" src="#" class="img-fluid rounded-4 w-100 object-fit-contain bg-slate-50 d-none" style="max-height: 200px;">
                                                             @endif
                                                         </div>
                                                     </div>
                                                     <div class="col-md-8">
                                                         <div class="mb-3">
-                                                            <label class="form-label text-slate-600 small fw-bold">Upload
-                                                                Foto Hero</label>
-                                                            <input type="file" name="hero_image_path"
+                                                            <label class="form-label text-slate-600 small fw-bold">Upload Foto Pimpinan</label>
+                                                            <input type="file" name="hero_image_path" onchange="previewImage(this, 'hero_preview', 'hero_placeholder')"
                                                                 class="form-control bg-slate-50 border-slate-200 rounded-3 text-sm"
                                                                 accept="image/jpeg,image/jpg,image/png,image/webp">
                                                             <div class="form-text text-[10px] text-slate-400 mt-1 italic">
-                                                                Format: JPG, JPEG, PNG, WebP. Maksimal 2MB.
+                                                                Rekomendasi: Foto transparan (PNG). Maksimal 2MB.
                                                             </div>
                                                         </div>
                                                         <div>
@@ -452,19 +464,18 @@
                                                 <div class="row g-4">
                                                     <div class="col-md-4">
                                                         <div
-                                                            class="position-relative rounded-4 overflow-hidden border border-slate-200 shadow-sm">
+                                                            class="position-relative rounded-4 overflow-hidden border border-slate-200 shadow-sm ratio ratio-16x9">
                                                             @if(isset($profile) && $profile->hero_bg_path)
-                                                                <img src="{{ asset('storage/' . $profile->hero_bg_path) }}"
-                                                                    class="w-100 h-100 object-fit-cover"
-                                                                    style="min-height: 140px;" alt="BG Preview">
+                                                                <img id="bg_preview" src="{{ asset('storage/' . $profile->hero_bg_path) }}"
+                                                                    class="w-100 h-100 object-fit-cover" alt="BG Preview">
                                                             @else
-                                                                <div class="bg-slate-100 w-100 d-flex flex-column align-items-center justify-content-center"
-                                                                    style="height: 140px;">
+                                                                <div id="bg_placeholder" class="bg-slate-100 w-100 d-flex flex-column align-items-center justify-content-center h-100">
                                                                     <i class="fas fa-mountain text-slate-300 fa-2x mb-2"></i>
                                                                 </div>
+                                                                <img id="bg_preview" src="#" class="w-100 h-100 object-fit-cover d-none">
                                                             @endif
                                                             <div
-                                                                class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-70 py-1.5 text-center">
+                                                                class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-70 py-1.5 text-center" style="z-index: 10;">
                                                                 <span
                                                                     class="text-[10px] font-black text-white uppercase tracking-widest">Preview</span>
                                                             </div>
@@ -472,9 +483,8 @@
                                                     </div>
                                                     <div class="col-md-8">
                                                         <div class="mb-4">
-                                                            <label class="form-label text-slate-600 small fw-bold">Upload
-                                                                Pemandangan Desa</label>
-                                                            <input type="file" name="hero_bg_path"
+                                                            <label class="form-label text-slate-600 small fw-bold">Upload Pemandangan Desa</label>
+                                                            <input type="file" name="hero_bg_path" onchange="previewImage(this, 'bg_preview', 'bg_placeholder')"
                                                                 class="form-control bg-slate-50 border-slate-200 rounded-3 text-sm">
                                                         </div>
 
@@ -658,4 +668,24 @@
             </div>
         </div>
     </div>
+    <script>
+        function previewImage(input, previewId, placeholderId) {
+            const preview = document.getElementById(previewId);
+            const placeholder = document.getElementById(placeholderId);
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    if (placeholder) {
+                        placeholder.classList.add('d-none');
+                    }
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 @endsection
