@@ -25,6 +25,12 @@ class AppProfileSeeder extends Seeder
                 'office_hours_fri' => '07.30 - 15.00 WIB',
                 'leader_name' => 'Nama Camat Besuk',
                 'leader_title' => 'Camat Besuk',
+                'is_menu_layanan_active' => true,
+                'is_menu_berita_active' => true,
+                'is_menu_statistik_active' => true,
+                'is_menu_umkm_active' => true,
+                'whatsapp_bot_number' => '0821-4328-9363',
+                'is_bot_active' => true,
             ]
         );
     }
