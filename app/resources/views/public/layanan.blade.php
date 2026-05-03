@@ -70,7 +70,7 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" id="btnTrack" class="btn btn-lg h-16 md:h-20 w-full bg-slate-900 hover:bg-black text-white border-0 rounded-[1.5rem] md:rounded-[2rem] font-black text-lg md:text-xl shadow-2xl shadow-slate-900/20 group relative overflow-hidden transition-all duration-300">
+                                <button type="button" id="btnTrack" onclick="doTrack()" class="btn btn-lg h-16 md:h-20 w-full bg-slate-900 hover:bg-black text-white border-0 rounded-[1.5rem] md:rounded-[2rem] font-black text-lg md:text-xl shadow-2xl shadow-slate-900/20 group relative overflow-hidden transition-all duration-300">
                                     <div class="absolute inset-0 bg-gradient-to-r from-teal-500 to-blue-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
                                     <span class="relative z-10 flex items-center justify-center gap-3">
                                         Lacak Sekarang
@@ -189,63 +189,19 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const params = new URLSearchParams(window.location.search);
-            const q = params.get('q') || params.get('identifier');
-            const wa = params.get('wa') || params.get('whatsapp_verify') || params.get('wa_verify');
-            
+        // Fungsi utama pelacakan
+        window.doTrack = async function() {
             const idInput = document.getElementById('identifier');
             const waInput = document.getElementById('whatsapp_verify');
-            const form = document.getElementById('trackingForm');
-
-            if (q && idInput) {
-                idInput.value = q;
-                if (typeof handleIdentifierChange === 'function') {
-                    handleIdentifierChange(q);
-                }
-                
-                if (wa && waInput) {
-                    waInput.value = wa;
-                }
-
-                // Langsung submit setelah jeda singkat
-                setTimeout(() => {
-                    if (form) {
-                        form.dispatchEvent(new Event('submit', { cancelable: true }));
-                    }
-                }, 300);
-            }
-        });
-
-        const identifierInput = document.getElementById('identifier');
-        const verificationField = document.getElementById('verificationField');
-        const whatsappVerify = document.getElementById('whatsapp_verify');
-
-        function handleIdentifierChange(val) {
-            const trimmed = val.trim();
-            // Jika 6 digit (PIN), tampilkan verifikasi WA
-            if (/^[0-9]{6}$/.test(trimmed)) {
-                verificationField.classList.remove('hidden');
-                verificationField.classList.add('animate__animated', 'animate__fadeInDown');
-                whatsappVerify.required = true;
-            } else {
-                // Jika UUID atau No WA (biasanya > 10 digit), sembunyikan verifikasi tambahan
-                verificationField.classList.add('hidden');
-                whatsappVerify.required = false;
-            }
-        }
-
-        identifierInput.addEventListener('input', (e) => handleIdentifierChange(e.target.value));
-
-        document.getElementById('trackingForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
             const btn = document.getElementById('btnTrack');
             const resultContainer = document.getElementById('resultContainer');
             const resultContent = document.getElementById('resultContent');
+            const verificationField = document.getElementById('verificationField');
 
-            const identifier = identifierInput.value;
-            const whatsapp = whatsappVerify.value;
+            if (!idInput.value.trim()) {
+                alert('Silakan masukkan PIN atau No. WhatsApp.');
+                return;
+            }
 
             // Loading state
             btn.disabled = true;
@@ -261,15 +217,18 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ identifier, whatsapp })
+                    body: JSON.stringify({ 
+                        identifier: idInput.value, 
+                        whatsapp: waInput.value 
+                    })
                 });
 
                 const data = await response.json();
 
                 if (response.status === 403 && data.auth_required) {
                     verificationField.classList.remove('hidden');
-                    whatsappVerify.required = true;
-                    whatsappVerify.focus();
+                    waInput.required = true;
+                    waInput.focus();
                     resultContent.innerHTML = `
                         <div class="p-8 bg-amber-50 rounded-[2rem] border border-amber-200 text-amber-800 font-bold flex items-center gap-4">
                             <div class="w-12 h-12 bg-amber-200 rounded-2xl flex items-center justify-center flex-shrink-0">
@@ -287,10 +246,53 @@
                     renderNotFound(data.message);
                 }
             } catch (error) {
+                console.error(error);
                 renderError();
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `Lacak Sekarang <i class="fas fa-arrow-right ml-2"></i>`;
+            }
+        };
+
+        function handleIdentifierChange(val) {
+            const trimmed = val.trim();
+            const verificationField = document.getElementById('verificationField');
+            const whatsappVerify = document.getElementById('whatsapp_verify');
+
+            if (/^[0-9]{6}$/.test(trimmed)) {
+                verificationField.classList.remove('hidden');
+                verificationField.classList.add('animate__animated', 'animate__fadeInDown');
+                whatsappVerify.required = true;
+            } else {
+                verificationField.classList.add('hidden');
+                whatsappVerify.required = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const q = params.get('q') || params.get('identifier');
+            const wa = params.get('wa') || params.get('whatsapp_verify');
+            
+            const idInput = document.getElementById('identifier');
+            const waInput = document.getElementById('whatsapp_verify');
+
+            if (idInput) {
+                idInput.addEventListener('input', (e) => handleIdentifierChange(e.target.value));
+            }
+
+            if (q && idInput) {
+                idInput.value = q;
+                handleIdentifierChange(q);
+                
+                if (wa && waInput) {
+                    waInput.value = wa;
+                }
+
+                // Auto-trigger
+                setTimeout(() => {
+                    window.doTrack();
+                }, 400);
             }
         });
 
