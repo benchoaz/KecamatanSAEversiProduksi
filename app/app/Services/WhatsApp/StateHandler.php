@@ -119,17 +119,9 @@ class StateHandler
             return $this->statusHandler->handleForgotPin($session->phone);
         }
 
-        return [
-            'success' => true,
-            'intent' => 'invalid_selection',
-            'reply' => "⚠️ *Pilihan tidak valid.*\n\n" .
-                "Silakan pilih:\n" .
-                "1. STATUS - Lacak Berkas\n" .
-                "2. SYARAT - Persyaratan Layanan\n" .
-                "3. MENU - Kembali ke Menu Utama\n\n" .
-                "Ketik angka *1*, *2*, atau *3*.",
-            'state_update' => 'ADM_SUBMENU',
-        ];
+        // Jika tidak ada yang cocok, jangan langsung bilang tidak valid. 
+        // Berikan ke IntentHandler untuk dicek apakah ini pertanyaan AI atau Keyword lain.
+        return $this->intentHandler->handle($session->phone, $message);
     }
 
     /**
@@ -168,17 +160,9 @@ class StateHandler
             return $this->intentHandler->handle($session->phone, 'menu');
         }
 
-        return [
-            'success' => true,
-            'intent' => 'invalid_selection',
-            'reply' => "⚠️ *Pilihan tidak valid.*\n\n" .
-                "Silakan pilih nomor di bawah ini:\n" .
-                "1. Produk UMKM\n" .
-                "2. Jasa & Tenaga Ahli\n" .
-                "3. MENU - Kembali ke Menu Utama\n\n" .
-                "Atau ketik *MENU* kapan saja.",
-            'state_update' => 'MENU_EKONOMI',
-        ];
+        // Jika tidak ada yang cocok, jangan langsung bilang tidak valid. 
+        // Berikan ke IntentHandler untuk dicek apakah ini pertanyaan AI atau Keyword lain.
+        return $this->intentHandler->handle($session->phone, $message);
     }
 
     /**
