@@ -262,7 +262,7 @@
                 <i class="fas fa-copy"></i> Salin PIN
             </button>
         </div>
-        <div class="sn-feedback-quick" style="background:#fffbeb; border:1px solid #fef3c7; border-radius:16px; padding:16px; margin:20px 0;">
+        <div id="quickFeedbackSection" style="background:#fffbeb; border:1px solid #fef3c7; border-radius:16px; padding:16px; margin:20px 0;">
             <p style="font-size:10px; font-weight:800; color:#b45309; text-transform:uppercase; margin-bottom:10px;">Bagaimana pengalaman pengajuan Anda?</p>
             <div style="display:flex; justify-content:center; gap:8px; margin-bottom:12px;">
                 @for($i=1; $i<=5; $i++)
@@ -271,16 +271,20 @@
                 </button>
                 @endfor
             </div>
-            <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback()" style="display:none; width:100%; padding:8px; background:#f59e0b; color:#fff; border:none; border-radius:10px; font-size:11px; font-weight:800; text-transform:uppercase; cursor:pointer;">
-                Kirim Penilaian <i class="fas fa-paper-plane"></i>
-            </button>
+            <div id="feedbackCommentSection">
+                <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan? (Opsional)" 
+                    style="width:100%; border:1px solid #fde68a; border-radius:12px; padding:10px; font-size:12px; margin-bottom:10px; background:rgba(255,255,255,0.5); font-family:inherit; outline:none;"></textarea>
+                <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback()" style="width:100%; padding:8px; background:#f59e0b; color:#fff; border:none; border-radius:10px; font-size:11px; font-weight:800; text-transform:uppercase; cursor:pointer;">
+                    Kirim Penilaian <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
             <div id="quickFeedbackSuccess" style="display:none; text-align:center;">
                 <i class="fas fa-check-circle" style="color:#10b981; font-size:20px; margin-bottom:4px;"></i>
                 <p style="font-size:10px; font-weight:800; color:#059669; text-transform:uppercase; margin:0;">Terima kasih!</p>
             </div>
         </div>
 
-        <a href="{{ route('layanan') }}" class="sn-modal-btn primary">
+        <a href="{{ route('public.tracking') }}" id="snRedirectBtn" class="sn-modal-btn primary">
             Cek Status Sekarang <i class="fas fa-arrow-right"></i>
         </a>
         <a href="{{ route('layanan') }}" class="sn-modal-btn ghost">Kembali ke Beranda</a>
@@ -1306,6 +1310,11 @@ document.getElementById('snForm').addEventListener('submit', async function(e) {
         if (data.success) {
             window.submittedUuid = data.uuid;
             document.getElementById('snPinDisplay').textContent = data.tracking_code;
+            
+            // Auto-fill redirect link
+            const phone = this.querySelector('input[name="whatsapp"]').value;
+            document.getElementById('snRedirectBtn').href = `{{ route('public.tracking') }}?q=${data.tracking_code}&wa=${phone}`;
+            
             updateProgress(100);
             const modal = document.getElementById('snSuccessModal');
             modal.classList.add('show');
@@ -1328,13 +1337,14 @@ window.setQuickRating = (r) => {
         const val = parseInt(btn.getAttribute('data-val'));
         btn.style.color = val <= r ? '#f59e0b' : '#cbd5e1';
     });
-    document.getElementById('btnSendQuickFeedback').style.display = 'block';
 }
 
 window.submitQuickFeedback = async () => {
     if(!quickRating || !window.submittedUuid) return;
     
     const btn = document.getElementById('btnSendQuickFeedback');
+    const comment = document.getElementById('quick_feedback_comment').value;
+    
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
 
@@ -1345,16 +1355,25 @@ window.submitQuickFeedback = async () => {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({ rating: quickRating, citizen_feedback: 'Pengisian form awal (Navigator)' })
+            body: JSON.stringify({ 
+                rating: quickRating, 
+                citizen_feedback: comment || 'Pengisian form awal (Navigator)' 
+            })
         });
 
         if(response.ok) {
-            btn.style.display = 'none';
+            document.getElementById('feedbackCommentSection').style.display = 'none';
             document.getElementById('quickFeedbackSuccess').style.display = 'block';
+        } else {
+            const errData = await response.json();
+            alert(errData.message || 'Gagal mengirim penilaian.');
         }
     } catch (e) {
+        console.error(e);
+        alert('Gagal mengirim penilaian. Silakan cek koneksi Anda.');
+    } finally {
         btn.disabled = false;
-        btn.innerText = 'Gagal';
+        btn.innerHTML = 'Kirim Penilaian <i class="fas fa-paper-plane"></i>';
     }
 }
 

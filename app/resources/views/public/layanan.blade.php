@@ -215,11 +215,13 @@
 
         function handleIdentifierChange(val) {
             const trimmed = val.trim();
+            // Jika 6 digit (PIN), tampilkan verifikasi WA
             if (/^[0-9]{6}$/.test(trimmed)) {
                 verificationField.classList.remove('hidden');
                 verificationField.classList.add('animate__animated', 'animate__fadeInDown');
                 whatsappVerify.required = true;
             } else {
+                // Jika UUID atau No WA (biasanya > 10 digit), sembunyikan verifikasi tambahan
                 verificationField.classList.add('hidden');
                 whatsappVerify.required = false;
             }

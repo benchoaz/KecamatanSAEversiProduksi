@@ -259,15 +259,19 @@ class PublicServiceController extends Controller
 
             $service = PublicService::where('tracking_code', $identifier)
                 ->orWhere('uuid', $identifier)
+                ->orWhere('whatsapp', 'like', "%$identifier%")
                 ->with(['desa', 'handler', 'histories'])
+                ->latest()
                 ->first();
 
             if ($service) {
-                // If it's a tracking_code (PIN), we usually need WA verification
-                // but let's make it auto-verify if $inputWa is provided
-                if ($inputWa) {
+                // If the identifier matches the phone number exactly, we can bypass PIN check
+                // OR if it's a PIN search, we check the WhatsApp verification
+                $isPhoneSearch = (str_contains($service->whatsapp, $identifier) && strlen($identifier) >= 10);
+
+                if ($inputWa || $isPhoneSearch) {
                     $ownerPhone = $this->portalService->normalizePhone($service->whatsapp);
-                    $searchPhone = $this->portalService->normalizePhone($inputWa);
+                    $searchPhone = $this->portalService->normalizePhone($inputWa ?: $identifier);
 
                     if (!str_contains($ownerPhone, $searchPhone) && !str_contains($searchPhone, substr($ownerPhone, -4))) {
                         return response()->json([
