@@ -64,13 +64,13 @@ class ComplaintHandler
         $messageLower = strtolower($messageTrim);
 
         // Check for cancel
-        if (in_array($messageLower, ['tidak', 'batal', 'cancel', 'no'])) {
+        if (in_array($messageLower, ['tidak', 'batal', 'cancel', 'no', 'stop', 'kembali'])) {
             $session->clear();
             return [
                 'success' => true,
                 'intent' => 'complaint_cancelled',
-                'reply' => "Pengaduan dibatalkan.\n" .
-                    "Ketik *MENU* untuk kembali ke menu utama.",
+                'reply' => "👋 *Siaaap!* Pengaduan telah dibatalkan.\n\n" .
+                    "Jika nanti Bapak/Ibu ingin menyampaikan aspirasi lagi, jangan ragu untuk menghubungi saya kembali ya. Ketik *MENU* untuk layanan lainnya. 😊",
                 'state_update' => null,
             ];
         }
@@ -105,11 +105,24 @@ class ComplaintHandler
         $messageLower = strtolower($messageTrim);
 
         // If user confirms with YA
-        if (in_array($messageLower, ['ya', 'y', 'yes', 'benar', 'ok', 'oke', 'siap'])) {
+        if (in_array($messageLower, ['ya', 'y', 'yes', 'benar', 'ok', 'oke', 'siap', 'betul'])) {
             $waNumber = $session->phone; // Use current session phone
         } else {
             // User provided different WhatsApp number
             $waNumber = preg_replace('/[^0-9]/', '', $messageTrim);
+            
+            // VALIDATION: If no numbers found, it's probably not a phone number
+            if (empty($waNumber) || strlen($waNumber) < 5) {
+                return [
+                    'success' => true,
+                    'intent' => 'complaint_wa_invalid',
+                    'reply' => "🙏 *Mohon maaf*, sepertinya nomor yang Anda masukkan kurang tepat.\n\n" .
+                        "Bisa tolong ketikkan nomor WhatsApp Anda yang aktif? (Contoh: *08123456789*)\n\n" .
+                        "Atau ketik *BATAL* untuk membatalkan.",
+                    'state_update' => 'WAITING_COMPLAINT_WA',
+                ];
+            }
+
             // Add country code if not present
             if (!str_starts_with($waNumber, '62')) {
                 $waNumber = '62' . ltrim($waNumber, '0');

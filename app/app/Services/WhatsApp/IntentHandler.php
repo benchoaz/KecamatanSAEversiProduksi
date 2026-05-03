@@ -45,12 +45,24 @@ class IntentHandler
         $session = WhatsappSession::where('phone', $phone)->first();
         $state = $session ? $session->state : null;
 
-        // 1. GLOBAL KEYWORDS: Reset to main menu
-        if ($this->matchesIntent($messageLower, ['menu', 'help', 'bantuan'])) {
-            return $this->getMainMenu();
+        // 2. GREETINGS: Warm response for hello/hi
+        $greetings = ['halo', 'hai', 'hallo', 'pagi', 'siang', 'sore', 'malam', 'assalamualaikum', 'salam', 'tes', 'test', 'oi'];
+        if ($this->matchesIntent($messageLower, $greetings)) {
+            // Give it to AI for a warm personalized greeting if AI is active
+            $aiResponse = $this->aiHandler->handle($phone, $message);
+            if ($aiResponse) return $aiResponse;
+
+            // Manual warm fallback if AI is off
+            return [
+                'success' => true,
+                'intent' => 'greeting',
+                'reply' => "👋 *Halo! Selamat datang di Layanan Digital " . $this->getRegionName() . "*.\n\n" .
+                    "Ada yang bisa saya bantu hari ini? Silakan ketik pertanyaan Anda atau ketik *MENU* untuk melihat daftar layanan kami. 😊",
+                'state_update' => null,
+            ];
         }
 
-        // 2. EMERGENCY DETECTOR: Handle emergency keywords immediately
+        // 3. EMERGENCY DETECTOR: Handle emergency keywords immediately
         $emergencyKeywords = ['kebakaran', 'api', 'ambulance', 'ambulans', 'kecelakaan', 'darurat', 'polisi', 'maling', 'trantibum', 'korupsi', 'pungli'];
         if ($this->matchesIntent($messageLower, $emergencyKeywords)) {
             return $this->handleEmergencyResponse($messageLower);
@@ -161,7 +173,12 @@ class IntentHandler
             if ($this->isSelection($messageLower, '3') || $messageLower === 'menu' || $messageLower === 'kembali') {
                 return $this->getMainMenu();
             }
-            // If user types something else, show submenu again
+            
+            // AI Fallback inside submenu
+            $aiResponse = $this->aiHandler->handle($phone, $message);
+            if ($aiResponse) return $aiResponse;
+
+            // If user types something else and AI fails, show submenu again
             return $this->getAdministrasiSubmenu();
         }
 

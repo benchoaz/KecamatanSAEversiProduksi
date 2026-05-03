@@ -143,38 +143,19 @@ class WhatsappController extends Controller
                 'reply_preview' => $replyPreview
             ]);
 
-            // =====================================================
-            // CRITICAL FIX: Save state_update to database
-            // The handlers return state_update but it wasn't being saved!
-            // =====================================================
             if (isset($response['state_update'])) {
                 if ($response['state_update'] === null) {
-                    // Clear session if state_update is null
                     $session->clear();
-                    \Log::info('Session cleared as per state_update');
                 } else {
-                    // Update session state
                     $session->updateState($response['state_update']);
-                    \Log::info('Session state updated to: ' . $response['state_update']);
                 }
             }
 
-            // =====================================================
-            // FAILSAFE MODE: Ensure reply is never empty
-            // =====================================================
             if (empty($response['reply'])) {
-                \Log::warning('Handler returned empty reply, using fallback', [
-                    'phone' => $phone,
-                    'intent' => $response['intent'] ?? 'unknown',
-                ]);
                 $response['reply'] = '🙏 Sistem sedang memproses. Silakan coba kembali beberapa saat lagi.';
             }
 
-            // Log interaction - convert array reply to string
-            $replyForLog = '';
-            if (isset($response['reply'])) {
-                $replyForLog = is_array($response['reply']) ? json_encode($response['reply']) : (string) $response['reply'];
-            }
+            $replyForLog = is_array($response['reply'] ?? '') ? json_encode($response['reply']) : (string) ($response['reply'] ?? '');
 
             WhatsappLog::logInteraction(
                 $phone,
@@ -184,12 +165,12 @@ class WhatsappController extends Controller
                 $response['success'] ?? true
             );
 
-            // Return response to n8n - n8n will handle sending to WAHA
-            // This avoids network issues between Dashboard and WAHA containers
             $response['chatId'] = $request->input('chatId');
             return response()->json($response);
+
         } catch (\Exception $e) {
-            // Log error
+            \Log::error('Bot Handler Error: ' . $e->getMessage());
+            
             WhatsappLog::logInteraction(
                 $phone,
                 $message,
@@ -199,27 +180,12 @@ class WhatsappController extends Controller
             );
 
             return $this->errorResponse(
-                'Maaf, terjadi kesalahan. Silakan coba lagi atau hubungi admin.'
+                "🙏 *Mohon maaf*, sepertinya saya sedikit kebingungan memproses pesan tersebut.\n\n" .
+                "Silakan ketik *MENU* untuk kembali ke layanan utama kami. Terima kasih atas kesabarannya! 😊"
             );
         }
     }
 
-    /**
-     * Health check endpoint
-     */
-    public function health(): JsonResponse
-    {
-        return response()->json([
-            'status' => 'ok',
-            'service' => 'WhatsApp Bot API',
-            'timestamp' => now()->toIso8601String(),
-            'maintenance_mode' => $this->isMaintenanceMode(),
-        ]);
-    }
-
-    /**
-     * Check if maintenance mode is enabled
-     */
     protected function isMaintenanceMode(): bool
     {
         return ModuleSetting::where('key', 'whatsapp_maintenance_mode')
@@ -227,9 +193,6 @@ class WhatsappController extends Controller
             ->exists();
     }
 
-    /**
-     * Standard success response
-     */
     protected function successResponse(string $reply, ?string $stateUpdate = null): JsonResponse
     {
         return response()->json([
@@ -239,9 +202,6 @@ class WhatsappController extends Controller
         ]);
     }
 
-    /**
-     * Standard error response
-     */
     protected function errorResponse(string $message): JsonResponse
     {
         return response()->json([
@@ -249,78 +209,5 @@ class WhatsappController extends Controller
             'reply' => $message,
             'state_update' => null,
         ]);
-    }
-
-    /**
-     * Send reply directly to WAHA API
-     * 
-     * @param string $phone Phone number (without @c.us suffix)
-     * @param string $message Message to send
-     * @return bool Whether the message was sent successfully
-     */
-    protected function sendToWaha(string $phone, string $message): bool
-    {
-        try {
-            $wahaUrl = config('services.waha.url', env('WAHA_API_URL'));
-            $wahaApiKey = config('services.waha.api_key', env('WAHA_API_KEY'));
-            $session = config('services.waha.session', env('WAHA_SESSION', 'default'));
-
-            if (empty($wahaUrl)) {
-                \Log::warning('WAHA API URL not configured, skipping direct reply');
-                return false;
-            }
-
-            // Prepare the phone number with @c.us suffix
-            $chatId = $phone . '@c.us';
-
-            // WAHA API endpoint for sending text messages
-            $endpoint = rtrim($wahaUrl, '/') . '/api/sendText';
-
-            $payload = [
-                'session' => $session,
-                'chatId' => $chatId,
-                'text' => $message,
-            ];
-
-            $headers = [
-                'Content-Type' => 'application/json',
-            ];
-
-            // Add API key if configured
-            if (!empty($wahaApiKey)) {
-                $headers['X-Api-Key'] = $wahaApiKey;
-            }
-
-            \Log::info('Sending reply to WAHA', [
-                'endpoint' => $endpoint,
-                'chatId' => $chatId,
-                'message_length' => strlen($message),
-            ]);
-
-            $response = \Illuminate\Support\Facades\Http::withHeaders($headers)
-                ->timeout(10)
-                ->post($endpoint, $payload);
-
-            if ($response->successful()) {
-                \Log::info('WAHA reply sent successfully', [
-                    'phone' => $phone,
-                    'response' => $response->json(),
-                ]);
-                return true;
-            } else {
-                \Log::error('WAHA reply failed', [
-                    'phone' => $phone,
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
-                return false;
-            }
-        } catch (\Exception $e) {
-            \Log::error('Exception sending WAHA reply', [
-                'phone' => $phone,
-                'error' => $e->getMessage(),
-            ]);
-            return false;
-        }
     }
 }

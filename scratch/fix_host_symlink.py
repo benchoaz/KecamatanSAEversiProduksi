@@ -1,0 +1,39 @@
+import os
+import pty
+import time
+
+host = '43.134.166.153'
+user = 'ubuntu'
+pw = 'nebula-57@-ocean'
+
+def run_ssh_cmd(cmd):
+    pid, fd = pty.fork()
+    if pid == 0:
+        os.execv('/usr/bin/ssh', ['ssh', '-o', 'StrictHostKeyChecking=no', f'{user}@{host}', cmd])
+    else:
+        output = b""
+        start = time.time()
+        while time.time() - start < 30:
+            try:
+                chunk = os.read(fd, 4096)
+                if not chunk: break
+                output += chunk
+                if b"password:" in chunk.lower():
+                    os.write(fd, (pw + "\n").encode())
+            except:
+                break
+        return output.decode(errors='ignore')
+
+print("--- Fixing Symlink on HOST ---")
+# Create relative symlink on host
+cmd = "cd /home/ubuntu/kecamatanSAE/app/public && ln -snf ../storage/app/public storage"
+print(run_ssh_cmd(cmd))
+
+print("--- Verifying Symlink on HOST ---")
+print(run_ssh_cmd("ls -la /home/ubuntu/kecamatanSAE/app/public/storage"))
+
+print("--- Fixing Permissions on HOST ---")
+print(run_ssh_cmd("sudo -S chown -R ubuntu:ubuntu /home/ubuntu/kecamatanSAE/app/public"))
+print(run_ssh_cmd("sudo -S chmod -R 775 /home/ubuntu/kecamatanSAE/app/public"))
+
+print("--- DONE ---")
