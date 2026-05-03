@@ -663,6 +663,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         menuContainer.addEventListener('change', (e) => {
             if (e.target.closest('.menu-item-row')) updateBotPreview();
+        });
+    }
 });
 
 function testApiKey(provider) {

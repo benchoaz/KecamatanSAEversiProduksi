@@ -27,5 +27,5 @@ def run_step(cmd):
                 break
         return output.decode(errors='ignore')
 
-print("--- DEPLOYING AI TO VPS ---")
-run_step("cd kecamatanSAE && git pull origin main && sudo docker compose -f docker-compose.vps.yml exec -T app php artisan optimize:clear")
+print("--- FIXING PERMISSIONS AND DEPLOYING AI TO VPS ---")
+run_step("cd kecamatanSAE && sudo chown -R ubuntu:ubuntu . && git pull origin main && sudo docker compose -f docker-compose.vps.yml exec -T app php artisan optimize:clear")

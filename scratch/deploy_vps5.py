@@ -12,7 +12,6 @@ def run_step(cmd):
         os.execv('/usr/bin/ssh', ['ssh', '-o', 'StrictHostKeyChecking=no', f'{user}@{host}', cmd])
     else:
         output = b""
-        password_sent = False
         start = time.time()
         while time.time() - start < 60: # 1 min timeout
             try:
@@ -20,12 +19,11 @@ def run_step(cmd):
                 if not chunk: break
                 output += chunk
                 print(chunk.decode(errors='ignore'), end='', flush=True)
-                if b"password:" in chunk.lower() and not password_sent:
+                if b"password:" in chunk.lower():
                     os.write(fd, (pw + "\n").encode())
-                    password_sent = True
             except:
                 break
         return output.decode(errors='ignore')
 
-print("--- DEPLOYING AI TO VPS ---")
-run_step("cd kecamatanSAE && git pull origin main && sudo docker compose -f docker-compose.vps.yml exec -T app php artisan optimize:clear")
+print("--- FIXING LARAVEL PERMISSIONS ON VPS ---")
+run_step("cd kecamatanSAE/app && sudo -S chmod -R 777 storage bootstrap/cache && sudo -S chmod -R 777 storage/logs/")
