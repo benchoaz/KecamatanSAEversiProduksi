@@ -3,8 +3,12 @@
 namespace App\Services\WhatsApp;
 
 use App\Models\AppProfile;
+use App\Models\ServiceNode;
+use App\Models\ServiceRequirement;
+use App\Models\PelayananFaq;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class AiHandler
 {
@@ -23,16 +27,22 @@ class AiHandler
 
         $regionName = $profile->region_name ?? 'Kecamatan SAE';
         
+        // Ambil Pengetahuan dari Database (Service & FAQ)
+        $knowledgeBase = $this->getDynamicKnowledge();
+        
         // Pagar Pembatas AI (Guardrails)
         $systemPrompt = "Anda adalah Asisten Virtual Resmi (AI) dengan standar Pelayanan Prima (Service Excellence) untuk {$regionName}.\n\n";
         $systemPrompt .= "PRINSIP PELAYANAN (WAJIB DIPATUHI):\n";
         $systemPrompt .= "1. SIKAP (ATTITUDE): Gunakan bahasa yang sangat santun, hangat, dan 'ngayomi'. Selalu gunakan sapaan hormat 'Bapak/Ibu' atau 'Saudara'.\n";
         $systemPrompt .= "2. PERHATIAN (ATTENTION): Berikan jawaban yang solutif dan tuntas. Jika warga bingung, bimbing mereka dengan langkah-langkah yang jelas.\n";
-        $systemPrompt .= "3. TINDAKAN (ACTION): Utamakan membantu kebutuhan administrasi warga dengan cepat dan akurat sesuai data resmi.\n";
+        $systemPrompt .= "3. TINDAKAN (ACTION): Utamakan membantu kebutuhan administrasi warga dengan cepat dan akurat sesuai data resmi di bawah ini.\n";
         $systemPrompt .= "4. TANGGUNG JAWAB: Jaga wibawa pemerintah {$regionName} dengan memberikan informasi yang valid.\n\n";
 
+        $systemPrompt .= "DATA LAYANAN & INFORMASI RESMI (Gunakan data ini sebagai referensi utama):\n";
+        $systemPrompt .= "{$knowledgeBase}\n\n";
+
         $systemPrompt .= "INSTRUKSI KHUSUS:\n";
-        $systemPrompt .= "1. TUGAS UTAMA: Menjawab pertanyaan seputar pelayanan publik, administrasi (KTP, KK, Akta, dll), dan informasi resmi kecamatan.\n";
+        $systemPrompt .= "1. TUGAS UTAMA: Menjawab pertanyaan seputar pelayanan publik, administrasi, dan informasi resmi kecamatan berdasarkan DATA LAYANAN di atas.\n";
         $systemPrompt .= "2. LAYANAN DARURAT & PENGADUAN:\n";
         $systemPrompt .= "   - Korupsi/Pungli: Arahkan ke SP4N LAPOR (https://www.lapor.go.id/)\n";
         $systemPrompt .= "   - Kebakaran: Hubungi 112\n";
@@ -41,6 +51,7 @@ class AiHandler
         $systemPrompt .= "   - Sertakan tagar: #PSC119 #SMES #ResponCepat #MelangkahBersamaSelamatkanJiwa\n";
         $systemPrompt .= "3. PENOLAKAN HALUS (OUT OF SCOPE): Jika pertanyaan di luar tupoksi, sampaikan maaf dengan sangat sopan. Contoh: 'Mohon maaf sekali Bapak/Ibu, kapasitas saya terbatas pada layanan publik {$regionName}. Mungkin ada hal terkait administrasi yang bisa saya bantu?'\n";
         $systemPrompt .= "4. FORMAT JAWABAN: Singkat, padat, gunakan bold (*) untuk poin penting. Selalu akhiri dengan tawaran bantuan tambahan yang ramah.\n";
+        $systemPrompt .= "5. JAM KERJA: Senin-Kamis ({$profile->office_hours_mon_thu}), Jumat ({$profile->office_hours_fri}).\n";
 
         $provider = $profile->ai_provider ?? 'gemini';
         $reply = "Maaf, terjadi kesalahan saat menghubungi server AI.";
@@ -152,5 +163,41 @@ class AiHandler
             return $data['choices'][0]['message']['content'] ?? "Maaf, respon gagal dipahami.";
         }
         throw new \Exception("{$provider} Error: " . $response->body());
+    }
+
+    /**
+     * Build the knowledge base from database (Cached for 10 minutes)
+     */
+    private function getDynamicKnowledge(): string
+    {
+        return Cache::remember('whatsapp_ai_knowledge', 600, function() {
+            $knowledge = "DAFTAR LAYANAN TERSEDIA:\n";
+            
+            // 1. Fetch Service Nodes (Main services)
+            $nodes = ServiceNode::where('is_active', true)->get();
+            foreach ($nodes as $node) {
+                $knowledge .= "- " . strtoupper($node->name) . ": " . ($node->description ?? 'Layanan administrasi') . "\n";
+                
+                // Get requirements for this node
+                $requirements = ServiceRequirement::where('service_node_id', $node->id)
+                    ->where('is_active', true)
+                    ->get();
+                    
+                if ($requirements->count() > 0) {
+                    $knowledge .= "  Persyaratan: " . $requirements->pluck('name')->implode(', ') . ".\n";
+                }
+            }
+
+            // 2. Fetch FAQ
+            $faqs = PelayananFaq::all();
+            if ($faqs->count() > 0) {
+                $knowledge .= "\nPERTANYAAN UMUM (FAQ):\n";
+                foreach ($faqs as $faq) {
+                    $knowledge .= "Tanya: {$faq->question}\nJawab: {$faq->answer}\n";
+                }
+            }
+
+            return $knowledge;
+        });
     }
 }
