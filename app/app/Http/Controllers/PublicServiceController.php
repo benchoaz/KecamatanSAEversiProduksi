@@ -462,9 +462,7 @@ class PublicServiceController extends Controller
             'citizen_feedback' => 'nullable|string|max:500',
         ]);
 
-        $service = PublicService::where('uuid', $uuid)
-            ->where('status', PublicService::STATUS_SELESAI)
-            ->firstOrFail();
+        $service = PublicService::where('uuid', $uuid)->firstOrFail();
 
         // Prevent double feedback
         if ($service->feedback_at) {

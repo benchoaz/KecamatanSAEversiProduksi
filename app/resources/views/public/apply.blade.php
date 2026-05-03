@@ -203,7 +203,7 @@
     </div>
 
     <div class="flex flex-col gap-3">
-        <div class="p-6 bg-amber-50 rounded-3xl border border-amber-100 mb-4">
+        <div id="quickFeedbackSection" class="p-6 bg-amber-50 rounded-3xl border border-amber-100 mb-4">
             <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Bagaimana pengalaman pengajuan Anda?</p>
             <div class="flex justify-center gap-2 mb-4">
                 @for($i=1; $i<=5; $i++)
@@ -212,9 +212,14 @@
                     </button>
                 @endfor
             </div>
-            <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback()" class="btn btn-sm bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase hidden">
-                Kirim Penilaian <i class="fas fa-paper-plane ml-1"></i>
-            </button>
+            
+            <div id="feedbackCommentSection" class="hidden animate__animated animate__fadeIn">
+                <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan? (Opsional)" 
+                    class="textarea textarea-bordered w-full bg-white/50 rounded-2xl text-xs mb-3 focus:border-amber-400 transition-all h-20"></textarea>
+                <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback()" class="btn btn-sm w-full bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase">
+                    Kirim Penilaian <i class="fas fa-paper-plane ml-1"></i>
+                </button>
+            </div>
         </div>
 
         <a href="{{ route('layanan') }}" id="redirect-btn" class="btn bg-slate-900 border-0 text-white rounded-2xl h-16 font-black normal-case text-lg shadow-xl shadow-slate-900/20">
@@ -356,13 +361,16 @@
             btn.classList.toggle('text-amber-400', val <= r);
             btn.classList.toggle('text-slate-300', val > r);
         });
-        document.getElementById('btnSendQuickFeedback').classList.remove('hidden');
+        document.getElementById('feedbackCommentSection').classList.remove('hidden');
     }
 
     window.submitQuickFeedback = async () => {
         if(!quickRating || !submittedUuid) return;
         
         const btn = document.getElementById('btnSendQuickFeedback');
+        const comment = document.getElementById('quick_feedback_comment').value;
+        const originalHtml = btn.innerHTML;
+        
         btn.disabled = true;
         btn.innerHTML = '<span class="loading loading-spinner loading-xs"></span>';
 
@@ -373,20 +381,30 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ rating: quickRating, citizen_feedback: 'Pengisian form awal' })
+                body: JSON.stringify({ 
+                    rating: quickRating, 
+                    citizen_feedback: comment || 'Pengisian form awal' 
+                })
             });
 
             if(response.ok) {
-                btn.parentElement.innerHTML = `
-                    <div class="text-center animate__animated animate__heartBeat">
-                        <i class="fas fa-check-circle text-emerald-500 text-2xl mb-2"></i>
+                document.getElementById('quickFeedbackSection').innerHTML = `
+                    <div class="text-center animate__animated animate__heartBeat py-4">
+                        <i class="fas fa-check-circle text-emerald-500 text-3xl mb-3"></i>
                         <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Terima kasih atas penilaian Anda!</p>
                     </div>
                 `;
+            } else {
+                const errData = await response.json();
+                alert(errData.message || 'Gagal mengirim penilaian.');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
             }
         } catch (e) {
+            console.error(e);
+            alert('Terjadi kesalahan jaringan.');
             btn.disabled = false;
-            btn.innerText = 'Gagal Mengirim';
+            btn.innerHTML = originalHtml;
         }
     }
 </script>

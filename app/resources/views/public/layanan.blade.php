@@ -379,7 +379,7 @@
                         </div>
                     </div>
 
-                    \${data.status === 'selesai' ? renderFeedback(data) : ''}
+                    ${renderFeedback(data)}
                 </div>
             `;
             resultContent.innerHTML = html;
@@ -510,7 +510,7 @@
                 });
 
                 if (response.ok) {
-                    document.getElementById('feedbackSection').innerHTML = \`
+                    document.getElementById('feedbackSection').innerHTML = `
                         <div class="p-10 bg-emerald-50 rounded-[2.5rem] border border-emerald-100 text-center animate__animated animate__heartBeat">
                             <div class="w-16 h-16 bg-white text-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                                 <i class="fas fa-check text-2xl"></i>
@@ -518,7 +518,12 @@
                             <h4 class="text-lg font-black text-emerald-900 mb-1">Terima Kasih!</h4>
                             <p class="text-sm text-emerald-700 font-medium">Masukan Anda sangat berharga bagi kami.</p>
                         </div>
-                    \`;
+                    `;
+                } else {
+                    const errData = await response.json();
+                    alert(errData.message || 'Gagal mengirim penilaian.');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Kirim Penilaian';
                 }
             } catch (e) {
                 alert('Gagal mengirim penilaian.');
