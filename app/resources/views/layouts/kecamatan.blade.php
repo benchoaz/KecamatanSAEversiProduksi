@@ -140,25 +140,62 @@
             justify-content: center;
             box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
         }
-        /* Custom Scrollbar Lebih Tebal - User Request */
+        /* Custom Scrollbar Lebih Tebal & Permanen - User Request */
         ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
+            width: 12px !important;
+            height: 12px !important;
         }
         ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1 !important;
+            background: #f1f5f9 !important;
             border-radius: 10px;
         }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8 !important; /* Abu-abu yang lebih jelas */
+            border-radius: 10px;
+            border: 2px solid #f1f5f9; /* Spacing effect */
+        }
         ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8 !important;
+            background: #64748b !important; /* Sedikit lebih gelap saat di hover */
         }
         /* Untuk Firefox */
         * {
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e1 transparent;
+            scrollbar-width: auto !important;
+            scrollbar-color: #94a3b8 #f1f5f9 !important;
+        }
+
+        /* Submenu Text & Contrast Fix (White Theme) */
+        .nav-submenu {
+            background-color: #f8fafc !important; /* Background terang untuk submenu */
+            border-radius: 10px;
+            margin: 5px 12px !important;
+            padding-left: 0 !important;
+            border: 1px solid #e2e8f0;
+        }
+        .nav-sublink {
+            color: #475569 !important; /* Tulisan abu gelap agar kontras di BG putih */
+            padding: 10px 15px 10px 48px !important;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .nav-sublink:hover {
+            color: #0f172a !important;
+            background-color: #f1f5f9 !important;
+            transform: translateX(3px);
+        }
+        .nav-sublink.active {
+            color: var(--sidebar-active) !important;
+            background-color: #f0f7ea !important;
+            font-weight: 700;
+        }
+        .nav-sublink i {
+            color: #94a3b8 !important;
+            margin-right: 10px;
+        }
+        .nav-sublink.active i {
+            color: var(--sidebar-active) !important;
         }
     </style>
     @stack('styles')
