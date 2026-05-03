@@ -6,6 +6,7 @@ use App\Models\AppProfile;
 use App\Models\ServiceNode;
 use App\Models\ServiceRequirement;
 use App\Models\PelayananFaq;
+use App\Models\AiMemory;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
@@ -25,33 +26,57 @@ class AiHandler
             return null;
         }
 
+        // 1. Memori AI (Ingat Nama)
+        $userName = 'Belum diketahui';
+        $memory = null;
+        if ($phone) {
+            $phoneClean = preg_replace('/[^0-9]/', '', $phone);
+            $memory = AiMemory::firstOrCreate(['phone_number' => $phoneClean]);
+            $userName = $memory->user_name ?? 'Belum diketahui';
+        }
+
         $regionName = $profile->region_name ?? 'Kecamatan SAE';
         
         // Ambil Pengetahuan dari Database (Service & FAQ)
         $knowledgeBase = $this->getDynamicKnowledge();
         
-        // Pagar Pembatas AI (Guardrails)
-        $systemPrompt = "Anda adalah Asisten Virtual Resmi (AI) dengan standar Pelayanan Prima (Service Excellence) untuk {$regionName}.\n\n";
-        $systemPrompt .= "PRINSIP PELAYANAN (WAJIB DIPATUHI):\n";
-        $systemPrompt .= "1. SIKAP (ATTITUDE): Gunakan bahasa yang sangat santun, hangat, dan 'ngayomi'. Selalu gunakan sapaan hormat 'Bapak/Ibu' atau 'Saudara'.\n";
-        $systemPrompt .= "2. PERHATIAN (ATTENTION): Berikan jawaban yang solutif dan tuntas. Jika warga bingung, bimbing mereka dengan langkah-langkah yang jelas.\n";
-        $systemPrompt .= "3. TINDAKAN (ACTION): Utamakan membantu kebutuhan administrasi warga dengan cepat dan akurat sesuai data resmi di bawah ini.\n";
-        $systemPrompt .= "4. TANGGUNG JAWAB: Jaga wibawa pemerintah {$regionName} dengan memberikan informasi yang valid.\n\n";
-
+        // Prompt Baru Berdasarkan Instruksi User
+        $systemPrompt = "Anda adalah AI Chatbot resmi layanan publik yang mewakili {$regionName}.\n\n";
+        $systemPrompt .= "TUJUAN UTAMA:\n";
+        $systemPrompt .= "Memberikan pelayanan prima, cepat, tepat, sopan, dan profesional kepada masyarakat, dengan tetap mengikuti alur workflow sistem yang telah ditentukan.\n\n";
+        
+        $systemPrompt .= "GAYA KOMUNIKASI:\n";
+        $systemPrompt .= "- Gunakan bahasa Indonesia formal, sopan, dan mudah dipahami\n";
+        $systemPrompt .= "- Nada ramah, tidak kaku, tidak bertele-tele\n";
+        $systemPrompt .= "- Hindari bahasa teknis yang sulit dimengerti masyarakat umum\n";
+        $systemPrompt .= "- Berikan kesan 'melayani dengan empati'\n\n";
+        
+        $systemPrompt .= "ATURAN UTAMA:\n";
+        $systemPrompt .= "1. SELALU ikuti struktur workflow yang tersedia dalam sistem\n";
+        $systemPrompt .= "2. Jangan memberikan jawaban di luar menu/alur yang sudah ditentukan\n";
+        $systemPrompt .= "3. Jika user keluar konteks, arahkan kembali ke pilihan layanan\n";
+        $systemPrompt .= "4. Jika data belum lengkap, minta dengan jelas dan sopan\n";
+        $systemPrompt .= "5. Jika terjadi error/sistem tidak tersedia, beri alternatif solusi\n\n";
+        
+        $systemPrompt .= "PENANGANAN KONDISI KHUSUS:\n";
+        $systemPrompt .= "[1] KEDARURATAN (Kecelakaan, Bencana, Kebakaran): Respon cepat, singkat, arahkan ke 112 atau 119.\n";
+        $systemPrompt .= "[2] KRIMINAL: Arahkan ke kepolisian (110).\n";
+        $systemPrompt .= "[3] KESEHATAN: Saran umum, arahkan ke faskes terdekat.\n\n";
+        
         $systemPrompt .= "DATA LAYANAN & INFORMASI RESMI (Gunakan data ini sebagai referensi utama):\n";
         $systemPrompt .= "{$knowledgeBase}\n\n";
 
-        $systemPrompt .= "INSTRUKSI KHUSUS:\n";
-        $systemPrompt .= "1. TUGAS UTAMA: Menjawab pertanyaan seputar pelayanan publik, administrasi, dan informasi resmi kecamatan.\n";
-        $systemPrompt .= "2. LAYANAN DARURAT (PRIORITAS TINGGI): Situasi darurat ADALAH dalam lingkup tugas Anda. Jika warga menanyakan kebakaran, kecelakaan, atau bantuan medis, JAWAB SEGERA dengan:\n";
-        $systemPrompt .= "   - Kebakaran: Hubungi 112\n";
-        $systemPrompt .= "   - Ambulans/Medis/Kecelakaan: Hubungi 119 atau PSC: (0298) 343 0000 / WA: 081 8181 91 119\n";
-        $systemPrompt .= "   - Keamanan/Polisi: Hubungi 110\n";
-        $systemPrompt .= "   - Korupsi/Pungli: Arahkan ke https://www.lapor.go.id\n";
-        $systemPrompt .= "   - Sertakan tagar: #PSC119 #SMES #ResponCepat #MelangkahBersamaSelamatkanJiwa\n";
-        $systemPrompt .= "3. PENOLAKAN HALUS (OUT OF SCOPE): Hanya tolak pertanyaan yang benar-benar tidak berhubungan dengan warga/kecamatan (misal: gosip artis, politik luar negeri). Pertanyaan darurat TIDAK BOLEH ditolak.\n";
-        $systemPrompt .= "4. FORMAT JAWABAN: Singkat, padat, gunakan bold (*) untuk poin penting. Selalu akhiri dengan tawaran bantuan tambahan yang ramah.\n";
-        $systemPrompt .= "5. JAM KERJA: Senin-Kamis ({$profile->office_hours_mon_thu}), Jumat ({$profile->office_hours_fri}).\n";
+        $systemPrompt .= "KONTEKS PENGGUNA SAAT INI:\n";
+        $systemPrompt .= "- Nama Pengguna: {$userName}\n";
+        
+        if ($userName === 'Belum diketahui') {
+            $systemPrompt .= "- INSTRUKSI MEMORI: Jika pengguna memberitahu namanya, Anda WAJIB menyapa mereka dengan nama tersebut di respon ini. SANGAT PENTING: Untuk membantu sistem mengingat, jika user memberitahu namanya, Anda HARUS menyertakan tag [SET_NAME:nama_pengguna] di paling akhir jawaban Anda (contoh: [SET_NAME:Budi]).\n";
+        } else {
+            $systemPrompt .= "- INSTRUKSI MEMORI: Gunakan nama {$userName} untuk menyapa pengguna agar lebih akrab namun tetap sopan.\n";
+        }
+        
+        $systemPrompt .= "\nBATASAN: Jangan beropini, jangan bercanda, jangan keluar dari konteks pelayanan publik.\n";
+        $systemPrompt .= "PRIORITAS: Kecepatan respon > Kejelasan informasi > Kepatuhan workflow > Kesopanan";
 
         $provider = $profile->ai_provider ?? 'gemini';
         $reply = "Maaf, terjadi kesalahan saat menghubungi server AI.";
@@ -64,20 +89,30 @@ class AiHandler
             } elseif (in_array($provider, ['deepseek', 'xai', 'openrouter', 'dashscope'])) {
                 $reply = $this->askOpenAICompatible($provider, $profile, $systemPrompt, $message);
             } else {
-                return null; // Provider tidak dikenal, lewati AI
+                return null;
             }
             
+            // Post-Processing: Deteksi & Simpan Nama (Memory)
+            if (preg_match('/\[SET_NAME:(.*?)\]/', $reply, $matches)) {
+                $detectedName = trim($matches[1]);
+                if ($memory && !empty($detectedName)) {
+                    $memory->user_name = $detectedName;
+                    $memory->save();
+                    Log::info("AI Memory Updated (Service): Name '{$detectedName}' stored for phone {$phoneClean}");
+                }
+                $reply = str_replace($matches[0], '', $reply);
+            }
+
             // Berhasil mendapat jawaban AI
             return [
                 'success' => true,
                 'intent' => 'ai_assistant',
-                'reply' => $reply,
-                'state_update' => null, // Jangan ubah state, biarkan warga di menu utama/sekarang
+                'reply' => trim($reply),
+                'state_update' => null,
             ];
             
         } catch (\Exception $e) {
             Log::error("WhatsApp AI Error ({$provider}): " . $e->getMessage());
-            // Jika AI gagal (kuota habis/down), kembalikan null agar WhatsApp bot tetap membalas dengan fallback
             return null; 
         }
     }

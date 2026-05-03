@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AppProfile;
+use App\Models\AiMemory;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -14,6 +15,8 @@ class AiAssistantController extends Controller
     {
         // 1. Validasi Input dari N8N
         $message = $request->input('message');
+        $phone = $request->input('phone');
+        
         if (!$message) {
             return response()->json(['reply' => 'Pesan kosong.'], 400);
         }
@@ -32,21 +35,67 @@ class AiAssistantController extends Controller
             ]);
         }
 
-        // 4. Siapkan Pagar Pembatas (Guardrails & System Prompt)
+        // 4. Memori AI (Ingat Nama)
+        $userName = 'Belum diketahui';
+        $memory = null;
+        if ($phone) {
+            // Bersihkan nomor telepon
+            $phoneClean = preg_replace('/[^0-9]/', '', $phone);
+            $memory = AiMemory::firstOrCreate(['phone_number' => $phoneClean]);
+            $userName = $memory->user_name ?? 'Belum diketahui';
+        }
+
+        // 5. Siapkan Pagar Pembatas (Guardrails & System Prompt)
         $regionName = $profile->region_name ?? 'Kecamatan SAE';
-        $systemPrompt = "Anda adalah Asisten Virtual Resmi (AI) untuk {$regionName}.\n\n";
-        $systemPrompt .= "INSTRUKSI SANGAT PENTING (WAJIB DIPATUHI):\n";
-        $systemPrompt .= "1. Tugas Anda HANYA menjawab pertanyaan seputar pelayanan publik, birokrasi, administrasi kependudukan (KTP, KK, Akta, Surat Pindah, SKTM), dan informasi resmi {$regionName}.\n";
-        $systemPrompt .= "2. JIKA pengguna bertanya tentang topik di luar tupoksi pemerintahan (seperti: resep makanan, politik, sejarah umum, coding, cuaca, dll), ANDA WAJIB MENOLAKNYA dengan sopan. Contoh: 'Maaf, saya adalah asisten {$regionName}. Saya hanya dapat membantu pertanyaan terkait administrasi dan layanan publik.'\n";
-        $systemPrompt .= "3. Gunakan bahasa Indonesia yang ramah, sopan, namun tetap profesional.\n";
-        $systemPrompt .= "4. Jawablah dengan singkat dan padat (jangan terlalu panjang karena ini untuk WhatsApp).\n";
-        $systemPrompt .= "5. Jika Anda tidak tahu syarat pasti suatu layanan, arahkan pengguna untuk mengetik !menu atau datang langsung ke kantor kecamatan.\n";
+        
+        // Prompt Baru Berdasarkan Instruksi User
+        $systemPrompt = "Anda adalah AI Chatbot resmi layanan publik yang mewakili {$regionName}.\n\n";
+        $systemPrompt .= "TUJUAN UTAMA:\n";
+        $systemPrompt .= "Memberikan pelayanan prima, cepat, tepat, sopan, dan profesional kepada masyarakat, dengan tetap mengikuti alur workflow sistem yang telah ditentukan.\n\n";
+        
+        $systemPrompt .= "GAYA KOMUNIKASI:\n";
+        $systemPrompt .= "- Gunakan bahasa Indonesia formal, sopan, dan mudah dipahami\n";
+        $systemPrompt .= "- Nada ramah, tidak kaku, tidak bertele-tele\n";
+        $systemPrompt .= "- Hindari bahasa teknis yang sulit dimengerti masyarakat umum\n";
+        $systemPrompt .= "- Berikan kesan 'melayani dengan empati'\n\n";
+        
+        $systemPrompt .= "ATURAN UTAMA:\n";
+        $systemPrompt .= "1. SELALU ikuti struktur workflow yang tersedia dalam sistem\n";
+        $systemPrompt .= "2. Jangan memberikan jawaban di luar menu/alur yang sudah ditentukan\n";
+        $systemPrompt .= "3. Jika user keluar konteks, arahkan kembali ke pilihan layanan\n";
+        $systemPrompt .= "4. Jika data belum lengkap, minta dengan jelas dan sopan\n";
+        $systemPrompt .= "5. Jika terjadi error/sistem tidak tersedia, beri alternatif solusi\n\n";
+        
+        $systemPrompt .= "KATEGORI LAYANAN YANG HARUS DIPAHAMI:\n";
+        $systemPrompt .= "- Administrasi kependudukan (KTP, KK, surat pindah, dll)\n";
+        $systemPrompt .= "- Pengaduan masyarakat\n";
+        $systemPrompt .= "- Informasi layanan publik\n";
+        $systemPrompt .= "- UMKM dan perizinan dasar\n";
+        $systemPrompt .= "- Jadwal pelayanan\n\n";
+        
+        $systemPrompt .= "PENANGANAN KONDISI KHUSUS:\n";
+        $systemPrompt .= "[1] KEDARURATAN (Kecelakaan, Bencana, Kebakaran): Respon cepat, singkat, arahkan ke 112.\n";
+        $systemPrompt .= "[2] KRIMINAL: Arahkan ke kepolisian (110). Jangan beri analisa hukum.\n";
+        $systemPrompt .= "[3] KESEHATAN: Berikan saran umum, arahkan ke puskesmas/RS terdekat.\n\n";
+        
+        $systemPrompt .= "KONTEKS PENGGUNA SAAT INI:\n";
+        $systemPrompt .= "- Nama Pengguna: {$userName}\n";
+        $systemPrompt .= "- Nomor HP: " . ($phone ?? 'Tidak tersedia') . "\n";
+        
+        if ($userName === 'Belum diketahui') {
+            $systemPrompt .= "- INSTRUKSI MEMORI: Jika pengguna menyebutkan namanya, Anda WAJIB menyapa mereka dengan nama tersebut di respon ini. SANGAT PENTING: Untuk membantu sistem mengingat, jika user memberitahu namanya, Anda HARUS menyertakan tag [SET_NAME:nama_pengguna] di paling akhir jawaban Anda (contoh: [SET_NAME:Budi]).\n";
+        } else {
+            $systemPrompt .= "- INSTRUKSI MEMORI: Sapa pengguna dengan nama {$userName} agar terasa lebih personal dan ramah.\n";
+        }
+        
+        $systemPrompt .= "\nBATASAN: Jangan beropini, jangan bercanda, jangan keluar dari konteks pelayanan publik, jangan berikan informasi yang belum pasti.\n";
+        $systemPrompt .= "PRIORITAS: Kecepatan respon > Kejelasan informasi > Kepatuhan workflow > Kesopanan";
 
         $provider = $profile->ai_provider ?? 'gemini';
-        $reply = "Maaf, terjadi kesalahan saat menghubungi server AI. (Provider tidak dikenal)";
+        $reply = "Maaf, terjadi kesalahan saat menghubungi server AI.";
 
         try {
-            // 5. Routing ke Provider yang dipilih Admin
+            // 6. Routing ke Provider yang dipilih Admin
             if ($provider === 'gemini') {
                 $reply = $this->askGemini($profile->google_api_key, $systemPrompt, $message);
             } elseif ($provider === 'openai') {
@@ -56,16 +105,32 @@ class AiAssistantController extends Controller
             } else {
                 $reply = "Mohon maaf, model AI (" . strtoupper($provider) . ") belum diimplementasikan.";
             }
+
+            // 7. Post-Processing: Deteksi & Simpan Nama (Memory)
+            if (preg_match('/\[SET_NAME:(.*?)\]/', $reply, $matches)) {
+                $detectedName = trim($matches[1]);
+                if ($memory && !empty($detectedName)) {
+                    $memory->user_name = $detectedName;
+                    $memory->save();
+                    
+                    // Log memori baru
+                    Log::info("AI Memory Updated: Name '{$detectedName}' stored for phone {$phoneClean}");
+                }
+                // Hapus tag dari jawaban yang dikirim ke user
+                $reply = str_replace($matches[0], '', $reply);
+            }
+
         } catch (\Exception $e) {
             Log::error("AI Webhook Error ({$provider}): " . $e->getMessage());
             $reply = "Mohon maaf, asisten pintar sedang mengalami gangguan koneksi ke pusat data server. Silakan ketik *!menu* untuk melihat panduan manual.";
         }
 
-        // 6. Kembalikan jawaban ke N8N
+        // 8. Kembalikan jawaban ke N8N
         return response()->json([
-            'reply' => $reply,
+            'reply' => trim($reply),
             'is_ai_active' => true,
-            'provider_used' => $provider
+            'provider_used' => $provider,
+            'user_name' => $userName === 'Belum diketahui' ? null : $userName
         ]);
     }
 
@@ -73,7 +138,6 @@ class AiAssistantController extends Controller
     {
         if (empty($apiKey)) throw new \Exception("Google API Key belum diisi di Dashboard.");
 
-        // Menggunakan model Gemini 1.5 Flash (sangat cepat dan murah)
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
         
         $response = Http::post($url, [
@@ -102,7 +166,7 @@ class AiAssistantController extends Controller
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$apiKey}",
         ])->post('https://api.openai.com/v1/chat/completions', [
-            'model' => 'gpt-3.5-turbo', // Model default
+            'model' => 'gpt-3.5-turbo',
             'messages' => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => $message],
