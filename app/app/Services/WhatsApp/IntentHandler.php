@@ -45,6 +45,11 @@ class IntentHandler
         $session = WhatsappSession::where('phone', $phone)->first();
         $state = $session ? $session->state : null;
 
+        // 1. GLOBAL KEYWORDS: Reset to main menu (HIGHEST PRIORITY)
+        if ($this->matchesIntent($messageLower, ['menu', 'help', 'bantuan', '0'])) {
+            return $this->getMainMenu();
+        }
+
         // 2. GREETINGS: Warm response for hello/hi
         $greetings = ['halo', 'hai', 'hallo', 'pagi', 'siang', 'sore', 'malam', 'assalamualaikum', 'salam', 'tes', 'test', 'oi'];
         if ($this->matchesIntent($messageLower, $greetings)) {
@@ -68,13 +73,13 @@ class IntentHandler
             return $this->handleEmergencyResponse($messageLower);
         }
 
-        // 2. STATE NAVIGATION: Handle Nested Menus
+        // 4. STATE NAVIGATION: Handle Nested Menus
         if ($state && str_starts_with($state, 'NAV_PATH:')) {
             $path = str_replace('NAV_PATH:', '', $state);
             return $this->handleMenuNavigation($phone, $messageLower, $path);
         }
 
-        // 3. ROOT MENU NAVIGATION
+        // 5. ROOT MENU NAVIGATION
         $activeMenu = $this->getActiveMenuMapping();
         foreach ($activeMenu as $number => $item) {
             if ($this->isSelection($messageLower, (string)$number)) {
@@ -140,13 +145,13 @@ class IntentHandler
             return $this->jasaHandler->search($query);
         }
 
-        // LOKER keyword - redirect ke Jasa/Direktori karena Loker sudah dihapus
+        // LOKER keyword
         if ($this->matchesIntent($messageLower, ['loker', 'lowongan', 'kerja'])) {
             $baseUrl = $this->getPublicUrl();
             return [
                 'success' => true,
                 'intent' => 'jasa_link',
-                'reply' => "🔧 *Direktori Jasa & Tenaga Ahli*\n\n" .
+                'reply' => "🔧 *Direktori Jasa & Tenaga AhlI*\n\n" .
                     "Temukan tukang, tenaga harian, dan penyedia jasa lokal:\n" .
                     "{$baseUrl}/ekonomi?tab=jasa\n\n" .
                     "Ketik *MENU* untuk kembali.",
@@ -160,9 +165,6 @@ class IntentHandler
         }
 
         // --- STATE BASED HANDLING ---
-        $session = WhatsappSession::where('phone', $phone)->first();
-
-        // Administrasi Submenu state
         if ($session && $session->state === 'ADM_SUBMENU') {
             if ($this->isSelection($messageLower, '1') || $messageLower === 'status' || $messageLower === 'cek status') {
                 return $this->statusHandler->handle($phone, 'STATUS');
@@ -199,13 +201,12 @@ class IntentHandler
             return $this->ownerHandler->initiate($phone);
         }
 
-        // Quick Holiday Toggles (Masyarakat Friendly)
+        // Quick Holiday Toggles
         if ($messageLower === 'libur' || $messageLower === 'buka') {
             return $this->ownerHandler->toggleHolidayStatus($phone, $messageLower);
         }
 
         // --- FAQ NATURAL LANGUAGE FALLBACK ---
-        // Try searching FAQs before giving up
         $faqData = $this->faqSearchService->search($messageLower);
         if ($faqData['found']) {
             if (isset($faqData['multiple']) && $faqData['multiple']) {
@@ -233,7 +234,6 @@ class IntentHandler
         }
 
         // --- AI SMART FALLBACK ---
-        // Jika sistem tidak mengerti perintahnya, tanyakan ke AI (jika AI menyala)
         $aiResponse = $this->aiHandler->handle($phone, $message);
         if ($aiResponse !== null) {
             return $aiResponse;
@@ -248,22 +248,16 @@ class IntentHandler
         ];
     }
 
-    /**
-     * 
-     */
     protected function matchesIntent(string $message, array $keywords): bool
     {
         foreach ($keywords as $keyword) {
-            if (str_starts_with($message, $keyword)) {
+            if ($message === $keyword || str_starts_with($message, $keyword . ' ')) {
                 return true;
             }
         }
         return false;
     }
 
-    /**
-     * Build map of current active menu items with sequential numbering
-     */
     protected function getActiveMenuMapping(array $menuItems = null): array
     {
         if ($menuItems === null) {
@@ -277,20 +271,14 @@ class IntentHandler
 
         $mapping = [];
         $numbering = 1;
-
         foreach ($menuItems as $item) {
             if (!($item['enabled'] ?? true)) continue;
-            
             $mapping[$numbering] = $item;
             $numbering++;
         }
-
         return $mapping;
     }
 
-    /**
-     * Navigate through nested menus based on path (e.g. 0.1)
-     */
     protected function handleMenuNavigation(string $phone, string $message, string $path): array
     {
         $profile = appProfile();
@@ -298,7 +286,6 @@ class IntentHandler
         if (is_string($fullMenu)) $fullMenu = json_decode($fullMenu, true);
         $fullMenu = $fullMenu ?: $this->defaultBotMenu();
 
-        // Navigate to the current submenu
         $indices = explode('.', $path);
         $currentMenu = $fullMenu;
         $parentLabel = 'MENU UTAMA';
@@ -308,35 +295,26 @@ class IntentHandler
                 $parentLabel = $currentMenu[$idx]['label'];
                 $currentMenu = $currentMenu[$idx]['children'];
             } else {
-                // Invalid path, go back to root
                 return $this->getMainMenu();
             }
         }
 
         $activeMapping = $this->getActiveMenuMapping($currentMenu);
-
-        // Check for selection
         foreach ($activeMapping as $number => $item) {
             if ($this->isSelection($message, (string)$number)) {
                 $action = $item['action'] ?? 'custom';
-
                 if ($action === 'submenu' && !empty($item['children'])) {
                     return $this->enterSubmenu($phone, $path . '.' . ($number - 1), $item);
                 }
-
                 if ($action === 'back') {
                     $newPath = count($indices) > 1 ? implode('.', array_slice($indices, 0, -1)) : null;
                     if ($newPath === null) return $this->getMainMenu();
-                    
-                    // Re-calculate the parent menu for previewing after going back
                     return $this->handleMenuNavigation($phone, 'RE-RENDER', $newPath);
                 }
-
                 return $this->executeMenuAction($action, $phone, $item);
             }
         }
 
-        // If no match, re-render current submenu
         return [
             'success' => true,
             'intent' => 'submenu_render',
@@ -345,9 +323,6 @@ class IntentHandler
         ];
     }
 
-    /**
-     * Enter a submenu
-     */
     protected function enterSubmenu(string $phone, string $newPath, array $item): array
     {
         $children = $item['children'] ?? [];
@@ -361,47 +336,31 @@ class IntentHandler
         ];
     }
 
-    /**
-     * Execute specific action from main menu or submenu
-     */
     protected function executeMenuAction(string $action, string $phone, array $item = []): array
     {
         switch ($action) {
             case 'administrasi':
                 return $this->getAdministrasiSubmenu();
-
             case 'umkm_produk':
                 $baseUrl = $this->getPublicUrl();
                 return [
                     'success' => true,
                     'intent' => 'umkm_produk',
-                    'reply' => "🛍️ *PRODUK UMKM LOKAL*\n\n" .
-                        "Temukan produk olahan dan kerajinan tangan karya warga lokal:\n\n" .
-                        "👉 {$baseUrl}/ekonomi?tab=produk\n\n" .
-                        "Ketik *MENU* untuk kembali.",
+                    'reply' => "🛍️ *PRODUK UMKM LOKAL*\n\nTemukan produk olahan dan kerajinan tangan karya warga lokal:\n\n👉 {$baseUrl}/ekonomi?tab=produk\n\nKetik *MENU* untuk kembali.",
                     'state_update' => null,
                 ];
-
             case 'jasa':
                 $baseUrl = $this->getPublicUrl();
                 return [
                     'success' => true,
                     'intent' => 'jasa',
-                    'reply' => "🔧 *CARI JASA & TENAGA AHLI*\n\n" .
-                        "Temukan tukang, ART, ojek, dan tenaga harian di sekitar Anda:\n\n" .
-                        "👉 {$baseUrl}/ekonomi?tab=jasa\n\n" .
-                        "Atau ketik jenis jasa yang Anda cari:\n" .
-                        "Contoh: *jasa tukang*, *jasa ojek*\n\n" .
-                        "Ketik *MENU* untuk kembali.",
+                    'reply' => "🔧 *CARI JASA & TENAGA AHLI*\n\nTemukan tukang, ART, ojek, dan tenaga harian di sekitar Anda:\n\n👉 {$baseUrl}/ekonomi?tab=jasa\n\nAtau ketik jenis jasa yang Anda cari:\nContoh: *jasa tukang*, *jasa ojek*\n\nKetik *MENU* untuk kembali.",
                     'state_update' => 'MENU_JASA',
                 ];
-
             case 'pengaduan':
                 return $this->complaintHandler->initiate($phone, 'pengaduan');
-
             case 'kelola_profil':
                 return $this->ownerHandler->initiate($phone);
-
             case 'custom':
                 if (!empty($item['url'])) {
                     return [
@@ -412,15 +371,11 @@ class IntentHandler
                     ];
                 }
                 return $this->getMainMenu();
-
             default:
                 return $this->getMainMenu();
         }
     }
 
-    /**
-     * Generate Main Menu message dynamically
-     */
     protected function getMainMenu(): array
     {
         $regionName = strtoupper(appProfile()->region_name ?? 'BESUK');
@@ -434,27 +389,22 @@ class IntentHandler
         ];
     }
 
-    /**
-     * Generic renderer for menus
-     */
     protected function renderMenu(array $mapping, string $title): string
     {
-        $menu  = "MENU LAYANAN " . strtoupper($title) . "\n\n";
+        $menu  = "🏛️ *LAYANAN DIGITAL " . strtoupper($title) . "*\n\n";
         $menu .= "Silakan pilih layanan (Ketik angka):\n\n";
 
         foreach ($mapping as $num => $item) {
             $label = $item['label'] ?? 'Pilihan';
             $desc  = $item['description'] ?? '';
-            $menu .= "{$num}. {$label}" . ($desc ? " - {$desc}" : "") . "\n";
+            $menu .= "{$num}. *{$label}*" . ($desc ? "\n   _{$desc}_" : "") . "\n\n";
         }
 
-        $menu .= "\nKetik *MENU* kapan saja untuk kembali.";
+        $menu .= "Atau ketik langsung apa yang ingin Anda tanyakan. 😊\n\n";
+        $menu .= "Ketik *MENU* untuk kembali.";
         return $menu;
     }
 
-    /**
-     * Get configured public URL, falling back to app.url
-     */
     protected function getPublicUrl(): string
     {
         $profile = appProfile();
@@ -464,9 +414,6 @@ class IntentHandler
         return rtrim(env('PUBLIC_BASE_URL', config('app.url', 'https://kecamatanbesuk.my.id')), '/');
     }
 
-    /**
-     * Default bot menu items when none configured in DB
-     */
     protected function defaultBotMenu(): array
     {
         return [
@@ -478,40 +425,15 @@ class IntentHandler
         ];
     }
 
-    /**
-     * 
-     */
-    protected function menuIntent(): array
-    {
-        return $this->getMainMenu();
-    }
-
-    /**
-     * 
-     */
     protected function isSelection(string $message, string $number): bool
     {
         $message = trim($message);
-
-        // Pure numeric match
-        if ($message === $number)
-            return true;
-
-        // Emoji match mapping
-        $emojis = [
-            '1' => '1',
-            '2' => '2',
-            '3' => '3',
-            '4' => '4',
-            '5' => '5',
-        ];
-
+        if ($message === $number) return true;
+        
+        $emojis = ['1'=>'1', '2'=>'2', '3'=>'3', '4'=>'4', '5'=>'5'];
         return isset($emojis[$number]) && isset($emojis[$message]) && $emojis[$message] === $emojis[$number];
     }
 
-    /**
-     * 
-     */
     protected function getUnknownIntentMessage(): string
     {
         return "🙏 *Mohon maaf*, saya belum mengenali pesan tersebut.\n\n" .
@@ -519,9 +441,6 @@ class IntentHandler
             "Terima kasih atas pengertiannya! 😊";
     }
 
-    /**
-     * 
-     */
     protected function getUmkmLink(): array
     {
         $baseUrl = $this->getPublicUrl();
@@ -530,43 +449,11 @@ class IntentHandler
         return [
             'success' => true,
             'intent' => 'umkm_link',
-            'reply' => "🛍️ *ETALASE PRODUK UMKM*\n\n" .
-                "Lihat semua produk pilihan warga {$this->getRegionName()} di:\n\n" .
-                "👉 {$umkmUrl}\n\n" .
-                "Anda juga bisa ketik nama produk yang dicari.\n" .
-                "Contoh: *umkm bakso*\n\n" .
-                "Ketik *MENU* atau *0* untuk kembali.",
-            'state_update' => 'WAITING_UMKM_SEARCH',
-        ];
-    }
-
-    /**
-     * 
-     */
-    protected function getLokerLink(): array
-    {
-        $baseUrl = config('app.url');
-        $lokerUrl = $baseUrl . '/loker';
-        $daftarUrl = $baseUrl . '/loker/pasang';
-
-        return [
-            'success' => true,
-            'intent' => 'loker_link',
-            'reply' => "LOWONGAN KERJA\n\n" .
-                "Lihat info lowongan kerja:\n" .
-                "{$lokerUrl}\n\n" .
-                "Pasang lowongan kerja:\n" .
-                "{$daftarUrl}\n\n" .
-                "Anda juga bisa ketik kata kunci.\n" .
-                "Contoh: *loker tukang*\n" .
-                "Ketik *MENU* untuk kembali.",
+            'reply' => "🛍️ *ETALASE PRODUK UMKM*\n\nLihat semua produk pilihan warga {$this->getRegionName()} di:\n\n👉 {$umkmUrl}\n\nKetik *MENU* untuk kembali.",
             'state_update' => null,
         ];
     }
 
-    /**
-     * 
-     */
     public function getLayananLink(): array
     {
         $baseUrl    = $this->getPublicUrl();
@@ -575,31 +462,17 @@ class IntentHandler
         return [
             'success' => true,
             'intent'  => 'syarat_link',
-            'reply'   => "🏛️ *LAYANAN ADMINISTRASI*\n\n" .
-                "Silakan pilih layanan yang Anda butuhkan:\n\n" .
-                "- syarat ktp - Pembuatan KTP\n" .
-                "- syarat kk - Pembuatan KK\n" .
-                "- syarat akta - Akta Kelahiran\n" .
-                "- syarat domisili - Surat Domisili\n\n" .
-                "Ajukan Secara Online:\n" .
-                "👉 {$layananUrl}\n\n" .
-                "Ketik *MENU* atau *0* untuk kembali.",
+            'reply'   => "🏛️ *LAYANAN ADMINISTRASI*\n\nAjukan Secara Online:\n👉 {$layananUrl}\n\nAtau ketik syarat yang Anda butuhkan (contoh: *syarat ktp*).\n\nKetik *MENU* untuk kembali.",
             'state_update' => 'ADM_SUBMENU',
         ];
     }
 
-    /**
-     * 
-     */
     protected function getRegionName(): string
     {
         $profile = appProfile();
         return $profile->region_name ?? 'Kecamatan';
     }
 
-    /**
-     * 
-     */
     public function getAdministrasiSubmenu(): array
     {
         $reply = "🏛️ *MENU ADMINISTRASI*\n\n";
@@ -618,13 +491,9 @@ class IntentHandler
         ];
     }
 
-    /**
-     * Handle emergency situations with direct contact numbers
-     */
     protected function handleEmergencyResponse(string $message): array
     {
         $reply = "🚨 *LAYANAN DARURAT CEPAT*\n\n";
-        
         if (str_contains($message, 'kebakaran')) {
             $reply .= "🔥 *KEBAKARAN:* Segera hubungi *112*\n\n";
         } elseif (str_contains($message, 'korupsi') || str_contains($message, 'pungli')) {
@@ -638,7 +507,6 @@ class IntentHandler
         $reply .= "🆘 *KONTAK DARURAT LAINNYA:*\n";
         $reply .= "☎️ Telp: (0298) 343 0000\n";
         $reply .= "🟢 WA: 081 8181 91 119\n\n";
-        $reply .= "#PSC119 #SMES #ResponCepat #MelangkahBersamaSelamatkanJiwa\n\n";
         $reply .= "Ketik *MENU* untuk layanan lainnya.";
 
         return [
