@@ -192,19 +192,23 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const query = urlParams.get('q');
-            const wa = urlParams.get('wa');
+            const query = urlParams.get('q') || urlParams.get('identifier');
+            const wa = urlParams.get('wa') || urlParams.get('whatsapp_verify');
             
             if (query) {
-                document.getElementById('identifier').value = query;
+                const identifierEl = document.getElementById('identifier');
+                const whatsappEl = document.getElementById('whatsapp_verify');
+                
+                identifierEl.value = query;
                 handleIdentifierChange(query);
                 
                 if (wa) {
-                    document.getElementById('whatsapp_verify').value = wa;
+                    whatsappEl.value = wa;
                 }
 
+                // Auto-trigger submission if we have data in URL
                 setTimeout(() => {
-                    document.getElementById('trackingForm').dispatchEvent(new Event('submit'));
+                    document.getElementById('trackingForm').dispatchEvent(new Event('submit', { cancelable: true }));
                 }, 500);
             }
         });
