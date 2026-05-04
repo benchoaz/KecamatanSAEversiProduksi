@@ -248,4 +248,13 @@ class AiHandler
             return $knowledge;
         });
     }
+
+    protected function getPublicUrl(): string
+    {
+        $profile = AppProfile::first();
+        if ($profile && !empty($profile->public_url)) {
+            return rtrim($profile->public_url, '/');
+        }
+        return rtrim(env('PUBLIC_BASE_URL', config('app.url')), '/');
+    }
 }
