@@ -89,7 +89,7 @@ class StatusHandler
             $result = [
                 'success' => true,
                 'intent' => 'status',
-                'reply' => $this->formatNotFound($phone),
+                'reply' => $this->formatNotFound($cleanPhone),
                 'state_update' => 'ADM_SUBMENU',
             ];
 
@@ -145,7 +145,7 @@ class StatusHandler
             return [
                 'success' => true,
                 'intent' => 'lupa_pin',
-                'reply' => $this->formatNoServicesForForgotPin($phone),
+                'reply' => $this->formatNoServicesForForgotPin($cleanPhone),
                 'state_update' => 'ADM_SUBMENU',
             ];
         }
@@ -171,10 +171,14 @@ class StatusHandler
             $phone = (string) $phone;
         }
 
+        // Handle WAHA format: 628123:1@c.us or 628123@c.us
+        // We only want the part before : or @
+        $phone = explode('@', $phone)[0];
+        $phone = explode(':', $phone)[0];
+
         // Remove all non-numeric characters
         $clean = preg_replace('/[^0-9]/', '', $phone);
 
-        // If starts with 62, keep it (Indonesia format with country code)
         // If starts with 0, convert to 62
         if (str_starts_with($clean, '0')) {
             $clean = '62' . substr($clean, 1);
