@@ -1616,6 +1616,72 @@
     </dialog>
 
     <script>
+        // --- GLOBAL SHARED FUNCTIONS (Define First) ---
+        window.quickRating = 0;
+        window.setQuickRating = (r) => {
+            window.quickRating = parseInt(r);
+            console.log("Rating set to:", window.quickRating);
+        };
+
+        window.submitQuickFeedback = async (uuid) => {
+            console.log("Submitting feedback for:", uuid);
+            if(!window.quickRating || window.quickRating === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Bintang Belum Dipilih',
+                    text: 'Silakan klik pada bintang untuk memberikan nilai.',
+                    confirmButtonColor: '#f59e0b',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+            if(!uuid || uuid === 'undefined') return;
+            const btn = document.querySelector('.swal2-container #btnSendQuickFeedback');
+            const comment = document.querySelector('.swal2-container #quick_feedback_comment')?.value || '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i>';
+            }
+            try {
+                const response = await fetch(`/service/feedback/${uuid}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ rating: window.quickRating, citizen_feedback: comment || 'Feedback dari Web' })
+                });
+                const resData = await response.json();
+                if(response.ok) {
+                    const section = document.querySelector('.swal2-container #quickFeedbackSection');
+                    if(section) {
+                        section.innerHTML = `
+                            <div class="text-center py-6 animate-fade-in">
+                                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-check text-2xl"></i>
+                                </div>
+                                <p class="text-xs font-black text-emerald-700 uppercase tracking-widest">Penilaian Terkirim!</p>
+                                <p class="text-[10px] text-slate-400 mt-1 font-medium">Terima kasih atas partisipasi Anda.</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    throw new Error(resData.message || 'Server menolak permintaan.');
+                }
+            } catch (e) {
+                console.error("Feedback error:", e);
+                Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: e.message || 'Terjadi kesalahan teknis.', confirmButtonColor: '#f43f5e' });
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Kirim Penilaian <i class="fas fa-paper-plane ml-1"></i>';
+                }
+            }
+        };
+
         // --- CHATBOT FAQ LOGIC (Preserved) ---
         const chatMessages = document.getElementById('chatMessages');
         const botForm = document.getElementById('publicFaqForm');
@@ -2703,89 +2769,7 @@
             }
         }
 
-        // --- QUICK FEEDBACK LOGIC ---
-        window.quickRating = 0;
-        window.setQuickRating = (r) => {
-            window.quickRating = parseInt(r);
-            console.log("Rating set to:", window.quickRating);
-        }
 
-        window.submitQuickFeedback = async (uuid) => {
-            console.log("Submitting feedback for:", uuid);
-            
-            if(!window.quickRating || window.quickRating === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Bintang Belum Dipilih',
-                    text: 'Silakan klik pada bintang untuk memberikan nilai.',
-                    confirmButtonColor: '#f59e0b',
-                    toast: true,
-                    position: 'top-end',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-                return;
-            }
-            
-            if(!uuid || uuid === 'undefined') {
-                console.error("UUID missing for feedback");
-                return;
-            }
-            
-            const btn = document.querySelector('.swal2-container #btnSendQuickFeedback');
-            const comment = document.querySelector('.swal2-container #quick_feedback_comment')?.value || '';
-            
-            if (btn) {
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i>';
-            }
-
-            try {
-                const response = await fetch(`/service/feedback/${uuid}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        rating: window.quickRating, 
-                        citizen_feedback: comment || 'Feedback dari Web' 
-                    })
-                });
-
-                const resData = await response.json();
-
-                if(response.ok) {
-                    const section = document.querySelector('.swal2-container #quickFeedbackSection');
-                    if(section) {
-                        section.innerHTML = `
-                            <div class="text-center py-6 animate-fade-in">
-                                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <i class="fas fa-check text-2xl"></i>
-                                </div>
-                                <p class="text-xs font-black text-emerald-700 uppercase tracking-widest">Penilaian Terkirim!</p>
-                                <p class="text-[10px] text-slate-400 mt-1 font-medium">Terima kasih atas partisipasi Anda.</p>
-                            </div>
-                        `;
-                    }
-                } else {
-                    throw new Error(resData.message || 'Server menolak permintaan.');
-                }
-            } catch (e) {
-                console.error("Feedback error:", e);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal Mengirim',
-                    text: e.message || 'Terjadi kesalahan teknis.',
-                    confirmButtonColor: '#f43f5e'
-                });
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = 'Kirim Penilaian <i class="fas fa-paper-plane ml-1"></i>';
-                }
-            }
-        }
     </script>
 
     @include('layouts.partials.public.bottom-bar')
