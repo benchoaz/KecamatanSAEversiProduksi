@@ -236,16 +236,38 @@
                                                 <i class="fas fa-power-off"></i>
                                             </button>
                                         @else
-                                            {{-- Aksi untuk Desa jika statusnya draft/revisi --}}
-                                            @if($p->status == 'draft' || $p->status == 'dikembalikan')
-                                                <a href="{{ route('desa.administrasi.personil.edit', $p->id) }}" 
-                                                    class="btn btn-icon btn-light rounded-circle shadow-sm text-primary-600"
-                                                    title="Edit Data">
-                                                    <i class="fas fa-pencil-alt"></i>
-                                                </a>
-                                            @else
-                                                <span class="badge bg-light text-slate-400 x-small px-3 border">No Action</span>
-                                            @endif
+                                            {{-- Aksi untuk Desa --}}
+                                            <div class="d-flex align-items-center gap-1">
+                                                @if($p->status == 'draft' || $p->status == 'dikembalikan')
+                                                    {{-- Tombol Kirim --}}
+                                                    <form action="{{ route('desa.administrasi.personil.submit', $p->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-icon btn-primary rounded-circle shadow-sm text-white" 
+                                                            title="Kirim ke Kecamatan" onclick="return confirm('Kirim data ini ke Kecamatan?')">
+                                                            <i class="fas fa-paper-plane"></i>
+                                                        </button>
+                                                    </form>
+
+                                                    {{-- Tombol Edit --}}
+                                                    <a href="{{ route('desa.administrasi.personil.edit', $p->id) }}" 
+                                                        class="btn btn-icon btn-light rounded-circle shadow-sm text-primary-600"
+                                                        title="Edit Data">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                    </a>
+
+                                                    {{-- Tombol Hapus --}}
+                                                    <form action="{{ route('desa.administrasi.personil.destroy', $p->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-icon btn-light rounded-circle shadow-sm text-danger" 
+                                                            title="Hapus Data" onclick="return confirm('Hapus data personil ini?')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <span class="badge bg-light text-slate-400 x-small px-3 border">Terkunci</span>
+                                                @endif
+                                            </div>
                                         @endif
                                     </div>
                                 </td>
