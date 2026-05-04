@@ -2227,18 +2227,18 @@
                                </div>
                                
                                <div id="quickFeedbackSection" class="p-4 bg-amber-50 rounded-2xl border border-amber-100 mb-4 text-center">
-                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Bagaimana pengalaman Anda?</p>
-                                    <div class="flex justify-center gap-2 mb-4">
-                                        <button type="button" onclick="setQuickRating(1)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="1"><i class="fas fa-star"></i></button>
-                                        <button type="button" onclick="setQuickRating(2)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="2"><i class="fas fa-star"></i></button>
-                                        <button type="button" onclick="setQuickRating(3)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="3"><i class="fas fa-star"></i></button>
-                                        <button type="button" onclick="setQuickRating(4)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="4"><i class="fas fa-star"></i></button>
-                                        <button type="button" onclick="setQuickRating(5)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="5"><i class="fas fa-star"></i></button>
+                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Pilih Bintang & Berikan Masukan:</p>
+                                    <div class="flex justify-center gap-3 mb-5">
+                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(1)" data-val="1"></i>
+                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(2)" data-val="2"></i>
+                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(3)" data-val="3"></i>
+                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(4)" data-val="4"></i>
+                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(5)" data-val="5"></i>
                                     </div>
                                     <div id="feedbackCommentArea">
-                                        <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan? (Opsional)" 
-                                            class="textarea textarea-bordered w-full bg-white/50 rounded-2xl text-xs mb-3 focus:border-amber-400 transition-all h-20"></textarea>
-                                        <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback('${result.uuid}')" class="btn btn-sm w-full bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase">
+                                        <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan tambahan?" 
+                                            class="textarea textarea-bordered w-full bg-white/70 rounded-2xl text-xs mb-3 focus:border-amber-400 transition-all h-24 shadow-inner"></textarea>
+                                        <button type="button" id="btnSendQuickFeedback" onclick="window.submitQuickFeedback('${result.uuid}')" class="btn btn-sm w-full bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase shadow-lg">
                                             Kirim Penilaian <i class="fas fa-paper-plane ml-1"></i>
                                         </button>
                                     </div>
@@ -2247,7 +2247,6 @@
                         confirmButtonColor: '#f43f5e',
                         confirmButtonText: 'Tutup',
                         didOpen: () => {
-                            // Reset rating when modal opens
                             window.quickRating = 0;
                         }
                     });
@@ -2587,18 +2586,18 @@
                                </div>
                                
                                <div id="quickFeedbackSection" class="p-4 bg-amber-50 rounded-2xl border border-amber-100 mb-4 text-center">
-                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Bagaimana pengalaman Anda?</p>
-                                    <div class="flex justify-center gap-2 mb-4">
-                                        <button type="button" onclick="setQuickRating(1)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="1"><i class="fas fa-star"></i></button>
-                                        <button type="button" onclick="setQuickRating(2)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="2"><i class="fas fa-star"></i></button>
-                                        <button type="button" onclick="setQuickRating(3)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="3"><i class="fas fa-star"></i></button>
-                                        <button type="button" onclick="setQuickRating(4)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="4"><i class="fas fa-star"></i></button>
-                                        <button type="button" onclick="setQuickRating(5)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="5"><i class="fas fa-star"></i></button>
+                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Pilih Bintang & Berikan Masukan:</p>
+                                    <div class="flex justify-center gap-3 mb-5">
+                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(1)" data-val="1"></i>
+                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(2)" data-val="2"></i>
+                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(3)" data-val="3"></i>
+                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(4)" data-val="4"></i>
+                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(5)" data-val="5"></i>
                                     </div>
                                     <div id="feedbackCommentArea">
-                                        <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan? (Opsional)" 
-                                            class="textarea textarea-bordered w-full bg-white/50 rounded-2xl text-xs mb-3 focus:border-amber-400 transition-all h-20"></textarea>
-                                        <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback('${result.uuid}')" class="btn btn-sm w-full bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase">
+                                        <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan tambahan?" 
+                                            class="textarea textarea-bordered w-full bg-white/70 rounded-2xl text-xs mb-3 focus:border-amber-400 transition-all h-24 shadow-inner"></textarea>
+                                        <button type="button" id="btnSendQuickFeedback" onclick="window.submitQuickFeedback('${result.uuid}')" class="btn btn-sm w-full bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase shadow-lg">
                                             Kirim Penilaian <i class="fas fa-paper-plane ml-1"></i>
                                         </button>
                                     </div>
@@ -2710,25 +2709,31 @@
             document.querySelectorAll('.quick-star').forEach(btn => {
                 const val = parseInt(btn.getAttribute('data-val'));
                 if (val <= window.quickRating) {
-                    btn.classList.remove('text-slate-300');
-                    btn.classList.add('text-amber-400', 'scale-110');
+                    btn.classList.remove('text-slate-200');
+                    btn.classList.add('text-amber-400', 'scale-125');
                 } else {
-                    btn.classList.add('text-slate-300');
-                    btn.classList.remove('text-amber-400', 'scale-110');
+                    btn.classList.add('text-slate-200');
+                    btn.classList.remove('text-amber-400', 'scale-125');
                 }
             });
         }
 
         window.submitQuickFeedback = async (uuid) => {
             if(!window.quickRating || window.quickRating === 0) {
-                Swal.showValidationMessage('Silakan pilih bintang penilaian terlebih dahulu');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Bintang Belum Dipilih',
+                    text: 'Silakan klik salah satu bintang untuk memberikan penilaian.',
+                    confirmButtonColor: '#f59e0b'
+                });
                 return;
             }
             
             if(!uuid) return;
             
-            const btn = document.getElementById('btnSendQuickFeedback');
-            const comment = document.getElementById('quick_feedback_comment')?.value || '';
+            // Mencari button di dalam modal yang sedang aktif
+            const btn = document.querySelector('.swal2-container #btnSendQuickFeedback') || document.getElementById('btnSendQuickFeedback');
+            const comment = document.querySelector('.swal2-container #quick_feedback_comment')?.value || '';
             const originalHtml = btn.innerHTML;
             
             btn.disabled = true;
@@ -2751,7 +2756,7 @@
                 const resData = await response.json();
 
                 if(response.ok) {
-                    const section = document.getElementById('quickFeedbackSection');
+                    const section = document.querySelector('.swal2-container #quickFeedbackSection') || document.getElementById('quickFeedbackSection');
                     if(section) {
                         section.innerHTML = `
                             <div class="text-center py-6 animate-fade-in">
@@ -2764,13 +2769,23 @@
                         `;
                     }
                 } else {
-                    Swal.showValidationMessage(resData.message || 'Gagal mengirim penilaian');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: resData.message || 'Gagal mengirim penilaian',
+                        confirmButtonColor: '#f43f5e'
+                    });
                     btn.disabled = false;
                     btn.innerHTML = originalHtml;
                 }
             } catch (e) {
                 console.error("Feedback error:", e);
-                Swal.showValidationMessage('Terjadi kesalahan koneksi');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Koneksi Terputus',
+                    text: 'Terjadi kesalahan koneksi saat mengirim penilaian.',
+                    confirmButtonColor: '#f43f5e'
+                });
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
             }
