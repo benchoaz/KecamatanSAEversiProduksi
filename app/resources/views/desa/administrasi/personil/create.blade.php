@@ -151,11 +151,8 @@
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok" type="number" placeholder="Contoh: 2400000" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <x-desa.form.input label="Tunjangan Jabatan (Rp)" name="tunjangan_jabatan" type="number" placeholder="Contoh: 500000" />
                                         </div>
                                     </div>
 
@@ -189,34 +186,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         const jabatanSelect = document.getElementById('jabatanSelect');
         const dusunWrapper = document.getElementById('dusunWrapper');
+        const dusunInput = dusunWrapper ? dusunWrapper.querySelector('input') : null;
         
         function toggleDusun() {
-            if (jabatanSelect.value === 'Kepala Dusun') {
-                dusunWrapper.style.display = 'block';
-                dusunWrapper.querySelector('input').setAttribute('required', 'required');
-            } else {
-                dusunWrapper.style.display = 'none';
-                dusunWrapper.querySelector('input').removeAttribute('required');
-            }
-        }
-
-        jabatanSelect.addEventListener('change', toggleDusun);
-        toggleDusun(); // Initial check
-    });
-</script>
-@endpush
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const jabatanSelect = document.getElementById('jabatanSelect');
-        const dusunWrapper = document.getElementById('dusunWrapper');
-        const dusunInput = dusunWrapper.querySelector('input');
-        
-        function toggleDusun() {
-            if (jabatanSelect.value === 'Kepala Dusun') {
+            if (jabatanSelect && jabatanSelect.value === 'Kepala Dusun') {
                 dusunWrapper.style.display = 'block';
                 if(dusunInput) dusunInput.setAttribute('required', 'required');
-            } else {
+            } else if(dusunWrapper) {
                 dusunWrapper.style.display = 'none';
                 if(dusunInput) {
                     dusunInput.removeAttribute('required');
@@ -225,8 +201,10 @@
             }
         }
 
-        jabatanSelect.addEventListener('change', toggleDusun);
-        toggleDusun(); // Initial check
+        if(jabatanSelect) {
+            jabatanSelect.addEventListener('change', toggleDusun);
+            toggleDusun(); // Initial check
+        }
     });
 </script>
 @endpush
