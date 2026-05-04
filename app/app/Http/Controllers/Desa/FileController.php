@@ -14,7 +14,7 @@ class FileController extends Controller
     /**
      * Download SK Personil (Perangkat & BPD)
      */
-    public function personil($id)
+    public function personil(Request $request, $id)
     {
         $personil = PersonilDesa::findOrFail($id);
 
@@ -23,11 +23,14 @@ class FileController extends Controller
             abort(403, 'Unauthorized access to this file.');
         }
 
-        if (!$personil->file_sk || !Storage::disk('local')->exists($personil->file_sk)) {
+        $type = $request->query('type', 'sk'); // Default to sk
+        $filePath = ($type === 'foto') ? $personil->foto : $personil->file_sk;
+
+        if (!$filePath || !Storage::disk('local')->exists($filePath)) {
             abort(404, 'File not found.');
         }
 
-        return response()->file(storage_path('app/' . $personil->file_sk));
+        return response()->file(storage_path('app/' . $filePath));
     }
 
     /**
