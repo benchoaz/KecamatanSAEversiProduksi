@@ -147,6 +147,9 @@
                                 </td>
                                 <td>
                                     <div class="fw-semibold text-primary-800">{{ $p->jabatan }}</div>
+                                    @if($p->nama_dusun)
+                                        <div class="x-small text-brand-600 fw-bold"><i class="fas fa-map-marker-alt me-1"></i> Dusun {{ $p->nama_dusun }}</div>
+                                    @endif
                                     <small class="text-tertiary">{{ $p->kategori == 'perangkat' ? 'Perangkat Desa' : 'BPD' }}</small>
                                 </td>
                                 <td>

@@ -69,7 +69,7 @@
                                 <div class="mb-4">
                                     <label class="form-label fw-bold text-slate-700">Jabatan <span
                                             class="text-danger">*</span></label>
-                                    <select name="jabatan" class="form-select rounded-3 border-slate-300 shadow-sm"
+                                    <select name="jabatan" id="jabatanSelect" class="form-select rounded-3 border-slate-300 shadow-sm"
                                         required>
                                         <option value="">Pilih Jabatan...</option>
                                         @if($kategori == 'perangkat')
@@ -89,6 +89,10 @@
                                             <option value="Anggota BPD">Anggota BPD</option>
                                         @endif
                                     </select>
+                                </div>
+
+                                <div id="dusunWrapper" style="display: none;">
+                                    <x-desa.form.input label="Nama Dusun" name="nama_dusun" placeholder="Contoh: Dusun Krajan" />
                                 </div>
 
                                 @if($kategori == 'perangkat')
@@ -180,4 +184,50 @@
             </div>
         </div>
     </div>
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const jabatanSelect = document.getElementById('jabatanSelect');
+        const dusunWrapper = document.getElementById('dusunWrapper');
+        
+        function toggleDusun() {
+            if (jabatanSelect.value === 'Kepala Dusun') {
+                dusunWrapper.style.display = 'block';
+                dusunWrapper.querySelector('input').setAttribute('required', 'required');
+            } else {
+                dusunWrapper.style.display = 'none';
+                dusunWrapper.querySelector('input').removeAttribute('required');
+            }
+        }
+
+        jabatanSelect.addEventListener('change', toggleDusun);
+        toggleDusun(); // Initial check
+    });
+</script>
+@endpush
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const jabatanSelect = document.getElementById('jabatanSelect');
+        const dusunWrapper = document.getElementById('dusunWrapper');
+        const dusunInput = dusunWrapper.querySelector('input');
+        
+        function toggleDusun() {
+            if (jabatanSelect.value === 'Kepala Dusun') {
+                dusunWrapper.style.display = 'block';
+                if(dusunInput) dusunInput.setAttribute('required', 'required');
+            } else {
+                dusunWrapper.style.display = 'none';
+                if(dusunInput) {
+                    dusunInput.removeAttribute('required');
+                    dusunInput.value = '';
+                }
+            }
+        }
+
+        jabatanSelect.addEventListener('change', toggleDusun);
+        toggleDusun(); // Initial check
+    });
+</script>
+@endpush
 @endsection
