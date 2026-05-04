@@ -1,24 +1,24 @@
 <header class="header border-0 shadow-sm px-4">
     <div class="header-left">
         <button class="menu-toggle shadow-sm rounded-3 border-0 bg-white text-primary-900 d-flex align-items-center justify-content-center" id="menuToggle" style="width: 42px; height: 42px; padding: 0;">
-            <i class="fas fa-bars-staggered"></i>
+            <i class="fas fa-bars"></i>
         </button>
 
         <div class="breadcrumb ms-3 d-none d-lg-flex align-items-center">
             <span class="breadcrumb-item">
-                <i class="fas fa-house-chimney text-brand-600 fs-5"></i>
+                <i class="fas fa-house-chimney text-brand-600 fs-4"></i>
             </span>
             <span class="breadcrumb-separator mx-2 opacity-25">/</span>
-            <span class="breadcrumb-item fw-black text-primary-900 fs-5" style="letter-spacing: -0.02em;">@yield('breadcrumb', 'Dashboard Kontrol')</span>
+            <span class="breadcrumb-item fw-black text-primary-900 fs-4" style="letter-spacing: -0.02em;">@yield('breadcrumb', 'Dashboard Kontrol')</span>
         </div>
     </div>
 
     <div class="header-right">
         <!-- Search -->
-        <div class="header-search ps-3 border-start border-primary-50 d-none d-md-flex">
-            <i class="fas fa-magnifying-glass text-tertiary"></i>
-            <input type="text" placeholder="Cari data desa atau indikator..."
-                class="search-input bg-primary-50 border-0 rounded-pill ps-5">
+        <div class="header-search ps-3 border-start border-primary-50 d-none d-md-flex align-items-center position-relative">
+            <i class="fas fa-magnifying-glass text-tertiary position-absolute ms-3"></i>
+            <input type="text" placeholder="Cari data desa..."
+                class="search-input bg-primary-50 border-0 rounded-pill px-5 py-2" style="font-size: 13px; width: 220px;">
         </div>
 
         <!-- System Controls -->
