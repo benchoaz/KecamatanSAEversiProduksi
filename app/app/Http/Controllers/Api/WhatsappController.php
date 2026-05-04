@@ -87,6 +87,15 @@ class WhatsappController extends Controller
             ]);
         }
 
+        // 1. FILTER BROADCAST / STATUS (CRITICAL)
+        $originalPhone = $request->input('phone', '');
+        if (str_contains($originalPhone, 'status@broadcast') || $originalPhone === 'status') {
+            return response()->json([
+                'success' => true,
+                'message' => 'Ignoring status broadcast event'
+            ]);
+        }
+
         // Validate request
         $request->validate([
             'phone' => 'required|string',

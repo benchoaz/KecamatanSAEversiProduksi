@@ -63,10 +63,13 @@ class WhatsappSession extends Model
     }
 
     /**
-     * Check if session is stale (older than 30 minutes)
+     * Check if session is stale (older than 30 seconds for active, 30 mins for idle)
      */
     public function isStale(): bool
     {
+        if ($this->isActive()) {
+            return $this->updated_at->diffInSeconds(Carbon::now()) > 30;
+        }
         return $this->updated_at->diffInMinutes(Carbon::now()) > 30;
     }
 

@@ -2218,9 +2218,7 @@
                 }
 
                 if (response.ok && (result.success || result.tracking_code || result.uuid)) {
-                    // Success
-                    const trackingId = result.tracking_code || result.uuid || 'baru';
-                    Swal.fire({
+                    // S                    Swal.fire({
                         icon: 'success',
                         title: 'Pengaduan Terkirim! 🎉',
                         html: `<p class="text-sm text-slate-600 mb-3">Terima kasih telah menyampaikan pengaduan. Kami akan memprosesnya segera.</p>
@@ -2238,7 +2236,7 @@
                                         <button type="button" onclick="setQuickRating(4)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="4"><i class="fas fa-star"></i></button>
                                         <button type="button" onclick="setQuickRating(5)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="5"><i class="fas fa-star"></i></button>
                                     </div>
-                                    <div id="feedbackCommentSection">
+                                    <div id="feedbackCommentArea">
                                         <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan? (Opsional)" 
                                             class="textarea textarea-bordered w-full bg-white/50 rounded-2xl text-xs mb-3 focus:border-amber-400 transition-all h-20"></textarea>
                                         <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback('${result.uuid}')" class="btn btn-sm w-full bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase">
@@ -2248,6 +2246,12 @@
                                </div>
                                <p class="text-xs text-slate-400 mt-2">Notifikasi akan dikirim via WhatsApp</p>`,
                         confirmButtonColor: '#f43f5e',
+                        confirmButtonText: 'Tutup',
+                        didOpen: () => {
+                            // Reset rating when modal opens
+                            window.quickRating = 0;
+                        }
+                    });ttonColor: '#f43f5e',
                         confirmButtonText: 'Tutup'
                     });
 
@@ -2536,9 +2540,8 @@
             if (_isAnonim2) _privTags2 += '[ANONIM]';
             if (_isRahasia2) _privTags2 += '[RAHASIA]';
 
-            // Combine title and message, set jenis_layanan
-            form.uraian.value = `[${jenisPengaduan}]${_privTags2 ? ' ' + _privTags2 : ''} ${title}\n\n${message}`;
-            form.jenis_layanan.value = `Pengaduan - ${jenisPengaduan}`;
+            // Build combined uraian string WITHOUT touching the visible textarea
+            const combinedUraian2 = `[${jenisPengaduan}]${_privTags2 ? ' ' + _privTags2 : ''} ${title}\n\n${message}`;
 
             // Show loading
             submitBtn.disabled = true;
@@ -2546,6 +2549,8 @@
 
             try {
                 const formData = new FormData(form);
+                formData.set('uraian', combinedUraian2);
+                formData.set('jenis_layanan', `Pengaduan - ${jenisPengaduan}`);
 
                 // PENTING: Gunakan URL relatif (bukan absolut) agar cookie sesi
                 // dikirim dengan benar oleh Chrome Android (mirip pola submissionForm)
@@ -2593,7 +2598,7 @@
                                         <button type="button" onclick="setQuickRating(4)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="4"><i class="fas fa-star"></i></button>
                                         <button type="button" onclick="setQuickRating(5)" class="quick-star w-10 h-10 rounded-xl bg-white text-slate-300 hover:text-amber-400 shadow-sm transition-all text-sm" data-val="5"><i class="fas fa-star"></i></button>
                                     </div>
-                                    <div id="feedbackCommentSection">
+                                    <div id="feedbackCommentArea">
                                         <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan? (Opsional)" 
                                             class="textarea textarea-bordered w-full bg-white/50 rounded-2xl text-xs mb-3 focus:border-amber-400 transition-all h-20"></textarea>
                                         <button type="button" id="btnSendQuickFeedback" onclick="submitQuickFeedback('${result.uuid}')" class="btn btn-sm w-full bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl px-6 font-bold text-[10px] uppercase">
@@ -2603,7 +2608,10 @@
                                </div>
                                <p class="text-xs text-slate-400 mt-2">Notifikasi akan dikirim via WhatsApp</p>`,
                         confirmButtonColor: '#f43f5e',
-                        confirmButtonText: 'Tutup'
+                        confirmButtonText: 'Tutup',
+                        didOpen: () => {
+                            window.quickRating = 0;
+                        }
                     });
 
                     // Reset form
@@ -2696,55 +2704,76 @@
         }
 
         // --- QUICK FEEDBACK LOGIC ---
-        let quickRating = 0;
+        window.quickRating = 0;
         window.setQuickRating = (r) => {
-            quickRating = r;
+            window.quickRating = parseInt(r);
+            console.log("Setting rating to:", window.quickRating);
+            
+            // Search globally for stars (Swal renders outside normal flow)
             document.querySelectorAll('.quick-star').forEach(btn => {
                 const val = parseInt(btn.getAttribute('data-val'));
-                btn.classList.toggle('text-amber-400', val <= r);
-                btn.classList.toggle('text-slate-300', val > r);
+                if (val <= window.quickRating) {
+                    btn.classList.remove('text-slate-300');
+                    btn.classList.add('text-amber-400', 'scale-110');
+                } else {
+                    btn.classList.add('text-slate-300');
+                    btn.classList.remove('text-amber-400', 'scale-110');
+                }
             });
         }
 
         window.submitQuickFeedback = async (uuid) => {
-            if(!quickRating || !uuid) return;
+            if(!window.quickRating || window.quickRating === 0) {
+                Swal.showValidationMessage('Silakan pilih bintang penilaian terlebih dahulu');
+                return;
+            }
+            
+            if(!uuid) return;
             
             const btn = document.getElementById('btnSendQuickFeedback');
-            const comment = document.getElementById('quick_feedback_comment').value;
+            const comment = document.getElementById('quick_feedback_comment')?.value || '';
             const originalHtml = btn.innerHTML;
             
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i>';
+            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i> Mengirim...';
 
             try {
                 const response = await fetch(`/service/feedback/${uuid}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ 
-                        rating: quickRating, 
-                        citizen_feedback: comment || 'Feedback dari Pengaduan Web' 
+                        rating: window.quickRating, 
+                        citizen_feedback: comment || 'Feedback dari Web' 
                     })
                 });
 
+                const resData = await response.json();
+
                 if(response.ok) {
-                    document.getElementById('quickFeedbackSection').innerHTML = `
-                        <div class="text-center py-4">
-                            <i class="fas fa-check-circle text-emerald-500 text-3xl mb-3"></i>
-                            <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Terima kasih atas penilaian Anda!</p>
-                        </div>
-                    `;
+                    const section = document.getElementById('quickFeedbackSection');
+                    if(section) {
+                        section.innerHTML = `
+                            <div class="text-center py-6 animate-fade-in">
+                                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-check text-2xl"></i>
+                                </div>
+                                <p class="text-xs font-black text-emerald-700 uppercase tracking-widest">Penilaian Terkirim!</p>
+                                <p class="text-[10px] text-slate-400 mt-1 font-medium">Terima kasih atas partisipasi Anda.</p>
+                            </div>
+                        `;
+                    }
                 } else {
-                    const errData = await response.json();
-                    alert(errData.message || 'Gagal mengirim penilaian.');
+                    Swal.showValidationMessage(resData.message || 'Gagal mengirim penilaian');
                     btn.disabled = false;
                     btn.innerHTML = originalHtml;
                 }
             } catch (e) {
-                console.error(e);
-                alert('Terjadi kesalahan jaringan.');
+                console.error("Feedback error:", e);
+                Swal.showValidationMessage('Terjadi kesalahan koneksi');
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
             }

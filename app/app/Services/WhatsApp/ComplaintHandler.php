@@ -104,6 +104,18 @@ class ComplaintHandler
         $messageTrim = trim($message);
         $messageLower = strtolower($messageTrim);
 
+        // Check for cancel
+        if (in_array($messageLower, ['batal', 'cancel', 'stop', 'kembali', 'menu'])) {
+            $session->clear();
+            return [
+                'success' => true,
+                'intent' => 'complaint_cancelled',
+                'reply' => "👋 *Siaaap!* Pengaduan telah dibatalkan.\n\n" .
+                    "Ketik *MENU* untuk layanan lainnya. 😊",
+                'state_update' => null,
+            ];
+        }
+
         // If user confirms with YA
         if (in_array($messageLower, ['ya', 'y', 'yes', 'benar', 'ok', 'oke', 'siap', 'betul'])) {
             $waNumber = $session->phone; // Use current session phone
@@ -151,6 +163,20 @@ class ComplaintHandler
     public function handleCategory(WhatsappSession $session, string $message): array
     {
         $input = trim($message);
+        $messageLower = strtolower($input);
+
+        // Check for cancel
+        if (in_array($messageLower, ['batal', 'cancel', 'stop', 'kembali', 'menu'])) {
+            $session->clear();
+            return [
+                'success' => true,
+                'intent' => 'complaint_cancelled',
+                'reply' => "👋 *Siaaap!* Pengaduan telah dibatalkan.\n\n" .
+                    "Ketik *MENU* untuk layanan lainnya. 😊",
+                'state_update' => null,
+            ];
+        }
+
         $category = 'Pengaduan'; // default
         
         if ($input === '1') {
