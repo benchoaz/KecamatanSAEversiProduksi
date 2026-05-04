@@ -41,7 +41,7 @@
                             <th class="ps-4 py-3">Nama Lengkap</th>
                             <th class="py-3">Jabatan</th>
                             @if($kategori == 'perangkat')
-                                <th class="py-3">Siltap & Tunjangan</th>
+                                <th class="py-3">Siltap</th>
                             @endif
                             <th class="py-3">SK Pengangkatan</th>
                             @if($kategori == 'bpd')
