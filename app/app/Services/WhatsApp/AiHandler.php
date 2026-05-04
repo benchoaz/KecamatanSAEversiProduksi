@@ -229,11 +229,11 @@ class AiHandler
             $nodes = ServiceNode::where('is_active', true)->get();
             foreach ($nodes as $node) {
                 $knowledge .= "- " . strtoupper($node->name) . ": " . ($node->description ?? 'Layanan administrasi') . "\n";
-                $requirements = ServiceRequirement::where('service_node_id', $node->id)
-                    ->where('is_active', true)
-                    ->get();
+                // Fixed: node_id instead of service_node_id, and removed non-existent is_active
+                $requirements = ServiceRequirement::where('node_id', $node->id)->get();
                 if ($requirements->count() > 0) {
-                    $knowledge .= "  Persyaratan: " . $requirements->pluck('name')->implode(', ') . ".\n";
+                    // Fixed: label instead of name
+                    $knowledge .= "  Persyaratan: " . $requirements->pluck('label')->implode(', ') . ".\n";
                 }
             }
             $faqs = PelayananFaq::all();
