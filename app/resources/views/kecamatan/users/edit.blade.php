@@ -240,17 +240,27 @@
 
                 function toggleDesaSelect() {
                     const selectedOption = roleSelect.options[roleSelect.selectedIndex];
-                    const roleName = selectedOption.getAttribute('data-role');
+                    if (!selectedOption) return;
 
-                    if (roleName === 'Operator Desa') {
+                    const roleName = (selectedOption.getAttribute('data-role') || '').toLowerCase().trim();
+                    const isOperatorDesa = roleName === 'operator desa' || roleName === 'operator_desa';
+
+                    if (isOperatorDesa) {
                         desaContainer.style.display = 'block';
                         // Switch to Desa tab automatically
                         const desaTab = document.getElementById('desa-tab');
-                        if (desaTab) bootstrap.Tab.getOrCreateInstance(desaTab).show();
+                        if (desaTab) {
+                            const tabInstance = bootstrap.Tab.getOrCreateInstance(desaTab);
+                            tabInstance.show();
+                        }
                     } else {
                         desaContainer.style.display = 'none';
-                        const kecTab = document.getElementById('kecamatan-tab');
-                        if (kecTab) bootstrap.Tab.getOrCreateInstance(kecTab).show();
+                        // If they select another role and we are on the Desa tab, maybe switch back to Kecamatan
+                        const activeTab = document.querySelector('#permissionTabs .nav-link.active');
+                        if (activeTab && activeTab.id === 'desa-tab') {
+                            const kecTab = document.getElementById('kecamatan-tab');
+                            if (kecTab) bootstrap.Tab.getOrCreateInstance(kecTab).show();
+                        }
                     }
                 }
 

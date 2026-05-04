@@ -55,12 +55,14 @@ class UserManagementController extends Controller
         $role = Role::find($request->role_id);
 
         // Validation Logic: Operator Desa MUST have desa_id
-        if ($role->nama_role === 'Operator Desa' && empty($request->desa_id)) {
+        $isOperatorDesa = strtolower($role->nama_role) === 'operator desa' || $role->nama_role === 'operator_desa';
+        
+        if ($isOperatorDesa && empty($request->desa_id)) {
             return back()->withErrors(['desa_id' => 'Operator Desa wajib memilih Desa.'])->withInput();
         }
 
         // Validation Logic: Kecamatan/Admin MUST NOT have desa_id
-        if ($role->nama_role !== 'Operator Desa') {
+        if (!$isOperatorDesa) {
             $validated['desa_id'] = null;
         }
 
@@ -109,11 +111,13 @@ class UserManagementController extends Controller
         $role = Role::find($request->role_id);
 
         // Refine rules
-        if ($role->nama_role === 'Operator Desa' && empty($request->desa_id)) {
+        $isOperatorDesa = strtolower($role->nama_role) === 'operator desa' || $role->nama_role === 'operator_desa';
+        
+        if ($isOperatorDesa && empty($request->desa_id)) {
             return back()->withErrors(['desa_id' => 'Operator Desa wajib memilih Desa.'])->withInput();
         }
 
-        if ($role->nama_role !== 'Operator Desa') {
+        if (!$isOperatorDesa) {
             $validated['desa_id'] = null;
         }
 
