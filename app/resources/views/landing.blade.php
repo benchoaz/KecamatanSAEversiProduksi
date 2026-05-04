@@ -303,21 +303,21 @@
                             <div class="text-reveal delay-300 relative group scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100">
                                 <div class="absolute -inset-10 bg-emerald-100 rounded-full blur-3xl opacity-50 animate-pulse"></div>
                                 <div class="relative bg-white/20 backdrop-blur-md p-2.5 md:p-4 rounded-[2.5rem] md:rounded-[3.5rem] border border-white/50 shadow-2xl transition-all duration-700 hover:rotate-2">
-                                    <div class="aspect-[4/5] w-[180px] sm:w-[240px] md:w-[280px] lg:w-[320px] rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border-4 border-white shadow-inner bg-slate-100">
+                                    <div class="aspect-video md:aspect-[4/5] w-[280px] sm:w-[320px] md:w-[280px] lg:w-[320px] rounded-[2rem] md:rounded-[3rem] overflow-hidden border-4 border-white shadow-inner bg-white">
                                         @if($appProfile->hero_image_path)
                                             <img src="{{ asset('storage/' . $appProfile->hero_image_path) }}" 
                                                  alt="{{ $appProfile->hero_image_alt ?? 'Pimpinan' }}"
-                                                 class="w-full h-full object-cover object-top">
+                                                 class="w-full h-full object-contain md:object-cover object-top">
                                         @else
                                             <div class="w-full h-full flex items-center justify-center text-slate-300">
-                                                <i class="fas fa-user-circle text-[8rem] md:text-[10rem]"></i>
+                                                <i class="fas fa-user-circle text-[6rem] md:text-[10rem]"></i>
                                             </div>
                                         @endif
                                     </div>
                                     
                                     <!-- Leader Floating Badge -->
                                     @if($appProfile->leader_name)
-                                    <div class="absolute -bottom-6 -left-4 md:-left-6 bg-white p-4 md:p-5 rounded-[1.5rem] md:rounded-3xl shadow-xl border border-emerald-50 min-w-[200px] md:min-w-[240px] transform -rotate-3 group-hover:rotate-0 transition-transform">
+                                    <div class="absolute -bottom-10 -left-2 md:-left-6 bg-white/90 backdrop-blur-md p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-xl border border-emerald-50 min-w-[180px] md:min-w-[240px] transform -rotate-2 group-hover:rotate-0 transition-transform z-20">
                                         <div class="flex items-center gap-3">
                                             <div class="w-1 h-8 md:w-1.5 md:h-10 bg-emerald-500 rounded-full"></div>
                                             <div>
