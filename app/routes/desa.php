@@ -33,6 +33,7 @@ Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->n
         Route::put('/personil/{id}', [App\Http\Controllers\Desa\AdministrasiController::class, 'personilUpdate'])->name('personil.update');
         Route::delete('/personil/{id}', [App\Http\Controllers\Desa\AdministrasiController::class, 'personilDestroy'])->name('personil.destroy');
         Route::post('/personil/{id}/submit', [App\Http\Controllers\Desa\AdministrasiController::class, 'personilSubmit'])->name('personil.submit');
+        Route::post('/personil/{id}/request-revision', [App\Http\Controllers\Desa\AdministrasiController::class, 'personilRequestRevision'])->name('personil.request-revision');
 
         // Lembaga Desa
         Route::get('/lembaga', [App\Http\Controllers\Desa\AdministrasiController::class, 'lembagaIndex'])->name('lembaga.index');

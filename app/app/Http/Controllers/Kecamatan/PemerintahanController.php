@@ -126,6 +126,21 @@ class PemerintahanController extends Controller
         return back()->with('success', 'Status personil berhasil diperbarui.');
     }
 
+    public function personilUnlock(Request $request, $id)
+    {
+        $personil = PersonilDesa::findOrFail($id);
+        
+        // Hanya bisa dibuka jika statusnya 'permohonan_revisi'
+        abort_unless($personil->status == 'permohonan_revisi', 403, 'Tidak ada permohonan revisi untuk data ini.');
+
+        $personil->update([
+            'status' => 'dikembalikan', // Kembali jadi editable
+            'catatan_revisi' => 'IZIN REVISI DIBERIKAN. Alasan Desa: ' . $personil->alasan_revisi
+        ]);
+
+        return back()->with('success', 'Kunci data berhasil dibuka. Desa sekarang dapat melakukan revisi.');
+    }
+
     public function personilTerminate(Request $request, $id)
     {
         $validated = $request->validate([

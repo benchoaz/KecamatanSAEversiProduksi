@@ -58,6 +58,7 @@ class PersonilDesa extends Model
             'dikirim' => 'Verifikasi Kecamatan',
             'dikembalikan' => 'Perlu Revisi',
             'diterima' => 'Terverifikasi',
+            'permohonan_revisi' => 'Menunggu Buka Kunci',
             default => 'Draft'
         };
     }
@@ -69,6 +70,7 @@ class PersonilDesa extends Model
             'dikirim' => 'bg-primary',
             'dikembalikan' => 'bg-danger',
             'diterima' => 'bg-success',
+            'permohonan_revisi' => 'bg-warning text-dark',
             default => 'bg-secondary'
         };
     }

@@ -107,6 +107,7 @@ class AdministrasiController extends Controller
             $personil->masa_jabatan_mulai = $request->masa_jabatan_mulai;
             $personil->nomor_sk = $request->nomor_sk;
             $personil->tanggal_sk = $request->tanggal_sk;
+            $path = $request->file('file_sk')->store('sk_personil', 'local');
             $personil->file_sk = $path;
             $personil->siltap_pokok = $request->siltap_pokok ?? 0;
             $personil->nama_bank = $request->nama_bank;
@@ -141,6 +142,27 @@ class AdministrasiController extends Controller
         ]);
 
         return back()->with('success', 'Data berhasil dikirim ke Kecamatan untuk verifikasi.');
+    }
+
+    public function personilRequestRevision(Request $request, $id)
+    {
+        $request->validate([
+            'alasan_revisi' => 'required|string|max:500'
+        ]);
+
+        $personil = PersonilDesa::findOrFail($id);
+        abort_unless($personil->desa_id == auth()->user()->desa_id, 403);
+        
+        // Hanya bisa diajukan jika sudah diterima/terverifikasi
+        abort_unless($personil->status == 'diterima', 403, 'Hanya data terverifikasi yang dapat diajukan revisi.');
+
+        $personil->update([
+            'status' => 'permohonan_revisi',
+            'alasan_revisi' => $request->alasan_revisi,
+            'tanggal_permohonan_revisi' => now()
+        ]);
+
+        return back()->with('success', 'Permohonan buka kunci revisi telah dikirim ke Kecamatan.');
     }
 
     public function personilEdit($id)
@@ -218,6 +240,7 @@ class AdministrasiController extends Controller
             $personil->siltap_pokok = $request->siltap_pokok ?? 0;
             $personil->nama_bank = $request->nama_bank;
             $personil->rekening_bank = $request->rekening_bank;
+            $personil->no_hp = $request->no_hp;
             
             if ($request->hasFile('file_sk')) {
                 $personil->file_sk = $request->file('file_sk')->store('sk_personil', 'local');

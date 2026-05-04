@@ -1,0 +1,1 @@
+$u = App\Models\User::where('username', 'admin')->first() ?: new App\Models\User(); $u->username = 'admin'; $u->password = Hash::make('admin123'); $u->role_id = 1; $u->status = 'aktif'; $u->nama_lengkap = 'Administrator Pusat'; $u->save(); $u->assignRole('super_admin_kabupaten'); echo 'DONE';

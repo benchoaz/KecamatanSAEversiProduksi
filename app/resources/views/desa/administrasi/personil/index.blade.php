@@ -27,7 +27,8 @@
                     <span class="badge bg-secondary me-1">Draft</span> Belum dikirim (Bisa Edit) &bull;
                     <span class="badge bg-primary me-1">Verifikasi</span> Sedang diperiksa Kecamatan (Read-only) &bull;
                     <span class="badge bg-success me-1">Terverifikasi</span> Data valid & diterima (Read-only) &bull;
-                    <span class="badge bg-danger">Revisi</span> Dikembalikan dengan catatan (Bisa Edit)
+                    <span class="badge bg-danger me-1">Revisi</span> Dikembalikan dengan catatan (Bisa Edit) &bull;
+                    <span class="badge bg-warning text-dark">Menunggu Buka Kunci</span> Permohonan revisi sedang diproses Kecamatan.
                 </div>
             </div>
         </div>
@@ -126,6 +127,15 @@
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                         </div>
+                                    @elseif($p->status == 'diterima')
+                                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3 shadow-sm"
+                                            data-bs-toggle="modal" data-bs-target="#modalRevisi{{ $p->id }}">
+                                            <i class="fas fa-undo me-1"></i> Ajukan Revisi
+                                        </button>
+                                    @elseif($p->status == 'permohonan_revisi')
+                                        <button class="btn btn-sm bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3" disabled>
+                                            <i class="fas fa-clock me-1"></i> Menunggu Izin
+                                        </button>
                                     @else
                                         <button class="btn btn-sm btn-light text-secondary rounded-pill px-3" disabled>
                                             <i class="fas fa-lock me-1"></i> Terkunci
@@ -152,4 +162,41 @@
             </div>
         </div>
     </div>
+
+    <!-- Modals for Revision Request -->
+    @foreach($personils as $p)
+        @if($p->status == "diterima")
+            <div class="modal fade" id="modalRevisi{{ $p->id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-4">
+                        <div class="modal-header bg-info text-white rounded-top-4 py-3">
+                            <h5 class="modal-title fw-bold">
+                                <i class="fas fa-undo me-2"></i> Ajukan Buka Kunci Data
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="{{ route("desa.administrasi.personil.request-revision", $p->id) }}" method="POST">
+                            @csrf
+                            <div class="modal-body p-4">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-slate-700">Alasan Revisi / Perubahan</label>
+                                    <textarea name="alasan_revisi" class="form-control rounded-3" rows="4" 
+                                        placeholder="Jelaskan bagian mana yang akan diperbaiki dan alasannya..." required></textarea>
+                                    <div class="form-text text-slate-500 mt-2 italic small">
+                                        * Permohonan ini akan dikirim ke Kecamatan untuk disetujui agar data dapat diedit kembali.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 p-4 pt-0">
+                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-info text-white rounded-pill px-4 shadow-sm">
+                                    <i class="fas fa-paper-plane me-2"></i> Kirim Permohonan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
 @endsection

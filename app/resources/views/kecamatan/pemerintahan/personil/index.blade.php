@@ -208,35 +208,64 @@
                                         <div class="x-small text-danger mt-1">Alasan: {{ ucfirst($p->status_keaktifan ?? 'Berhenti') }}</div>
                                     @else
                                         <span class="badge {{ $p->status_badge }} rounded-pill px-3">{{ $p->status_label }}</span>
+                                        @if($p->status == 'permohonan_revisi')
+                                            <div class="mt-1">
+                                                <small class="text-warning fw-bold" title="{{ $p->alasan_revisi }}" style="cursor:help;">
+                                                    <i class="fas fa-comment-dots me-1"></i> Alasan: {{ Str::limit($p->alasan_revisi, 30) }}
+                                                </small>
+                                            </div>
+                                        @endif
                                     @endif
                                 </td>
                                  <td class="text-end pe-4">
                                     <div class="d-flex align-items-center justify-content-end gap-1">
-                                        @if(auth()->user()->role == 'kecamatan')
-                                            @if($p->status != 'diterima')
+                                        @php 
+                                            $user = auth()->user();
+                                            $userRoleName = strtolower($user->role->name ?? '');
+                                            $hasKecamatanAuthority = $user->isSuperAdmin() || 
+                                                                    in_array($userRoleName, ['super admin', 'operator kecamatan', 'verifikator']) || 
+                                                                    $user->can('view_seksi_pemerintahan');
+                                        @endphp
+
+                                        @if($hasKecamatanAuthority)
+                                            @if($p->status == 'permohonan_revisi')
+                                                <form action="{{ route('kecamatan.pemerintahan.detail.personil.unlock', $p->id) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="btn btn-icon btn-info rounded-circle shadow-sm text-white"
+                                                        title="Buka Kunci Data (Izinkan Revisi)" onclick="return confirm('Izinkan Desa melakukan perubahan data ini?')">
+                                                        <i class="fas fa-unlock"></i>
+                                                    </button>
+                                                </form>
+                                            @elseif($p->status != 'diterima')
+                                                <!-- Validasi / Terima -->
                                                 <form action="{{ route('kecamatan.pemerintahan.detail.personil.verify', $p->id) }}"
                                                     method="POST" class="d-inline">
                                                     @csrf
                                                     <input type="hidden" name="status" value="diterima">
                                                     <button type="submit"
                                                         class="btn btn-icon btn-success rounded-circle shadow-sm text-white"
-                                                        title="Verifikasi / Terima">
+                                                        title="Validasi & Terima Data" onclick="return confirm('Terima dan verifikasi data ini?')">
                                                         <i class="fas fa-check"></i>
                                                     </button>
                                                 </form>
 
+                                                <!-- Kembalikan / Minta Perbaikan -->
                                                 <button type="button" class="btn btn-icon btn-warning rounded-circle shadow-sm text-white"
-                                                    data-bs-toggle="modal" data-bs-target="#revisionModal{{ $p->id }}" title="Minta Revisi">
-                                                    <i class="fas fa-reply"></i>
+                                                    data-bs-toggle="modal" data-bs-target="#revisionModal{{ $p->id }}" title="Kembalikan (Minta Perbaikan)">
+                                                    <i class="fas fa-undo"></i>
                                                 </button>
                                             @endif
 
+                                            <!-- Nonaktifkan -->
                                             <button type="button" class="btn btn-icon btn-light rounded-circle shadow-sm text-danger"
                                                 title="Nonaktifkan" data-bs-toggle="modal" data-bs-target="#terminateModal{{ $p->id }}">
                                                 <i class="fas fa-power-off"></i>
                                             </button>
                                         @else
                                             {{-- Aksi untuk Desa --}}
+}
                                             <div class="d-flex align-items-center gap-1">
                                                 @if($p->status == 'draft' || $p->status == 'dikembalikan')
                                                     {{-- Tombol Kirim --}}

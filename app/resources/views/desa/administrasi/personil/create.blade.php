@@ -127,25 +127,22 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <x-desa.form.input label="Mulai Menjabat (TMT)" name="masa_jabatan_mulai"
                                             type="date" required="true" />
                                     </div>
-                                    @if($kategori == 'perangkat')
-                                        <div class="col-md-6">
-                                            <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok"
-                                                type="number" placeholder="Contoh: 2400000" />
-                                        </div>
-                                    @else
-                                        <div class="col-md-6">
+                                    <div class="col-md-4">
+                                        <x-desa.form.input label="Siltap/Tunjangan (Rp)" name="siltap_pokok"
+                                            type="number" placeholder="Contoh: 2400000" />
+                                    </div>
+                                    @if($kategori == 'bpd')
+                                        <div class="col-md-4">
                                             <x-desa.form.input label="Selesai Jabatan" name="masa_jabatan_selesai"
                                                 type="date" required="true" />
                                         </div>
                                     @endif
                                 </div>
 
-                                @if($kategori == 'perangkat')
-                                <div class="row mt-3">
                                     <div class="col-md-6">
                                         <x-desa.form.input label="Nama Bank" name="nama_bank" placeholder="Contoh: Bank Jatim" />
                                     </div>
@@ -154,7 +151,6 @@
                                             placeholder="Masukkan nomor rekening bank" />
                                     </div>
                                 </div>
-                                @endif
                             </div>
 
                             <hr class="border-light my-5">

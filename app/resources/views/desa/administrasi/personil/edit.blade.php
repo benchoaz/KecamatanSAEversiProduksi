@@ -72,7 +72,7 @@
                                         <div class="mb-3">
                                             <label class="form-label fw-bold text-slate-700">NIK <span class="text-danger">*</span></label>
                                             <input type="text" name="nik" id="nikInput" class="form-control rounded-3 shadow-sm border-slate-300" 
-                                                value="{{ $personil->nik }}" :readonly="$readonly"
+                                                value="{{ $personil->nik }}" {{ $readonly ? 'readonly' : '' }}
                                                 placeholder="16 Digit Angka" maxlength="16" required>
                                             <div id="nikCounter" class="x-small mt-1 fw-bold text-danger">0 / 16 digit</div>
                                         </div>
@@ -145,22 +145,6 @@
                                             type="date" :value="$personil->masa_jabatan_mulai ? $personil->masa_jabatan_mulai->format('Y-m-d') : ''" 
                                             :readonly="$readonly" required="true" />
                                     </div>
-                                    @if($kategori == 'perangkat')
-                                        <div class="col-md-6">
-                                            <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok"
-                                                type="number" :value="$personil->siltap_pokok" :readonly="$readonly" placeholder="Contoh: 2400000" />
-                                        </div>
-                                    @else
-                                        <div class="col-md-6">
-                                            <x-desa.form.input label="Selesai Jabatan" name="masa_jabatan_selesai"
-                                                type="date" :value="$personil->masa_jabatan_selesai ? $personil->masa_jabatan_selesai->format('Y-m-d') : ''" 
-                                                :readonly="$readonly" required="true" />
-                                        </div>
-                                    @endif
-                                </div>
-
-                                @if($kategori == 'perangkat')
-                                <div class="row mt-3">
                                     <div class="col-md-6">
                                         <x-desa.form.input label="Nama Bank" name="nama_bank" :value="$personil->nama_bank"
                                             :readonly="$readonly" placeholder="Contoh: Bank Jatim" />
@@ -170,7 +154,6 @@
                                             :readonly="$readonly" placeholder="Masukkan nomor rekening bank" />
                                     </div>
                                 </div>
-                                @endif
                             </div>
 
                             <hr class="border-light my-5">
