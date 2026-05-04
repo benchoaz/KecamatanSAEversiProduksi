@@ -171,21 +171,24 @@
         </div>
     @endif
 
+@endsection
+
+@section('modal')
     <!-- Modal Tambah Lembaga -->
     <div class="modal fade" id="addLembagaModal" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Tambah Lembaga Desa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-primary-900 text-white py-3">
+                    <h5 class="modal-title fw-bold">Tambah Lembaga Desa</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <form action="{{ route('kecamatan.pemerintahan.detail.lembaga.store') }}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
-                    <div class="modal-body">
+                    <div class="modal-body p-4">
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label">Tipe Lembaga</label>
+                                <label class="form-label fw-bold small">Tipe Lembaga</label>
                                 <select name="tipe_lembaga" class="form-select" required>
                                     <option value="PKK">PKK (Pemberdayaan Kesejahteraan Keluarga)</option>
                                     <option value="Karang Taruna">Karang Taruna</option>
@@ -196,69 +199,65 @@
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Nama Lembaga (Sesuai SK)</label>
+                                <label class="form-label fw-bold small">Nama Lembaga (Sesuai SK)</label>
                                 <input type="text" name="nama_lembaga" class="form-control"
                                     placeholder="Contoh: PKK Desa Sukamaju" required>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Nama Ketua</label>
+                                <label class="form-label fw-bold small">Nama Ketua</label>
                                 <input type="text" name="ketua" class="form-control" placeholder="Nama Lengkap">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">No SK</label>
+                                <label class="form-label fw-bold small">No SK</label>
                                 <input type="text" name="nomor_sk" class="form-control">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Tahun Formasi</label>
+                                <label class="form-label fw-bold small">Tahun Formasi</label>
                                 <input type="number" name="tahun_pembentukan" class="form-control" placeholder="YYYY">
                             </div>
                             <div class="col-12">
-                                <label class="form-label">File SK (PDF)</label>
+                                <label class="form-label fw-bold small">File SK (PDF)</label>
                                 <input type="file" name="file_sk" class="form-control" accept="application/pdf">
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Lembaga</button>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-brand-600 text-white rounded-pill px-4">Simpan Lembaga</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Modals for Revision moved outside table -->
-    @section('modal')
-        @if(isset($lembagas))
-            @foreach($lembagas as $l)
-                <div class="modal fade" id="revisionModal{{ $l->id }}" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg rounded-4">
-                            <div class="modal-header bg-warning-subtle text-warning-emphasis fw-bold">
-                                Catatan Revisi ({{ $l->nama_lembaga }})
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <form action="{{ route('kecamatan.pemerintahan.detail.lembaga.verify', $l->id) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="status" value="dikembalikan">
-                                <div class="modal-body text-start">
-                                    <label class="form-label fw-bold small">Alasan Pengembalian</label>
-                                    <textarea name="catatan" class="form-control" rows="3" required
-                                        placeholder="Jelaskan data yang perlu diperbaiki..."></textarea>
-                                </div>
-                                <div class="modal-footer border-0">
-                                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Batal</button>
-                                    <button type="submit" class="btn btn-warning rounded-pill px-4">Kirim Revisi</button>
-                                </div>
-                            </form>
+    @if(isset($lembagas))
+        @foreach($lembagas as $l)
+            <!-- Modal Revisi -->
+            <div class="modal fade" id="revisionModal{{ $l->id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-4">
+                        <div class="modal-header bg-warning-subtle text-warning-emphasis fw-bold">
+                            Catatan Revisi ({{ $l->nama_lembaga }})
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
+                        <form action="{{ route('kecamatan.pemerintahan.detail.lembaga.verify', $l->id) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="status" value="dikembalikan">
+                            <div class="modal-body text-start">
+                                <label class="form-label fw-bold small">Alasan Pengembalian</label>
+                                <textarea name="catatan" class="form-control" rows="3" required
+                                    placeholder="Jelaskan data yang perlu diperbaiki..."></textarea>
+                            </div>
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-warning rounded-pill px-4">Kirim Revisi</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            @endforeach
-        @endif
-    @endsection
-
-@endsection
+            </div>
+        @endforeach
+    @endif
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/menu-pages.css') }}">

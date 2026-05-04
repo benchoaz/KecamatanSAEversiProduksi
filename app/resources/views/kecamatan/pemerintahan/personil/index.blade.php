@@ -265,7 +265,6 @@
                                             </button>
                                         @else
                                             {{-- Aksi untuk Desa --}}
-}
                                             <div class="d-flex align-items-center gap-1">
                                                 @if($p->status == 'draft' || $p->status == 'dikembalikan')
                                                     {{-- Tombol Kirim --}}
@@ -321,182 +320,221 @@
         </div>
     @endif
 
-    <!-- Simple Placeholder Modal for Demo -->
-    <div class="modal fade" id="addPersonilModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-header bg-primary-900 text-white rounded-top-4 py-3 px-4">
-                    <h5 class="modal-title fw-bold">Tambah Data Personil</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <form action="{{ $store_route }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="kategori" value="{{ $kategori ?? 'perangkat' }}">
-                    <input type="hidden" name="desa_id" value="{{ $desa_id }}">
+@endsection
 
-                    <div class="modal-body p-4">
-                        <div class="row g-4">
-                            <!-- Foto Section -->
-                            <div class="col-12 text-center mb-2">
-                                <div class="position-relative d-inline-block">
-                                    <div class="rounded-circle border-dashed border-2 border-primary-200 d-flex align-items-center justify-content-center bg-primary-50"
-                                        style="width: 120px; height: 120px;">
-                                        <i class="fas fa-camera fa-2x text-primary-300"></i>
+@section('modal')
+    @if($desa_id)
+        <!-- Modal Tambah Personil -->
+        <div class="modal fade" id="addPersonilModal" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header bg-primary-900 text-white rounded-top-4 py-3 px-4">
+                        <h5 class="modal-title fw-bold">Tambah Data Personil</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ $store_route }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="kategori" value="{{ $kategori ?? 'perangkat' }}">
+                        <input type="hidden" name="desa_id" value="{{ $desa_id }}">
+
+                        <div class="modal-body p-4">
+                            <div class="row g-4">
+                                <!-- Foto Section -->
+                                <div class="col-12 text-center mb-2">
+                                    <div class="position-relative d-inline-block">
+                                        <div class="rounded-circle border-dashed border-2 border-primary-200 d-flex align-items-center justify-content-center bg-primary-50"
+                                            style="width: 120px; height: 120px;">
+                                            <i class="fas fa-camera fa-2x text-primary-300"></i>
+                                        </div>
+                                        <label for="fotoInput"
+                                            class="position-absolute bottom-0 end-0 bg-brand-600 text-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                                            style="width: 36px; height: 36px; cursor: pointer;">
+                                            <i class="fas fa-plus"></i>
+                                            <input type="file" id="fotoInput" name="foto" class="d-none" accept="image/*">
+                                        </label>
                                     </div>
-                                    <label for="fotoInput"
-                                        class="position-absolute bottom-0 end-0 bg-brand-600 text-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                                        style="width: 36px; height: 36px; cursor: pointer;">
-                                        <i class="fas fa-plus"></i>
-                                        <input type="file" id="fotoInput" name="foto" class="d-none" accept="image/*">
-                                    </label>
+                                    <div class="mt-2 small text-tertiary">Pas Foto (JPG/PNG, Max 1MB)</div>
                                 </div>
-                                <div class="mt-2 small text-tertiary">Pas Foto (JPG/PNG, Max 1MB)</div>
-                            </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Nama Lengkap</label>
-                                <input type="text" name="nama" class="form-control rounded-3 border-gray-200"
-                                    placeholder="Contoh: Budi Santoso, S.T" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">NIK (16 Digit)</label>
-                                <input type="text" name="nik" class="form-control rounded-3 border-gray-200" maxlength="16"
-                                    placeholder="Masukkan 16 digit NIK" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Tempat Lahir</label>
-                                <input type="text" name="tempat_lahir" class="form-control rounded-3 border-gray-200"
-                                    placeholder="Contoh: Probolinggo">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Tanggal Lahir</label>
-                                <input type="date" name="tanggal_lahir" class="form-control rounded-3 border-gray-200"
-                                    required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Nomor Telepon / WhatsApp</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0 text-success"><i
-                                            class="fab fa-whatsapp"></i></span>
-                                    <input type="text" name="no_hp" class="form-control rounded-3 border-start-0 ps-0"
-                                        placeholder="Contoh: 08123456789">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Nama Lengkap</label>
+                                    <input type="text" name="nama" class="form-control rounded-3 border-gray-200"
+                                        placeholder="Contoh: Budi Santoso, S.T" required>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Jabatan</label>
-                                <select name="jabatan" class="form-select rounded-3 border-gray-200" required>
-                                    @if(($kategori ?? 'perangkat') == 'perangkat')
-                                        <option value="Kepala Desa">Kepala Desa</option>
-                                        <option value="Sekretaris Desa">Sekretaris Desa</option>
-                                        <option value="Kaur Keuangan">Kaur Keuangan</option>
-                                        <option value="Kaur Perencanaan">Kaur Perencanaan</option>
-                                        <option value="Kaur Umum">Kaur Umum</option>
-                                        <option value="Kasi Pemerintahan">Kasi Pemerintahan</option>
-                                        <option value="Kasi Kesejahteraan">Kasi Kesejahteraan</option>
-                                        <option value="Kasi Pelayanan">Kasi Pelayanan</option>
-                                        <option value="Kepala Dusun">Kepala Dusun</option>
-                                    @else
-                                        <option value="Ketua BPD">Ketua BPD</option>
-                                        <option value="Wakil Ketua BPD">Wakil Ketua BPD</option>
-                                        <option value="Sekretaris BPD">Sekretaris BPD</option>
-                                        <option value="Anggota BPD">Anggota BPD</option>
-                                    @endif
-                                </select>
-                            </div>
-
-                            <!-- Financial Section -->
-                            <div class="col-12 mt-4">
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <h6 class="fw-bold text-primary-900 mb-0">Informasi Keuangan & Perbankan</h6>
-                                    <div class="h-px bg-slate-200 flex-grow-1"></div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">NIK (16 Digit)</label>
+                                    <input type="text" name="nik" class="form-control rounded-3 border-gray-200" maxlength="16"
+                                        placeholder="Masukkan 16 digit NIK" required>
                                 </div>
-                            </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Tempat Lahir</label>
+                                    <input type="text" name="tempat_lahir" class="form-control rounded-3 border-gray-200"
+                                        placeholder="Contoh: Probolinggo">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Tanggal Lahir</label>
+                                    <input type="date" name="tanggal_lahir" class="form-control rounded-3 border-gray-200"
+                                        required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Nomor Telepon / WhatsApp</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0 text-success"><i
+                                                class="fab fa-whatsapp"></i></span>
+                                        <input type="text" name="no_hp" class="form-control rounded-3 border-start-0 ps-0"
+                                            placeholder="Contoh: 08123456789">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Jabatan</label>
+                                    <select name="jabatan" class="form-select rounded-3 border-gray-200" required>
+                                        @if(($kategori ?? 'perangkat') == 'perangkat')
+                                            <option value="Kepala Desa">Kepala Desa</option>
+                                            <option value="Sekretaris Desa">Sekretaris Desa</option>
+                                            <option value="Kaur Keuangan">Kaur Keuangan</option>
+                                            <option value="Kaur Perencanaan">Kaur Perencanaan</option>
+                                            <option value="Kaur Umum">Kaur Umum</option>
+                                            <option value="Kasi Pemerintahan">Kasi Pemerintahan</option>
+                                            <option value="Kasi Kesejahteraan">Kasi Kesejahteraan</option>
+                                            <option value="Kasi Pelayanan">Kasi Pelayanan</option>
+                                            <option value="Kepala Dusun">Kepala Dusun</option>
+                                        @else
+                                            <option value="Ketua BPD">Ketua BPD</option>
+                                            <option value="Wakil Ketua BPD">Wakil Ketua BPD</option>
+                                            <option value="Sekretaris BPD">Sekretaris BPD</option>
+                                            <option value="Anggota BPD">Anggota BPD</option>
+                                        @endif
+                                    </select>
+                                </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Siltap Pokok (Rp)</label>
-                                <input type="number" name="siltap_pokok" class="form-control rounded-3 border-gray-200"
-                                    placeholder="0" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Tunjangan Jabatan (Rp)</label>
-                                <input type="number" name="tunjangan_jabatan" class="form-control rounded-3 border-gray-200"
-                                    placeholder="0">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Nama Bank</label>
-                                <input type="text" name="nama_bank" class="form-control rounded-3 border-gray-200"
-                                    placeholder="Contoh: Bank Jatim">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Nomor Rekening</label>
-                                <input type="text" name="rekening_bank" class="form-control rounded-3 border-gray-200"
-                                    placeholder="Masukkan nomor rekening">
-                            </div>
+                                <!-- Financial Section -->
+                                <div class="col-12 mt-4">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <h6 class="fw-bold text-primary-900 mb-0">Informasi Keuangan & Perbankan</h6>
+                                        <div class="h-px bg-slate-200 flex-grow-1"></div>
+                                    </div>
+                                </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Mulai Menjabat</label>
-                                <input type="date" name="masa_jabatan_mulai" class="form-control rounded-3 border-gray-200">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Nomor SK</label>
-                                <input type="text" name="nomor_sk" class="form-control rounded-3 border-gray-200"
-                                    placeholder="Contoh: 188/02/426.411.02/2024">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-primary-900">Tanggal SK</label>
-                                <input type="date" name="tanggal_sk" class="form-control rounded-3 border-gray-200">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold text-primary-900">Dokumen SK (PDF)</label>
-                                <div class="input-group">
-                                    <input type="file" name="file_sk" class="form-control rounded-3"
-                                        accept="application/pdf">
-                                    <span class="input-group-text bg-light text-muted small">Max 2MB</span>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Siltap Pokok (Rp)</label>
+                                    <input type="number" name="siltap_pokok" class="form-control rounded-3 border-gray-200"
+                                        placeholder="0" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Tunjangan Jabatan (Rp)</label>
+                                    <input type="number" name="tunjangan_jabatan" class="form-control rounded-3 border-gray-200"
+                                        placeholder="0">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Nama Bank</label>
+                                    <input type="text" name="nama_bank" class="form-control rounded-3 border-gray-200"
+                                        placeholder="Contoh: Bank Jatim">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Nomor Rekening</label>
+                                    <input type="text" name="rekening_bank" class="form-control rounded-3 border-gray-200"
+                                        placeholder="Masukkan nomor rekening">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Mulai Menjabat</label>
+                                    <input type="date" name="masa_jabatan_mulai" class="form-control rounded-3 border-gray-200">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Nomor SK</label>
+                                    <input type="text" name="nomor_sk" class="form-control rounded-3 border-gray-200"
+                                        placeholder="Contoh: 188/02/426.411.02/2024">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-primary-900">Tanggal SK</label>
+                                    <input type="date" name="tanggal_sk" class="form-control rounded-3 border-gray-200">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold text-primary-900">Dokumen SK (PDF)</label>
+                                    <div class="input-group">
+                                        <input type="file" name="file_sk" class="form-control rounded-3"
+                                            accept="application/pdf">
+                                        <span class="input-group-text bg-light text-muted small">Max 2MB</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer border-0 p-4 pt-0">
-                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-toggle="modal"
-                            data-bs-target="#addPersonilModal">Gagalkan</button>
-                        <button type="submit" class="btn btn-brand-600 text-white rounded-pill px-5 shadow-sm">Simpan
-                            Data</button>
-                    </div>
-                </form>
+                        <div class="modal-footer border-0 p-4 pt-0">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Gagalkan</button>
+                            <button type="submit" class="btn btn-brand-600 text-white rounded-pill px-5 shadow-sm">Simpan
+                                Data</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 
-    <!-- Modals for Revision moved outside table -->
-    @section('modal')
-        @if(isset($personils))
-            @foreach($personils as $p)
-                <div class="modal fade" id="revisionModal{{ $p->id }}" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg rounded-4">
-                            <div class="modal-header bg-warning-subtle text-warning-emphasis fw-bold">
-                                Catatan Revisi ({{ $p->nama }})
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <form action="{{ route('kecamatan.pemerintahan.detail.personil.verify', $p->id) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="status" value="dikembalikan">
-                                <div class="modal-body text-start">
-                                    <label class="form-label fw-bold small">Alasan Pengembalian</label>
-                                    <textarea name="catatan" class="form-control" rows="3" required
-                                        placeholder="Jelaskan data yang perlu diperbaiki..."></textarea>
-                                </div>
-                                <div class="modal-footer border-0">
-                                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Batal</button>
-                                    <button type="submit" class="btn btn-warning rounded-pill px-4">Kirim Revisi</button>
-                                </div>
-                            </form>
+    @if(isset($personils))
+        @foreach($personils as $p)
+            <!-- Modal Revisi -->
+            <div class="modal fade" id="revisionModal{{ $p->id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-4">
+                        <div class="modal-header bg-warning-subtle text-warning-emphasis fw-bold">
+                            Catatan Revisi ({{ $p->nama }})
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
+                        <form action="{{ route('kecamatan.pemerintahan.detail.personil.verify', $p->id) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="status" value="dikembalikan">
+                            <div class="modal-body text-start">
+                                <label class="form-label fw-bold small">Alasan Pengembalian</label>
+                                <textarea name="catatan" class="form-control" rows="3" required
+                                    placeholder="Jelaskan data yang perlu diperbaiki..."></textarea>
+                            </div>
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-warning rounded-pill px-4">Kirim Revisi</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            @endforeach
-        @endif
-    @endsection
+            </div>
+
+            <!-- Modal Nonaktifkan -->
+            <div class="modal fade" id="terminateModal{{ $p->id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-4">
+                        <div class="modal-header bg-danger text-white fw-bold">
+                            Nonaktifkan Personil: {{ $p->nama }}
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form action="{{ route('kecamatan.pemerintahan.detail.personil.terminate', $p->id) }}" method="POST">
+                            @csrf
+                            <div class="modal-body text-start">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Alasan Penonaktifan</label>
+                                    <select name="status_keaktifan" class="form-select" required>
+                                        <option value="berhenti">Berhenti</option>
+                                        <option value="diberhentikan">Diberhentikan</option>
+                                        <option value="meninggal">Meninggal Dunia</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Tanggal Non-Aktif</label>
+                                    <input type="date" name="tanggal_nonaktif" class="form-control" required value="{{ date('Y-m-d') }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Keterangan Tambahan</label>
+                                    <textarea name="alasan_nonaktif" class="form-control" rows="3" placeholder="Opsional..."></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-danger rounded-pill px-4">Konfirmasi Non-Aktif</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @endif
 
 @endsection
 

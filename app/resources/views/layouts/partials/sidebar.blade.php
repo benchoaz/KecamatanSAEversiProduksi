@@ -66,6 +66,7 @@
         </div>
 
         <!-- Ekonomi & Kreatif -->
+        @if(\App\Models\Menu::isActive('ekbang'))
         <div class="nav-section">
             <span class="nav-section-title">Ekonomi & Kreatif</span>
             <ul class="nav-menu">
@@ -89,6 +90,7 @@
                 @endauth
             </ul>
         </div>
+        @endif
 
         <!-- Seksi Pelayanan Umum (Restored) -->
         <div class="nav-section">
@@ -134,7 +136,7 @@
 
         <!-- Domain Menus -->
         @auth
-            @if($isCoreAdmin || auth()->user()->isOperatorKecamatan())
+            @if(($isCoreAdmin || auth()->user()->isOperatorKecamatan()) && \App\Models\Menu::isActive('kesra'))
                 <div class="nav-section">
                     <span class="nav-section-title">Bidang Kesra (Pasal 439)</span>
                     <ul class="nav-menu">
@@ -189,6 +191,7 @@
                         </li>
                     </ul>
                 </div>
+            @endif
             @else
                 @if($isCoreAdmin || auth()->user()->canany(['dashboard.view_desa', 'dashboard.view_kecamatan']))
                     <div class="nav-section">
@@ -208,6 +211,7 @@
                                 {{-- MODE KECAMATAN: Dropdown Menu --}}
                             @else
                                 <!-- Pemerintahan -->
+                                @if(\App\Models\Menu::isActive('pemerintahan'))
                                 <li class="nav-item has-submenu {{ request()->is('pemerintahan*') ? 'open' : '' }}">
                                     <a href="#" class="nav-link {{ request()->is('pemerintahan*') ? 'active' : '' }}">
                                         <span class="nav-icon"><i class="fas fa-building-columns"></i></span>
@@ -219,11 +223,12 @@
                                                 Desa</a></li>
                                     </ul>
                                 </li>
+                                @endif
                             @endif
 
 
                             <!-- Ekonomi & Pembangunan (Kecamatan Domain Check) -->
-                            @if(auth()->user()->isOperatorKecamatan() || auth()->user()->isSuperAdmin())
+                            @if((auth()->user()->isOperatorKecamatan() || auth()->user()->isSuperAdmin()) && \App\Models\Menu::isActive('ekbang'))
                                 <li class="nav-item {{ request()->is('ekbang*') ? 'open' : '' }}">
                                     <a href="{{ route('kecamatan.ekbang.index') }}"
                                         class="nav-link {{ request()->is('kecamatan/ekbang*') ? 'active' : '' }}">
@@ -259,6 +264,38 @@
         @endauth
 
         @auth
+            <!-- Trantibum Section -->
+            @if(($isCoreAdmin || auth()->user()->isOperatorKecamatan()) && \App\Models\Menu::isActive('trantibum'))
+                <div class="nav-section">
+                    <span class="nav-section-title">Seksi Trantibum</span>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="{{ route('kecamatan.trantibum.index') }}"
+                                class="nav-link {{ request()->is('kecamatan/trantibum*') ? 'active' : '' }}">
+                                <span class="nav-icon"><i class="fas fa-shield-halved"></i></span>
+                                <span class="nav-text">Monitoring Trantibum</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            @endif
+
+            <!-- Analisa Data Section -->
+            @if(($isCoreAdmin || auth()->user()->isOperatorKecamatan()) && \App\Models\Menu::isActive('analisa'))
+                <div class="nav-section">
+                    <span class="nav-section-title">Analisa & Evaluasi</span>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="{{ route('kecamatan.laporan.index') }}"
+                                class="nav-link {{ request()->is('kecamatan/laporan*') ? 'active' : '' }}">
+                                <span class="nav-icon"><i class="fas fa-magnifying-glass-chart"></i></span>
+                                <span class="nav-text">Dashboard Analisa</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            @endif
+
             <!-- Analytics / History -->
             <div class="nav-section">
                 <span class="nav-section-title">Monitoring</span>

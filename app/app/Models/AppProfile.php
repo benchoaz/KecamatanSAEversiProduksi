@@ -60,6 +60,8 @@ class AppProfile extends Model
         'zhipu_api_key',
         'openrouter_api_key',
         'alpha_vantage_api_key',
+        'ai_bot_name',
+        'ai_bot_instruction',
     ];
 
     protected $casts = [

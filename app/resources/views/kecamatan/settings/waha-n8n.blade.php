@@ -17,7 +17,10 @@
                 <h1 class="fw-bold fs-4 mb-0">Pengaturan WhatsApp Bot</h1>
                 <p class="text-muted small mb-0">Update nomor WhatsApp bot yang ditampilkan di halaman depan.</p>
             </div>
-            <div class="ms-auto">
+            <div class="ms-auto d-flex gap-2">
+                <button type="button" onclick="syncMemory()" class="btn btn-outline-indigo btn-sm">
+                    <i class="fas fa-sync me-1"></i> Sinkronkan Memori AI
+                </button>
                 <a href="{{ route('kecamatan.settings.waha-n8n.provider') }}"
                    class="btn btn-outline-primary btn-sm">
                     <i class="fas fa-plug me-1"></i> Konfigurasi Provider WA
@@ -115,6 +118,17 @@
                                 </div>
 
                                 <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label text-slate-700 fw-semibold">Nama Bot AI (Persona)</label>
+                                        <input type="text" name="ai_bot_name" value="{{ old('ai_bot_name', $profile->ai_bot_name ?? 'Kecamatan SAE Assistant') }}" class="form-control bg-white border-slate-200 rounded-3 text-sm" placeholder="Contoh: Admin Cantik, Si Pintar, dll">
+                                        <div class="form-text text-slate-400 small">Nama ini akan digunakan AI untuk memperkenalkan diri.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-slate-700 fw-semibold">Instruksi Tambahan (System Prompt)</label>
+                                        <textarea name="ai_bot_instruction" class="form-control bg-white border-slate-200 rounded-3 text-sm" rows="1" placeholder="Contoh: Gunakan bahasa yang sangat sopan dan ramah.">{{ old('ai_bot_instruction', $profile->ai_bot_instruction) }}</textarea>
+                                        <div class="form-text text-slate-400 small">Instruksi khusus untuk mengatur gaya bicara AI.</div>
+                                    </div>
+
                                     <div class="col-md-12">
                                         <label class="form-label text-slate-700 fw-semibold">Pilih Provider AI</label>
                                         <select name="ai_provider" class="form-select bg-white border-slate-200 rounded-3 text-sm mb-4">
@@ -750,6 +764,48 @@ function testApiKey(provider) {
     })
     .catch(e => {
         Swal.fire('Error', 'Gagal menghubungi server lokal.', 'error');
+    });
+}
+
+function syncMemory() {
+    Swal.fire({
+        title: 'Sinkronkan Memori AI?',
+        text: "Ini akan membersihkan cache instruksi lama dan memaksa AI untuk menggunakan data terbaru (seperti nama wilayah atau aturan baru).",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#4f46e5',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Sinkronkan!',
+        cancelButtonText: 'Batal',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+            return fetch("{{ route('kecamatan.settings.waha-n8n.sync-memory') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(response.statusText);
+                return response.json();
+            })
+            .catch(error => {
+                Swal.showValidationMessage(`Request failed: ${error}`);
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Sinkronisasi Berhasil',
+                text: result.value.message,
+                footer: result.value.n8n_status === 'success' ? 
+                    '<span class="text-success"><i class="fas fa-check-circle me-1"></i> n8n terintegrasi & memori disegarkan.</span>' : 
+                    '<span class="text-warning"><i class="fas fa-exclamation-triangle me-1"></i> Cache lokal bersih, namun n8n tidak merespon (cek konfigurasi webhook).</span>'
+            });
+        }
     });
 }
 </script>

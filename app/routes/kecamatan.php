@@ -207,6 +207,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
             Route::get('/provider',              [WahaN8nController::class, 'providerSettings'])->name('provider');
             Route::put('/provider',              [WahaN8nController::class, 'updateProvider'])->name('provider.update');
             Route::post('/provider/test',        [WahaN8nController::class, 'testProvider'])->name('provider.test');
+            Route::post('/sync-memory',         [WahaN8nController::class, 'syncMemory'])->name('sync-memory');
             Route::get('/workflow/download',     [WahaN8nController::class, 'downloadN8nWorkflow'])->name('workflow.download');
         });
 

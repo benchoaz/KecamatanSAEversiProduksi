@@ -100,6 +100,8 @@ class WahaN8nController extends Controller
             if ($request->filled('dashscope_api_key')) $profileData['dashscope_api_key'] = $request->input('dashscope_api_key');
             if ($request->filled('zhipu_api_key')) $profileData['zhipu_api_key'] = $request->input('zhipu_api_key');
             $profileData['is_ai_active'] = $request->has('is_ai_active');
+            $profileData['ai_bot_name'] = $request->input('ai_bot_name');
+            $profileData['ai_bot_instruction'] = $request->input('ai_bot_instruction');
         }
 
         if ($request->has('whatsapp_bot_menu')) {
@@ -267,6 +269,42 @@ class WahaN8nController extends Controller
         return response($json, 200, [
             'Content-Type'        => 'application/json',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Sync / Clear Memory (AI Refresh)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    public function syncMemory(Request $request)
+    {
+        // 1. Clear Laravel Application Cache
+        app(\App\Services\ApplicationProfileService::class)->clearCache();
+        WahaN8nSetting::clearCache();
+
+        // 2. Notify n8n via Webhook to refresh instructions/memory
+        $settings = WahaN8nSetting::getSettings();
+        $webhookUrl = $settings->n8n_webhook_url;
+
+        $n8nStatus = 'not_configured';
+        if ($webhookUrl) {
+            try {
+                $response = \Illuminate\Support\Facades\Http::timeout(10)->post($webhookUrl, [
+                    'type'   => 'clear_memory',
+                    'action' => 'sync_context',
+                    'source' => 'admin_dashboard',
+                    'timestamp' => now()->toIso8601String(),
+                ]);
+                $n8nStatus = $response->successful() ? 'success' : 'failed';
+            } catch (\Exception $e) {
+                $n8nStatus = 'error: ' . $e->getMessage();
+            }
+        }
+
+        return response()->json([
+            'success'    => true,
+            'message'    => 'Cache aplikasi berhasil dibersihkan. Memori AI telah dijadwalkan untuk sinkronisasi ulang.',
+            'n8n_status' => $n8nStatus
         ]);
     }
 }
