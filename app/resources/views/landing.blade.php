@@ -2217,8 +2217,7 @@
                     throw new Error(`Server error ${response.status}. Coba refresh halaman dan kirim ulang.`);
                 }
 
-                if (response.ok && (result.success || result.tracking_code || result.uuid)) {
-                    // S                    Swal.fire({
+                    Swal.fire({
                         icon: 'success',
                         title: 'Pengaduan Terkirim! 🎉',
                         html: `<p class="text-sm text-slate-600 mb-3">Terima kasih telah menyampaikan pengaduan. Kami akan memprosesnya segera.</p>
@@ -2251,8 +2250,6 @@
                             // Reset rating when modal opens
                             window.quickRating = 0;
                         }
-                    });ttonColor: '#f43f5e',
-                        confirmButtonText: 'Tutup'
                     });
 
                     // Close modal and reset form
