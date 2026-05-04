@@ -184,6 +184,7 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- 1. JABATAN & DUSUN TOGGLE ---
         const jabatanSelect = document.getElementById('jabatanSelect');
         const dusunWrapper = document.getElementById('dusunWrapper');
         const dusunInput = dusunWrapper ? dusunWrapper.querySelector('input') : null;
@@ -203,7 +204,31 @@
 
         if(jabatanSelect) {
             jabatanSelect.addEventListener('change', toggleDusun);
-            toggleDusun(); // Initial check
+            toggleDusun();
+        }
+
+        // --- 2. NIK COUNTER ---
+        const nikInput = document.querySelector('input[name="nik"]');
+        if (nikInput) {
+            // Create counter element
+            const counterDiv = document.createElement('div');
+            counterDiv.id = 'nikCounter';
+            counterDiv.style.cssText = 'font-size: 0.65rem; font-weight: bold; margin-top: 2px; transition: color 0.3s;';
+            nikInput.parentNode.appendChild(counterDiv);
+
+            function updateCounter() {
+                const len = nikInput.value.length;
+                counterDiv.innerText = `${len} / 16 digit`;
+                if (len === 16) {
+                    counterDiv.style.color = '#10b981'; // Green-500
+                    counterDiv.innerText += ' (Pas)';
+                } else {
+                    counterDiv.style.color = '#ef4444'; // Red-500
+                }
+            }
+
+            nikInput.addEventListener('input', updateCounter);
+            updateCounter(); // Initial check
         }
     });
 </script>

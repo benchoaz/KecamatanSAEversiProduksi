@@ -70,7 +70,7 @@ class AdministrasiController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nik' => 'required|string|size:16|regex:/^[0-9]+$/|unique:personil_desa,nik',
+            'nik' => 'required|digits:16|unique:personil_desa,nik',
             'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'jabatan' => 'required|string',
@@ -144,7 +144,7 @@ class AdministrasiController extends Controller
 
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nik' => 'required|string|size:16|regex:/^[0-9]+$/|unique:personil_desa,nik,' . $id,
+            'nik' => 'required|digits:16|unique:personil_desa,nik,' . $id,
             'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'jabatan' => 'required|string',
