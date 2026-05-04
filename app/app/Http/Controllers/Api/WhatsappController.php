@@ -28,6 +28,13 @@ class WhatsappController extends Controller
      */
     public function handle(Request $request): JsonResponse
     {
+        // INTENSIVE DEBUG LOGGING
+        \Log::info('RAW_WHATSAPP_REQUEST', [
+            'all_data' => $request->all(),
+            'headers' => $request->headers->all(),
+            'method' => $request->method(),
+        ]);
+        
         // =====================================================
         // TRANSFORM WAHA WEBHOOK FORMAT
         // n8n sends: { phone: null, message: { payload: { from, body } } }
