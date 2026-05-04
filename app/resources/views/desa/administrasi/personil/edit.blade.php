@@ -87,7 +87,7 @@
                                             :readonly="$readonly" placeholder="Contoh: Bank Jatim" />
                                     </div>
                                     <div class="col-md-6">
-                                        <x-desa.form.input label="Nomor Rekening" name="rekening_bank" :value="$personil->rekening_bank"
+                                        <x-desa.form.input label="Nomor Rekening Pribadi" name="rekening_bank" :value="$personil->rekening_bank"
                                             :readonly="$readonly" placeholder="Nomor Rekening Bank" />
                                     </div>
                                 </div>

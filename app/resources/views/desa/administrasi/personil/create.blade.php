@@ -161,7 +161,7 @@
                                             <x-desa.form.input label="Nama Bank" name="nama_bank" placeholder="Contoh: Bank Jatim" />
                                         </div>
                                         <div class="col-md-6">
-                                            <x-desa.form.input label="Nomor Rekening" name="rekening_bank" placeholder="Nomor Rekening Bank" />
+                                            <x-desa.form.input label="Nomor Rekening Pribadi" name="rekening_bank" placeholder="Nomor Rekening Bank" />
                                         </div>
                                     </div>
                                 </div>

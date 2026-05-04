@@ -92,10 +92,23 @@ class AdministrasiController extends Controller
         DB::transaction(function () use ($request) {
             $path = $request->file('file_sk')->store('sk_personil', 'local');
 
-            $personil = new PersonilDesa($request->except('file_sk'));
+            $personil = new PersonilDesa();
             $personil->desa_id = auth()->user()->desa_id;
+            $personil->kategori = $request->kategori;
+            $personil->nama = $request->nama;
+            $personil->nik = $request->nik;
+            $personil->tempat_lahir = $request->tempat_lahir;
+            $personil->tanggal_lahir = $request->tanggal_lahir;
+            $personil->jabatan = $request->jabatan;
+            $personil->nama_dusun = $request->nama_dusun;
+            $personil->masa_jabatan_mulai = $request->masa_jabatan_mulai;
+            $personil->nomor_sk = $request->nomor_sk;
+            $personil->tanggal_sk = $request->tanggal_sk;
             $personil->file_sk = $path;
-            $personil->status = 'draft'; // Default status
+            $personil->siltap_pokok = $request->siltap_pokok ?? 0;
+            $personil->nama_bank = $request->nama_bank;
+            $personil->rekening_bank = $request->rekening_bank;
+            $personil->status = 'draft';
             $personil->save();
 
             // Log Riwayat Awal
@@ -186,7 +199,25 @@ class AdministrasiController extends Controller
                 ]);
             }
 
-            $personil->update($data);
+            // Sync all fields
+            $personil->nama = $request->nama;
+            $personil->nik = $request->nik;
+            $personil->tempat_lahir = $request->tempat_lahir;
+            $personil->tanggal_lahir = $request->tanggal_lahir;
+            $personil->jabatan = $request->jabatan;
+            $personil->nama_dusun = $request->nama_dusun;
+            $personil->masa_jabatan_mulai = $request->masa_jabatan_mulai;
+            $personil->nomor_sk = $request->nomor_sk;
+            $personil->tanggal_sk = $request->tanggal_sk;
+            $personil->siltap_pokok = $request->siltap_pokok ?? 0;
+            $personil->nama_bank = $request->nama_bank;
+            $personil->rekening_bank = $request->rekening_bank;
+            
+            if (isset($data['file_sk'])) {
+                $personil->file_sk = $data['file_sk'];
+            }
+            
+            $personil->save();
         });
 
         return redirect()->route('desa.administrasi.personil.index', ['kategori' => $personil->kategori])
