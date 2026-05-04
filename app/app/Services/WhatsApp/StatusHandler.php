@@ -225,7 +225,7 @@ class StatusHandler
     protected function formatSingleStatus(PublicService $service): string
     {
         $statusLabel = $this->getStatusBadge($service->status);
-        $baseUrl = config('app.url', 'https://localhost');
+        $baseUrl = $this->getPublicUrl();
         $trackingUrl = rtrim($baseUrl, '/') . '/layanan?q=' . $service->tracking_code;
 
         $msg = "📂 *INFORMASI BERKAS ANDA*\n\n";
@@ -257,7 +257,7 @@ class StatusHandler
      */
     protected function formatMultipleStatus($services): string
     {
-        $baseUrl = config('app.url', 'https://localhost');
+        $baseUrl = $this->getPublicUrl();
         
         $msg = "📂 *DAFTAR BERKAS LAYANAN ANDA*\n\n";
         $msg .= "Halo! Kami menemukan *{$services->count()}* berkas yang terdaftar dengan nomor ini:\n\n";
@@ -278,6 +278,15 @@ class StatusHandler
         $msg .= "_Ketik MENU untuk kembali._";
 
         return $msg;
+    }
+
+    protected function getPublicUrl(): string
+    {
+        $profile = \App\Models\AppProfile::first();
+        if ($profile && !empty($profile->public_url)) {
+            return rtrim($profile->public_url, '/');
+        }
+        return rtrim(env('PUBLIC_BASE_URL', config('app.url')), '/');
     }
 
     /**

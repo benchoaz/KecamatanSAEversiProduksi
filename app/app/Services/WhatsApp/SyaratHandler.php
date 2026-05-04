@@ -85,13 +85,11 @@ class SyaratHandler
     {
         $title = $result['question'];
         $answer = $result['answer'];
-        
-        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+        $baseUrl = $this->getPublicUrl();
         
         $reply = "✅ *{$title}*\n\n";
         $reply .= $answer;
         
-        // Add link if relevant (using old logic but simplified)
         $link = $this->detectServiceLink($title);
         if ($link) {
             $reply .= "\n\nAjukan Online:\n";
@@ -108,21 +106,19 @@ class SyaratHandler
      */
     protected function formatFaqAnswer(PelayananFaq $faq): string
     {
-        // Detect service keyword to build link
         $serviceLink = $this->detectServiceLink($faq->keywords);
-        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+        $baseUrl = $this->getPublicUrl();
 
         $reply = "{$faq->question}\n\n";
         $reply .= $faq->answer;
 
-        // Add link if service detected
         if ($serviceLink) {
             $reply .= "\n\nAjukan Permohonan Online:\n";
             $reply .= "{$baseUrl}/{$serviceLink}";
         }
 
-        $reply .= "\n\nKetik *SYARAT* untuk melihat daftar layanan lainnya.\n";
-        $reply .= "Ketik *MENU* atau *0* untuk kembali ke menu utama.";
+        $reply .= "\n\nKetik *SYARAT* untuk lainnya.\n";
+        $reply .= "Ketik *MENU* atau *0* untuk kembali.";
 
         return $reply;
     }
@@ -162,12 +158,11 @@ class SyaratHandler
      */
     protected function getCategoriesList(): string
     {
-        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+        $baseUrl = $this->getPublicUrl();
 
-        $reply = "SYARAT LAYANAN KECAMATAN\n\n";
+        $reply = "🏛️ *SYARAT LAYANAN KECAMATAN*\n\n";
         $reply .= "Silakan ketik layanan yang Anda butuhkan:\n\n";
 
-        // Get all active FAQs grouped by category
         $faqs = PelayananFaq::where('is_active', true)
             ->where('category', '!=', 'Darurat')
             ->orderBy('category')
@@ -190,10 +185,10 @@ class SyaratHandler
             }
         }
 
-        $reply .= "Contoh: *syarat kk*, *syarat ktp*, *syarat domisili*\n\n";
+        $reply .= "Contoh: *syarat kk*, *syarat ktp*\n\n";
         $reply .= "Ajukan Secara Online:\n";
         $reply .= "{$baseUrl}/#layanan\n\n";
-        $reply .= "Ketik *MENU* atau *0* untuk kembali ke menu utama.";
+        $reply .= "Ketik *MENU* atau *0* untuk kembali.";
 
         return $reply;
     }
@@ -203,19 +198,27 @@ class SyaratHandler
      */
     protected function getNotFoundMessage(string $query): string
     {
-        $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
+        $baseUrl = $this->getPublicUrl();
 
         $reply = "Maaf, tidak ditemukan informasi syarat untuk \"{$query}\".\n\n";
         $reply .= "Silakan coba kata kunci lain seperti:\n";
         $reply .= "- SYARAT KTP\n";
         $reply .= "- SYARAT KK\n";
-        $reply .= "- SYARAT AKTA\n";
-        $reply .= "- SYARAT DOMISILI\n\n";
+        $reply .= "- SYARAT AKTA\n\n";
         $reply .= "Lihat Semua Layanan:\n";
         $reply .= "{$baseUrl}/#layanan\n\n";
-        $reply .= "Ketik *SYARAT* untuk melihat daftar lengkap.\n";
-        $reply .= "Ketik *MENU* atau *0* untuk kembali ke menu utama.";
+        $reply .= "Ketik *SYARAT* untuk daftar lengkap.\n";
+        $reply .= "Ketik *MENU* atau *0* untuk kembali.";
 
         return $reply;
+    }
+
+    protected function getPublicUrl(): string
+    {
+        $profile = \App\Models\AppProfile::first();
+        if ($profile && !empty($profile->public_url)) {
+            return rtrim($profile->public_url, '/');
+        }
+        return rtrim(env('PUBLIC_BASE_URL', config('app.url')), '/');
     }
 }
