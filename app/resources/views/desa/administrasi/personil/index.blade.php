@@ -39,14 +39,9 @@
                     <thead class="bg-light text-slate-600 small fw-bold text-uppercase">
                         <tr>
                             <th class="ps-4 py-3">Nama Lengkap</th>
-                            <th class="py-3">Jabatan</th>
-                            @if($kategori == 'perangkat')
-                                <th class="py-3">Siltap</th>
-                            @endif
-                            <th class="py-3">SK Pengangkatan</th>
-                            @if($kategori == 'bpd')
-                                <th class="py-3">Masa Jabatan</th>
-                            @endif
+                            <th class="py-3">Jabatan / Kontak</th>
+                            <th class="py-3">Siltap</th>
+                            <th class="py-3">Masa Jabatan</th>
                             <th class="py-3 text-center">Status</th>
                             <th class="py-3 text-end pe-4">Aksi</th>
                         </tr>
@@ -56,45 +51,53 @@
                             <tr>
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary fw-bold border"
-                                            style="width: 40px; height: 40px;">
-                                            {{ strtoupper(substr($p->nama, 0, 1)) }}
-                                        </div>
+                                        @if($p->foto)
+                                            <img src="{{ route('desa.administrasi.file.personil', ['id' => $p->id, 'type' => 'foto']) }}" 
+                                                class="rounded-circle border shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">
+                                        @else
+                                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary fw-bold border"
+                                                style="width: 40px; height: 40px;">
+                                                {{ strtoupper(substr($p->nama, 0, 1)) }}
+                                            </div>
+                                        @endif
                                         <div>
                                             <div class="fw-bold text-slate-800">{{ $p->nama }}</div>
                                             <small class="text-slate-500">NIK: {{ $p->nik }}</small>
                                         </div>
                                     </div>
                                 </td>
-                                 <td>{{ $p->jabatan }}</td>
-                                @if($kategori == 'perangkat')
-                                    <td>
-                                        <div class="small fw-medium text-slate-800">Rp {{ number_format($p->siltap_pokok ?? 0, 0, ',', '.') }}</div>
-                                    </td>
-                                @endif
                                 <td>
-                                    <div class="d-flex flex-column">
-                                        <span class="fw-medium text-slate-700">{{ $p->nomor_sk }}</span>
-                                        @if($p->file_sk)
-                                            <a href="{{ route('desa.administrasi.file.personil', $p->id) }}" target="_blank"
-                                                class="small text-primary text-decoration-none">
-                                                <i class="fas fa-paperclip me-1"></i> Lihat File
-                                            </a>
-                                        @else
-                                            <span class="text-danger small"><i class="fas fa-exclamation-circle"></i> Belum
-                                                upload</span>
+                                    <div class="fw-medium text-slate-700 mb-1">{{ $p->jabatan }}</div>
+                                    @if($p->no_hp)
+                                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $p->no_hp) }}" target="_blank" 
+                                            class="badge bg-success-subtle text-success text-decoration-none border border-success-subtle px-2">
+                                            <i class="fab fa-whatsapp me-1"></i> Hubungi
+                                        </a>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="small fw-bold text-brand-600">Rp {{ number_format($p->siltap_pokok ?? 0, 0, ',', '.') }}</div>
+                                </td>
+                                <td>
+                                    @php
+                                        $pensiunDate = $p->tanggal_lahir ? $p->tanggal_lahir->addYears(60) : null;
+                                        if($p->kategori == 'bpd') $pensiunDate = $p->masa_jabatan_selesai;
+                                        
+                                        $diffMonths = $pensiunDate ? now()->diffInMonths($pensiunDate, false) : 999;
+                                        $colorClass = 'text-success';
+                                        if($diffMonths <= 0) $colorClass = 'text-danger fw-bold';
+                                        elseif($diffMonths <= 3) $colorClass = 'text-danger fw-bold';
+                                        elseif($diffMonths <= 12) $colorClass = 'text-warning fw-bold';
+                                    @endphp
+                                    <div class="small {{ $colorClass }}">
+                                        {{ $pensiunDate ? $pensiunDate->format('d M Y') : '-' }}
+                                        @if($pensiunDate)
+                                            <div class="x-small opacity-75">
+                                                @if($diffMonths <= 0) (Habis) @else (Sisa {{ $diffMonths }} bln) @endif
+                                            </div>
                                         @endif
                                     </div>
                                 </td>
-                                @if($kategori == 'bpd')
-                                    <td>
-                                        <div class="small text-slate-600">
-                                            {{ $p->masa_jabatan_mulai ? $p->masa_jabatan_mulai->format('d M Y') : '-' }} <br>
-                                            s/d <span
-                                                class="text-secondary">{{ $p->masa_jabatan_selesai ? $p->masa_jabatan_selesai->format('d M Y') : 'Sekarang' }}</span>
-                                        </div>
-                                    </td>
-                                @endif
                                 <td class="text-center">
                                     <span class="badge {{ $p->status_badge }} rounded-pill px-3 py-2">
                                         {{ $p->status_label }}

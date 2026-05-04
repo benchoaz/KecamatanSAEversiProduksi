@@ -79,10 +79,12 @@ class AdministrasiController extends Controller
             'nomor_sk' => 'required|string',
             'tanggal_sk' => 'required|date',
             'file_sk' => 'required|file|mimes:pdf|max:2048',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
             'kategori' => 'required|in:perangkat,bpd',
             'siltap_pokok' => 'nullable|numeric|min:0',
             'rekening_bank' => 'nullable|string|max:50',
             'nama_bank' => 'nullable|string|max:100',
+            'no_hp' => 'nullable|string|max:20',
         ], [
             'nik.unique' => 'NIK ini sudah terdaftar di sistem. Silakan cek kembali.',
             'nik.size' => 'NIK harus tepat 16 digit.',
@@ -90,13 +92,14 @@ class AdministrasiController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
-            $path = $request->file('file_sk')->store('sk_personil', 'local');
+            $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('foto_personil', 'local') : null;
 
             $personil = new PersonilDesa();
             $personil->desa_id = auth()->user()->desa_id;
             $personil->kategori = $request->kategori;
             $personil->nama = $request->nama;
             $personil->nik = $request->nik;
+            $personil->foto = $fotoPath;
             $personil->tempat_lahir = $request->tempat_lahir;
             $personil->tanggal_lahir = $request->tanggal_lahir;
             $personil->jabatan = $request->jabatan;
@@ -108,6 +111,7 @@ class AdministrasiController extends Controller
             $personil->siltap_pokok = $request->siltap_pokok ?? 0;
             $personil->nama_bank = $request->nama_bank;
             $personil->rekening_bank = $request->rekening_bank;
+            $personil->no_hp = $request->no_hp;
             $personil->status = 'draft';
             $personil->save();
 
@@ -166,10 +170,12 @@ class AdministrasiController extends Controller
             'nomor_sk' => 'required|string',
             'tanggal_sk' => 'required|date',
             'file_sk' => 'nullable|file|mimes:pdf|max:2048', // Nullable on update
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
             'siltap_pokok' => 'nullable|numeric|min:0',
             'tunjangan_jabatan' => 'nullable|numeric|min:0',
             'rekening_bank' => 'nullable|string|max:50',
             'nama_bank' => 'nullable|string|max:100',
+            'no_hp' => 'nullable|string|max:20',
         ], [
             'nik.unique' => 'NIK ini sudah terdaftar di sistem. Silakan cek kembali.',
             'nik.size' => 'NIK harus tepat 16 digit.',
@@ -213,8 +219,12 @@ class AdministrasiController extends Controller
             $personil->nama_bank = $request->nama_bank;
             $personil->rekening_bank = $request->rekening_bank;
             
-            if (isset($data['file_sk'])) {
-                $personil->file_sk = $data['file_sk'];
+            if ($request->hasFile('file_sk')) {
+                $personil->file_sk = $request->file('file_sk')->store('sk_personil', 'local');
+            }
+
+            if ($request->hasFile('foto')) {
+                $personil->foto = $request->file('foto')->store('foto_personil', 'local');
             }
             
             $personil->save();

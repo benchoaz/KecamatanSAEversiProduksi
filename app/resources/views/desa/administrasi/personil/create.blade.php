@@ -48,20 +48,40 @@
                                     </div>
                                 </div>
 
-                                <x-desa.form.input label="Nama Lengkap" name="nama" placeholder="Nama sesuai KTP"
-                                    required="true" />
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-slate-700">Pas Foto</label>
+                                        <div class="mb-2 bg-light rounded-3 d-flex align-items-center justify-content-center border" 
+                                            style="width: 120px; height: 160px; border: 2px dashed #cbd5e1 !important;">
+                                            <i class="fas fa-camera fa-2x text-slate-300"></i>
+                                        </div>
+                                        <input type="file" name="foto" class="form-control form-control-sm" accept="image/*">
+                                        <small class="text-slate-400 x-small">Maks: 1MB (JPG/PNG)</small>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <x-desa.form.input label="Nama Lengkap" name="nama" placeholder="Nama sesuai KTP"
+                                            required="true" />
 
-                                <x-desa.form.input label="Nomor Induk Kependudukan (NIK)" name="nik"
-                                    placeholder="16 Digit Angka" required="true" />
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-slate-700">NIK <span class="text-danger">*</span></label>
+                                            <input type="text" name="nik" id="nikInput" class="form-control rounded-3" 
+                                                placeholder="16 Digit Angka" maxlength="16" required>
+                                            <div id="nikCounter" class="x-small mt-1 fw-bold text-danger">0 / 16 digit</div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <x-desa.form.input label="Tempat Lahir" name="tempat_lahir" placeholder="Kota/Kabupaten Lahir"
+                                    <div class="col-md-4">
+                                        <x-desa.form.input label="Tempat Lahir" name="tempat_lahir" placeholder="Kota/Kab"
                                             required="true" />
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <x-desa.form.input label="Tanggal Lahir" name="tanggal_lahir" type="date"
                                             required="true" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <x-desa.form.input label="Nomor HP / WA" name="no_hp" placeholder="081xxx" />
                                     </div>
                                 </div>
 
