@@ -4,12 +4,12 @@
             <i class="fas fa-bars-staggered"></i>
         </button>
 
-        <div class="breadcrumb ms-2 d-none d-lg-flex">
+        <div class="breadcrumb ms-3 d-none d-lg-flex align-items-center">
             <span class="breadcrumb-item">
-                <i class="fas fa-house-chimney text-brand-600"></i>
+                <i class="fas fa-house-chimney text-brand-600 fs-5"></i>
             </span>
-            <span class="breadcrumb-separator opacity-25">/</span>
-            <span class="breadcrumb-item fw-bold text-primary-900">@yield('breadcrumb', 'Dashboard Kontrol')</span>
+            <span class="breadcrumb-separator mx-2 opacity-25">/</span>
+            <span class="breadcrumb-item fw-black text-primary-900 fs-5" style="letter-spacing: -0.02em;">@yield('breadcrumb', 'Dashboard Kontrol')</span>
         </div>
     </div>
 
@@ -113,7 +113,7 @@
                     <div class="gov-profile__avatar bg-brand-600">
                         {{ strtoupper(substr(auth()->user()->nama_lengkap ?? 'U', 0, 2)) }}
                     </div>
-                    <div class="gov-profile__name d-none d-sm-block">
+                    <div class="gov-profile__name d-none d-sm-block text-truncate" style="max-width: 150px;">
                         {{ auth()->user()->nama_lengkap ?? 'User' }}
                     </div>
                     <i class="fas fa-chevron-down gov-profile__chevron"></i>

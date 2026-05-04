@@ -217,13 +217,13 @@
             height: 100%;
             display: flex;
             align-items: center;
-            padding-top: 8rem; /* Increased for mobile to clear info banner */
-            padding-bottom: 3rem;
+            padding-top: 6rem; /* Optimized for mobile */
+            padding-bottom: 4rem;
         }
 
         @media (min-width: 1024px) {
             .hero-content {
-                padding-top: 2.5rem; /* Desktop padding adjustment */
+                padding-top: 0; /* Vertically centered on desktop */
                 padding-bottom: 0;
             }
         }
@@ -281,12 +281,12 @@
                                 <span class="text-xs font-bold uppercase tracking-wide">Ngobrol SAE Bareng {{ appProfile()->region_level }}</span>
                             </div>
                             
-                            <h1 class="text-reveal delay-200 text-5xl md:text-7xl font-black text-[#1e293b] mb-6 leading-[1.1] tracking-tight">
+                            <h1 class="text-reveal delay-200 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-[#1e293b] mb-6 leading-[1.15] tracking-tight">
                                 Solusi Cepat<br>
                                 Urusan <span class="text-[#0f766e]">Layanan Publik</span>
                             </h1>
                             
-                            <p class="text-reveal delay-300 text-lg md:text-xl text-[#475569] mb-10 leading-relaxed font-medium max-w-xl">
+                            <p class="text-reveal delay-300 text-base md:text-lg lg:text-xl text-[#475569] mb-8 lg:mb-10 leading-relaxed font-medium max-w-xl">
                                 Akses berbagai layanan publik secara digital, cepat, dan transparan. Mudahkan urusan administrasi Anda dari mana saja.
                             </p>
 
@@ -484,13 +484,13 @@
                             }
                         @endphp
                         <div onclick="{!! $onClick !!}"
-                            class="bg-white/90 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-lg border border-white hover:scale-105 transition-all cursor-pointer group">
+                            class="bg-white/90 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem] shadow-lg border border-white hover:scale-105 transition-all cursor-pointer group flex flex-col items-center text-center">
                             <div
-                                class="w-14 h-14 {{ $svc->warna_bg ?? 'bg-emerald-50' }} {{ $svc->warna_text ?? 'text-emerald-600' }} rounded-2xl flex items-center justify-center mb-4 group-hover:{{ str_replace('text-', 'bg-', $svc->warna_text ?? 'text-emerald-600') }} group-hover:text-white transition-all duration-500 shadow-sm">
-                                <i class="fas {{ $svc->ikon ?? 'fa-star' }} text-2xl"></i>
+                                class="w-12 h-12 md:w-14 md:h-14 {{ $svc->warna_bg ?? 'bg-emerald-50' }} {{ $svc->warna_text ?? 'text-emerald-600' }} rounded-2xl flex items-center justify-center mb-3 md:mb-4 group-hover:{{ str_replace('text-', 'bg-', $svc->warna_text ?? 'text-emerald-600') }} group-hover:text-white transition-all duration-500 shadow-sm">
+                                <i class="fas {{ $svc->ikon ?? 'fa-star' }} text-xl md:text-2xl"></i>
                             </div>
-                            <h3 class="font-black text-slate-800 text-sm mb-1 line-clamp-1 group-hover:text-teal-600 transition-colors">{{ $svc->nama_layanan }}</h3>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight line-clamp-1">{{ $svc->estimasi_waktu ?? 'Akses Cepat' }}</p>
+                            <h3 class="font-black text-slate-800 text-[11px] md:text-sm mb-1 line-clamp-1 group-hover:text-teal-600 transition-colors">{{ $svc->nama_layanan }}</h3>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight line-clamp-1">{{ $svc->estimasi_waktu ?? 'Akses Cepat' }}</p>
                         </div>
                     @empty
                         <div class="col-span-full text-center py-12 bg-white/40 backdrop-blur-md rounded-[3rem] border border-white/50 border-dashed">
