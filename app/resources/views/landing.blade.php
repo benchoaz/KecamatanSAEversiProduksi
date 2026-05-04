@@ -2711,25 +2711,34 @@
         }
 
         window.submitQuickFeedback = async (uuid) => {
+            console.log("Submitting feedback for:", uuid);
+            
             if(!window.quickRating || window.quickRating === 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Bintang Belum Dipilih',
-                    text: 'Silakan klik salah satu bintang untuk memberikan penilaian.',
-                    confirmButtonColor: '#f59e0b'
+                    text: 'Silakan klik pada bintang untuk memberikan nilai.',
+                    confirmButtonColor: '#f59e0b',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
                 });
                 return;
             }
             
-            if(!uuid) return;
+            if(!uuid || uuid === 'undefined') {
+                console.error("UUID missing for feedback");
+                return;
+            }
             
-            // Mencari button di dalam modal yang sedang aktif
-            const btn = document.querySelector('.swal2-container #btnSendQuickFeedback') || document.getElementById('btnSendQuickFeedback');
+            const btn = document.querySelector('.swal2-container #btnSendQuickFeedback');
             const comment = document.querySelector('.swal2-container #quick_feedback_comment')?.value || '';
-            const originalHtml = btn.innerHTML;
             
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i> Mengirim...';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i>';
+            }
 
             try {
                 const response = await fetch(`/service/feedback/${uuid}`, {
@@ -2748,7 +2757,7 @@
                 const resData = await response.json();
 
                 if(response.ok) {
-                    const section = document.querySelector('.swal2-container #quickFeedbackSection') || document.getElementById('quickFeedbackSection');
+                    const section = document.querySelector('.swal2-container #quickFeedbackSection');
                     if(section) {
                         section.innerHTML = `
                             <div class="text-center py-6 animate-fade-in">
@@ -2761,25 +2770,20 @@
                         `;
                     }
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal',
-                        text: resData.message || 'Gagal mengirim penilaian',
-                        confirmButtonColor: '#f43f5e'
-                    });
-                    btn.disabled = false;
-                    btn.innerHTML = originalHtml;
+                    throw new Error(resData.message || 'Server menolak permintaan.');
                 }
             } catch (e) {
                 console.error("Feedback error:", e);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Koneksi Terputus',
-                    text: 'Terjadi kesalahan koneksi saat mengirim penilaian.',
+                    title: 'Gagal Mengirim',
+                    text: e.message || 'Terjadi kesalahan teknis.',
                     confirmButtonColor: '#f43f5e'
                 });
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Kirim Penilaian <i class="fas fa-paper-plane ml-1"></i>';
+                }
             }
         }
     </script>
