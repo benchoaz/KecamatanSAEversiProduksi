@@ -2217,6 +2217,9 @@
                     throw new Error(`Server error ${response.status}. Coba refresh halaman dan kirim ulang.`);
                 }
 
+                if (response.ok) {
+                    const trackingId = result.tracking_code || result.uuid || '---';
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Pengaduan Terkirim! 🎉',
@@ -2252,7 +2255,8 @@
                     });
 
                     // Close modal and reset form
-                    document.getElementById('complaintModal').close();
+                    const complaintModal = document.getElementById('complaintModal');
+                    if (complaintModal) complaintModal.close();
                     form.reset();
                     if (charCount) charCount.textContent = '0';
 
