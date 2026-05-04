@@ -33,23 +33,32 @@ class SyncTatadesaDemografi extends Command
         $desas = Desa::all();
 
         foreach ($desas as $desa) {
-            // Jika website kosong, buat format berdasarkan nama_desa, contoh: "Alas Nyiur" -> "alasnyiur.tatadesa.com"
-            $websiteUrl = $desa->website;
+            // Priority: tatadesa_domain > website
+            $domain = $desa->tatadesa_domain;
             
-            if (empty($websiteUrl)) {
-                $subdomain = Str::slug(str_replace(' ', '', $desa->nama_desa), '');
-                $websiteUrl = "{$subdomain}.tatadesa.com";
-                
-                // Simpan website
-                $desa->website = $websiteUrl;
+            if (empty($domain) && $desa->website) {
+                // Strip https:// and trailing slashes from website column
+                $domain = preg_replace('/^https?:\/\//', '', rtrim($desa->website, '/'));
+                // Save back for future use
+                $desa->tatadesa_domain = $domain;
                 $desa->save();
             }
 
-            $this->info("Mengambil data untuk desa {$desa->nama_desa} ({$websiteUrl})...");
+            if (empty($domain)) {
+                $subdomain = Str::slug(str_replace(' ', '', $desa->nama_desa), '');
+                $domain = "{$subdomain}.tatadesa.com";
+                
+                // Simpan domain
+                $desa->tatadesa_domain = $domain;
+                $desa->save();
+            }
+
+            $this->info("Mengambil data untuk desa {$desa->nama_desa} ({$domain})...");
 
             try {
-                // Fetch All Data Concurrent-ish
-                $baseUrl = "https://{$websiteUrl}/api/v1/public";
+                // Ensure domain doesn't have internal protocol
+                $domain = preg_replace('/^https?:\/\//', '', $domain);
+                $baseUrl = "https://{$domain}/api/v1/public";
                 
                 $responses = \Illuminate\Support\Facades\Http::pool(fn (\Illuminate\Http\Client\Pool $pool) => [
                     $pool->as('demografi')->timeout(10)->get("{$baseUrl}/penduduk/statistik"),
