@@ -42,6 +42,8 @@ class IntentHandler
     public function handle(string $phone, string $message): array
     {
         $messageLower = strtolower(trim($message));
+        $phone = $this->normalizePhone($phone);
+        
         $session = WhatsappSession::where('phone', $phone)->first();
         $state = $session ? $session->state : null;
 
@@ -458,6 +460,20 @@ class IntentHandler
         
         $emojis = ['1'=>'1', '2'=>'2', '3'=>'3', '4'=>'4', '5'=>'5'];
         return isset($emojis[$number]) && isset($emojis[$message]) && $emojis[$message] === $emojis[$number];
+    }
+
+    protected function normalizePhone(string $phone): string
+    {
+        // Handle WAHA format: 628123:1@c.us or 628123@c.us
+        // We only want the part before : or @
+        $phone = explode('@', $phone)[0];
+        $phone = explode(':', $phone)[0];
+
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        if (str_starts_with($phone, '0')) {
+            $phone = '62' . substr($phone, 1);
+        }
+        return $phone;
     }
 
     protected function getUnknownIntentMessage(): string
