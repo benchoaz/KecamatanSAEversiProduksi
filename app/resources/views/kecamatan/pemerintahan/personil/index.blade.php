@@ -210,38 +210,44 @@
                                         <span class="badge {{ $p->status_badge }} rounded-pill px-3">{{ $p->status_label }}</span>
                                     @endif
                                 </td>
-                                <td class="text-end pe-4">
+                                 <td class="text-end pe-4">
                                     <div class="d-flex align-items-center justify-content-end gap-1">
-                                        <a href="#" class="btn btn-icon btn-light rounded-circle shadow-sm text-primary-600"
-                                            title="Edit Profil">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </a>
+                                        @if(auth()->user()->role == 'kecamatan')
+                                            @if($p->status != 'diterima')
+                                                <form action="{{ route('kecamatan.pemerintahan.detail.personil.verify', $p->id) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    <input type="hidden" name="status" value="diterima">
+                                                    <button type="submit"
+                                                        class="btn btn-icon btn-success rounded-circle shadow-sm text-white"
+                                                        title="Verifikasi / Terima">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
 
-                                        @if($p->status != 'diterima')
-                                            <form action="{{ route('kecamatan.pemerintahan.detail.personil.verify', $p->id) }}"
-                                                method="POST" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="status" value="diterima">
-                                                <button type="submit"
-                                                    class="btn btn-icon btn-success rounded-circle shadow-sm text-white"
-                                                    title="Verifikasi / Terima">
-                                                    <i class="fas fa-check"></i>
+                                                <button type="button" class="btn btn-icon btn-warning rounded-circle shadow-sm text-white"
+                                                    data-bs-toggle="modal" data-bs-target="#revisionModal{{ $p->id }}" title="Minta Revisi">
+                                                    <i class="fas fa-reply"></i>
                                                 </button>
-                                            </form>
+                                            @endif
 
-                                            <button type="button" class="btn btn-icon btn-warning rounded-circle shadow-sm text-white"
-                                                data-bs-toggle="modal" data-bs-target="#revisionModal{{ $p->id }}" title="Minta Revisi">
-                                                <i class="fas fa-reply"></i>
+                                            <button type="button" class="btn btn-icon btn-light rounded-circle shadow-sm text-danger"
+                                                title="Nonaktifkan" data-bs-toggle="modal" data-bs-target="#terminateModal{{ $p->id }}">
+                                                <i class="fas fa-power-off"></i>
                                             </button>
+                                        @else
+                                            {{-- Aksi untuk Desa jika statusnya draft/revisi --}}
+                                            @if($p->status == 'draft' || $p->status == 'dikembalikan')
+                                                <a href="{{ route('desa.administrasi.personil.edit', $p->id) }}" 
+                                                    class="btn btn-icon btn-light rounded-circle shadow-sm text-primary-600"
+                                                    title="Edit Data">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </a>
+                                            @else
+                                                <span class="badge bg-light text-slate-400 x-small px-3 border">No Action</span>
+                                            @endif
                                         @endif
-
-                                        <button type="button" class="btn btn-icon btn-light rounded-circle shadow-sm text-danger"
-                                            title="Nonaktifkan">
-                                            <i class="fas fa-power-off"></i>
-                                        </button>
                                     </div>
-
-
                                 </td>
                             </tr>
                         @empty
