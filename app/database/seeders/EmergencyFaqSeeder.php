@@ -38,6 +38,13 @@ class EmergencyFaqSeeder extends Seeder
                 'keywords' => 'korupsi, pungli, dana desa, lapor, penyelewengan',
                 'is_active' => true,
             ],
+            [
+                'category' => 'darurat',
+                'question' => 'Berapa nomor Call Center Kabupaten Probolinggo?',
+                'answer' => "🆘 CALL CENTER KAB. PROBOLINGGO:\n☎️ Telp: (0298) 343 0000\n🟢 WA: 081 8181 91 119 (Khusus Layanan Ambulans)",
+                'keywords' => 'call center, probolinggo, nomor telepon, wa, ambulans',
+                'is_active' => true,
+            ],
         ];
 
         foreach ($faqs as $faq) {

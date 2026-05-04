@@ -535,7 +535,7 @@ class IntentHandler
 
         $reply .= "🆘 *CALL CENTER KAB. PROBOLINGGO:*\n";
         $reply .= "☎️ Telp: (0298) 343 0000\n";
-        $reply .= "🟢 WA: 081 8181 91 119\n\n";
+        $reply .= "🟢 WA: 081 8181 91 119 *(Khusus Ambulans)*\n\n";
         $reply .= "Ketik *MENU* untuk layanan lainnya.";
 
         return [
