@@ -2276,11 +2276,11 @@
                 const contentType = response.headers.get('content-type') || '';
                 if (contentType.includes('application/json')) {
                     result = await response.json();
+                    console.log("Server Response Result:", result);
                 } else {
-                    // Server mengembalikan non-JSON (misal: halaman error 419/500)
                     const rawText = await response.text();
                     console.error('Non-JSON response:', response.status, rawText.substring(0, 200));
-                    throw new Error(`Server error ${response.status}. Coba refresh halaman dan kirim ulang.`);
+                    throw new Error(`Server error ${response.status}. Coba refresh halaman.`);
                 }
 
                 if (response.ok) {
@@ -2775,71 +2775,43 @@
     @include('layouts.partials.public.bottom-bar')
 
     <script>
-        const desasData = {
-            @foreach($desas as $desa)
-                @php 
-                    $slug = strtolower(str_replace(' ', '', $desa->nama_desa));
-                @endphp
-                "{{ strtoupper($desa->nama_desa) }}": "https://{{ $slug }}.tatadesa.com",
-            @endforeach
-        };
-
         // Only initialize map if container exists (not all pages have the map)
         document.addEventListener('DOMContentLoaded', function () {
             const mapContainer = document.getElementById('mapContainer');
-            if (!mapContainer) {
-                console.log('Map container not found on this page - skipping map initialization');
-                return;
-            }
+            if (!mapContainer) return;
 
-            // Harmonic Professional Palette (Earthy & Teal Govt Tones)
-            const villageColors = [
-                '#0f766e', '#0369a1', '#1d4ed8', '#4338ca', '#6d28d9',
-                '#7e22ce', '#a21caf', '#be185d', '#b91c1c', '#c2410c',
-                '#b45309', '#a16207', '#4d7c0f', '#15803d', '#166534',
-                '#3f6212', '#115e59'
-            ];
+            // Harmonic Professional Palette
+            const villageColors = ['#0f766e', '#0369a1', '#1d4ed8', '#4338ca', '#6d28d9', '#7e22ce', '#a21caf', '#be185d', '#b91c1c', '#c2410c', '#b45309', '#a16207', '#4d7c0f', '#15803d', '#166534', '#3f6212', '#115e59'];
 
-            // Initialize Map with smooth motion
+            // Initialize Map
             const map = L.map('mapContainer', {
                 center: [{{ appProfile()->map_latitude ?? -7.78 }}, {{ appProfile()->map_longitude ?? 113.47 }}],
                 zoom: 13,
                 scrollWheelZoom: false,
                 attributionControl: false,
                 zoomControl: false,
-                doubleClickZoom: false, // Disabled to prevent zooming when opening portal
+                doubleClickZoom: false,
                 zoomSnap: 0.5,
                 zoomDelta: 0.5
             });
 
-            L.control.zoom({
-                position: 'topright'
-            }).addTo(map);
+            if (L.control.zoom) {
+                L.control.zoom({ position: 'topright' }).addTo(map);
+            }
 
-            // --- RESET VIEW CONTROL ---
             let initialBounds = null;
-
             const ResetControl = L.Control.extend({
-                options: {
-                    position: 'topright'
-                },
+                options: { position: 'topright' },
                 onAdd: function (map) {
                     const container = L.DomUtil.create('div', 'leaflet-control-reset');
                     container.title = "Reset Zoom & Posisi";
                     container.innerHTML = '<i class="fas fa-sync-alt"></i>';
-
                     L.DomEvent.on(container, 'click', function (e) {
                         L.DomEvent.stopPropagation(e);
                         if (initialBounds) {
-                            map.flyToBounds(initialBounds, {
-                                padding: [100, 100],
-                                duration: 1.5,
-                                easeLinearity: 0.25
-                            });
+                            map.flyToBounds(initialBounds, { padding: [100, 100], duration: 1.5 });
                         } else {
-                            map.flyTo([{{ appProfile()->map_latitude ?? -7.78 }}, {{ appProfile()->map_longitude ?? 113.47 }}], 13.5, {
-                                duration: 1.5
-                            });
+                            map.flyTo([{{ appProfile()->map_latitude ?? -7.78 }}, {{ appProfile()->map_longitude ?? 113.47 }}], 13.5, { duration: 1.5 });
                         }
                     });
                     return container;
@@ -2847,186 +2819,62 @@
             });
             map.addControl(new ResetControl());
 
-            // Cleanest Basemap (Voyager style)
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
-                maxZoom: 19
-            }).addTo(map);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', { maxZoom: 19, opacity: 0.6 }).addTo(map);
 
-            // Overlay labels for context at higher zoom
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
-                maxZoom: 19,
-                opacity: 0.6
-            }).addTo(map);
-
-            // --- CONFIG & UTILS ---
             const activeRegionName = "{{ strtoupper(appProfile()->region_name) }}";
             const geoBaseDir = "/data/geo";
+            const getGeoName = (props) => (props.NM_KEC || props.nm_kecamatan || props.name || props.NAMOBJ || props.village_name || "").toUpperCase();
 
-            // Helper to find name in various GeoJSON property schemes
-            const getGeoName = (props) => {
-                return (props.NM_KEC || props.nm_kecamatan || props.name || props.NAMOBJ || props.village_name || "").toUpperCase();
-            };
-
-            // --- LAYER 1: KECAMATAN OUTER GLOW (Dynamic Filtering) ---
             fetch(`${geoBaseDir}/layer_kecamatan.geojson`)
                 .then(res => res.json())
                 .then(data => {
-                    // Filter features to match the active region name from settings
                     const filteredFeatures = data.features.filter(f => {
                         const featName = getGeoName(f.properties);
                         return featName.includes(activeRegionName) || activeRegionName.includes(featName);
                     });
-
-                    // Use filtered data if found, otherwise use original as fallback
                     const renderData = filteredFeatures.length > 0 ? { ...data, features: filteredFeatures } : data;
-
-                    // Shadow/Glow Layer
-                    L.geoJSON(renderData, {
-                        style: {
-                            color: '#0d9488',
-                            weight: 15,
-                            opacity: 0.05,
-                            fill: false,
-                            interactive: false
-                        }
-                    }).addTo(map);
-
-                    // Main Boundary
-                    L.geoJSON(renderData, {
-                        style: {
-                            color: '#1e293b',
-                            weight: 4,
-                            opacity: 0.8,
-                            dashArray: '1, 12',
-                            lineCap: 'round',
-                            fill: false,
-                            interactive: false
-                        }
-                    }).addTo(map);
-
-                    // If we have a specific region, adjust initial zoom to it
+                    L.geoJSON(renderData, { style: { color: '#0d9488', weight: 15, opacity: 0.05, fill: false, interactive: false } }).addTo(map);
+                    L.geoJSON(renderData, { style: { color: '#1e293b', weight: 4, opacity: 0.8, dashArray: '1, 12', lineCap: 'round', fill: false, interactive: false } }).addTo(map);
                     if (filteredFeatures.length > 0) {
-                        const bounds = L.geoJSON(renderData).getBounds();
-                        initialBounds = bounds;
-                        map.fitBounds(bounds, {
-                            padding: [100, 100]
-                        });
+                        initialBounds = L.geoJSON(renderData).getBounds();
+                        map.fitBounds(initialBounds, { padding: [100, 100] });
                     }
-                })
-                .catch(err => console.error("Error loading Kecamatan layer:", err));
+                }).catch(e => {});
 
-            // --- LAYER 2: VILLAGES / DESA (Interactive) ---
             let desaLayer;
             fetch(`${geoBaseDir}/layer_desa.geojson`)
                 .then(res => res.json())
                 .then(data => {
                     desaLayer = L.geoJSON(data, {
-                        style: function (feature) {
-                            const colorIndex = data.features.indexOf(feature) % villageColors.length;
-                            return {
-                                fillColor: villageColors[colorIndex],
-                                fillOpacity: 0.25,
-                                color: 'white',
-                                weight: 1.5,
-                                className: 'premium-desa-path'
-                            };
-                        },
-                        onEachFeature: function (feature, layer) {
+                        style: (f) => ({ fillColor: villageColors[data.features.indexOf(f) % villageColors.length], fillOpacity: 0.25, color: 'white', weight: 1.5, className: 'premium-desa-path' }),
+                        onEachFeature: (feature, layer) => {
                             const nama = getGeoName(feature.properties);
                             const slug = nama.toLowerCase().replace(/\s+/g, '');
-                            const url = `https://${slug}.tatadesa.com`;
-
-                            // Ensure no popup binds to this layer
-                            layer.unbindPopup();
-
                             layer.on({
-                                mouseover: function (e) {
-                                    const l = e.target;
-                                    l.setStyle({
-                                        fillOpacity: 0.6,
-                                        weight: 3,
-                                        color: '#fff',
-                                        fillColor: '#0d9488'
-                                    });
-
-                                    layer.bindTooltip(`
-                                    <div class="px-3 py-2 text-center">
-                                        <p class="text-[8px] font-bold text-teal-400 uppercase tracking-widest mb-0.5">Wilayah Desa</p>
-                                        <p class="text-sm font-black text-white mb-1.5">${nama}</p>
-                                        <div class="bg-slate-800/80 rounded-lg p-1.5 border border-slate-600/50 flex flex-col gap-1 text-left">
-                                            <p class="text-[8px] text-slate-300 flex items-center gap-1.5"><i class="fas fa-hand-pointer text-teal-400"></i> Single-Klik = Zoom</p>
-                                            <p class="text-[8px] text-slate-300 flex items-center gap-1.5"><i class="fas fa-mouse text-amber-400"></i> Double-Klik = Portal Desa</p>
-                                        </div>
-                                    </div>
-                                `, {
-                                        sticky: true,
-                                        className: 'premium-tooltip',
-                                        direction: 'top',
-                                        offset: [0, -10]
-                                    }).openTooltip();
-
-                                    l.bringToFront();
+                                mouseover: (e) => {
+                                    e.target.setStyle({ fillOpacity: 0.6, weight: 3, color: '#fff', fillColor: '#0d9488' });
+                                    layer.bindTooltip(`<div class="px-3 py-2 text-center"><p class="text-[8px] font-bold text-teal-400 uppercase tracking-widest mb-0.5">Wilayah Desa</p><p class="text-sm font-black text-white mb-1.5">${nama}</p></div>`, { sticky: true, className: 'premium-tooltip', direction: 'top', offset: [0, -10] }).openTooltip();
+                                    e.target.bringToFront();
                                 },
-                                mouseout: function (e) {
-                                    desaLayer.resetStyle(e.target);
-                                },
-                                click: function (e) {
-                                    e.originalEvent.stopPropagation();
-                                    map.flyToBounds(e.target.getBounds(), {
-                                        padding: [80, 80],
-                                        duration: 1.2
-                                    });
-                                },
-                                dblclick: function (e) {
-                                    e.originalEvent.stopPropagation();
-                                    window.open(url, '_blank');
-                                }
+                                mouseout: (e) => desaLayer.resetStyle(e.target),
+                                click: (e) => { e.originalEvent.stopPropagation(); map.flyToBounds(e.target.getBounds(), { padding: [80, 80], duration: 1.2 }); },
+                                dblclick: (e) => { e.originalEvent.stopPropagation(); window.open(`https://${slug}.tatadesa.com`, '_blank'); }
                             });
                         }
                     }).addTo(map);
-
-                    // Close any stray popups
-                    map.on('popupopen', function() {
-                        map.closePopup();
-                    });
-
-                    // Initial fit to villages if no kecamatan bounds set yet
                     if (!desaLayer.getBounds().isEmpty()) {
                         if (!initialBounds) initialBounds = desaLayer.getBounds();
-                        map.fitBounds(desaLayer.getBounds(), {
-                            padding: [60, 60]
-                        });
+                        map.fitBounds(desaLayer.getBounds(), { padding: [60, 60] });
                     }
-                })
-                .catch(err => console.error("Error loading Desa layer:", err));
+                }).catch(e => {});
 
-            // --- LAYER 3: PULSING POI ---
-            fetch(`${geoBaseDir}/layer_poi.geojson`)
-                .then(res => res.json())
-                .then(data => {
-                    L.geoJSON(data, {
-                        pointToLayer: function (feature, latlng) {
-                            const icon = L.divIcon({
-                                className: 'poi-pulse-wrapper',
-                                html: `
-                                <div class="pulse-ring"></div>
-                                <div class="pulse-core shadow-2xl">
-                                    <i class="fas fa-university"></i>
-                                </div>
-                                <div class="poi-label">${feature.properties.name}</div>
-                            `,
-                                iconSize: [40, 40],
-                                iconAnchor: [20, 20]
-                            });
-                            return L.marker(latlng, { icon: icon });
-                        },
-                        onEachFeature: function (feature, layer) {
-                            layer.on('click', () => {
-                                window.open(feature.properties.map_url, '_blank');
-                            });
-                        }
-                    }).addTo(map);
-                });
+            fetch(`${geoBaseDir}/layer_poi.geojson`).then(res => res.json()).then(data => {
+                L.geoJSON(data, {
+                    pointToLayer: (feature, latlng) => L.marker(latlng, { icon: L.divIcon({ className: 'poi-pulse-wrapper', html: `<div class="pulse-ring"></div><div class="pulse-core shadow-2xl"><i class="fas fa-university"></i></div><div class="poi-label">${feature.properties.name}</div>`, iconSize: [40, 40], iconAnchor: [20, 20] }) }),
+                    onEachFeature: (feature, layer) => { layer.on('click', () => window.open(feature.properties.map_url, '_blank')); }
+                }).addTo(map);
+            }).catch(e => {});
         }); // End DOMContentLoaded wrapper
     </script>
 
