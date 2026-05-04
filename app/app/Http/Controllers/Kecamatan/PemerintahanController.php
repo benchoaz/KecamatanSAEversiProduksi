@@ -37,7 +37,7 @@ class PemerintahanController extends Controller
         $desa_id = request('desa_id');
 
         $pemerintahanMenus = [
-            'A' => ['title' => 'Administrasi Perangkat Desa', 'icon' => 'fa-users-gear', 'route' => 'kecamatan.pemerintahan.detail.personil.index', 'desc' => 'Arsip data & SK pengangkatan/pemberhentian perangkat.'],
+            'A' => ['title' => 'Administrasi Kepala Desa & Perangkat Desa', 'icon' => 'fa-users-gear', 'route' => 'kecamatan.pemerintahan.detail.personil.index', 'desc' => 'Arsip data & SK pengangkatan/pemberhentian perangkat.'],
             'B' => ['title' => 'Administrasi BPD', 'icon' => 'fa-users-rectangle', 'route' => 'kecamatan.pemerintahan.detail.bpd.index', 'desc' => 'Arsip data pimpinan & anggota serta masa keanggotaan BPD.'],
             'C' => ['title' => 'Registrasi Lembaga Desa', 'icon' => 'fa-sitemap', 'route' => 'kecamatan.pemerintahan.detail.lembaga.index', 'desc' => 'Pendataan struktur & kepengurusan lembaga kemasyarakatan.'],
             'D' => ['title' => 'Arsip Perencanaan Desa', 'icon' => 'fa-calendar-check', 'route' => 'kecamatan.pemerintahan.detail.perencanaan.index', 'desc' => 'Penyimpanan dokumen Musrenbang & usulan pembangunan desa.'],
@@ -45,6 +45,7 @@ class PemerintahanController extends Controller
             'F' => ['title' => 'Administrasi Inventaris', 'icon' => 'fa-boxes-stacked', 'route' => 'kecamatan.pemerintahan.detail.inventaris.index', 'desc' => 'Pendataan status administrasi aset barang & tanah milik desa.'],
             'G' => ['title' => 'Arsip Dokumen Perencanaan', 'icon' => 'fa-folder-open', 'route' => 'kecamatan.pemerintahan.detail.dokumen.index', 'desc' => 'Penyimpanan referensi dokumen RPJMDes & RKPDes (Tanpa APBDes).'],
             'H' => ['title' => 'Inventaris Peraturan Desa', 'icon' => 'fa-gavel', 'route' => 'kecamatan.pemerintahan.detail.peraturan.index', 'desc' => 'Daftar produk hukum & peraturan desa yang telah ditetapkan.'],
+            'I' => ['title' => 'Rekapitulasi Siltap 17 Desa', 'icon' => 'fa-file-invoice-dollar', 'route' => 'kecamatan.pemerintahan.detail.rekap-siltap.index', 'desc' => 'Konsolidasi data gaji perangkat desa & generate Surat Pengantar Camat.'],
         ];
 
         $healthMetrics = $desa_id ? $this->calculateHealth($desa_id) : null;
@@ -55,7 +56,9 @@ class PemerintahanController extends Controller
             ->take(5)
             ->get();
 
-        return view('kecamatan.pemerintahan.index', compact('pemerintahanMenus', 'healthMetrics', 'desa_id', 'recentSubmissions'));
+        $desas = Desa::orderBy('nama_desa')->get();
+
+        return view('kecamatan.pemerintahan.index', compact('pemerintahanMenus', 'healthMetrics', 'desa_id', 'recentSubmissions', 'desas'));
     }
 
     public function personilStore(Request $request)
@@ -68,6 +71,10 @@ class PemerintahanController extends Controller
             'no_hp' => 'nullable|string|max:20',
             'jabatan' => 'required|string',
             'kategori' => 'required|in:perangkat,bpd',
+            'siltap_pokok' => 'nullable|numeric|min:0',
+            'tunjangan_jabatan' => 'nullable|numeric|min:0',
+            'nama_bank' => 'nullable|string|max:255',
+            'rekening_bank' => 'nullable|string|max:50',
             'nomor_sk' => 'nullable|string|max:255',
             'tanggal_sk' => 'nullable|date',
             'masa_jabatan_mulai' => 'nullable|date',
@@ -598,5 +605,94 @@ class PemerintahanController extends Controller
         if ($month >= 7 && $month <= 9)
             return 'rkp';
         return 'apbdes';
+    }
+
+    public function rekapSiltapIndex()
+    {
+        $desas = \App\Models\Desa::withCount([
+            'personil as perangkat_count' => function ($query) {
+                $query->where('kategori', 'perangkat');
+            },
+            'personil as kades_count' => function ($query) {
+                $query->where('kategori', 'perangkat')->where('jabatan', 'like', '%Kepala Desa%');
+            },
+            'personil as sekdes_count' => function ($query) {
+                $query->where('kategori', 'perangkat')->where('jabatan', 'like', '%Sekretaris Desa%');
+            },
+            'personil as staff_count' => function ($query) {
+                $query->where('kategori', 'perangkat')
+                      ->where('jabatan', 'not like', '%Kepala Desa%')
+                      ->where('jabatan', 'not like', '%Sekretaris Desa%');
+            }
+        ])
+            ->orderBy('nama_desa')
+            ->get();
+
+        // Hitung total siltap berdasarkan standar kategori
+        $desas->map(function($desa) {
+            $desa->total_siltap = ($desa->kades_count * $desa->siltap_kades) + 
+                                 ($desa->sekdes_count * $desa->siltap_sekdes) + 
+                                 ($desa->staff_count * $desa->siltap_perangkat);
+            return $desa;
+        });
+
+        return view('kecamatan.pemerintahan.rekap-siltap.index', compact('desas'));
+    }
+
+    public function rekapSiltapDownload()
+    {
+        $desas = \App\Models\Desa::withCount([
+            'personil as perangkat_count' => function ($query) {
+                $query->where('kategori', 'perangkat');
+            },
+            'personil as kades_count' => function ($query) {
+                $query->where('kategori', 'perangkat')->where('jabatan', 'like', '%Kepala Desa%');
+            },
+            'personil as sekdes_count' => function ($query) {
+                $query->where('kategori', 'perangkat')->where('jabatan', 'like', '%Sekretaris Desa%');
+            },
+            'personil as staff_count' => function ($query) {
+                $query->where('kategori', 'perangkat')
+                      ->where('jabatan', 'not like', '%Kepala Desa%')
+                      ->where('jabatan', 'not like', '%Sekretaris Desa%');
+            }
+        ])
+            ->orderBy('nama_desa')
+            ->get();
+
+        // Hitung total siltap berdasarkan standar kategori
+        $desas->map(function($desa) {
+            $desa->total_siltap = ($desa->kades_count * $desa->siltap_kades) + 
+                                 ($desa->sekdes_count * $desa->siltap_sekdes) + 
+                                 ($desa->staff_count * $desa->siltap_perangkat);
+            return $desa;
+        });
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kecamatan.pemerintahan.rekap-siltap.pdf', compact('desas'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('Rekapitulasi_Siltap_Kecamatan_' . date('Ymd_His') . '.pdf');
+    }
+
+    public function updatePagu(\Illuminate\Http\Request $request, $id)
+    {
+        $request->validate([
+            'rekening_desa' => 'required|string|max:50',
+            'pagu_siltap' => 'required|numeric|min:0',
+            'siltap_kades' => 'required|numeric|min:0',
+            'siltap_sekdes' => 'required|numeric|min:0',
+            'siltap_perangkat' => 'required|numeric|min:0',
+        ]);
+
+        $desa = \App\Models\Desa::findOrFail($id);
+        $desa->update([
+            'rekening_desa' => $request->rekening_desa,
+            'pagu_siltap' => $request->pagu_siltap,
+            'siltap_kades' => $request->siltap_kades,
+            'siltap_sekdes' => $request->siltap_sekdes,
+            'siltap_perangkat' => $request->siltap_perangkat,
+        ]);
+
+        return back()->with('success', 'Data keuangan desa ' . $desa->nama_desa . ' berhasil diperbarui.');
     }
 }

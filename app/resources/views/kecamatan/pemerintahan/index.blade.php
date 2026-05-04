@@ -39,7 +39,7 @@
     {{-- Grid Modul --}}
     <div class="mb-4 d-flex align-items-center justify-content-between">
         <div>
-            <h4 class="fw-black text-primary-900 mb-1 tracking-tight">Modul Administrasi Sektoral (A-H)</h4>
+            <h4 class="fw-black text-primary-900 mb-1 tracking-tight">Modul Administrasi Sektoral (A-I)</h4>
             <p class="text-tertiary small mb-0 font-medium">Pilih modul spesifik untuk pengelolaan data mendalam</p>
         </div>
         <div class="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
@@ -90,8 +90,11 @@
 
         <!-- Export Audit Package Card -->
         <div class="col-xl-3 col-lg-4 col-md-6">
-            <a href="{{ auth()->user()->desa_id ? route('desa.pemerintahan.export') : route('kecamatan.pemerintahan.export') }}"
-                class="text-decoration-none group">
+            @if(auth()->user()->desa_id)
+                <a href="{{ route('desa.pemerintahan.export') }}" class="text-decoration-none group">
+            @else
+                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#modalExportAudit" class="text-decoration-none group">
+            @endif
                 <div class="card border-0 shadow-soft rounded-5 p-4 h-100 position-relative overflow-hidden transition-all"
                     style="background: #fffbeb; border: 2px dashed #f59e0b !important;">
                     <div
@@ -200,6 +203,67 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+@if(!auth()->user()->desa_id)
+<!-- Modal Export Audit -->
+<div class="modal fade" id="modalExportAudit" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+            <div class="modal-header bg-amber-50 border-0 py-4 px-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-amber-100 text-amber-600 rounded-4 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                        <i class="fas fa-box-archive"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-black text-amber-900 mb-0">Pilih Desa untuk Paket Audit</h5>
+                        <p class="text-amber-700 x-small mb-0 font-medium">Silakan pilih desa yang ingin diunduh arsip lengkapnya.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="list-group list-group-flush border-0">
+                    <div class="row g-0 p-3">
+                        @foreach($desas as $desa)
+                            <div class="col-md-6 p-2">
+                                <a href="{{ route('kecamatan.pemerintahan.export', ['desa_id' => $desa->id]) }}" 
+                                   class="d-flex align-items-center justify-content-between p-3 rounded-4 border bg-white text-decoration-none hover-shadow-sm transition-all group-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-slate-50 text-slate-400 rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
+                                            <i class="fas fa-house-chimney x-small"></i>
+                                        </div>
+                                        <span class="fw-bold text-primary-900 text-uppercase small">{{ $desa->nama_desa }}</span>
+                                    </div>
+                                    <div class="text-amber-500 opacity-0 group-item-hover:opacity-100 transition-opacity">
+                                        <i class="fas fa-download small"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light border-0 py-3 justify-content-center">
+                <p class="x-small text-muted mb-0"><i class="fas fa-circle-info me-1"></i> Paket ini berisi ZIP arsip SK Personil, BPD, Lembaga, dan Dokumen Perencanaan.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow-sm:hover {
+        border-color: #f59e0b !important;
+        background-color: #fffbeb !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    .group-item:hover .text-amber-500 {
+        opacity: 1 !important;
+    }
+</style>
+@endif
+@endpush
 
 @push('styles')
     <style>

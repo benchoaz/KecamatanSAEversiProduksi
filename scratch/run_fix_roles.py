@@ -7,17 +7,6 @@ host = '43.134.166.153'
 user = 'ubuntu'
 pw = 'nebula-57@-ocean'
 
-files_to_sync = [
-    'app/app/Http/Controllers/Api/WhatsappController.php',
-    'app/app/Services/WhatsApp/IntentHandler.php',
-    'app/app/Services/WhatsApp/ComplaintHandler.php',
-    'app/app/Services/WhatsApp/AiHandler.php',
-    'app/app/Models/WhatsappSession.php',
-    'app/resources/views/layouts/kecamatan.blade.php',
-    'app/resources/views/public/service_navigator.blade.php',
-    'app/app/Http/Controllers/Public/LayananController.php'
-]
-
 def run_ssh_cmd(cmd):
     pid, fd = pty.fork()
     if pid == 0:
@@ -36,29 +25,23 @@ def run_ssh_cmd(cmd):
                 break
         return output.decode(errors='ignore')
 
-print("--- Starting Full Sync (Bot + UI + Services) ---")
+files_to_sync = [
+    'app/database/seeders/FixRolesSeeder.php'
+]
 
+print("--- Syncing FixRolesSeeder ---")
 for f in files_to_sync:
     local_path = f"/home/beni/ProjectkuKecamatanSAEKab/KecamatanSAE/KecamatanSAEversiProduksi/{f}"
-    if not os.path.exists(local_path):
-        print(f"File {f} not found locally. Skipping.")
-        continue
-        
     with open(local_path, 'r') as file:
         content = file.read()
-    
     b64_content = base64.b64encode(content.encode()).decode()
-    
     remote_path = f"/home/ubuntu/KecamatanSAEversiProduksi/{f}"
     container_path = f"/var/www/{f.replace('app/', '', 1)}"
-    
-    print(f"Syncing {f}...")
     run_ssh_cmd(f"mkdir -p $(dirname {remote_path}) && echo '{b64_content}' | base64 -d > {remote_path}")
     run_ssh_cmd(f"sudo -S docker cp {remote_path} kecamatan-app:{container_path}")
 
-# Clear cache
-print("Clearing Laravel cache...")
-run_ssh_cmd("sudo -S docker exec kecamatan-app php artisan cache:clear")
-run_ssh_cmd("sudo -S docker exec kecamatan-app php artisan view:clear")
+print("--- Running FixRolesSeeder on VPS ---")
+result = run_ssh_cmd("sudo -S docker exec kecamatan-app php artisan db:seed --class=FixRolesSeeder")
+print(result)
 
-print("--- Full Sync Completed! ---")
+print("--- Deployment Completed! ---")

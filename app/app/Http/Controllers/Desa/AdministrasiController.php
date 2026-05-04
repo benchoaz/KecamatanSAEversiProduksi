@@ -78,7 +78,10 @@ class AdministrasiController extends Controller
             'nomor_sk' => 'required|string',
             'tanggal_sk' => 'required|date',
             'file_sk' => 'required|file|mimes:pdf|max:2048',
-            'kategori' => 'required|in:perangkat,bpd'
+            'kategori' => 'required|in:perangkat,bpd',
+            'siltap_pokok' => 'nullable|numeric|min:0',
+            'rekening_bank' => 'nullable|string|max:50',
+            'nama_bank' => 'nullable|string|max:100',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -144,6 +147,10 @@ class AdministrasiController extends Controller
             'nomor_sk' => 'required|string',
             'tanggal_sk' => 'required|date',
             'file_sk' => 'nullable|file|mimes:pdf|max:2048', // Nullable on update
+            'siltap_pokok' => 'nullable|numeric|min:0',
+            'tunjangan_jabatan' => 'nullable|numeric|min:0',
+            'rekening_bank' => 'nullable|string|max:50',
+            'nama_bank' => 'nullable|string|max:100',
         ]);
 
         DB::transaction(function () use ($request, $personil) {

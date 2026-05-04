@@ -55,13 +55,9 @@
                                     placeholder="16 Digit Angka" required="true" />
 
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <x-desa.form.input label="Tempat Lahir" name="tempat_lahir"
-                                            placeholder="Kota/Kabupaten Lahir" />
-                                    </div>
-                                    <div class="col-md-6">
-                                        <x-desa.form.input label="Tanggal Lahir" name="tanggal_lahir" type="date"
-                                            required="true" />
+                                    <div class="col-md-12">
+                                        <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok" type="number" 
+                                            placeholder="Contoh: 2400000" />
                                     </div>
                                 </div>
 
@@ -130,6 +126,41 @@
                                     helper="Lampirkan scan asli SK Pengangkatan. Pastikan tulisan terbaca jelas."
                                     required="true" />
                             </div>
+
+                            @if($kategori == 'perangkat')
+                                <hr class="border-light my-5">
+
+                                <!-- 2. INFORMASI KEUANGAN & PERBANKAN -->
+                                <div class="mb-4">
+                                    <div class="section-header-premium mb-4">
+                                        <div class="accent-bar"></div>
+                                        <div>
+                                            <h6 class="fw-bold text-slate-800 mb-1"><i
+                                                    class="fas fa-money-bill-wave me-2 text-primary-500"></i> Informasi Keuangan & Perbankan
+                                            </h6>
+                                            <small class="text-slate-500">Data penghasilan tetap dan rekening bank</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok" type="number" placeholder="Contoh: 2400000" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <x-desa.form.input label="Tunjangan Jabatan (Rp)" name="tunjangan_jabatan" type="number" placeholder="Contoh: 500000" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <x-desa.form.input label="Nama Bank" name="nama_bank" placeholder="Contoh: Bank Jatim" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <x-desa.form.input label="Nomor Rekening" name="rekening_bank" placeholder="Nomor Rekening Bank" />
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
 
                             <!-- 3. AKSI -->
                             <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">

@@ -66,6 +66,34 @@
                                 @endif
                             </div>
 
+                            @if($kategori == 'perangkat')
+                            <hr class="border-light my-5">
+
+                            <!-- 3. INFORMASI KEUANGAN & PERBANKAN -->
+                            <div class="mb-5">
+                                <h6 class="fw-bold text-primary-600 text-uppercase small ls-1 mb-4"><i
+                                        class="fas fa-money-bill-wave me-2"></i> Informasi Keuangan & Perbankan</h6>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok" type="number" 
+                                            :value="$personil->siltap_pokok" :readonly="$readonly" placeholder="Contoh: 2400000" />
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <x-desa.form.input label="Nama Bank" name="nama_bank" :value="$personil->nama_bank"
+                                            :readonly="$readonly" placeholder="Contoh: Bank Jatim" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-desa.form.input label="Nomor Rekening" name="rekening_bank" :value="$personil->rekening_bank"
+                                            :readonly="$readonly" placeholder="Nomor Rekening Bank" />
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
                             <hr class="border-light my-5">
 
                             <!-- 3. DOKUMEN -->

@@ -40,6 +40,9 @@
                         <tr>
                             <th class="ps-4 py-3">Nama Lengkap</th>
                             <th class="py-3">Jabatan</th>
+                            @if($kategori == 'perangkat')
+                                <th class="py-3">Siltap & Tunjangan</th>
+                            @endif
                             <th class="py-3">SK Pengangkatan</th>
                             @if($kategori == 'bpd')
                                 <th class="py-3">Masa Jabatan</th>
@@ -63,7 +66,12 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ $p->jabatan }}</td>
+                                 <td>{{ $p->jabatan }}</td>
+                                @if($kategori == 'perangkat')
+                                    <td>
+                                        <div class="small fw-medium text-slate-800">Rp {{ number_format($p->siltap_pokok ?? 0, 0, ',', '.') }}</div>
+                                    </td>
+                                @endif
                                 <td>
                                     <div class="d-flex flex-column">
                                         <span class="fw-medium text-slate-700">{{ $p->nomor_sk }}</span>

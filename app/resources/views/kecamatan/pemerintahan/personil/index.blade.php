@@ -1,6 +1,6 @@
 @extends(auth()->user()->desa_id ? 'layouts.desa' : 'layouts.kecamatan')
 
-@section('title', $title ?? 'Administrasi Perangkat Desa')
+@section('title', $title ?? 'Administrasi Kepala Desa & Perangkat Desa')
 
 @section('content')
     <div class="content-header mb-5">
@@ -12,7 +12,7 @@
         </div>
         <div class="d-flex justify-content-between align-items-end">
             <div>
-                <h2 class="fw-bold text-primary-900 mb-1">{{ $title ?? 'Administrasi Perangkat Desa' }}</h2>
+                <h2 class="fw-bold text-primary-900 mb-1">{{ $title ?? 'Administrasi Kepala Desa & Perangkat Desa' }}</h2>
                 <p class="text-tertiary mb-0">
                     @if($desa_id)
                         <i class="fas fa-circle-info me-1"></i> Manajemen data riwayat, legalitas, dan kontak personil desa.
@@ -322,6 +322,36 @@
                                     @endif
                                 </select>
                             </div>
+
+                            <!-- Financial Section -->
+                            <div class="col-12 mt-4">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <h6 class="fw-bold text-primary-900 mb-0">Informasi Keuangan & Perbankan</h6>
+                                    <div class="h-px bg-slate-200 flex-grow-1"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-primary-900">Siltap Pokok (Rp)</label>
+                                <input type="number" name="siltap_pokok" class="form-control rounded-3 border-gray-200"
+                                    placeholder="0" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-primary-900">Tunjangan Jabatan (Rp)</label>
+                                <input type="number" name="tunjangan_jabatan" class="form-control rounded-3 border-gray-200"
+                                    placeholder="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-primary-900">Nama Bank</label>
+                                <input type="text" name="nama_bank" class="form-control rounded-3 border-gray-200"
+                                    placeholder="Contoh: Bank Jatim">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-primary-900">Nomor Rekening</label>
+                                <input type="text" name="rekening_bank" class="form-control rounded-3 border-gray-200"
+                                    placeholder="Masukkan nomor rekening">
+                            </div>
+
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold text-primary-900">Mulai Menjabat</label>
                                 <input type="date" name="masa_jabatan_mulai" class="form-control rounded-3 border-gray-200">

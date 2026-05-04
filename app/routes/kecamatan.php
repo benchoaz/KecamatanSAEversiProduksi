@@ -158,6 +158,11 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
                 Route::get('/dokumen', [PemerintahanController::class, 'dokumenIndex'])->name('dokumen.index');
                 Route::post('/dokumen', [PemerintahanController::class, 'dokumenStore'])->name('dokumen.store');
                 Route::get('/peraturan', [PemerintahanController::class, 'peraturanIndex'])->name('peraturan.index');
+                
+                // Rekapitulasi Siltap 17 Desa
+                Route::get('/rekap-siltap', [PemerintahanController::class, 'rekapSiltapIndex'])->name('rekap-siltap.index');
+                Route::post('/rekap-siltap/{id}/update-pagu', [PemerintahanController::class, 'updatePagu'])->name('rekap-siltap.update-pagu');
+                Route::get('/rekap-siltap/download', [PemerintahanController::class, 'rekapSiltapDownload'])->name('rekap-siltap.download');
             });
 
             // Sub-Modul: Data Kepala Desa & Perangkat
