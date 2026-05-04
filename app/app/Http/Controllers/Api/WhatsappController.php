@@ -44,8 +44,9 @@ class WhatsappController extends Controller
             // Extract phone from payload.from
             if (isset($payload['from'])) {
                 $phone = $payload['from'];
-                // Strip @c.us or @s.whatsapp.net or @newsletter suffix
-                $phone = preg_replace('/@(c\.us|s\.whatsapp\.net|newsletter)$/', '', $phone);
+                // Handle WAHA format: 628123:1@c.us
+                $phone = explode('@', $phone)[0];
+                $phone = explode(':', $phone)[0];
             }
 
             // Extract message text from payload.body
@@ -67,7 +68,11 @@ class WhatsappController extends Controller
         elseif ($request->has('data.from') && $request->has('data.body')) {
             $wahaData = $request->input('data');
             $phone = $wahaData['participant'] ?? $wahaData['author'] ?? $wahaData['from'];
+            
+            // Handle WAHA format: 628123:1@c.us
             $phone = explode('@', $phone)[0];
+            $phone = explode(':', $phone)[0];
+
             $phone = preg_replace('/[^0-9]/', '', $phone);
             if (str_starts_with($phone, '0')) {
                 $phone = '62' . substr($phone, 1);
