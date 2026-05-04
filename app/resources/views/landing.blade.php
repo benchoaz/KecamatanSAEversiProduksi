@@ -298,8 +298,8 @@
                             </div>
                         </div>
 
-                        <!-- Right: Visual Balance (Regional Leader Photo) -->
-                        <div class="w-full lg:w-2/5 flex justify-center lg:justify-end relative order-first lg:order-last mb-6 lg:mb-0">
+                        <!-- Right: Visual Balance (Regional Leader Photo) - Hidden on Mobile -->
+                        <div class="hidden lg:flex lg:w-2/5 justify-end relative order-last mb-0">
                             <div class="text-reveal delay-300 relative group scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100">
                                 <div class="absolute -inset-10 bg-emerald-100 rounded-full blur-3xl opacity-50 animate-pulse"></div>
                                 <div class="relative bg-white/20 backdrop-blur-md p-2.5 md:p-4 rounded-[2.5rem] md:rounded-[3.5rem] border border-white/50 shadow-2xl transition-all duration-700 hover:rotate-2">
