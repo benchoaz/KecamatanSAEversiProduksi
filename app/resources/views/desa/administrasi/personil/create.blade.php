@@ -25,8 +25,7 @@
                                     {{ $kategori == 'perangkat' ? 'Perangkat Desa' : 'Anggota BPD' }}
                                 </h5>
                                 <small class="text-white opacity-75" style="font-size: 0.75rem;">Pastikan data yang diinput
-                                    sesuai dengan dokumen
-                                    resmi.</small>
+                                    sesuai dengan dokumen resmi.</small>
                             </div>
                         </div>
                     </div>
@@ -38,25 +37,25 @@
                             <input type="hidden" name="kategori" value="{{ $kategori }}">
 
                             <!-- 1. INFORMASI DASAR -->
-                            <div class="mb-4">
-                                <div class="section-header-premium mb-3">
+                            <div class="mb-5">
+                                <div class="section-header-premium mb-4">
                                     <div class="accent-bar"></div>
                                     <div>
                                         <h6 class="fw-bold text-slate-800 mb-1"><i
                                                 class="fas fa-id-card me-2 text-primary-500"></i> Informasi Dasar</h6>
-                                        <small class="text-slate-500">Data identitas dan tempat tanggal lahir</small>
+                                        <small class="text-slate-500">Data identitas, foto, dan kontak</small>
                                     </div>
                                 </div>
 
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-bold text-slate-700">Pas Foto</label>
-                                        <div class="mb-2 bg-light rounded-3 d-flex align-items-center justify-content-center border" 
-                                            style="width: 120px; height: 160px; border: 2px dashed #cbd5e1 !important;">
-                                            <i class="fas fa-camera fa-2x text-slate-300"></i>
+                                <div class="row mb-4">
+                                    <div class="col-md-4 text-center">
+                                        <label class="form-label fw-bold text-slate-700 d-block">Pas Foto</label>
+                                        <div class="mx-auto mb-2 bg-light rounded-3 d-flex align-items-center justify-content-center border" 
+                                            style="width: 140px; height: 180px; border: 2px dashed #cbd5e1 !important;">
+                                            <i class="fas fa-camera fa-3x text-slate-300"></i>
                                         </div>
                                         <input type="file" name="foto" class="form-control form-control-sm" accept="image/*">
-                                        <small class="text-slate-400 x-small">Maks: 1MB (JPG/PNG)</small>
+                                        <small class="text-slate-400 x-small mt-1 d-block">Maks: 1MB (JPG/PNG)</small>
                                     </div>
                                     <div class="col-md-8">
                                         <x-desa.form.input label="Nama Lengkap" name="nama" placeholder="Nama sesuai KTP"
@@ -64,7 +63,7 @@
 
                                         <div class="mb-3">
                                             <label class="form-label fw-bold text-slate-700">NIK <span class="text-danger">*</span></label>
-                                            <input type="text" name="nik" id="nikInput" class="form-control rounded-3" 
+                                            <input type="text" name="nik" id="nikInput" class="form-control rounded-3 shadow-sm border-slate-300" 
                                                 placeholder="16 Digit Angka" maxlength="16" required>
                                             <div id="nikCounter" class="x-small mt-1 fw-bold text-danger">0 / 16 digit</div>
                                         </div>
@@ -85,10 +84,8 @@
                                     </div>
                                 </div>
 
-                                <!-- Custom Select for Jabatan (Since logic varies) -->
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold text-slate-700">Jabatan <span
-                                            class="text-danger">*</span></label>
+                                <div class="mb-4 mt-3">
+                                    <label class="form-label fw-bold text-slate-700">Jabatan <span class="text-danger">*</span></label>
                                     <select name="jabatan" id="jabatanSelect" class="form-select rounded-3 border-slate-300 shadow-sm"
                                         required>
                                         <option value="">Pilih Jabatan...</option>
@@ -114,86 +111,94 @@
                                 <div id="dusunWrapper" style="display: none;">
                                     <x-desa.form.input label="Nama Dusun" name="nama_dusun" placeholder="Contoh: Dusun Krajan" />
                                 </div>
+                            </div>
 
-                                @if($kategori == 'perangkat')
-                                    <div class="row">
+                            <hr class="border-light my-5">
+
+                            <!-- 2. INFORMASI JABATAN & KEUANGAN -->
+                            <div class="mb-5">
+                                <div class="section-header-premium mb-4">
+                                    <div class="accent-bar" style="background: #10b981;"></div>
+                                    <div>
+                                        <h6 class="fw-bold text-slate-800 mb-1"><i
+                                                class="fas fa-money-bill-wave me-2 text-success"></i> Jabatan & Keuangan</h6>
+                                        <small class="text-slate-500">Masa jabatan, Siltap, dan rekening bank</small>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <x-desa.form.input label="Mulai Menjabat (TMT)" name="masa_jabatan_mulai"
+                                            type="date" required="true" />
+                                    </div>
+                                    @if($kategori == 'perangkat')
                                         <div class="col-md-6">
-                                            <x-desa.form.input label="Mulai Menjabat (TMT)" name="masa_jabatan_mulai"
+                                            <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok"
+                                                type="number" placeholder="Contoh: 2400000" />
+                                        </div>
+                                    @else
+                                        <div class="col-md-6">
+                                            <x-desa.form.input label="Selesai Jabatan" name="masa_jabatan_selesai"
                                                 type="date" required="true" />
                                         </div>
+                                    @endif
+                                </div>
+
+                                @if($kategori == 'perangkat')
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <x-desa.form.input label="Nama Bank" name="nama_bank" placeholder="Contoh: Bank Jatim" />
                                     </div>
+                                    <div class="col-md-6">
+                                        <x-desa.form.input label="Nomor Rekening Pribadi" name="rekening_bank"
+                                            placeholder="Masukkan nomor rekening bank" />
+                                    </div>
+                                </div>
                                 @endif
                             </div>
 
                             <hr class="border-light my-5">
 
-                            <!-- 3. DOKUMEN LEGALITAS -->
-                            <div class="mb-4">
+                            <!-- 3. LEGALITAS (SK) -->
+                            <div class="mb-5">
                                 <div class="section-header-premium mb-4">
-                                    <div class="accent-bar"></div>
+                                    <div class="accent-bar" style="background: #f59e0b;"></div>
                                     <div>
                                         <h6 class="fw-bold text-slate-800 mb-1"><i
-                                                class="fas fa-file-contract me-2 text-primary-500"></i> Dokumen Legalitas
-                                        </h6>
-                                        <small class="text-slate-500">SK Pengangkatan dan file pendukung</small>
+                                                class="fas fa-file-signature me-2 text-warning"></i> Legalitas (SK)</h6>
+                                        <small class="text-slate-500">Nomor SK dan lampiran dokumen PDF</small>
                                     </div>
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-8">
-                                        <x-desa.form.input label="Nomor SK Pengangkatan" name="nomor_sk"
-                                            placeholder="Nomor Surat Keputusan" required="true" />
+                                    <div class="col-md-6">
+                                        <x-desa.form.input label="Nomor SK" name="nomor_sk"
+                                            placeholder="Contoh: 188/01/426.313.11/2024" required="true" />
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <x-desa.form.input label="Tanggal SK" name="tanggal_sk" type="date"
                                             required="true" />
                                     </div>
                                 </div>
 
-                                <x-desa.form.upload label="File SK (Scan PDF)" name="file_sk"
-                                    helper="Lampirkan scan asli SK Pengangkatan. Pastikan tulisan terbaca jelas."
-                                    required="true" />
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-slate-700">Lampiran SK (PDF) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="file" name="file_sk"
+                                        class="form-control rounded-3 border-slate-300 shadow-sm" accept="application/pdf"
+                                        required>
+                                    <small class="text-slate-500 mt-1 d-block"><i
+                                            class="fas fa-info-circle me-1"></i> Format PDF, maks. 2MB</small>
+                                </div>
                             </div>
 
-                            @if($kategori == 'perangkat')
-                                <hr class="border-light my-5">
-
-                                <!-- 2. INFORMASI KEUANGAN & PERBANKAN -->
-                                <div class="mb-4">
-                                    <div class="section-header-premium mb-4">
-                                        <div class="accent-bar"></div>
-                                        <div>
-                                            <h6 class="fw-bold text-slate-800 mb-1"><i
-                                                    class="fas fa-money-bill-wave me-2 text-primary-500"></i> Informasi Keuangan & Perbankan
-                                            </h6>
-                                            <small class="text-slate-500">Data penghasilan tetap dan rekening bank</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok" type="number" placeholder="Contoh: 2400000" />
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <x-desa.form.input label="Nama Bank" name="nama_bank" placeholder="Contoh: Bank Jatim" />
-                                        </div>
-                                        <div class="col-md-6">
-                                            <x-desa.form.input label="Nomor Rekening Pribadi" name="rekening_bank" placeholder="Nomor Rekening Bank" />
-                                        </div>
-                                    </div>
+                            <div class="pt-4 border-top">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="reset" class="btn btn-light rounded-pill px-4 fw-medium">Reset</button>
+                                    <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
+                                        <i class="fas fa-save me-2"></i> Simpan Data
+                                    </button>
                                 </div>
-                            @endif
-
-                            <!-- 3. AKSI -->
-                            <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">
-                                <a href="{{ route('desa.administrasi.personil.index', ['kategori' => $kategori]) }}"
-                                    class="btn btn-light rounded-pill px-4">Batal</a>
-                                <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm fw-bold">
-                                    <i class="fas fa-save me-2"></i> Simpan Draft
-                                </button>
                             </div>
                         </form>
                     </div>
@@ -201,56 +206,50 @@
             </div>
         </div>
     </div>
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- 1. JABATAN & DUSUN TOGGLE ---
-        const jabatanSelect = document.getElementById('jabatanSelect');
-        const dusunWrapper = document.getElementById('dusunWrapper');
-        const dusunInput = dusunWrapper ? dusunWrapper.querySelector('input') : null;
-        
-        function toggleDusun() {
-            if (jabatanSelect && jabatanSelect.value === 'Kepala Dusun') {
-                dusunWrapper.style.display = 'block';
-                if(dusunInput) dusunInput.setAttribute('required', 'required');
-            } else if(dusunWrapper) {
-                dusunWrapper.style.display = 'none';
-                if(dusunInput) {
-                    dusunInput.removeAttribute('required');
-                    dusunInput.value = '';
-                }
-            }
-        }
-
-        if(jabatanSelect) {
-            jabatanSelect.addEventListener('change', toggleDusun);
-            toggleDusun();
-        }
-
-        // --- 2. NIK COUNTER ---
-        const nikInput = document.querySelector('input[name="nik"]');
-        if (nikInput) {
-            // Create counter element
-            const counterDiv = document.createElement('div');
-            counterDiv.id = 'nikCounter';
-            counterDiv.style.cssText = 'font-size: 0.65rem; font-weight: bold; margin-top: 2px; transition: color 0.3s;';
-            nikInput.parentNode.appendChild(counterDiv);
-
-            function updateCounter() {
-                const len = nikInput.value.length;
-                counterDiv.innerText = `${len} / 16 digit`;
-                if (len === 16) {
-                    counterDiv.style.color = '#10b981'; // Green-500
-                    counterDiv.innerText += ' (Pas)';
-                } else {
-                    counterDiv.style.color = '#ef4444'; // Red-500
-                }
-            }
-
-            nikInput.addEventListener('input', updateCounter);
-            updateCounter(); // Initial check
-        }
-    });
-</script>
-@endpush
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // NIK Counter Logic
+            const nikInput = document.getElementById('nikInput');
+            const nikCounter = document.getElementById('nikCounter');
+
+            if (nikInput && nikCounter) {
+                function updateNikCounter() {
+                    const len = nikInput.value.length;
+                    nikCounter.innerText = `${len} / 16 digit`;
+                    if (len === 16) {
+                        nikCounter.classList.remove('text-danger');
+                        nikCounter.classList.add('text-success');
+                        nikCounter.innerText += ' (Pas)';
+                    } else {
+                        nikCounter.classList.remove('text-success');
+                        nikCounter.classList.add('text-danger');
+                    }
+                }
+
+                nikInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    updateNikCounter();
+                });
+                
+                updateNikCounter();
+            }
+
+            // Dusun Wrapper Logic
+            const jabatanSelect = document.getElementById('jabatanSelect');
+            const dusunWrapper = document.getElementById('dusunWrapper');
+
+            if (jabatanSelect && dusunWrapper) {
+                jabatanSelect.addEventListener('change', function() {
+                    if (this.value === 'Kepala Dusun') {
+                        dusunWrapper.style.display = 'block';
+                    } else {
+                        dusunWrapper.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+@endpush
