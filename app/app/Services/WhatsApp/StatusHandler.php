@@ -44,6 +44,19 @@ class StatusHandler
                 ->first();
 
             if ($service) {
+                // SECURITY CHECK: Verify if the sender's phone matches the record
+                $senderPhone = $this->normalizePhone($phone);
+                $recordPhone = $this->normalizePhone($service->whatsapp);
+
+                if ($senderPhone !== $recordPhone) {
+                    return [
+                        'success' => true,
+                        'intent' => 'status_denied',
+                        'reply' => "🔒 *AKSES DITOLAK*\n\nMaaf, berkas dengan PIN tersebut terdaftar atas nomor WhatsApp lain. Anda hanya bisa melacak berkas milik Anda sendiri demi keamanan data.\n\n_Ketik MENU untuk kembali._",
+                        'state_update' => 'ADM_SUBMENU',
+                    ];
+                }
+
                 $result = [
                     'success' => true,
                     'intent' => 'status',
