@@ -4,34 +4,28 @@
 
 @section('content')
     <div class="dashboard container-fluid px-0">
-        <!-- Premium Section Header -->
-        <div class="welcome-banner p-5 rounded-5 mb-5 position-relative overflow-hidden shadow-2xl animate-entrance"
-            style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid rgba(255,255,255,0.05);">
-
-            <div class="position-absolute top-0 right-0 w-100 h-100 opacity-10 pointer-events-none">
-                <div
-                    class="position-absolute top-0 end-0 translate-middle w-50 h-100 bg-primary rounded-circle blur-3xl opacity-20">
-                </div>
-            </div>
+        <!-- Premium Section Header (White Theme) -->
+        <div class="welcome-banner p-5 rounded-5 mb-5 position-relative overflow-hidden shadow-soft animate-entrance"
+            style="background: #ffffff; border: 1px solid #e2e8f0;">
 
             <div class="position-relative z-2">
                 <div class="d-flex align-items-center gap-3 mb-4">
                     <span
-                        class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-20 px-3 py-1.5 rounded-pill small tracking-widest text-uppercase fw-bold">
-                        <i class="fas fa-building-columns me-1"></i> Seksi Pemerintahan
+                        class="badge bg-slate-100 text-slate-900 border border-slate-200 px-3 py-1.5 rounded-pill small tracking-widest text-uppercase fw-bold">
+                        <i class="fas fa-building-columns me-1 text-primary"></i> Seksi Pemerintahan
                     </span>
-                    <div class="h-px bg-white bg-opacity-10 flex-grow-1"></div>
+                    <div class="h-px bg-slate-100 flex-grow-1"></div>
                 </div>
 
-                <h1 class="display-5 fw-black text-white mb-2 tracking-tight">Tata Kelola Administrasi</h1>
-                <p class="text-slate-400 fs-5 mb-0 font-medium max-w-2xl">
+                <h1 class="display-5 fw-black text-primary-900 mb-2 tracking-tight">Tata Kelola Administrasi</h1>
+                <p class="text-tertiary fs-5 mb-0 font-medium max-w-2xl">
                     Pusat monitoring buku induk, personil, dan kepatuhan dokumen digital sewilayah
                     {{ appProfile()->region_level }} {{ appProfile()->region_name }}.
                 </p>
             </div>
 
             <div class="position-absolute end-0 bottom-0 opacity-5 mb-n5 me-n4 z-1">
-                <i class="fas fa-shield-halved fa-12x text-white"></i>
+                <i class="fas fa-shield-halved fa-12x text-slate-900"></i>
             </div>
         </div>
     </div>
