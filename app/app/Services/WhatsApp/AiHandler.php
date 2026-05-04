@@ -54,7 +54,9 @@ class AiHandler
             $systemPrompt .= "- Jawaban Anda harus natural, tidak kaku, dan mengutamakan pelayanan.\n\n";
             
             $systemPrompt .= "PERINTAH KHUSUS & KONTROL:\n";
-            $systemPrompt .= "- Jika warga ingin membatalkan/berhenti (kata: 'batal', 'stop', 'berhenti'), jawab dengan sopan bahwa proses dihentikan dan tawarkan bantuan lain.\n";
+            $systemPrompt .= "- Jika warga ingin mengadu atau melapor (kata: 'ngadu', 'lapor', 'pengaduan'), Anda WAJIB memberikan link pengaduan resmi: " . $this->getPublicUrl() . "/#pengaduan\n";
+            $systemPrompt .= "- Beritahu mereka bahwa laporan yang masuk melalui link tersebut akan langsung diproses oleh petugas kecamatan.\n";
+            $systemPrompt .= "- Jika warga ingin membatalkan/berhenti (kata: 'batal', 'stop', 'berhenti'), jawab dengan sopan bahwa proses dihentikan.\n";
             $systemPrompt .= "- Jika warga ingin melanjutkan (kata: 'teruskan', 'lanjut'), berikan semangat dan lanjutkan bantuan Anda.\n";
             $systemPrompt .= "- Anda harus memahami percakapan sederhana dan salam (halo, apa kabar, terima kasih) dengan ramah.\n\n";
 
