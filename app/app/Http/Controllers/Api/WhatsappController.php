@@ -48,11 +48,11 @@ class WhatsappController extends Controller
         if (is_array($message) && isset($message['payload'])) {
             $payload = $message['payload'];
 
-            // Extract phone from payload.from
-            if (isset($payload['from'])) {
-                $phone = $payload['from'];
+            // Extract phone from payload.author (prioritize real number) then payload.from
+            if (isset($payload['author']) || isset($payload['from'])) {
+                $rawFrom = $payload['author'] ?? $payload['from'];
                 // Handle WAHA format: 628123:1@c.us
-                $phone = explode('@', $phone)[0];
+                $phone = explode('@', $rawFrom)[0];
                 $phone = explode(':', $phone)[0];
             }
 
