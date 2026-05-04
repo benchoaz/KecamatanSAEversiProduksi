@@ -533,9 +533,12 @@ class IntentHandler
             }
         }
 
-        $reply .= "🆘 *CALL CENTER KAB. PROBOLINGGO:*\n";
-        $reply .= "☎️ Telp: (0298) 343 0000\n";
-        $reply .= "🟢 WA: 081 8181 91 119 *(Khusus Ambulans)*\n\n";
+        if (!(str_contains($message, 'korupsi') || str_contains($message, 'pungli') || str_contains($message, 'penyelewengan'))) {
+            $reply .= "🆘 *CALL CENTER KAB. PROBOLINGGO:*\n";
+            $reply .= "☎️ Telp: (0298) 343 0000\n";
+            $reply .= "🟢 WA: 081 8181 91 119 *(Khusus Ambulans)*\n\n";
+        }
+
         $reply .= "Ketik *MENU* untuk layanan lainnya.";
 
         return [
