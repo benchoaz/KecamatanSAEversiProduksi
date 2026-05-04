@@ -1,0 +1,211 @@
+{
+  "name": "🤖 WhatsApp Bot - PRIMARY V4 (FIXED LID & SSL)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-primary",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "WAHA Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "webhookId": "whatsapp-primary"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\": true}",
+        "options": {}
+      },
+      "id": "respond-ok",
+      "name": "Respond 200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        450,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.event }}",
+              "value2": "message"
+            }
+          ],
+          "boolean": [
+            {
+              "value1": "={{ !$json.body.payload.from.includes('status@broadcast') }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "event-filter",
+      "name": "Event Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = items[0].json.body;\nconst payload = body.payload || {};\n\n// Normalize phone (LID Fix)\nreturn [{\n  json: {\n    chatId: payload.from,\n    author: payload.author || payload.from,\n    message: payload.body || payload.text || '',\n    raw_payload: body\n  }\n}];"
+      },
+      "id": "normalize-node",
+      "name": "Normalize & Validate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://kecamatanbesuk.web.id/api/whatsapp/handle",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-TOKEN",
+              "value": "JEalbL50Ysu8MCKVS1q9j38BPpNBorzj"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chatId",
+              "value": "={{ $json.chatId }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.raw_payload }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "call-laravel",
+      "name": "Call Dashboard API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://waha-ohiqijryhkzp.boba.sumopod.my.id/api/sendText",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "tq4ZqP4Ck40WENkfk5Aah4tCF4u5DBtg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "session",
+              "value": "session_01kqepctxvfe6jx212f0b4h48t"
+            },
+            {
+              "name": "chatId",
+              "value": "={{ $node[\"Normalize & Validate\"].json.chatId }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.reply }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "send-text-waha",
+      "name": "SendText WAHA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1050,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "WAHA Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Event Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event Filter": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Validate": {
+      "main": [
+        [
+          {
+            "node": "Call Dashboard API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Dashboard API": {
+      "main": [
+        [
+          {
+            "node": "SendText WAHA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

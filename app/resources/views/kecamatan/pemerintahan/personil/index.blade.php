@@ -116,59 +116,75 @@
                     </thead>
                     <tbody class="bg-white">
                         @forelse($personils as $p)
-                            <tr>
+                            @php
+                                $isKades = str_contains(strtolower($p->jabatan), 'kepala desa');
+                                $pensiunDate = $p->masa_jabatan_selesai;
+                                $isUrgent = $pensiunDate && $pensiunDate->isFuture() && $pensiunDate->diffInMonths(now()) < 12;
+                                $isExpired = $pensiunDate && $pensiunDate->isPast();
+                                $umur = $p->tanggal_lahir ? \Carbon\Carbon::parse($p->tanggal_lahir)->age : '-';
+                            @endphp
+                            <tr class="{{ $isExpired ? 'bg-light opacity-75' : '' }}">
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="personil-photo">
                                             @if($p->foto)
                                                 <img src="{{ route('kecamatan.file.personil-foto', $p->id) }}" alt="Foto {{ $p->nama }}"
-                                                    class="rounded-circle object-fit-cover"
-                                                    style="width: 48px; height: 48px; border: 2px solid var(--brand-100);">
+                                                    class="rounded-circle object-fit-cover shadow-sm"
+                                                    style="width: 50px; height: 50px; border: 2px solid #fff;">
                                             @else
                                                 <div class="rounded-circle bg-brand-50 text-brand-600 d-flex align-items-center justify-content-center fw-bold shadow-sm"
-                                                    style="width: 48px; height: 48px;">
+                                                    style="width: 50px; height: 50px; border: 2px solid #fff;">
                                                     {{ strtoupper(substr($p->nama, 0, 1)) }}
                                                 </div>
                                             @endif
                                         </div>
                                         <div>
                                             <div class="fw-bold text-primary-900">{{ $p->nama }}</div>
-                                            <small class="text-tertiary">NIK: {{ $p->nik }}</small>
+                                            <div class="small text-tertiary">NIK: {{ $p->nik }}</div>
+                                            <span class="badge bg-slate-100 text-slate-600 x-small mt-1">Umur: {{ $umur }} Thn</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-brand-50 text-brand-600 border-0 px-3 fw-semibold">
-                                        {{ $p->jabatan }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="small text-primary-700 fw-medium">
-                                        {{ $p->masa_jabatan_mulai ? $p->masa_jabatan_mulai->format('d/m/Y') : '-' }}
-                                        <span class="text-tertiary mx-1">s/d</span>
-                                        <span
-                                            class="{{ $p->masa_jabatan_selesai && $p->masa_jabatan_selesai->isPast() ? 'text-danger fw-bold' : '' }}">
-                                            {{ $p->masa_jabatan_selesai ? $p->masa_jabatan_selesai->format('d/m/Y') : 'Sekarang' }}
-                                        </span>
-                                    </div>
-                                    @if($p->kategori == 'perangkat')
-                                        <div class="x-small text-tertiary mt-1">
-                                            @if(str_contains(strtolower($p->jabatan), 'kepala desa'))
-                                                <i class="fas fa-clock-rotate-left me-1"></i> Sesuai Aturan 8 Thn
-                                            @else
-                                                <i class="fas fa-user-clock me-1"></i> Pensiun Usia 60 Thn
-                                            @endif
-                                        </div>
-                                    @endif
+                                    <div class="fw-semibold text-primary-800">{{ $p->jabatan }}</div>
+                                    <small class="text-tertiary">{{ $p->kategori == 'perangkat' ? 'Perangkat Desa' : 'BPD' }}</small>
                                 </td>
                                 <td>
                                     <div class="d-flex flex-column">
-                                        <small class="text-tertiary">No. SK:</small>
+                                        <div class="small fw-medium text-slate-700">
+                                            {{ $p->masa_jabatan_mulai ? $p->masa_jabatan_mulai->format('d/M/Y') : '-' }}
+                                            <span class="text-slate-300 mx-1">→</span>
+                                            <span class="{{ $isExpired ? 'text-danger fw-bold' : ($isUrgent ? 'text-warning fw-bold' : 'text-emerald-600') }}">
+                                                {{ $pensiunDate ? $pensiunDate->format('d/M/Y') : 'Sekarang' }}
+                                            </span>
+                                        </div>
+                                        
+                                        @if($pensiunDate && !$isExpired)
+                                            <div class="mt-1">
+                                                @if($isUrgent)
+                                                    <span class="badge bg-warning-subtle text-warning-emphasis x-small border border-warning-subtle">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i> Sisa {{ now()->diffInMonths($pensiunDate) }} Bulan
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-emerald-50 text-emerald-600 x-small border border-emerald-100">
+                                                        <i class="fas fa-check-circle me-1"></i> Aktif ({{ now()->diffInYears($pensiunDate) }} Thn lagi)
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @elseif($isExpired)
+                                            <span class="badge bg-danger-subtle text-danger x-small mt-1 border border-danger-subtle">
+                                                <i class="fas fa-clock me-1"></i> Masa Jabatan Habis
+                                            </span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column">
                                         <span class="small fw-semibold text-primary-900">{{ $p->nomor_sk ?? '-' }}</span>
                                         @if($p->file_sk)
                                             <a href="{{ route('kecamatan.file.personil', $p->id) }}" target="_blank"
-                                                class="text-brand-600 small mt-1 text-decoration-none fw-bold">
-                                                <i class="fas fa-file-pdf me-1"></i> Buka Dokumen
+                                                class="text-brand-600 x-small mt-1 text-decoration-none fw-bold hover-underline">
+                                                <i class="fas fa-file-pdf me-1"></i> Lihat SK PDF
                                             </a>
                                         @endif
                                     </div>
@@ -176,15 +192,20 @@
                                 <td>
                                     @if($p->no_hp)
                                         <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $p->no_hp) }}" target="_blank"
-                                            class="btn btn-xs btn-success rounded-pill px-3 shadow-sm">
-                                            <i class="fab fa-whatsapp me-1"></i> WhatsApp
+                                            class="btn btn-xs btn-outline-success rounded-pill px-3 fw-bold">
+                                            <i class="fab fa-whatsapp me-1"></i> WA
                                         </a>
                                     @else
-                                        <span class="text-tertiary small">Tidak ada nomor</span>
+                                        <span class="text-slate-300 small italic">N/A</span>
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge {{ $p->status_badge }} rounded-pill px-3">{{ $p->status_label }}</span>
+                                    @if(!$p->is_active)
+                                        <span class="badge bg-danger rounded-pill px-3 text-uppercase x-small ls-1">Non-Aktif</span>
+                                        <div class="x-small text-danger mt-1">Alasan: {{ ucfirst($p->status_keaktifan ?? 'Berhenti') }}</div>
+                                    @else
+                                        <span class="badge {{ $p->status_badge }} rounded-pill px-3">{{ $p->status_label }}</span>
+                                    @endif
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="d-flex align-items-center justify-content-end gap-1">

@@ -1,0 +1,204 @@
+{
+  "name": "🤖 Kecamatan SAE WhatsApp Bot (V3 NO SSL ERROR)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-primary",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "WAHA Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "webhookId": "whatsapp-primary"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = items[0].json.body;\nconst payload = body.payload || {};\n\n// 1. Filter: Hanya proses event 'message' dan abaikan status broadcast\nif (body.event !== 'message' || (payload.from && payload.from.includes('status@broadcast'))) {\n  return []; // Hentikan workflow\n}\n\n// 2. Normalize: Ambil nomor asli (Anti-LID)\nlet rawPhone = payload.author || payload.from || \"\";\nlet cleanPhone = rawPhone.split('@')[0].split(':')[0].replace(/[^0-9]/g, '');\n\n// Jika mulai dengan 0, ubah ke 62\nif (cleanPhone.startsWith('0')) {\n  cleanPhone = '62' + cleanPhone.substring(1);\n}\n\nreturn [{\n  json: {\n    chatId: payload.from,\n    phone: cleanPhone,\n    message_text: (payload.body || \"\").trim(),\n    raw_payload: body\n  }\n}];"
+      },
+      "id": "code-logic",
+      "name": "Filter & Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\":true}",
+        "options": {}
+      },
+      "id": "respond-ok",
+      "name": "Respond 200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://kecamatanbesuk.web.id/api/whatsapp/handle",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-TOKEN",
+              "value": "JEalbL50Ysu8MCKVS1q9j38BPpNBorzj"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.phone }}"
+            },
+            {
+              "name": "chatId",
+              "value": "={{ $json.chatId }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.raw_payload }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "call-dashboard",
+      "name": "Call Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.success }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "check-reply",
+      "name": "Should Reply?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        950,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://waha-ohiqijryh.vps.sumopod.my.id/api/sendText",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "session",
+              "value": "default"
+            },
+            {
+              "name": "chatId",
+              "value": "={{ $node[\"Filter & Normalize\"].json.chatId }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.reply }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "send-to-waha",
+      "name": "Send to WAHA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1200,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "WAHA Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter & Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Normalize": {
+      "main": [
+        [
+          {
+            "node": "Call Dashboard",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Dashboard": {
+      "main": [
+        [
+          {
+            "node": "Should Reply?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Reply?": {
+      "main": [
+        [
+          {
+            "node": "Send to WAHA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": "2059"
+  },
+  "pinData": {},
+  "versionId": "v3-no-ssl-error"
+}

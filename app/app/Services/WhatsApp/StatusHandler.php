@@ -325,8 +325,13 @@ class StatusHandler
      */
     protected function formatNotFound(string $phone): string
     {
+        $baseUrl = $this->getPublicUrl();
+        $trackingUrl = rtrim($baseUrl, '/') . '/layanan';
+
         return "❌ *Berkas Tidak Ditemukan*\n\n" .
             "Kami tidak menemukan berkas layanan yang terdaftar dengan nomor *{$phone}*.\n\n" .
+            "🔗 *Cek Langsung di Website:*\n" .
+            "{$trackingUrl}\n\n" .
             "💡 *Saran Aktif:*\n" .
             "- Ketik langsung **PIN Lacak** (6 angka) jika ada.\n" .
             "- Ketik **MENU** untuk melihat opsi lain.\n\n" .

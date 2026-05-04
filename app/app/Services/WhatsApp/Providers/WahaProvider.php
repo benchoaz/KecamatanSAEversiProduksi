@@ -35,10 +35,11 @@ class WahaProvider implements WhatsAppProviderInterface
             $phone = $this->normalizePhone($phone);
 
             $response = Http::timeout(30)
+                ->withoutVerifying() // BYPASS SSL ISSUES
                 ->withHeaders($this->headers())
                 ->post("{$this->apiUrl}/api/sendText", [
                     'session' => $this->session,
-                    'chatId'  => "{$phone}@c.us",
+                    'chatId'  => str_contains($phone, '@') ? $phone : "{$phone}@c.us",
                     'text'    => $message,
                 ]);
 

@@ -55,9 +55,13 @@
                                     placeholder="16 Digit Angka" required="true" />
 
                                 <div class="row">
-                                    <div class="col-md-12">
-                                        <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok" type="number" 
-                                            placeholder="Contoh: 2400000" />
+                                    <div class="col-md-6">
+                                        <x-desa.form.input label="Tempat Lahir" name="tempat_lahir" placeholder="Kota/Kabupaten Lahir"
+                                            required="true" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <x-desa.form.input label="Tanggal Lahir" name="tanggal_lahir" type="date"
+                                            required="true" />
                                     </div>
                                 </div>
 

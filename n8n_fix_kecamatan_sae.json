@@ -1,0 +1,266 @@
+{
+  "name": "🤖 Kecamatan SAE WhatsApp Bot (FIX LID)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "whatsapp-primary",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "WAHA Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "whatsapp-primary"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.event }}",
+              "operation": "equals",
+              "value2": "message"
+            },
+            {
+              "value1": "={{ $json.body.payload.from ?? \"\" }}",
+              "operation": "notContains",
+              "value2": "status@broadcast"
+            }
+          ]
+        }
+      },
+      "id": "event-filter",
+      "name": "Event Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\":true}",
+        "options": {}
+      },
+      "id": "respond-ok",
+      "name": "Respond 200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "chatId",
+              "value": "={{ $json.body.payload.from }}"
+            },
+            {
+              "name": "phone",
+              "value": "={{ ($json.body.payload.author || $json.body.payload.from).split('@')[0].split(':')[0] }}"
+            },
+            {
+              "name": "msg",
+              "value": "={{ ($json.body.payload.body || \"\").trim() }}"
+            },
+            {
+              "name": "message_full",
+              "value": "={{ $json.body }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "normalize",
+      "name": "Normalize (Anti-LID)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://kecamatanbesuk.web.id/api/whatsapp/handle",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-TOKEN",
+              "value": "JEalbL50Ysu8MCKVS1q9j38BPpNBorzj"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.phone }}"
+            },
+            {
+              "name": "chatId",
+              "value": "={{ $json.chatId }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message_full }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "call-dashboard",
+      "name": "Call Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.success }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "check-reply",
+      "name": "Should Reply?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://waha-ohiqijryh.vps.sumopod.my.id/api/sendText",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "session",
+              "value": "default"
+            },
+            {
+              "name": "chatId",
+              "value": "={{ $node[\"Normalize (Anti-LID)\"].json.chatId }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.reply }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-to-waha",
+      "name": "Send to WAHA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1250,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "WAHA Webhook": {
+      "main": [
+        [
+          {
+            "node": "Event Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event Filter": {
+      "main": [
+        [
+          {
+            "node": "Normalize (Anti-LID)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize (Anti-LID)": {
+      "main": [
+        [
+          {
+            "node": "Call Dashboard",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Dashboard": {
+      "main": [
+        [
+          {
+            "node": "Should Reply?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Reply?": {
+      "main": [
+        [
+          {
+            "node": "Send to WAHA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": "2059"
+  },
+  "pinData": {},
+  "versionId": "1b0a7b6a-9b8c-4a3d-8d5e-7f6a5b4c3d2e"
+}

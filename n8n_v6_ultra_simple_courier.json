@@ -1,0 +1,120 @@
+{
+  "name": "🤖 n8n Courier (V6 ULTRA SIMPLE)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-primary",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "WAHA Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "webhookId": "whatsapp-primary"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = items[0].json.body;\nconst payload = body.payload || {};\n\nif (body.event !== 'message' || (payload.from && payload.from.includes('status@broadcast'))) {\n  return [];\n}\n\nreturn [{\n  json: {\n    chatId: payload.from,\n    raw_payload: body\n  }\n}];"
+      },
+      "id": "code-logic",
+      "name": "Event Filter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\":true}",
+        "options": {}
+      },
+      "id": "respond-ok",
+      "name": "Respond 200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://kecamatanbesuk.web.id/api/whatsapp/handle",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-TOKEN",
+              "value": "JEalbL50Ysu8MCKVS1q9j38BPpNBorzj"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chatId",
+              "value": "={{ $json.chatId }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.raw_payload }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "call-dashboard",
+      "name": "Send to Laravel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        700,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "WAHA Webhook": {
+      "main": [
+        [
+          {
+            "node": "Event Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event Filter": {
+      "main": [
+        [
+          {
+            "node": "Send to Laravel",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

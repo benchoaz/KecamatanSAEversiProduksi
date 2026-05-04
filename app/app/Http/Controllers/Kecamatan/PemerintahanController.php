@@ -117,10 +117,6 @@ class PemerintahanController extends Controller
 
         $personil = PersonilDesa::findOrFail($id);
 
-        // Ensure user has access (kecamatan operator matches desa if needed, or global kecamatan)
-        // Kecamatan user usually has access to all desas in their kecamatan
-        // Assuming middleware handles basic role. 
-
         $personil->status = $validated['status'];
         if ($validated['status'] == 'dikembalikan') {
             $personil->catatan_revisi = $validated['catatan'];
@@ -128,6 +124,25 @@ class PemerintahanController extends Controller
         $personil->save();
 
         return back()->with('success', 'Status personil berhasil diperbarui.');
+    }
+
+    public function personilTerminate(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'status_keaktifan' => 'required|in:meninggal,berhenti,diberhentikan',
+            'tanggal_nonaktif' => 'required|date',
+            'alasan_nonaktif' => 'nullable|string'
+        ]);
+
+        $personil = PersonilDesa::findOrFail($id);
+        $personil->update([
+            'is_active' => false,
+            'status_keaktifan' => $validated['status_keaktifan'],
+            'tanggal_nonaktif' => $validated['tanggal_nonaktif'],
+            'alasan_nonaktif' => $validated['alasan_nonaktif'],
+        ]);
+
+        return back()->with('success', 'Personil ' . $personil->nama . ' telah dinonaktifkan.');
     }
 
     public function personilIndex()

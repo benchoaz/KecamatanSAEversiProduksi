@@ -140,6 +140,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
                 Route::get('/personil', [PemerintahanController::class, 'personilIndex'])->name('personil.index');
                 Route::post('/personil', [PemerintahanController::class, 'personilStore'])->name('personil.store');
                 Route::post('/personil/{id}/verify', [PemerintahanController::class, 'personilVerify'])->name('personil.verify');
+                Route::post('/personil/{id}/terminate', [PemerintahanController::class, 'personilTerminate'])->name('personil.terminate');
 
                 Route::get('/bpd', [PemerintahanController::class, 'bpdIndex'])->name('bpd.index');
                 Route::post('/bpd', [PemerintahanController::class, 'personilStore'])->name('bpd.store'); // Reuse store for now

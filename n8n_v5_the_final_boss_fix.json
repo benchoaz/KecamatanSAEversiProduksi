@@ -1,0 +1,179 @@
+{
+  "name": "🤖 Kecamatan SAE WhatsApp Bot (V5 FINAL BOSS FIX)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-primary",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "WAHA Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "webhookId": "whatsapp-primary"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = items[0].json.body;\nconst payload = body.payload || {};\n\nif (body.event !== 'message' || (payload.from && payload.from.includes('status@broadcast'))) {\n  return [];\n}\n\nlet rawPhone = payload.author || payload.from || \"\";\nlet cleanPhone = rawPhone.split('@')[0].split(':')[0].replace(/[^0-9]/g, '');\n\nif (cleanPhone.startsWith('0')) {\n  cleanPhone = '62' + cleanPhone.substring(1);\n}\n\nreturn [{\n  json: {\n    chatId: payload.from,\n    phone: cleanPhone,\n    message_text: (payload.body || \"\").trim(),\n    raw_payload: body\n  }\n}];"
+      },
+      "id": "code-logic",
+      "name": "Filter & Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"ok\":true}",
+        "options": {}
+      },
+      "id": "respond-ok",
+      "name": "Respond 200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://kecamatanbesuk.web.id/api/whatsapp/handle",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-TOKEN",
+              "value": "JEalbL50Ysu8MCKVS1q9j38BPpNBorzj"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.phone }}"
+            },
+            {
+              "name": "chatId",
+              "value": "={{ $json.chatId }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.raw_payload }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "call-dashboard",
+      "name": "Call Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.success }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "check-reply",
+      "name": "Should Reply?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        950,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const axios = require('axios');\nconst https = require('https');\n\n// Konfigurasi Agen HTTPS untuk mengabaikan SSL\nconst agent = new https.Agent({\n  rejectUnauthorized: false\n});\n\nconst chatId = items[0].json.chatId;\nconst replyText = items[0].json.reply;\nconst wahaUrl = 'https://waha-ohiqijryh.vps.sumopod.my.id/api/sendText';\n\ntry {\n  const response = await axios.post(wahaUrl, {\n    session: 'default',\n    chatId: chatId,\n    text: replyText\n  }, {\n    httpsAgent: agent,\n    timeout: 10000\n  });\n  \n  return [{ json: response.data }];\n} catch (error) {\n  throw new Error(`Gagal mengirim ke WAHA: ${error.message}`);\n}"
+      },
+      "id": "send-to-waha-force",
+      "name": "Send back to WAHA (Force SSL Bypass)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "WAHA Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter & Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Normalize": {
+      "main": [
+        [
+          {
+            "node": "Call Dashboard",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Dashboard": {
+      "main": [
+        [
+          {
+            "node": "Should Reply?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Reply?": {
+      "main": [
+        [
+          {
+            "node": "Send back to WAHA (Force SSL Bypass)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

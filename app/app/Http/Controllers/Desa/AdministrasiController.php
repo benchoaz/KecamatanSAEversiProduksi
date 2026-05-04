@@ -70,8 +70,8 @@ class AdministrasiController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nik' => 'required|digits:16',
-            'tempat_lahir' => 'nullable|string|max:255',
+            'nik' => 'required|string|size:16|regex:/^[0-9]+$/|unique:personil_desa,nik',
+            'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'jabatan' => 'required|string',
             'masa_jabatan_mulai' => $request->kategori == 'perangkat' ? 'required|date' : 'nullable|date',
@@ -82,6 +82,10 @@ class AdministrasiController extends Controller
             'siltap_pokok' => 'nullable|numeric|min:0',
             'rekening_bank' => 'nullable|string|max:50',
             'nama_bank' => 'nullable|string|max:100',
+        ], [
+            'nik.unique' => 'NIK ini sudah terdaftar di sistem. Silakan cek kembali.',
+            'nik.size' => 'NIK harus tepat 16 digit.',
+            'nik.regex' => 'NIK hanya boleh berisi angka.',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -139,8 +143,8 @@ class AdministrasiController extends Controller
 
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nik' => 'required|digits:16',
-            'tempat_lahir' => 'nullable|string|max:255',
+            'nik' => 'required|string|size:16|regex:/^[0-9]+$/|unique:personil_desa,nik,' . $id,
+            'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'jabatan' => 'required|string',
             'masa_jabatan_mulai' => $personil->kategori == 'perangkat' ? 'required|date' : 'nullable|date',
@@ -151,6 +155,10 @@ class AdministrasiController extends Controller
             'tunjangan_jabatan' => 'nullable|numeric|min:0',
             'rekening_bank' => 'nullable|string|max:50',
             'nama_bank' => 'nullable|string|max:100',
+        ], [
+            'nik.unique' => 'NIK ini sudah terdaftar di sistem. Silakan cek kembali.',
+            'nik.size' => 'NIK harus tepat 16 digit.',
+            'nik.regex' => 'NIK hanya boleh berisi angka.',
         ]);
 
         DB::transaction(function () use ($request, $personil) {
