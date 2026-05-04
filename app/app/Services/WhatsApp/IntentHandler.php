@@ -46,7 +46,17 @@ class IntentHandler
         $state = $session ? $session->state : null;
 
         // 1. GLOBAL KEYWORDS: Reset to main menu (HIGHEST PRIORITY)
-        if ($this->matchesIntent($messageLower, ['menu', 'help', 'bantuan', '0'])) {
+        if ($this->matchesIntent($messageLower, ['menu', 'help', 'bantuan', '0', 'batal', 'stop', 'berhenti', 'cancel'])) {
+            // If it's a cancel keyword, clear session first
+            if (in_array($messageLower, ['batal', 'stop', 'berhenti', 'cancel'])) {
+                if ($session) $session->clear();
+                return [
+                    'success' => true,
+                    'intent' => 'cancel',
+                    'reply' => "👋 *Siaaap!* Permintaan Anda telah dibatalkan.\n\nKetik *MENU* untuk layanan lainnya. 😊",
+                    'state_update' => null
+                ];
+            }
             return $this->getMainMenu();
         }
 
@@ -67,9 +77,15 @@ class IntentHandler
             ];
         }
 
-        // 3. EMERGENCY DETECTOR: Handle emergency keywords immediately
-        $emergencyKeywords = ['kebakaran', 'api', 'ambulance', 'ambulans', 'kecelakaan', 'darurat', 'polisi', 'maling', 'trantibum', 'korupsi', 'pungli'];
-        if ($this->matchesIntent($messageLower, $emergencyKeywords)) {
+        // 3. EMERGENCY DETECTOR: Handle emergency keywords (CONTAIN matching for safety)
+        $emergencyKeywords = [
+            'kebakaran', 'api', 'bom',
+            'ambulance', 'ambulans', 'kecelakaan', 'darurat', 'pingsan', 'sekarat', 'kritis',
+            'polisi', 'maling', 'rampok', 'begal', 'bunuh', 'kriminal',
+            'korupsi', 'pungli', 'penyelewengan',
+            'hamil', 'melahirkan', 'persalinan', 'kontraksi'
+        ];
+        if ($this->containsIntent($messageLower, $emergencyKeywords)) {
             return $this->handleEmergencyResponse($messageLower);
         }
 
@@ -252,6 +268,16 @@ class IntentHandler
     {
         foreach ($keywords as $keyword) {
             if ($message === $keyword || str_starts_with($message, $keyword . ' ')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function containsIntent(string $message, array $keywords): bool
+    {
+        foreach ($keywords as $keyword) {
+            if (str_contains($message, $keyword)) {
                 return true;
             }
         }
@@ -494,17 +520,20 @@ class IntentHandler
     protected function handleEmergencyResponse(string $message): array
     {
         $reply = "🚨 *LAYANAN DARURAT CEPAT*\n\n";
-        if (str_contains($message, 'kebakaran')) {
-            $reply .= "🔥 *KEBAKARAN:* Segera hubungi *112*\n\n";
-        } elseif (str_contains($message, 'korupsi') || str_contains($message, 'pungli')) {
+        if (str_contains($message, 'kebakaran') || str_contains($message, 'api')) {
+            $reply .= "🔥 *KEBAKARAN:* Segera hubungi Pemadam Kebakaran / BPBD di *112*\n\n";
+        } elseif (str_contains($message, 'korupsi') || str_contains($message, 'pungli') || str_contains($message, 'penyelewengan')) {
             $reply .= "⚖️ *ADUAN KORUPSI/PUNGLI:* Silakan lapor melalui SP4N LAPOR:\n👉 https://www.lapor.go.id\n\n";
-        } elseif (str_contains($message, 'polisi') || str_contains($message, 'maling') || str_contains($message, 'trantibum')) {
-            $reply .= "👮 *KEAMANAN (Polisi):* Hubungi *110*\n\n";
-        } elseif (str_contains($message, 'ambulance') || str_contains($message, 'ambulans') || str_contains($message, 'kecelakaan')) {
-            $reply .= "🚑 *AMBULANCE / KECELAKAAN:* Hubungi *119*\n\n";
+        } elseif ($this->containsIntent($message, ['polisi', 'maling', 'rampok', 'begal', 'kriminal'])) {
+            $reply .= "👮 *KEAMANAN (Polisi):* Hubungi Call Center Polri di *110*\n\n";
+        } elseif ($this->containsIntent($message, ['ambulance', 'ambulans', 'kecelakaan', 'hamil', 'melahirkan', 'pingsan'])) {
+            $reply .= "🚑 *DARURAT MEDIS / AMBULANCE:* Segera hubungi Call Center Kesehatan di *119*\n\n";
+            if (str_contains($message, 'hamil') || str_contains($message, 'melahirkan')) {
+                $reply .= "🤰 *INFO PERSALINAN:* Tetap tenang, siapkan buku KIA/KK, dan segera menuju Puskesmas/RS terdekat atau hubungi bidan desa.\n\n";
+            }
         }
 
-        $reply .= "🆘 *KONTAK DARURAT LAINNYA:*\n";
+        $reply .= "🆘 *CALL CENTER KAB. PROBOLINGGO:*\n";
         $reply .= "☎️ Telp: (0298) 343 0000\n";
         $reply .= "🟢 WA: 081 8181 91 119\n\n";
         $reply .= "Ketik *MENU* untuk layanan lainnya.";
