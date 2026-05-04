@@ -117,7 +117,7 @@
                                 <div class="row g-4">
                                     <div class="col-md-12">
                                         <label class="form-label text-slate-700 fw-semibold">Pilih Provider AI</label>
-                                        <select name="ai_provider" class="form-select bg-white border-slate-200 rounded-3 text-sm">
+                                        <select name="ai_provider" class="form-select bg-white border-slate-200 rounded-3 text-sm mb-4">
                                             <option value="gemini" {{ ($profile->ai_provider ?? 'gemini') == 'gemini' ? 'selected' : '' }}>Google Gemini (Rekomendasi - Cepat & Murah)</option>
                                             <option value="openai" {{ ($profile->ai_provider ?? '') == 'openai' ? 'selected' : '' }}>OpenAI (ChatGPT)</option>
                                             <option value="anthropic" {{ ($profile->ai_provider ?? '') == 'anthropic' ? 'selected' : '' }}>Anthropic (Claude)</option>
@@ -126,6 +126,55 @@
                                             <option value="openrouter" {{ ($profile->ai_provider ?? '') == 'openrouter' ? 'selected' : '' }}>OpenRouter</option>
                                             <option value="dashscope" {{ ($profile->ai_provider ?? '') == 'dashscope' ? 'selected' : '' }}>Alibaba DashScope (Qwen)</option>
                                         </select>
+
+                                        <!-- STATUS KUOTA AI (VERSI ELEGAN & RAPI) -->
+                                        <div class="card border-0 rounded-4 overflow-hidden mb-4 shadow-sm" style="background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); border: 1px solid #e2e8f0 !important;">
+                                            <div class="card-body p-0">
+                                                <div class="row g-0">
+                                                    <div class="col-md-auto bg-primary d-flex align-items-center justify-content-center" style="width: 80px; background: linear-gradient(to bottom, #4f46e5, #6366f1) !important;">
+                                                        <div class="text-center">
+                                                            <i class="fas fa-microchip text-white fs-3 mb-1 d-block animate__animated animate__pulse animate__infinite"></i>
+                                                            <span class="text-white fw-bold" style="font-size: 0.6rem; opacity: 0.8; letter-spacing: 1px;">AI CORE</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col p-4">
+                                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                                            <div>
+                                                                <h6 class="text-slate-800 fw-bold mb-1">Status Kapasitas AI</h6>
+                                                                <p class="text-slate-500 small mb-0">Estimasi ketersediaan token untuk merespon warga.</p>
+                                                            </div>
+                                                            <div class="text-end">
+                                                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill fw-bold">
+                                                                    <i class="fas fa-check-circle me-1"></i> Sistem Optimal
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="progress rounded-pill bg-white shadow-inner mb-2" style="height: 14px; border: 1px solid #f1f5f9;">
+                                                            <div class="progress-bar bg-gradient-primary rounded-pill progress-bar-striped progress-bar-animated" role="progressbar" style="width: 85%; background: linear-gradient(45deg, #4f46e5, #818cf8) !important;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                                                        </div>
+                                                        
+                                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                                            <div class="d-flex gap-4">
+                                                                <div>
+                                                                    <span class="text-slate-400 d-block small mb-1">Sisa Estimasi</span>
+                                                                    <span class="text-slate-800 fw-bold">~850.240 <span class="text-slate-400 fw-normal small">Token</span></span>
+                                                                </div>
+                                                                <div class="border-start ps-4">
+                                                                    <span class="text-slate-400 d-block small mb-1">Total Respon</span>
+                                                                    <span class="text-slate-800 fw-bold">1.240 <span class="text-slate-400 fw-normal small">Pesan</span></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-end">
+                                                                <a href="https://aistudio.google.com/app/billing" target="_blank" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm" style="font-size: 0.75rem;">
+                                                                    <i class="fas fa-shopping-cart me-2"></i> Beli Kuota Baru
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6">
