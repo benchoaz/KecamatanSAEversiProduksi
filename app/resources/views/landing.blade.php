@@ -2227,13 +2227,13 @@
                                </div>
                                
                                <div id="quickFeedbackSection" class="p-4 bg-amber-50 rounded-2xl border border-amber-100 mb-4 text-center">
-                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Pilih Bintang & Berikan Masukan:</p>
-                                    <div class="flex justify-center gap-3 mb-5">
-                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(1)" data-val="1"></i>
-                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(2)" data-val="2"></i>
-                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(3)" data-val="3"></i>
-                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(4)" data-val="4"></i>
-                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(5)" data-val="5"></i>
+                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Beri Nilai Pengalaman Anda:</p>
+                                    <div class="rating rating-lg gap-2 mb-5">
+                                        <input type="radio" name="rating-main" class="mask mask-star-2 bg-amber-400" onclick="window.setQuickRating(1)" />
+                                        <input type="radio" name="rating-main" class="mask mask-star-2 bg-amber-400" onclick="window.setQuickRating(2)" />
+                                        <input type="radio" name="rating-main" class="mask mask-star-2 bg-amber-400" onclick="window.setQuickRating(3)" />
+                                        <input type="radio" name="rating-main" class="mask mask-star-2 bg-amber-400" onclick="window.setQuickRating(4)" />
+                                        <input type="radio" name="rating-main" class="mask mask-star-2 bg-amber-400" onclick="window.setQuickRating(5)" />
                                     </div>
                                     <div id="feedbackCommentArea">
                                         <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan tambahan?" 
@@ -2586,13 +2586,13 @@
                                </div>
                                
                                <div id="quickFeedbackSection" class="p-4 bg-amber-50 rounded-2xl border border-amber-100 mb-4 text-center">
-                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Pilih Bintang & Berikan Masukan:</p>
-                                    <div class="flex justify-center gap-3 mb-5">
-                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(1)" data-val="1"></i>
-                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(2)" data-val="2"></i>
-                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(3)" data-val="3"></i>
-                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(4)" data-val="4"></i>
-                                        <i class="fas fa-star quick-star cursor-pointer text-2xl text-slate-200 hover:text-amber-400 transition-all transform hover:scale-125" onclick="window.setQuickRating(5)" data-val="5"></i>
+                                    <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Beri Nilai Pengalaman Anda:</p>
+                                    <div class="rating rating-lg gap-2 mb-5">
+                                        <input type="radio" name="rating-inline" class="mask mask-star-2 bg-amber-400" onclick="window.setQuickRating(1)" />
+                                        <input type="radio" name="rating-inline" class="mask mask-star-2 bg-amber-400" onclick="window.setQuickRating(2)" />
+                                        <input type="radio" name="rating-inline" class="mask mask-star-2 bg-amber-400" onclick="window.setQuickRating(3)" />
+                                        <input type="radio" name="rating-inline" class="mask mask-star-2 bg-amber-400" onclick="window.setQuickRating(4)" />
+                                        <input type="radio" name="rating-inline" class="mask mask-star-2 bg-amber-400" onclick="window.setQuickRating(5)" />
                                     </div>
                                     <div id="feedbackCommentArea">
                                         <textarea id="quick_feedback_comment" placeholder="Ada saran atau masukan tambahan?" 
@@ -2703,19 +2703,7 @@
         window.quickRating = 0;
         window.setQuickRating = (r) => {
             window.quickRating = parseInt(r);
-            console.log("Setting rating to:", window.quickRating);
-            
-            // Search globally for stars (Swal renders outside normal flow)
-            document.querySelectorAll('.quick-star').forEach(btn => {
-                const val = parseInt(btn.getAttribute('data-val'));
-                if (val <= window.quickRating) {
-                    btn.classList.remove('text-slate-200');
-                    btn.classList.add('text-amber-400', 'scale-125');
-                } else {
-                    btn.classList.add('text-slate-200');
-                    btn.classList.remove('text-amber-400', 'scale-125');
-                }
-            });
+            console.log("Rating set to:", window.quickRating);
         }
 
         window.submitQuickFeedback = async (uuid) => {
