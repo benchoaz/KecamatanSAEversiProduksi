@@ -23,7 +23,7 @@ class LandingController extends Controller
         $profileService = app(ApplicationProfileService::class);
         $appProfile = $profileService->getProfile();
 
-        $publicAnnouncements = Announcement::where('target_type', 'public')
+        $publicAnnouncements = Announcement::whereIn('target_type', ['public', 'service'])
             ->where('is_active', true)
             ->where('start_date', '<=', now())
             ->where('end_date', '>=', now())
@@ -225,7 +225,7 @@ class LandingController extends Controller
             ->values()
             ->toArray();
 
-        $publicAnnouncements = Announcement::where('target_type', 'public')
+        $publicAnnouncements = Announcement::whereIn('target_type', ['public', 'service'])
             ->where('is_active', true)
             ->where('start_date', '<=', now())
             ->where('end_date', '>=', now())
