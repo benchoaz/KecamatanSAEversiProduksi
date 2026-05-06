@@ -140,6 +140,52 @@
                                     </div>
                                 </div>
 
+                                <!-- NEW: BRANDING KREATIF IMAGE -->
+                                <div class="col-md-12 mt-4">
+                                    <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-4">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-3 text-center border-end border-emerald-100">
+                                                <div class="position-relative d-inline-block">
+                                                    @if($profile->branding_image_path)
+                                                        <img id="branding_preview" src="{{ asset('storage/' . $profile->branding_image_path) }}"
+                                                            class="img-fluid mb-2 d-block mx-auto rounded-3"
+                                                            style="max-height: 100px; width: auto; filter: drop-shadow(0 4px 10px rgba(16, 185, 129, 0.2));">
+                                                    @else
+                                                        <div id="branding_placeholder" class="p-4 bg-white border border-dashed border-emerald-200 rounded-3 mb-2 d-inline-block">
+                                                            <i class="fas fa-palette text-emerald-100 fa-3x"></i>
+                                                        </div>
+                                                        <img id="branding_preview" src="#" class="img-fluid mb-2 d-none mx-auto rounded-3" style="max-height: 100px; width: auto;">
+                                                    @endif
+                                                </div>
+                                                <span class="d-block text-[10px] fw-bold text-emerald-400 uppercase">Branding Kreatif</span>
+                                            </div>
+                                            <div class="col-md-9 ps-md-4">
+                                                <label class="form-label text-emerald-900 fw-bold">Upload Visual Branding Utama</label>
+                                                <p class="text-[11px] text-emerald-600 mb-2">Unggah ilustrasi kreatif (seperti "Besuk Kreatif") untuk mempercantik halaman depan.</p>
+                                                <input type="file" name="branding_image_path" onchange="previewImage(this, 'branding_preview', 'branding_placeholder')"
+                                                    class="form-control bg-white border-emerald-100 rounded-3 @error('branding_image_path') is-invalid @enderror">
+                                                <div class="d-flex gap-2 mt-2">
+                                                    <span class="badge bg-emerald-100 text-emerald-700 font-normal">PNG/JPG/WEBP</span>
+                                                    <span class="badge bg-emerald-100 text-emerald-700 font-normal">Max 5MB</span>
+                                                    <span class="badge bg-white text-emerald-600 border border-emerald-100 font-normal">Resolusi Tinggi Disarankan</span>
+                                                </div>
+
+                                                <!-- NEW: ON/OFF TOGGLE -->
+                                                <div class="mt-4 p-3 bg-white rounded-3 border border-emerald-100 d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span class="d-block text-slate-700 fw-bold text-sm">Aktifkan Popup Selamat Datang</span>
+                                                        <span class="text-[10px] text-slate-500">Muncul otomatis saat pengunjung pertama kali membuka website.</span>
+                                                    </div>
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" name="is_branding_active" id="is_branding_active" 
+                                                            {{ $profile->is_branding_active ? 'checked' : '' }} style="width: 3em; height: 1.5em; cursor: pointer;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-12 mt-4">
                                     <div class="p-4 border border-teal-100 bg-teal-50 bg-opacity-30 rounded-4">
                                         <div class="d-flex align-items-center gap-2 mb-4">

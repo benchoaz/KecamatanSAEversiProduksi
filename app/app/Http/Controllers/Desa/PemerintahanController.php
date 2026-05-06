@@ -11,6 +11,7 @@ use App\Models\PersonilDesa;
 use App\Models\Submission;
 use App\Repositories\Interfaces\SubmissionRepositoryInterface;
 use App\Services\MasterDataService;
+use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpZip\ZipFile;
@@ -108,7 +109,8 @@ class PemerintahanController extends Controller
             $validated['file_sk'] = $path;
         }
 
-        PersonilDesa::create($validated);
+        $personil = PersonilDesa::create($validated);
+        AuditHelper::log('create', 'personil_desa', $personil->id, null, $personil->toArray());
         return back()->with('success', 'Data personil berhasil ditambahkan.');
     }
 
@@ -136,7 +138,8 @@ class PemerintahanController extends Controller
         ]);
 
         $validated['desa_id'] = auth()->user()->desa_id;
-        InventarisDesa::create($validated);
+        $inventaris = InventarisDesa::create($validated);
+        AuditHelper::log('create', 'inventaris_desa', $inventaris->id, null, $inventaris->toArray());
 
         return back()->with('success', 'Data inventaris berhasil disimpan.');
     }
@@ -203,6 +206,7 @@ class PemerintahanController extends Controller
             }
 
             DB::commit();
+            AuditHelper::log('create', 'perencanaan_desa', $perencanaan->id, null, $perencanaan->toArray());
             return back()->with('success', 'Data Musrenbang & Usulan berhasil disimpan.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -248,7 +252,8 @@ class PemerintahanController extends Controller
             $validated['file_path'] = $path;
         }
 
-        DokumenDesa::create($validated);
+        $dokumen = DokumenDesa::create($validated);
+        AuditHelper::log('create', 'dokumen_desa', $dokumen->id, null, $dokumen->toArray());
         return back()->with('success', 'Dokumen berhasil diarsipkan.');
     }
 
@@ -280,7 +285,8 @@ class PemerintahanController extends Controller
             $validated['file_sk'] = $path;
         }
 
-        LembagaDesa::create($validated);
+        $lembaga = LembagaDesa::create($validated);
+        AuditHelper::log('create', 'lembaga_desa', $lembaga->id, null, $lembaga->toArray());
         return back()->with('success', 'Data lembaga berhasil ditambahkan.');
     }
 

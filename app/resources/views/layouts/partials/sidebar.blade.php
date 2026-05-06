@@ -307,6 +307,15 @@
                             <span class="nav-text">Riwayat & Status</span>
                         </a>
                     </li>
+                    @if(auth()->user()->desa_id)
+                    <li class="nav-item">
+                        <a href="{{ route('desa.audit-logs.index') }}"
+                            class="nav-link {{ request()->routeIs('desa.audit-logs.*') ? 'active' : '' }}">
+                            <span class="nav-icon"><i class="fas fa-fingerprint"></i></span>
+                            <span class="nav-text">Log Aktivitas</span>
+                        </a>
+                    </li>
+                    @endif
                 </ul>
             </div>
         @endauth

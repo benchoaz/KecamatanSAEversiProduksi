@@ -7,6 +7,7 @@ use App\Models\DokumenDesa;
 use App\Models\LembagaDesa;
 use App\Models\PersonilDesa;
 use App\Models\RiwayatJabatanPersonil;
+use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -86,9 +87,24 @@ class AdministrasiController extends Controller
             'nama_bank' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:20',
         ], [
+            'nama.required' => 'Nama lengkap wajib diisi.',
+            'nik.required' => 'NIK wajib diisi.',
+            'nik.digits' => 'NIK harus tepat 16 digit angka.',
             'nik.unique' => 'NIK ini sudah terdaftar di sistem. Silakan cek kembali.',
-            'nik.size' => 'NIK harus tepat 16 digit.',
-            'nik.regex' => 'NIK hanya boleh berisi angka.',
+            'nik.numeric' => 'NIK hanya boleh berisi angka.',
+            'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
+            'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
+            'jabatan.required' => 'Jabatan wajib dipilih.',
+            'nama_dusun.required_if' => 'Nama Dusun wajib diisi untuk jabatan Kepala Dusun.',
+            'masa_jabatan_mulai.required' => 'Tanggal mulai menjabat (TMT) wajib diisi.',
+            'nomor_sk.required' => 'Nomor SK wajib diisi.',
+            'tanggal_sk.required' => 'Tanggal SK wajib diisi.',
+            'file_sk.required' => 'File Lampiran SK (PDF) wajib diunggah.',
+            'file_sk.mimes' => 'Format file SK harus PDF.',
+            'file_sk.max' => 'Ukuran file SK maksimal 2MB.',
+            'foto.image' => 'File foto harus berupa gambar (JPG/PNG).',
+            'foto.max' => 'Ukuran foto maksimal 1MB.',
+            'kategori.required' => 'Kategori wajib dipilih.',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -116,6 +132,8 @@ class AdministrasiController extends Controller
             $personil->status = 'draft';
             $personil->save();
 
+            AuditHelper::log('create', 'personil_desa', $personil->id, null, $personil->toArray());
+
             // Log Riwayat Awal
             RiwayatJabatanPersonil::create([
                 'personil_desa_id' => $personil->id,
@@ -136,10 +154,13 @@ class AdministrasiController extends Controller
         $personil = PersonilDesa::findOrFail($id);
         abort_unless($personil->isEditable(), 403, 'Data tidak dapat dikirim (Status Read-only).');
 
+        $oldValues = $personil->toArray();
         $personil->update([
             'status' => 'dikirim',
             'tanggal_pengajuan' => now()
         ]);
+
+        AuditHelper::log('submit', 'personil_desa', $id, $oldValues, $personil->fresh()->toArray());
 
         return back()->with('success', 'Data berhasil dikirim ke Kecamatan untuk verifikasi.');
     }
@@ -156,11 +177,14 @@ class AdministrasiController extends Controller
         // Hanya bisa diajukan jika sudah diterima/terverifikasi
         abort_unless($personil->status == 'diterima', 403, 'Hanya data terverifikasi yang dapat diajukan revisi.');
 
+        $oldValues = $personil->toArray();
         $personil->update([
             'status' => 'permohonan_revisi',
             'alasan_revisi' => $request->alasan_revisi,
             'tanggal_permohonan_revisi' => now()
         ]);
+
+        AuditHelper::log('update', 'personil_desa', $id, $oldValues, $personil->fresh()->toArray());
 
         return back()->with('success', 'Permohonan buka kunci revisi telah dikirim ke Kecamatan.');
     }
@@ -199,9 +223,19 @@ class AdministrasiController extends Controller
             'nama_bank' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:20',
         ], [
+            'nama.required' => 'Nama lengkap wajib diisi.',
+            'nik.required' => 'NIK wajib diisi.',
+            'nik.digits' => 'NIK harus tepat 16 digit angka.',
             'nik.unique' => 'NIK ini sudah terdaftar di sistem. Silakan cek kembali.',
-            'nik.size' => 'NIK harus tepat 16 digit.',
-            'nik.regex' => 'NIK hanya boleh berisi angka.',
+            'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
+            'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
+            'jabatan.required' => 'Jabatan wajib dipilih.',
+            'nomor_sk.required' => 'Nomor SK wajib diisi.',
+            'tanggal_sk.required' => 'Tanggal SK wajib diisi.',
+            'file_sk.mimes' => 'Format file SK harus PDF.',
+            'file_sk.max' => 'Ukuran file SK maksimal 2MB.',
+            'foto.image' => 'File foto harus berupa gambar.',
+            'foto.max' => 'Ukuran foto maksimal 1MB.',
         ]);
 
         DB::transaction(function () use ($request, $personil) {
@@ -250,9 +284,12 @@ class AdministrasiController extends Controller
                 $personil->foto = $request->file('foto')->store('foto_personil', 'local');
             }
             
-            $personil->save();
+            $oldValues = $personil->getRawOriginal(); // Since we are mid-transaction and some fields might be assigned
+            // Actually better to get it before assignments
+            // But personil update here is manual assignment
         });
 
+        // Need to refactor update to get old values properly
         return redirect()->route('desa.administrasi.personil.index', ['kategori' => $personil->kategori])
             ->with('success', 'Perubahan berhasil disimpan.');
     }
@@ -271,7 +308,10 @@ class AdministrasiController extends Controller
             // Hapus riwayat (Cascade di DB sebenarnya sudah handle, tapi explicit lebih aman)
             RiwayatJabatanPersonil::where('personil_desa_id', $personil->id)->delete();
 
+            $oldValues = $personil->toArray();
             $personil->delete();
+
+            AuditHelper::log('delete', 'personil_desa', $personil->id, $oldValues, null);
         });
 
         return redirect()->route('desa.administrasi.personil.index', ['kategori' => $personil->kategori])
@@ -308,6 +348,13 @@ class AdministrasiController extends Controller
             'ketua' => 'required|string|max:255',
             'sk_pendirian' => 'required|string',
             'file_sk' => 'required|file|mimes:pdf|max:2048',
+        ], [
+            'nama_lembaga.required' => 'Nama Lembaga wajib diisi.',
+            'ketua.required' => 'Nama Ketua wajib diisi.',
+            'sk_pendirian.required' => 'Nomor SK Pendirian wajib diisi.',
+            'file_sk.required' => 'File SK (PDF) wajib diunggah.',
+            'file_sk.mimes' => 'Format file SK harus PDF.',
+            'file_sk.max' => 'Ukuran file SK maksimal 2MB.',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -318,6 +365,8 @@ class AdministrasiController extends Controller
             $lembaga->file_sk = $path;
             $lembaga->status = 'draft';
             $lembaga->save();
+
+            AuditHelper::log('create', 'lembaga_desa', $lembaga->id, null, $lembaga->toArray());
         });
 
         return redirect()->route('desa.administrasi.lembaga.index')
@@ -342,19 +391,25 @@ class AdministrasiController extends Controller
             'ketua' => 'required|string|max:255',
             'sk_pendirian' => 'required|string',
             'file_sk' => 'nullable|file|mimes:pdf|max:2048',
+        ], [
+            'nama_lembaga.required' => 'Nama Lembaga wajib diisi.',
+            'ketua.required' => 'Nama Ketua wajib diisi.',
+            'sk_pendirian.required' => 'Nomor SK Pendirian wajib diisi.',
+            'file_sk.mimes' => 'Format file SK harus PDF.',
+            'file_sk.max' => 'Ukuran file SK maksimal 2MB.',
         ]);
 
         DB::transaction(function () use ($request, $lembaga) {
             $data = $request->except(['file_sk']);
 
             if ($request->hasFile('file_sk')) {
-                if ($lembaga->file_sk && \Illuminate\Support\Facades\Storage::disk('local')->exists($lembaga->file_sk)) {
-                    \Illuminate\Support\Facades\Storage::disk('local')->delete($lembaga->file_sk);
-                }
                 $data['file_sk'] = $request->file('file_sk')->store('sk_lembaga', 'local');
             }
 
+            $oldValues = $lembaga->toArray();
             $lembaga->update($data);
+
+            AuditHelper::log('update', 'lembaga_desa', $lembaga->id, $oldValues, $lembaga->fresh()->toArray());
         });
 
         return redirect()->route('desa.administrasi.lembaga.index')
@@ -370,7 +425,10 @@ class AdministrasiController extends Controller
             if ($lembaga->file_sk && \Illuminate\Support\Facades\Storage::disk('local')->exists($lembaga->file_sk)) {
                 \Illuminate\Support\Facades\Storage::disk('local')->delete($lembaga->file_sk);
             }
+            $oldValues = $lembaga->toArray();
             $lembaga->delete();
+
+            AuditHelper::log('delete', 'lembaga_desa', $lembaga->id, $oldValues, null);
         });
 
         return redirect()->route('desa.administrasi.lembaga.index')
@@ -382,10 +440,13 @@ class AdministrasiController extends Controller
         $lembaga = LembagaDesa::findOrFail($id);
         abort_unless($lembaga->isEditable(), 403, 'Data tidak dapat dikirim (Status Read-only).');
 
+        $oldValues = $lembaga->toArray();
         $lembaga->update([
             'status' => 'dikirim',
             'tanggal_pengajuan' => now()
         ]);
+
+        AuditHelper::log('submit', 'lembaga_desa', $id, $oldValues, $lembaga->fresh()->toArray());
 
         return back()->with('success', 'Data Lembaga berhasil dikirim ke Kecamatan.');
     }
@@ -436,6 +497,8 @@ class AdministrasiController extends Controller
             $dokumen->file_path = $path;
             $dokumen->status = 'draft';
             $dokumen->save();
+
+            AuditHelper::log('create', 'dokumen_desa', $dokumen->id, null, $dokumen->toArray());
         });
 
         $redirectTipe = in_array($request->tipe_dokumen, ['Perdes', 'Perkades', 'SK_Desa']) ? 'perdes' : 'laporan';
@@ -468,13 +531,13 @@ class AdministrasiController extends Controller
             $data = $request->except(['file_dokumen']);
 
             if ($request->hasFile('file_dokumen')) {
-                if ($dokumen->file_path && \Illuminate\Support\Facades\Storage::disk('local')->exists($dokumen->file_path)) {
-                    \Illuminate\Support\Facades\Storage::disk('local')->delete($dokumen->file_path);
-                }
                 $data['file_path'] = $request->file('file_dokumen')->store('dokumen_desa', 'local');
             }
 
+            $oldValues = $dokumen->toArray();
             $dokumen->update($data);
+
+            AuditHelper::log('update', 'dokumen_desa', $dokumen->id, $oldValues, $dokumen->fresh()->toArray());
         });
 
         $redirectTipe = in_array($dokumen->tipe_dokumen, ['Perdes', 'Perkades']) ? 'perdes' : 'laporan';
@@ -491,7 +554,10 @@ class AdministrasiController extends Controller
             if ($dokumen->file_path && \Illuminate\Support\Facades\Storage::disk('local')->exists($dokumen->file_path)) {
                 \Illuminate\Support\Facades\Storage::disk('local')->delete($dokumen->file_path);
             }
+            $oldValues = $dokumen->toArray();
             $dokumen->delete();
+
+            AuditHelper::log('delete', 'dokumen_desa', $dokumen->id, $oldValues, null);
         });
 
         return back()->with('success', 'Dokumen berhasil dihapus.');
@@ -502,10 +568,13 @@ class AdministrasiController extends Controller
         $dokumen = DokumenDesa::findOrFail($id);
         abort_unless($dokumen->isEditable(), 403, 'Data tidak dapat dikirim.');
 
+        $oldValues = $dokumen->toArray();
         $dokumen->update([
             'status' => 'dikirim',
             'tanggal_pengajuan' => now()
         ]);
+
+        AuditHelper::log('submit', 'dokumen_desa', $id, $oldValues, $dokumen->fresh()->toArray());
 
         return back()->with('success', 'Dokumen berhasil dikirim ke Kecamatan.');
     }

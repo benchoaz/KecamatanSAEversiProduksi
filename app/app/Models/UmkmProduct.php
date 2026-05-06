@@ -18,12 +18,22 @@ class UmkmProduct extends Model
         'satuan_harga',
         'deskripsi',
         'foto_produk',
-        'is_available'
+        'is_available',
+        'stock',
+        'sku',
+        'weight',
+        'is_preorder',
+        'discount_price',
+        'discount_percentage',
+        'variations'
     ];
 
     protected $casts = [
         'is_available' => 'boolean',
-        'harga' => 'decimal:2'
+        'is_preorder' => 'boolean',
+        'harga' => 'decimal:2',
+        'discount_price' => 'decimal:2',
+        'variations' => 'array'
     ];
 
     public function umkm()

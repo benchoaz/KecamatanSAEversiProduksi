@@ -51,7 +51,15 @@ class PerencanaanController extends Controller
             // e.g., requiring parent relation
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, [
+            'tipe_dokumen.required' => 'Tipe dokumen (RPJMDes/RKPDes/APBDes) wajib dipilih.',
+            'tahun.required' => 'Tahun perencanaan wajib diisi.',
+            'file_dokumen.required' => 'File dokumen (PDF) wajib diunggah.',
+            'file_dokumen.mimes' => 'Format file dokumen harus PDF.',
+            'file_dokumen.max' => 'Ukuran file dokumen maksimal 10MB.',
+            'nomor_perdes.required' => 'Nomor Perdes wajib diisi untuk tahun 2026 ke atas.',
+            'tanggal_perdes.required' => 'Tanggal Perdes wajib diisi untuk tahun 2026 ke atas.',
+        ]);
 
         DB::beginTransaction();
         try {

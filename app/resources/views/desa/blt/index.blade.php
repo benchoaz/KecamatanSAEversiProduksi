@@ -91,6 +91,15 @@
                                                     <button type="submit"
                                                         class="btn btn-sm btn-sky text-white rounded-pill px-3">Kirim</button>
                                                 </form>
+                                                <form action="{{ route('desa.blt.destroy', $item->id) }}" method="POST"
+                                                    class="d-inline" onsubmit="return confirm('Hapus laporan ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
                                             @endif
                                         </div>
                                     </td>

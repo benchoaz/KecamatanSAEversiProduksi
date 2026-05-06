@@ -7,6 +7,7 @@ use App\Models\Submission;
 use App\Models\Menu;
 use App\Models\Aspek;
 use App\Models\Indikator;
+use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 
 class KesraController extends Controller
@@ -88,6 +89,8 @@ class KesraController extends Controller
             'periode' => now()->format('Y-m'),
         ]);
 
+        AuditHelper::log('create', 'submissions', $submission->id, null, $submission->toArray());
+
         // Store category and details in submission metadata or custom fields
         // You may need to add these fields to your submissions table or use a JSON field
 
@@ -147,9 +150,12 @@ class KesraController extends Controller
             'deskripsi' => 'required|string',
         ]);
 
+        $oldValues = $submission->toArray();
         $submission->update([
             'aspek_id' => $validated['aspek_id'],
         ]);
+
+        AuditHelper::log('update', 'submissions', $submission->id, $oldValues, $submission->fresh()->toArray());
 
         return redirect()->route('desa.kesra.show', $submission->id)
             ->with('success', 'Data Kesra berhasil diperbarui.');
@@ -168,12 +174,44 @@ class KesraController extends Controller
         abort_if($submission->status !== 'draft', 403, 'Hanya data dengan status draft yang dapat disubmit.');
 
         // Update status to submitted
+        $oldValues = $submission->toArray();
         $submission->update([
             'status' => 'submitted',
             'submitted_at' => now(),
         ]);
 
+        AuditHelper::log('submit', 'submissions', $id, $oldValues, $submission->fresh()->toArray());
+
         return redirect()->route('desa.kesra.index')
             ->with('success', 'Data Kesra berhasil dikirim untuk verifikasi Kecamatan.');
+    }
+
+    /**
+     * Remove the specified Kesra submission from storage
+     */
+    public function destroy($id)
+    {
+        $user = auth()->user();
+        $submission = Submission::findOrFail($id);
+
+        // Security checks
+        abort_unless($submission->desa_id === $user->desa_id, 403);
+        abort_unless($submission->status === 'draft' || $submission->status === 'returned', 403, 'Data yang sudah disubmit tidak dapat dihapus.');
+
+        // Delete associated files if any
+        foreach ($submission->buktiDukung as $bukti) {
+            if ($bukti->file_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($bukti->file_path);
+            }
+            $bukti->delete();
+        }
+
+        $oldValues = $submission->toArray();
+        $submission->delete();
+
+        AuditHelper::log('delete', 'submissions', $id, $oldValues, null);
+
+        return redirect()->route('desa.kesra.index')
+            ->with('success', 'Draft data Kesra berhasil dihapus.');
     }
 }

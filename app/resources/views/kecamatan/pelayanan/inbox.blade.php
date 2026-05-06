@@ -34,6 +34,15 @@
                 <p class="text-slate-400 small mb-0">{{ $pageDesc }}</p>
             </div>
             <div class="d-flex gap-2">
+                @if(auth()->user()->hasRole('Super Admin'))
+                    <form action="{{ route('kecamatan.pelayanan.clear-all') }}" method="POST" onsubmit="return confirm('PERHATIAN: Anda akan menghapus SELURUH data pelayanan di kategori ini. Tindakan ini tidak dapat dibatalkan. Lanjutkan?')">
+                        @csrf
+                        <input type="hidden" name="category" value="pelayanan">
+                        <button type="submit" class="btn btn-outline-danger rounded-3 px-3 small fw-bold shadow-sm">
+                            <i class="fas fa-trash-alt me-2"></i> Bersihkan Semua Data
+                        </button>
+                    </form>
+                @endif
                 @if($category == 'umkm' || $category == 'ekonomi')
                     <a href="{{ route('economy.create') }}" class="btn btn-brand-600 rounded-3 px-3 small fw-bold text-white shadow-sm hover-up">
                         <i class="fas fa-plus me-2"></i> Bantu Daftar Ekonomi
@@ -72,10 +81,15 @@
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden border border-slate-100">
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-slate-50/50 border-bottom border-slate-100">
-                            <tr>
-                                <th class="ps-4 py-3 text-slate-400 text-[11px] fw-bold uppercase tracking-wider">Tanggal</th>
+                    <form id="bulk-delete-form" action="{{ route('kecamatan.pelayanan.bulk-destroy') }}" method="POST">
+                        @csrf
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-slate-50/50 border-bottom border-slate-100">
+                                <tr>
+                                    <th class="ps-4 py-3" style="width: 40px;">
+                                        <input type="checkbox" class="form-check-input" id="check-all">
+                                    </th>
+                                    <th class="py-3 text-slate-400 text-[11px] fw-bold uppercase tracking-wider">Tanggal</th>
                                 <th class="py-3 text-slate-400 text-[11px] fw-bold uppercase tracking-wider">Informasi / Judul</th>
                                 <th class="py-3 text-slate-400 text-[11px] fw-bold uppercase tracking-wider">Sumber</th>
                                 <th class="py-3 text-slate-400 text-[11px] fw-bold uppercase tracking-wider">Wilayah</th>
@@ -88,6 +102,9 @@
                             @forelse($complaints as $item)
                                 <tr class="transition-all hover:bg-slate-50/50">
                                     <td class="ps-4 py-3">
+                                        <input type="checkbox" name="ids[]" value="{{ $item->id }}" class="form-check-input check-item">
+                                    </td>
+                                    <td class="py-3">
                                         <div class="fw-semibold text-slate-700 small">{{ $item->created_at->format('d/m/y') }}</div>
                                         <div class="text-[10px] text-slate-400 text-nowrap">{{ $item->created_at->format('H:i') }} WIB</div>
                                     </td>
@@ -157,10 +174,16 @@
                                         </span>
                                     </td>
                                     <td class="pe-4 py-3 text-end">
-                                        <a href="{{ route('kecamatan.pelayanan.show', $item->id) }}"
-                                            class="btn btn-sm btn-white border border-slate-200 rounded-3 px-3 fw-bold text-slate-600">
-                                            @if($item->status == 'Menunggu Verifikasi') Tanggapi @else Detail @endif
-                                        </a>
+                                        <div class="d-flex justify-content-end gap-1">
+                                            <a href="{{ route('kecamatan.pelayanan.show', $item->id) }}"
+                                                class="btn btn-sm btn-white border border-slate-200 rounded-3 px-2 fw-bold text-slate-600">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger border-slate-200 rounded-3 px-2" 
+                                                onclick="deleteItem({{ $item->id }})" title="Hapus">
+                                                <i class="fas fa-trash-alt text-[10px]"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -174,8 +197,25 @@
                                 </tr>
                             @endforelse
                         </tbody>
-                    </table>
+                        </table>
+                    </form>
                 </div>
+
+                <!-- Floating Bulk Actions -->
+                <div id="bulk-actions" class="position-fixed bottom-0 start-50 translate-middle-x mb-4 d-none" style="z-index: 1050;">
+                    <div class="bg-slate-900 text-white px-4 py-3 rounded-pill shadow-lg d-flex align-items-center gap-3">
+                        <span class="small fw-bold"><span id="selected-count">0</span> Data Terpilih</span>
+                        <div class="vr bg-slate-700"></div>
+                        <button type="button" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold" onclick="submitBulkDelete()">
+                            <i class="fas fa-trash-alt me-2"></i> Hapus Terpilih
+                        </button>
+                    </div>
+                </div>
+
+                <form id="delete-form" method="POST" style="display: none;">
+                    @csrf
+                    @method('DELETE')
+                </form>
             </div>
             @if($complaints->hasPages())
                 <div class="card-footer bg-white border-top border-slate-100 py-3 px-4">

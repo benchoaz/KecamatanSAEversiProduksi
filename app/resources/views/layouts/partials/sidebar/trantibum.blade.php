@@ -1,12 +1,12 @@
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo">
-            <div class="logo-icon bg-transparent text-white">
+            <div class="logo-icon bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-xl flex items-center justify-center shadow-lg">
                 @if(appProfile()->logo_path)
                     <img src="{{ asset('storage/' . appProfile()->logo_path) }}" class="img-fluid"
                         style="max-height: 40px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));">
                 @else
-                    <i class="fas fa-shield-halved"></i>
+                    <i class="fas fa-landmark"></i>
                 @endif
             </div>
             <div class="logo-text">
@@ -115,7 +115,7 @@
                     <i class="fas fa-shield-halved"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <span class="user-name text-truncate text-white d-block">{{ auth()->user()->nama_lengkap }}</span>
+                    <span class="user-name text-truncate text-dark d-block">{{ auth()->user()->nama_lengkap }}</span>
                     <span class="user-role text-uppercase">{{ optional(auth()->user()->role)->nama_role }}</span>
                 </div>
             </div>

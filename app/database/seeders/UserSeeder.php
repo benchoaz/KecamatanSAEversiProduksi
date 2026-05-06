@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             ['email' => 'admin@probolinggokab.go.id'],
             [
                 'name' => 'Super Admin Kecamatan',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('super123'),
                 'role' => 'superadmin',
                 'is_active' => true,
             ]
@@ -66,7 +66,7 @@ class UserSeeder extends Seeder
                 ['email' => 'operator.alaskandang@probolinggokab.go.id'],
                 [
                     'name' => 'Operator Alas Kandang',
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('operator'),
                     'role' => 'operator_desa',
                     'desa_id' => $desaId,
                     'is_active' => true,

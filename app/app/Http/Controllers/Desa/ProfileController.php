@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Desa;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Helpers\AuditHelper;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
@@ -21,9 +22,12 @@ class ProfileController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
+        $oldValues = $request->user()->toArray();
         $request->user()->update([
             'password' => Hash::make($validated['password']),
         ]);
+
+        AuditHelper::log('update_password', 'users', $request->user()->id, $oldValues, ['password' => 'CHANGED']);
 
         return back()->with('success', 'Password berhasil diperbarui.');
     }
@@ -50,7 +54,10 @@ class ProfileController extends Controller
             $data['foto'] = $request->file('foto')->store('users/foto', 'public');
         }
 
+        $oldValues = $user->toArray();
         $user->update($data);
+
+        AuditHelper::log('update_profile', 'users', $user->id, $oldValues, $user->fresh()->toArray());
 
         return back()->with('success', 'Profil berhasil diperbarui.');
     }

@@ -562,4 +562,68 @@ class PelayananController extends Controller
 
         return redirect()->back()->with('success', 'Catatan aktivitas berhasil ditambahkan.');
     }
+    /**
+     * Delete a single service record
+     */
+    public function destroy($id)
+    {
+        $service = PublicService::findOrFail($id);
+        
+        // Delete related data
+        $service->attachments()->delete();
+        $service->histories()->delete();
+        $service->delete();
+
+        return redirect()->back()->with('success', 'Data berhasil dihapus.');
+    }
+
+    /**
+     * Bulk Delete records
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'Tidak ada data yang dipilih.');
+        }
+
+        PublicService::whereIn('id', $ids)->each(function($service) {
+            $service->attachments()->delete();
+            $service->histories()->delete();
+            $service->delete();
+        });
+
+        return redirect()->back()->with('success', count($ids) . ' data berhasil dihapus.');
+    }
+
+    /**
+     * Clear all data from specific categories (Super Admin Only)
+     */
+    public function clearAll(Request $request)
+    {
+        if (!auth()->user()->hasRole('Super Admin')) {
+            abort(403, 'Hanya Super Admin yang dapat menghapus seluruh data.');
+        }
+
+        $category = $request->input('category'); // 'pelayanan', 'pengaduan', 'all'
+        
+        $query = PublicService::query();
+        if ($category === 'pelayanan') {
+            $query->where('category', PublicService::CATEGORY_PELAYANAN);
+        } elseif ($category === 'pengaduan') {
+            $query->where('category', PublicService::CATEGORY_PENGADUAN);
+        } elseif ($category === 'feedback') {
+            $query->whereNotNull('rating');
+        }
+
+        $count = $query->count();
+        
+        $query->each(function($service) {
+            $service->attachments()->delete();
+            $service->histories()->delete();
+            $service->delete();
+        });
+
+        return redirect()->back()->with('success', "Seluruh data ({$count} baris) telah dibersihkan.");
+    }
 }

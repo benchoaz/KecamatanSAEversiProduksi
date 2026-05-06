@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\EconomyController;
 use App\Http\Controllers\UmkmRakyatController;
+use App\Http\Controllers\UmkmSellerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -89,6 +90,15 @@ Route::prefix('umkm-rakyat')->name('umkm_rakyat.')->group(function () {
         // Toko/Settings
         Route::get('/settings', [UmkmRakyatController::class, 'manageSettings'])->name('.settings');
         Route::post('/settings', [UmkmRakyatController::class, 'updateSettings'])->name('.settings.update');
+
+        // Professional Seller Centre (NEW & PERFECTED)
+        Route::prefix('seller')->name('.seller')->group(function () {
+            Route::get('/', [UmkmSellerController::class, 'dashboard'])->name('.dashboard');
+            Route::get('/orders', [UmkmSellerController::class, 'orders'])->name('.orders');
+            Route::post('/orders/{orderId}/status', [UmkmSellerController::class, 'updateOrderStatus'])->name('.orders.status');
+            Route::get('/inventory', [UmkmSellerController::class, 'inventory'])->name('.inventory');
+            Route::post('/inventory/{productId}/stock', [UmkmSellerController::class, 'updateStock'])->name('.inventory.stock');
+        });
     });
 
     // Profil Toko & Etalase Publik (Tergantung slug)

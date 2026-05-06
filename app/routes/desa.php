@@ -21,6 +21,10 @@ Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->n
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
+    // Audit Logs
+    Route::get('/audit-logs', [App\Http\Controllers\Desa\AuditLogController::class, 'index'])->name('audit-logs.index');
+    Route::get('/audit-logs/{id}', [App\Http\Controllers\Desa\AuditLogController::class, 'show'])->name('audit-logs.show');
+
     // === MODUL ADMINISTRASI DESA (NEW) ===
     Route::prefix('administrasi')->name('administrasi.')->group(function () {
         Route::get('/', [App\Http\Controllers\Desa\AdministrasiController::class, 'index'])->name('index');
@@ -79,6 +83,7 @@ Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->n
         Route::post('/{id}/submit', [SubmissionController::class, 'submit'])->name('submit');
         Route::post('/{id}/file', [SubmissionController::class, 'uploadFile'])->name('file.upload');
         Route::delete('/file/{file_id}', [SubmissionController::class, 'deleteFile'])->name('file.delete');
+        Route::delete('/{id}', [SubmissionController::class, 'destroy'])->name('destroy');
 
         // Ajax Helper
         Route::get('/helper/aspek/{menuId}', [SubmissionController::class, 'getAspek']);
@@ -130,6 +135,7 @@ Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->n
         Route::put('/{id}', [PembangunanController::class, 'update'])->name('update');
         Route::get('/{id}', [PembangunanController::class, 'show'])->name('show');
         Route::post('/{id}/submit', [PembangunanController::class, 'submit'])->name('submit');
+        Route::delete('/{id}', [PembangunanController::class, 'destroy'])->name('destroy');
     });
 
     // Modul BLT Desa
@@ -141,6 +147,7 @@ Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->n
         Route::put('/{id}', [BltController::class, 'update'])->name('update');
         Route::get('/{id}', [BltController::class, 'show'])->name('show');
         Route::post('/{id}/submit', [BltController::class, 'submit'])->name('submit');
+        Route::delete('/{id}', [BltController::class, 'destroy'])->name('destroy');
     });
 
     // Pemerintahan (Input Side)
@@ -177,6 +184,7 @@ Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->n
         Route::put('/{id}', [App\Http\Controllers\Desa\KesraController::class, 'update'])->name('update');
         Route::get('/{id}', [App\Http\Controllers\Desa\KesraController::class, 'show'])->name('show');
         Route::post('/{id}/submit', [App\Http\Controllers\Desa\KesraController::class, 'submit'])->name('submit');
+        Route::delete('/{id}', [App\Http\Controllers\Desa\KesraController::class, 'destroy'])->name('destroy');
     });
 
     // Trantibum (Input Side - UPDATED with specific Kejadian reports)
@@ -201,6 +209,7 @@ Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->n
         Route::put('/{id}', [TrantibumController::class, 'update'])->name('update');
         Route::get('/{id}', [TrantibumController::class, 'show'])->name('show');
         Route::post('/{id}/submit', [TrantibumController::class, 'submit'])->name('submit');
+        Route::delete('/{id}', [TrantibumController::class, 'destroy'])->name('destroy');
     });
 
     // Modul Pembangunan Logbooks

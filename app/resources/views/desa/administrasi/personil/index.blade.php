@@ -126,6 +126,14 @@
                                                 class="btn btn-sm btn-outline-warning rounded-pill px-3" title="Edit Data">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                            <form action="{{ route('desa.administrasi.personil.destroy', $p->id) }}" method="POST"
+                                                onsubmit="return confirm('Hapus data ini secara permanen?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Hapus Data">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     @elseif($p->status == 'diterima')
                                         <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3 shadow-sm"

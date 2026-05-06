@@ -30,6 +30,7 @@ class ApplicationProfileController extends Controller
             'region_level' => 'required|in:desa,kecamatan,kabupaten',
             'tagline' => 'nullable|string|max:200',
             'logo_path' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'branding_image_path' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120', // Up to 5MB
             'image_pariwisata' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
             'image_festival' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
             'hero_image_path' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048', // Limit 2MB, support JPG/JPEG/PNG/WebP
@@ -74,6 +75,7 @@ class ApplicationProfileController extends Controller
             'zhipu_api_key' => 'nullable|string',
             'openrouter_api_key' => 'nullable|string',
             'alpha_vantage_api_key' => 'nullable|string',
+            'is_branding_active' => 'nullable|in:0,1,on',
         ]);
 
         $profile = AppProfile::first() ?? new AppProfile();
@@ -83,6 +85,7 @@ class ApplicationProfileController extends Controller
             'region_name',
             'region_level',
             'tagline',
+            'branding_image_path',
             'hero_image_alt',
             'hero_bg_opacity',
             'hero_bg_blur',
@@ -112,8 +115,10 @@ class ApplicationProfileController extends Controller
             'zhipu_api_key',
             'openrouter_api_key',
             'alpha_vantage_api_key',
+            'is_branding_active',
         ]);
         $data['hero_image_active'] = $request->has('hero_image_active') ? true : false;
+        $data['is_branding_active'] = $request->has('is_branding_active') ? true : false;
         $data['is_menu_pengaduan_active'] = $request->has('is_menu_pengaduan_active') ? true : false;
         $data['is_menu_umkm_active'] = $request->has('is_menu_umkm_active') ? true : false;
         $data['is_menu_berita_active'] = $request->has('is_menu_berita_active') ? true : false;
@@ -135,6 +140,7 @@ class ApplicationProfileController extends Controller
         // Handle File Uploads
         $fileFields = [
             'logo_path' => 'logo_path',
+            'branding_image_path' => 'branding_image_path',
             'image_pariwisata' => 'image_pariwisata',
             'image_festival' => 'image_festival',
             'hero_image_path' => 'hero_image_path',
@@ -149,7 +155,7 @@ class ApplicationProfileController extends Controller
                 }
 
                 $path = 'app';
-                if ($requestKey === 'logo_path') {
+                if ($requestKey === 'logo_path' || $requestKey === 'branding_image_path') {
                     $path = 'logos';
                 }
                 if ($requestKey === 'hero_image_path') {

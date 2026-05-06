@@ -41,14 +41,14 @@
         </div>
 
         <a href="/" class="flex items-center gap-3">
-            @if(appProfile()->logo_path && Storage::disk('public')->exists(appProfile()->logo_path))
-                <img src="{{ asset('storage/' . appProfile()->logo_path) }}"
+            @if(appProfile()->logo_path)
+                <img src="{{ asset('storage/' . appProfile()->logo_path) }}?v={{ file_exists(storage_path('app/public/' . appProfile()->logo_path)) ? filemtime(storage_path('app/public/' . appProfile()->logo_path)) : time() }}"
                     alt="Logo {{ appProfile()->region_name }}"
                     class="h-10 md:h-14 lg:h-16 w-auto object-contain flex-shrink-0 transition-transform hover:scale-105">
             @else
                 <div
-                    class="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
-                    <img src="{{ asset('assets/images/logo-garuda.png') }}" alt="Logo Garuda" class="h-8 object-contain">
+                    class="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0 border border-white/20">
+                    <i class="fas fa-landmark text-white text-xl"></i>
                 </div>
             @endif
             <div>
@@ -64,30 +64,43 @@
             <li><a href="/"
                     class="text-sm font-medium {{ request()->is('/') ? 'text-teal-600 bg-teal-50' : 'text-gray-600 hover:text-teal-600 hover:bg-teal-50' }} rounded-lg">Beranda</a>
             </li>
+            @if(appProfile()->is_menu_pelayanan_active)
             <li><a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}"
                     class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Layanan</a>
             </li>
+            @endif
+            
+            @if(appProfile()->is_menu_umkm_active)
             <li><a href="{{ route('economy.index') }}"
                     class="text-sm font-medium {{ request()->is('ekonomi*') ? 'text-teal-600 bg-teal-50' : 'text-gray-600 hover:text-teal-600 hover:bg-teal-50' }} rounded-lg">Pusat
                     Ekonomi</a>
             </li>
+            @endif
+            
+            @if(appProfile()->is_menu_statistik_active)
             <li>
                 <a href="{{ route('landing.statistik.index') }}"
                     class="text-sm font-medium {{ request()->is('statistik*') ? 'text-teal-600 bg-teal-50' : 'text-gray-600 hover:text-teal-600 hover:bg-teal-50' }} rounded-lg">
                     Statistik
                 </a>
             </li>
+            @endif
+            
+            @if(appProfile()->is_menu_berita_active)
             <li><a href="{{ request()->is('/') ? '#berita' : '/#berita' }}"
                     class="text-sm font-medium text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg">Berita</a>
             </li>
+            @endif
         </ul>
     </div>
     <div class="navbar-end gap-2">
 
+        @if(appProfile()->is_menu_pengaduan_active)
         <button onclick="document.getElementById('complaintModal').showModal()"
             class="btn btn-sm bg-rose-100/50 hover:bg-rose-500 text-rose-600 hover:text-white border-0 hidden lg:flex rounded-lg px-5 font-bold shadow-sm transition-colors">
             <i class="fas fa-exclamation-circle mr-1"></i> Lapor!
         </button>
+        @endif
         <div class="hidden lg:block w-px h-6 bg-slate-200 mx-1"></div>
         
         <!-- Mobile Portal Admin Icon -->

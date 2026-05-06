@@ -96,6 +96,7 @@
                             <span class="font-bold text-sm">Beranda Utama</span>
                         </a>
                     </li>
+                    @if(appProfile()->is_menu_pelayanan_active)
                     <li>
                         <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}"
                             class="text-slate-400 hover:text-white transition-all flex items-center gap-3 group">
@@ -104,6 +105,8 @@
                             <span class="font-bold text-sm">Portal Layanan</span>
                         </a>
                     </li>
+                    @endif
+                    @if(appProfile()->is_menu_umkm_active)
                     <li>
                         <a href="{{ route('economy.index') }}"
                             class="text-slate-400 hover:text-white transition-all flex items-center gap-3 group">
@@ -112,6 +115,8 @@
                             <span class="font-bold text-sm">Pusat Ekonomi</span>
                         </a>
                     </li>
+                    @endif
+                    @if(appProfile()->is_menu_pelayanan_active)
                     <li>
                         <a href="{{ route('public.tracking') }}"
                             class="text-slate-400 hover:text-white transition-all flex items-center gap-3 group">
@@ -120,6 +125,7 @@
                             <span class="font-bold text-sm">Tracking Berkas</span>
                         </a>
                     </li>
+                    @endif
                 </ul>
             </div>
 

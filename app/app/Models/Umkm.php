@@ -49,13 +49,18 @@ class Umkm extends Model
         'is_on_holiday',
         'name_updated_at',
         'is_verified',
-        'nib_number'
+        'nib_number',
+        'shipping_methods',
+        'payment_methods',
+        'auto_reply_message'
     ];
 
     protected $casts = [
         'name_updated_at' => 'datetime',
         'is_on_holiday' => 'boolean',
-        'is_verified' => 'boolean'
+        'is_verified' => 'boolean',
+        'shipping_methods' => 'array',
+        'payment_methods' => 'array'
     ];
 
     protected $hidden = [
@@ -92,6 +97,16 @@ class Umkm extends Model
     public function logs()
     {
         return $this->hasMany(UmkmAdminLog::class, 'umkm_id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(UmkmOrder::class, 'umkm_id');
+    }
+
+    public function promotions()
+    {
+        return $this->hasMany(UmkmPromotion::class, 'umkm_id');
     }
 
     /**

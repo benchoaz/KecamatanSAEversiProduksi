@@ -54,8 +54,11 @@ services:
     working_dir: /var/www
     env_file: ./app/.env
     volumes:
-      - ./app/storage:/var/www/storage:rw
+      - ./app/app:/var/www/app:rw
+      - ./app/routes:/var/www/routes:rw
       - ./app/resources/views:/var/www/resources/views:rw
+      - ./app/database/migrations:/var/www/database/migrations:rw
+      - ./app/storage:/var/www/storage:rw
       - ./app/.env:/var/www/.env
     networks:
       - kecamatan-network
@@ -78,7 +81,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kecamatan.rule=Host(`kecamatanbesuk.my.id`)"
+      - "traefik.http.routers.kecamatan.rule=Host(`kecamatanbesuk.web.id`)"
       - "traefik.http.routers.kecamatan.entrypoints=websecure"
       - "traefik.http.routers.kecamatan.tls.certresolver=myresolver"
       - "traefik.http.routers.kecamatan.priority=1"
@@ -172,7 +175,7 @@ networks:
 volumes:
   pgdata:
     external: true
-    name: kecamatansaeversikabupaten_pgdata
+    name: kecamatansae_pgdata
   redis_data:
     external: true
-    name: kecamatansaeversikabupaten_redis_data
+    name: kecamatansae_redis_data

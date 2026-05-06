@@ -21,42 +21,49 @@
             </ul>
         </div>
 
-        <div class="desa-nav-section">
-            <div class="desa-nav-title">Administrasi</div>
-            <ul class="desa-nav-menu">
-                <li class="desa-nav-item">
-                    <a href="{{ route('desa.administrasi.index') }}"
-                        class="desa-nav-link {{ request()->routeIs('desa.administrasi.*') ? 'active' : '' }}">
-                        <i class="desa-nav-icon fas fa-folder-open"></i>
-                        <span>Administrasi Desa</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="desa-nav-section">
-            <div class="desa-nav-title">Perencanaan</div>
-            <ul class="desa-nav-menu">
-                <li class="desa-nav-item">
-                    <a href="{{ route('desa.musdes.index') }}"
-                        class="desa-nav-link {{ request()->routeIs('desa.musdes.*') ? 'active' : '' }}">
-                        <i class="desa-nav-icon fas fa-gavel"></i>
-                        <span>Musyawarah Desa</span>
-                    </a>
-                </li>
-                <li class="desa-nav-item">
-                    <a href="{{ route('desa.pemerintahan.detail.perencanaan.index') }}"
-                        class="desa-nav-link {{ request()->routeIs('desa.pemerintahan.detail.perencanaan.*') ? 'active' : '' }}">
-                        <i class="desa-nav-icon fas fa-file-invoice"></i>
-                        <span>Dokumen Perencanaan</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
         @php
+            $pemerintahanMenu = \App\Models\Menu::where('kode_menu', 'pemerintahan')->first();
             $ekbangMenu = \App\Models\Menu::where('kode_menu', 'ekbang')->first();
+            $trantibumMenu = \App\Models\Menu::where('kode_menu', 'trantibum')->first();
+            $kesraMenu = \App\Models\Menu::where('kode_menu', 'kesra')->first();
+            $analisaMenu = \App\Models\Menu::where('kode_menu', 'analisa')->first();
         @endphp
+
+        @if($pemerintahanMenu && $pemerintahanMenu->is_active)
+            <div class="desa-nav-section">
+                <div class="desa-nav-title">Administrasi</div>
+                <ul class="desa-nav-menu">
+                    <li class="desa-nav-item">
+                        <a href="{{ route('desa.administrasi.index') }}"
+                            class="desa-nav-link {{ request()->routeIs('desa.administrasi.*') ? 'active' : '' }}">
+                            <i class="desa-nav-icon fas fa-folder-open"></i>
+                            <span>Administrasi Desa</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="desa-nav-section">
+                <div class="desa-nav-title">Perencanaan</div>
+                <ul class="desa-nav-menu">
+                    <li class="desa-nav-item">
+                        <a href="{{ route('desa.musdes.index') }}"
+                            class="desa-nav-link {{ request()->routeIs('desa.musdes.*') ? 'active' : '' }}">
+                            <i class="desa-nav-icon fas fa-gavel"></i>
+                            <span>Musyawarah Desa</span>
+                        </a>
+                    </li>
+                    <li class="desa-nav-item">
+                        <a href="{{ route('desa.pemerintahan.detail.perencanaan.index') }}"
+                            class="desa-nav-link {{ request()->routeIs('desa.pemerintahan.detail.perencanaan.*') ? 'active' : '' }}">
+                            <i class="desa-nav-icon fas fa-file-invoice"></i>
+                            <span>Dokumen Perencanaan</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        @endif
+
 
         @if($ekbangMenu && $ekbangMenu->is_active)
             <div class="desa-nav-section">
@@ -108,25 +115,27 @@
             </div>
         @endif
 
-        <div class="desa-nav-section">
-            <div class="desa-nav-title">Trantibum</div>
-            <ul class="desa-nav-menu">
-                <li class="desa-nav-item">
-                    <a href="{{ route('desa.trantibum.kejadian.index') }}"
-                        class="desa-nav-link {{ request()->routeIs('desa.trantibum.kejadian.*') ? 'active' : '' }}">
-                        <i class="desa-nav-icon fas fa-shield-alt text-danger"></i>
-                        <span>Laporan Trantibum</span>
-                    </a>
-                </li>
-                <li class="desa-nav-item">
-                    <a href="{{ route('desa.trantibum.relawan.index') }}"
-                        class="desa-nav-link {{ request()->routeIs('desa.trantibum.relawan.*') ? 'active' : '' }}">
-                        <i class="desa-nav-icon fas fa-users-cog text-primary"></i>
-                        <span>Tim Relawan</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+        @if($trantibumMenu && $trantibumMenu->is_active)
+            <div class="desa-nav-section">
+                <div class="desa-nav-title">Trantibum</div>
+                <ul class="desa-nav-menu">
+                    <li class="desa-nav-item">
+                        <a href="{{ route('desa.trantibum.kejadian.index') }}"
+                            class="desa-nav-link {{ request()->routeIs('desa.trantibum.kejadian.*') ? 'active' : '' }}">
+                            <i class="desa-nav-icon fas fa-shield-alt text-danger"></i>
+                            <span>Laporan Trantibum</span>
+                        </a>
+                    </li>
+                    <li class="desa-nav-item">
+                        <a href="{{ route('desa.trantibum.relawan.index') }}"
+                            class="desa-nav-link {{ request()->routeIs('desa.trantibum.relawan.*') ? 'active' : '' }}">
+                            <i class="desa-nav-icon fas fa-users-cog text-primary"></i>
+                            <span>Tim Relawan</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        @endif
 
         <div class="desa-nav-section">
             <div class="desa-nav-title">Laporan & Arsip</div>

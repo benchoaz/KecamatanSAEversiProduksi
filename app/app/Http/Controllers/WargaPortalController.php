@@ -79,6 +79,7 @@ class WargaPortalController extends Controller
         $umkms = Umkm::where('no_wa', 'like', $likeClause)->get();
         $jasas = WorkDirectory::where('contact_phone', 'like', $likeClause)->get();
         $umkmLocals = UmkmLocal::where('contact_wa', 'like', $likeClause)->get();
+        $services = \App\Models\PublicService::where('whatsapp', 'like', $likeClause)->latest()->get();
 
         // Group UmkmLocal by phone number to handle shops with multiple products
         $consolidatedUmkmLocals = $umkmLocals->groupBy('contact_wa')->map(function ($group) {
@@ -138,7 +139,8 @@ class WargaPortalController extends Controller
             'allAssets' => $allAssets,
             'umkms' => $umkms,
             'jasas' => $jasas,
-            'umkmLocals' => $umkmLocals, // Keep raw if needed elsewhere
+            'umkmLocals' => $umkmLocals,
+            'services' => $services,
             'phone' => $phone
         ]);
     }

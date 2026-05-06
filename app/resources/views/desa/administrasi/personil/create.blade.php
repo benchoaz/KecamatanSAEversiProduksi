@@ -63,8 +63,11 @@
 
                                         <div class="mb-3">
                                             <label class="form-label fw-bold text-slate-700">NIK <span class="text-danger">*</span></label>
-                                            <input type="text" name="nik" id="nikInput" class="form-control rounded-3 shadow-sm border-slate-300" 
-                                                placeholder="16 Digit Angka" maxlength="16" required>
+                                            <input type="text" name="nik" id="nikInput" class="form-control rounded-3 shadow-sm @error('nik') is-invalid @enderror border-slate-300" 
+                                                placeholder="16 Digit Angka" maxlength="16" value="{{ old('nik') }}" required>
+                                            @error('nik')
+                                                <div class="invalid-feedback fw-bold">{{ $message }}</div>
+                                            @enderror
                                             <div id="nikCounter" class="x-small mt-1 fw-bold text-danger">0 / 16 digit</div>
                                         </div>
                                     </div>
@@ -86,26 +89,29 @@
 
                                 <div class="mb-4 mt-3">
                                     <label class="form-label fw-bold text-slate-700">Jabatan <span class="text-danger">*</span></label>
-                                    <select name="jabatan" id="jabatanSelect" class="form-select rounded-3 border-slate-300 shadow-sm"
+                                    <select name="jabatan" id="jabatanSelect" class="form-select rounded-3 border-slate-300 shadow-sm @error('jabatan') is-invalid @enderror"
                                         required>
                                         <option value="">Pilih Jabatan...</option>
                                         @if($kategori == 'perangkat')
-                                            <option value="Kepala Desa">Kepala Desa</option>
-                                            <option value="Sekretaris Desa">Sekretaris Desa</option>
-                                            <option value="Kaur Keuangan">Kaur Keuangan</option>
-                                            <option value="Kaur Perencanaan">Kaur Perencanaan</option>
-                                            <option value="Kaur Umum">Kaur Umum</option>
-                                            <option value="Kasi Pemerintahan">Kasi Pemerintahan</option>
-                                            <option value="Kasi Kesejahteraan">Kasi Kesejahteraan</option>
-                                            <option value="Kasi Pelayanan">Kasi Pelayanan</option>
-                                            <option value="Kepala Dusun">Kepala Dusun</option>
+                                            <option value="Kepala Desa" {{ old('jabatan') == 'Kepala Desa' ? 'selected' : '' }}>Kepala Desa</option>
+                                            <option value="Sekretaris Desa" {{ old('jabatan') == 'Sekretaris Desa' ? 'selected' : '' }}>Sekretaris Desa</option>
+                                            <option value="Kaur Keuangan" {{ old('jabatan') == 'Kaur Keuangan' ? 'selected' : '' }}>Kaur Keuangan</option>
+                                            <option value="Kaur Perencanaan" {{ old('jabatan') == 'Kaur Perencanaan' ? 'selected' : '' }}>Kaur Perencanaan</option>
+                                            <option value="Kaur Umum" {{ old('jabatan') == 'Kaur Umum' ? 'selected' : '' }}>Kaur Umum</option>
+                                            <option value="Kasi Pemerintahan" {{ old('jabatan') == 'Kasi Pemerintahan' ? 'selected' : '' }}>Kasi Pemerintahan</option>
+                                            <option value="Kasi Kesejahteraan" {{ old('jabatan') == 'Kasi Kesejahteraan' ? 'selected' : '' }}>Kasi Kesejahteraan</option>
+                                            <option value="Kasi Pelayanan" {{ old('jabatan') == 'Kasi Pelayanan' ? 'selected' : '' }}>Kasi Pelayanan</option>
+                                            <option value="Kepala Dusun" {{ old('jabatan') == 'Kepala Dusun' ? 'selected' : '' }}>Kepala Dusun</option>
                                         @else
-                                            <option value="Ketua BPD">Ketua BPD</option>
-                                            <option value="Wakil Ketua BPD">Wakil Ketua BPD</option>
-                                            <option value="Sekretaris BPD">Sekretaris BPD</option>
-                                            <option value="Anggota BPD">Anggota BPD</option>
+                                            <option value="Ketua BPD" {{ old('jabatan') == 'Ketua BPD' ? 'selected' : '' }}>Ketua BPD</option>
+                                            <option value="Wakil Ketua BPD" {{ old('jabatan') == 'Wakil Ketua BPD' ? 'selected' : '' }}>Wakil Ketua BPD</option>
+                                            <option value="Sekretaris BPD" {{ old('jabatan') == 'Sekretaris BPD' ? 'selected' : '' }}>Sekretaris BPD</option>
+                                            <option value="Anggota BPD" {{ old('jabatan') == 'Anggota BPD' ? 'selected' : '' }}>Anggota BPD</option>
                                         @endif
                                     </select>
+                                    @error('jabatan')
+                                        <div class="invalid-feedback fw-bold">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div id="dusunWrapper" style="display: none;">
@@ -181,8 +187,11 @@
                                     <label class="form-label fw-bold text-slate-700">Lampiran SK (PDF) <span
                                             class="text-danger">*</span></label>
                                     <input type="file" name="file_sk"
-                                        class="form-control rounded-3 border-slate-300 shadow-sm" accept="application/pdf"
+                                        class="form-control rounded-3 border-slate-300 shadow-sm @error('file_sk') is-invalid @enderror" accept="application/pdf"
                                         required>
+                                    @error('file_sk')
+                                        <div class="invalid-feedback fw-bold">{{ $message }}</div>
+                                    @enderror
                                     <small class="text-slate-500 mt-1 d-block"><i
                                             class="fas fa-info-circle me-1"></i> Format PDF, maks. 2MB</small>
                                 </div>

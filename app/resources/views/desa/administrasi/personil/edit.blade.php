@@ -71,9 +71,12 @@
 
                                         <div class="mb-3">
                                             <label class="form-label fw-bold text-slate-700">NIK <span class="text-danger">*</span></label>
-                                            <input type="text" name="nik" id="nikInput" class="form-control rounded-3 shadow-sm border-slate-300" 
-                                                value="{{ $personil->nik }}" {{ $readonly ? 'readonly' : '' }}
+                                            <input type="text" name="nik" id="nikInput" class="form-control rounded-3 shadow-sm @error('nik') is-invalid @enderror border-slate-300" 
+                                                value="{{ old('nik', $personil->nik) }}" {{ $readonly ? 'readonly' : '' }}
                                                 placeholder="16 Digit Angka" maxlength="16" required>
+                                            @error('nik')
+                                                <div class="invalid-feedback fw-bold">{{ $message }}</div>
+                                            @enderror
                                             <div id="nikCounter" class="x-small mt-1 fw-bold text-danger">0 / 16 digit</div>
                                         </div>
                                     </div>
@@ -97,26 +100,29 @@
 
                                 <div class="mb-4 mt-3">
                                     <label class="form-label fw-bold text-slate-700">Jabatan <span class="text-danger">*</span></label>
-                                    <select name="jabatan" id="jabatanSelect" class="form-select rounded-3 border-slate-300 shadow-sm"
+                                    <select name="jabatan" id="jabatanSelect" class="form-select rounded-3 border-slate-300 shadow-sm @error('jabatan') is-invalid @enderror"
                                         @if($readonly) disabled @endif required>
                                         <option value="">Pilih Jabatan...</option>
                                         @if($kategori == 'perangkat')
-                                            <option value="Kepala Desa" {{ $personil->jabatan == 'Kepala Desa' ? 'selected' : '' }}>Kepala Desa</option>
-                                            <option value="Sekretaris Desa" {{ $personil->jabatan == 'Sekretaris Desa' ? 'selected' : '' }}>Sekretaris Desa</option>
-                                            <option value="Kaur Keuangan" {{ $personil->jabatan == 'Kaur Keuangan' ? 'selected' : '' }}>Kaur Keuangan</option>
-                                            <option value="Kaur Perencanaan" {{ $personil->jabatan == 'Kaur Perencanaan' ? 'selected' : '' }}>Kaur Perencanaan</option>
-                                            <option value="Kaur Umum" {{ $personil->jabatan == 'Kaur Umum' ? 'selected' : '' }}>Kaur Umum</option>
-                                            <option value="Kasi Pemerintahan" {{ $personil->jabatan == 'Kasi Pemerintahan' ? 'selected' : '' }}>Kasi Pemerintahan</option>
-                                            <option value="Kasi Kesejahteraan" {{ $personil->jabatan == 'Kasi Kesejahteraan' ? 'selected' : '' }}>Kasi Kesejahteraan</option>
-                                            <option value="Kasi Pelayanan" {{ $personil->jabatan == 'Kasi Pelayanan' ? 'selected' : '' }}>Kasi Pelayanan</option>
-                                            <option value="Kepala Dusun" {{ $personil->jabatan == 'Kepala Dusun' ? 'selected' : '' }}>Kepala Dusun</option>
+                                            <option value="Kepala Desa" {{ old('jabatan', $personil->jabatan) == 'Kepala Desa' ? 'selected' : '' }}>Kepala Desa</option>
+                                            <option value="Sekretaris Desa" {{ old('jabatan', $personil->jabatan) == 'Sekretaris Desa' ? 'selected' : '' }}>Sekretaris Desa</option>
+                                            <option value="Kaur Keuangan" {{ old('jabatan', $personil->jabatan) == 'Kaur Keuangan' ? 'selected' : '' }}>Kaur Keuangan</option>
+                                            <option value="Kaur Perencanaan" {{ old('jabatan', $personil->jabatan) == 'Kaur Perencanaan' ? 'selected' : '' }}>Kaur Perencanaan</option>
+                                            <option value="Kaur Umum" {{ old('jabatan', $personil->jabatan) == 'Kaur Umum' ? 'selected' : '' }}>Kaur Umum</option>
+                                            <option value="Kasi Pemerintahan" {{ old('jabatan', $personil->jabatan) == 'Kasi Pemerintahan' ? 'selected' : '' }}>Kasi Pemerintahan</option>
+                                            <option value="Kasi Kesejahteraan" {{ old('jabatan', $personil->jabatan) == 'Kasi Kesejahteraan' ? 'selected' : '' }}>Kasi Kesejahteraan</option>
+                                            <option value="Kasi Pelayanan" {{ old('jabatan', $personil->jabatan) == 'Kasi Pelayanan' ? 'selected' : '' }}>Kasi Pelayanan</option>
+                                            <option value="Kepala Dusun" {{ old('jabatan', $personil->jabatan) == 'Kepala Dusun' ? 'selected' : '' }}>Kepala Dusun</option>
                                         @else
-                                            <option value="Ketua BPD" {{ $personil->jabatan == 'Ketua BPD' ? 'selected' : '' }}>Ketua BPD</option>
-                                            <option value="Wakil Ketua BPD" {{ $personil->jabatan == 'Wakil Ketua BPD' ? 'selected' : '' }}>Wakil Ketua BPD</option>
-                                            <option value="Sekretaris BPD" {{ $personil->jabatan == 'Sekretaris BPD' ? 'selected' : '' }}>Sekretaris BPD</option>
-                                            <option value="Anggota BPD" {{ $personil->jabatan == 'Anggota BPD' ? 'selected' : '' }}>Anggota BPD</option>
+                                            <option value="Ketua BPD" {{ old('jabatan', $personil->jabatan) == 'Ketua BPD' ? 'selected' : '' }}>Ketua BPD</option>
+                                            <option value="Wakil Ketua BPD" {{ old('jabatan', $personil->jabatan) == 'Wakil Ketua BPD' ? 'selected' : '' }}>Wakil Ketua BPD</option>
+                                            <option value="Sekretaris BPD" {{ old('jabatan', $personil->jabatan) == 'Sekretaris BPD' ? 'selected' : '' }}>Sekretaris BPD</option>
+                                            <option value="Anggota BPD" {{ old('jabatan', $personil->jabatan) == 'Anggota BPD' ? 'selected' : '' }}>Anggota BPD</option>
                                         @endif
                                     </select>
+                                    @error('jabatan')
+                                        <div class="invalid-feedback fw-bold">{{ $message }}</div>
+                                    @enderror
                                     @if($readonly) <input type="hidden" name="jabatan" value="{{ $personil->jabatan }}"> @endif
                                 </div>
 
@@ -184,8 +190,11 @@
                                 <div class="mb-3">
                                     <label class="form-label fw-bold text-slate-700">Lampiran SK (PDF)</label>
                                     <input type="file" name="file_sk"
-                                        class="form-control rounded-3 border-slate-300 shadow-sm" accept="application/pdf"
+                                        class="form-control rounded-3 border-slate-300 shadow-sm @error('file_sk') is-invalid @enderror" accept="application/pdf"
                                         @if($readonly) disabled @endif>
+                                    @error('file_sk')
+                                        <div class="invalid-feedback fw-bold">{{ $message }}</div>
+                                    @enderror
                                     @if($personil->file_sk)
                                         <div class="mt-2">
                                             <a href="{{ route('desa.administrasi.file.personil', $personil->id) }}" target="_blank" 

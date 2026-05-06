@@ -75,6 +75,9 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
         // to avoid hijacking static prefixes like /visitor, /faq, /layanan
         Route::get('/{id}', [PelayananController::class, 'show'])->name('show');
         Route::put('/{id}', [PelayananController::class, 'updateStatus'])->name('update-status');
+        Route::delete('/{id}', [PelayananController::class, 'destroy'])->name('destroy');
+        Route::post('/bulk-destroy', [PelayananController::class, 'bulkDestroy'])->name('bulk-destroy');
+        Route::post('/clear-all', [PelayananController::class, 'clearAll'])->name('clear-all');
         Route::post('/{id}/history-comment', [PelayananController::class, 'addHistoryComment'])->name('history-comment');
         Route::get('/feedback/results', [PelayananController::class, 'feedbackIndex'])->name('feedback.index');
     });
@@ -165,6 +168,10 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
                 Route::get('/rekap-siltap', [PemerintahanController::class, 'rekapSiltapIndex'])->name('rekap-siltap.index');
                 Route::post('/rekap-siltap/{id}/update-pagu', [PemerintahanController::class, 'updatePagu'])->name('rekap-siltap.update-pagu');
                 Route::get('/rekap-siltap/download', [PemerintahanController::class, 'rekapSiltapDownload'])->name('rekap-siltap.download');
+
+                // Print Reports (A-I)
+                Route::get('/print/rekap', [PemerintahanController::class, 'printRekap'])->name('print.rekap');
+                Route::get('/print/desa', [PemerintahanController::class, 'printPerDesa'])->name('print.desa');
             });
 
             // Sub-Modul: Data Kepala Desa & Perangkat

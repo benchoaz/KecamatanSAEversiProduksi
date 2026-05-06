@@ -73,6 +73,14 @@
                                                     class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                                     Detail & Edit
                                                 </a>
+                                                <form action="{{ route('desa.administrasi.lembaga.destroy', $lembaga->id) }}" method="POST"
+                                                    onsubmit="return confirm('Hapus lembaga ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
                                             @else
                                                 <a href="{{ route('desa.administrasi.lembaga.edit', $lembaga->id) }}"
                                                     class="btn btn-sm btn-light text-secondary rounded-pill px-3">

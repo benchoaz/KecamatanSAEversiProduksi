@@ -46,18 +46,16 @@ class PortalService
         return $clean;
     }
 
-    /**
-     * Find assets (UMKM, Jasa, UMKM Local) by phone number
-     */
     public function findAssetsByPhone(string $phone): array
     {
         $basePhone = $this->normalizePhone($phone);
         $likeClause = '%' . $basePhone . '%';
 
         return [
-            'umkm' => Umkm::where('no_wa', 'like', $likeClause)->first(),
-            'jasa' => WorkDirectory::where('contact_phone', 'like', $likeClause)->first(),
-            'umkmLocal' => UmkmLocal::where('contact_wa', 'like', $likeClause)->first(),
+            'umkm' => Umkm::where('no_wa', 'like', $likeClause)->get(),
+            'jasa' => WorkDirectory::where('contact_phone', 'like', $likeClause)->get(),
+            'umkmLocal' => UmkmLocal::where('contact_wa', 'like', $likeClause)->get(),
+            'services' => PublicService::where('whatsapp', 'like', $likeClause)->latest()->get(),
         ];
     }
 

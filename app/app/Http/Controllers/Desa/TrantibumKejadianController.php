@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Desa;
 
 use App\Http\Controllers\Controller;
 use App\Models\TrantibumKejadian;
+use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -50,7 +51,9 @@ class TrantibumKejadianController extends Controller
             $data['foto_kejadian'] = $path;
         }
 
-        TrantibumKejadian::create($data);
+        $kejadian = TrantibumKejadian::create($data);
+
+        AuditHelper::log('create', 'trantibum_kejadian', $kejadian->id, null, $kejadian->toArray());
 
         return redirect()->route('desa.trantibum.kejadian.index')
             ->with('success', 'Laporan kejadian berhasil dikirim ke Kecamatan.');
@@ -73,7 +76,10 @@ class TrantibumKejadianController extends Controller
             Storage::disk('public')->delete($kejadian->foto_kejadian);
         }
 
+        $oldValues = $kejadian->toArray();
         $kejadian->delete();
+
+        AuditHelper::log('delete', 'trantibum_kejadian', $id, $oldValues, null);
 
         return redirect()->route('desa.trantibum.kejadian.index')
             ->with('success', 'Laporan kejadian berhasil dihapus.');

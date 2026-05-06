@@ -8,59 +8,57 @@ user = 'ubuntu'
 pw = 'nebula-57@-ocean'
 
 files_to_sync = [
-    'app/Http/Controllers/Desa/AdministrasiController.php',
-    'app/Http/Controllers/Kecamatan/PemerintahanController.php',
-    'app/Http/Controllers/ApplicationProfileController.php',
-    'app/Models/User.php',
-    'app/Models/PersonilDesa.php',
-    'app/Models/Menu.php',
-    'app/Services/WhatsApp/AiHandler.php',
-    'resources/views/desa/administrasi/personil/create.blade.php',
-    'resources/views/desa/administrasi/personil/edit.blade.php',
-    'resources/views/desa/administrasi/personil/index.blade.php',
-    'resources/views/kecamatan/pemerintahan/personil/index.blade.php',
-    'resources/views/kecamatan/settings/features.blade.php',
-    'resources/views/layouts/partials/sidebar.blade.php',
-    'routes/desa.php',
-    'routes/kecamatan.php'
+    'app/app/Services/WhatsApp/AiHandler.php',
+    'app/app/Http/Controllers/Api/AiAssistantController.php'
 ]
 
-def sync_files():
-    for f in files_to_sync:
-        local_path = f"app/{f}"
-        remote_path = f"{user}@{host}:~/kecamatanSAE/app/{f}"
-        
-        print(f"Syncing {f}...")
-        
-        pid, fd = pty.fork()
-        if pid == 0:
-            os.execv('/usr/bin/scp', ['scp', '-o', 'StrictHostKeyChecking=no', local_path, remote_path])
-        else:
-            # Wait for password prompt
-            start = time.time()
-            while time.time() - start < 30:
-                try:
-                    data = os.read(fd, 4096)
-                    if b"password:" in data:
-                        os.write(fd, (pw + "\n").encode())
-                        break
-                    if not data: break
-                except:
-                    break
-            
-            # Wait for completion
-            os.waitpid(pid, 0)
-            print(f"Finished {f}")
-
-if __name__ == "__main__":
-    sync_files()
-    
-    # Clear cache on remote
-    print("\nCleaning cache on VPS...")
+def run_scp(local_path, remote_path):
+    print(f"Syncing {local_path} -> {remote_path}...")
     pid, fd = pty.fork()
     if pid == 0:
-        os.execv('/usr/bin/ssh', ['ssh', '-o', 'StrictHostKeyChecking=no', f'{user}@{host}', 'cd kecamatanSAE && sudo docker compose exec -T app php artisan view:clear && sudo docker compose exec -T app php artisan cache:clear && sudo docker compose exec -T app php artisan config:clear'])
+        os.execv('/usr/bin/scp', ['scp', '-o', 'StrictHostKeyChecking=no', local_path, f'{user}@{host}:{remote_path}'])
     else:
-        time.sleep(2); os.write(fd, (pw + "\n").encode()); time.sleep(2); os.write(fd, (pw + "\n").encode())
-        os.waitpid(pid, 0)
-        print("Cache cleared!")
+        output = b""
+        password_sent = False
+        start = time.time()
+        while time.time() - start < 30:
+            try:
+                chunk = os.read(fd, 4096)
+                if not chunk: break
+                output += chunk
+                if b"password:" in chunk.lower() and not password_sent:
+                    os.write(fd, (pw + "\n").encode())
+                    password_sent = True
+            except:
+                break
+        return output.decode(errors='ignore')
+
+def run_ssh(cmd):
+    print(f"Executing: {cmd}...")
+    pid, fd = pty.fork()
+    if pid == 0:
+        os.execv('/usr/bin/ssh', ['ssh', '-o', 'StrictHostKeyChecking=no', f'{user}@{host}', cmd])
+    else:
+        output = b""
+        password_sent = False
+        start = time.time()
+        while time.time() - start < 30:
+            try:
+                chunk = os.read(fd, 4096)
+                if not chunk: break
+                output += chunk
+                if b"password:" in chunk.lower() and not password_sent:
+                    os.write(fd, (pw + "\n").encode())
+                    password_sent = True
+            except:
+                break
+        return output.decode(errors='ignore')
+
+for f in files_to_sync:
+    remote_path = f"~/kecamatanSAE/{f}"
+    run_scp(f, remote_path)
+
+# Clear cache on VPS
+run_ssh("cd kecamatanSAE && sudo docker compose -f docker-compose.vps.yml exec -T app php artisan optimize:clear")
+
+print("--- SYNC COMPLETED ---")

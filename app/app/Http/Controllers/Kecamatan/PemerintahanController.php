@@ -725,4 +725,60 @@ class PemerintahanController extends Controller
 
         return back()->with('success', 'Data keuangan desa ' . $desa->nama_desa . ' berhasil diperbarui.');
     }
+
+    public function printRekap()
+    {
+        $desas = Desa::all();
+        $data = [];
+
+        foreach ($desas as $desa) {
+            $data[] = [
+                'nama' => $desa->nama_desa,
+                'personil' => PersonilDesa::where('desa_id', $desa->id)->where('kategori', 'perangkat')->count(),
+                'bpd' => PersonilDesa::where('desa_id', $desa->id)->where('kategori', 'bpd')->count(),
+                'lembaga' => LembagaDesa::where('desa_id', $desa->id)->count(),
+                'perencanaan' => PerencanaanDesa::where('desa_id', $desa->id)->count(),
+                'submission' => Submission::where('desa_id', $desa->id)->count(),
+                'inventaris' => InventarisDesa::where('desa_id', $desa->id)->count(),
+                'dokumen_perencanaan' => DokumenDesa::where('desa_id', $desa->id)->where('kategori', 'perencanaan')->count(),
+                'peraturan' => DokumenDesa::where('desa_id', $desa->id)->where('kategori', 'peraturan')->count(),
+                'pagu_siltap' => $desa->pagu_siltap ?? 0,
+            ];
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kecamatan.pemerintahan.export.rekap_pdf', [
+            'data' => $data,
+            'title' => 'REKAPITULASI ADMINISTRASI DESA (MODUL A-I)',
+            'date' => now()->format('d/m/Y H:i')
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->stream('Rekap_Administrasi_Kecamatan.pdf');
+    }
+
+    public function printPerDesa(Request $request)
+    {
+        $desa_id = $request->desa_id;
+        $desa = Desa::findOrFail($desa_id);
+        
+        $personil = PersonilDesa::where('desa_id', $desa_id)->where('kategori', 'perangkat')->get();
+        $bpd = PersonilDesa::where('desa_id', $desa_id)->where('kategori', 'bpd')->get();
+        $lembaga = LembagaDesa::where('desa_id', $desa_id)->get();
+        $perencanaan = PerencanaanDesa::where('desa_id', $desa_id)->get();
+        $inventaris = InventarisDesa::where('desa_id', $desa_id)->get();
+        $dokumen = DokumenDesa::where('desa_id', $desa_id)->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kecamatan.pemerintahan.export.desa_pdf', [
+            'desa' => $desa,
+            'personil' => $personil,
+            'bpd' => $bpd,
+            'lembaga' => $lembaga,
+            'perencanaan' => $perencanaan,
+            'inventaris' => $inventaris,
+            'dokumen' => $dokumen,
+            'title' => 'LAPORAN ADMINISTRASI DESA ' . strtoupper($desa->nama_desa),
+            'date' => now()->format('d/m/Y H:i')
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Laporan_Administrasi_' . $desa->nama_desa . '.pdf');
+    }
 }

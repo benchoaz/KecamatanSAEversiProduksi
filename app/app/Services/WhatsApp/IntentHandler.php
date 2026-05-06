@@ -101,10 +101,35 @@ class IntentHandler
             return $this->handleEmergencyResponse($messageLower);
         }
 
-        // 4. STATE NAVIGATION: Handle Nested Menus
+        // 4. STATE NAVIGATION: Handle Nested Menus (HIGHER PRIORITY THAN ROOT)
         if ($state && str_starts_with($state, 'NAV_PATH:')) {
             $path = str_replace('NAV_PATH:', '', $state);
             return $this->handleMenuNavigation($phone, $messageLower, $path);
+        }
+
+        // --- NEW: Prioritize Submenu States over Root Numbers ---
+        if ($session && $session->state === 'ADM_SUBMENU') {
+            if ($this->isSelection($messageLower, '1') || $messageLower === 'status' || $messageLower === 'cek status') {
+                return $this->statusHandler->handle($phone, 'STATUS');
+            }
+            if ($this->isSelection($messageLower, '2') || $messageLower === 'syarat') {
+                return $this->getLayananLink();
+            }
+            if ($this->isSelection($messageLower, '3') || $messageLower === 'menu' || $messageLower === 'kembali') {
+                return $this->getMainMenu();
+            }
+        }
+
+        if ($session && $session->state === 'MENU_ADMIN') {
+            if ($this->isSelection($messageLower, '1')) {
+                return $this->syaratHandler->search(null);
+            }
+            if ($this->isSelection($messageLower, '2')) {
+                return $this->statusHandler->handle($phone, null);
+            }
+            if ($this->isSelection($messageLower, '3')) {
+                return $this->complaintHandler->initiate($phone, 'pelayanan');
+            }
         }
 
         // 5. ROOT MENU NAVIGATION
@@ -193,41 +218,7 @@ class IntentHandler
         }
 
         // --- STATE BASED HANDLING ---
-        if ($session && $session->state === 'ADM_SUBMENU') {
-            if ($this->isSelection($messageLower, '1') || $messageLower === 'status' || $messageLower === 'cek status') {
-                return $this->statusHandler->handle($phone, 'STATUS');
-            }
-            if ($this->isSelection($messageLower, '2') || $messageLower === 'syarat') {
-                return $this->getLayananLink();
-            }
-            if ($this->isSelection($messageLower, '3') || $messageLower === 'menu' || $messageLower === 'kembali') {
-                return $this->getMainMenu();
-            }
-            
-            // AI Fallback inside submenu
-            $aiResponse = $this->aiHandler->handle($phone, $message);
-            if ($aiResponse) return $aiResponse;
-
-            // If user types something else and AI fails, show submenu again
-            return $this->getAdministrasiSubmenu();
-        }
-
-        if ($session && $session->state === 'MENU_ADMIN') {
-            if ($this->isSelection($messageLower, '1')) {
-                return $this->syaratHandler->search(null);
-            }
-            if ($this->isSelection($messageLower, '2')) {
-                return $this->statusHandler->handle($phone, null);
-            }
-            if ($this->isSelection($messageLower, '3')) {
-                return $this->complaintHandler->initiate($phone, 'pelayanan');
-            }
-        }
-
-        // Owner toggle intent
-        if ($this->matchesIntent($messageLower, ['toggle', 'aktif', 'nonaktif', 'on', 'off', 'kelola'])) {
-            return $this->ownerHandler->initiate($phone);
-        }
+        // --- STATE BASED HANDLING MOVED UP ---
 
         // Quick Holiday Toggles
         if ($messageLower === 'libur' || $messageLower === 'buka') {

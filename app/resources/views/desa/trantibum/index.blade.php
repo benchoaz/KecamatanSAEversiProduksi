@@ -139,6 +139,14 @@
                                                         class="btn btn-sm btn-outline-warning" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
+                                                    <form action="{{ route('desa.trantibum.destroy', $submission->id) }}" method="POST"
+                                                        class="d-inline" onsubmit="return confirm('Hapus draft ini?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 @endif
                                             </div>
                                         </td>

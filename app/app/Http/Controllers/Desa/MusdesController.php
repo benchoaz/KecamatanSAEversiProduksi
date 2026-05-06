@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Desa;
 
 use App\Http\Controllers\Controller;
 use App\Models\Desa\DesaSubmission;
+use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -45,6 +46,12 @@ class MusdesController extends Controller
             'jenis_musdes' => 'required|string',
             'jumlah_undangan' => 'nullable|integer|min:1',
             'keterangan' => 'nullable|string|max:300',
+        ], [
+            'judul.required' => 'Judul Musdes wajib diisi.',
+            'periode.required' => 'Tahun Anggaran wajib diisi.',
+            'tanggal_pelaksanaan.required' => 'Tanggal pelaksanaan wajib diisi.',
+            'lokasi.required' => 'Lokasi pelaksanaan wajib diisi.',
+            'jenis_musdes.required' => 'Jenis Musdes wajib dipilih.',
         ]);
 
         DB::beginTransaction();
@@ -74,6 +81,8 @@ class MusdesController extends Controller
                     'field_value' => $val,
                 ]);
             }
+
+            AuditHelper::log('create', 'desa_submissions', $submission->id, null, $submission->toArray());
 
             DB::commit();
 
@@ -132,6 +141,7 @@ class MusdesController extends Controller
 
         DB::beginTransaction();
         try {
+            $oldValues = $submission->toArray();
             // Update Induk
             $submission->update([
                 'judul' => $validated['judul'],
@@ -156,6 +166,8 @@ class MusdesController extends Controller
                     'field_value' => $val,
                 ]);
             }
+
+            AuditHelper::log('update', 'desa_submissions', $submission->id, $oldValues, $submission->fresh()->toArray());
 
             DB::commit();
             return back()->with('success', 'Perubahan data berhasil disimpan.');
@@ -255,10 +267,13 @@ class MusdesController extends Controller
         }
 
         // 2. Jika lengkap, ubah status
+        $oldValues = $submission->toArray();
         $submission->update([
             'status' => DesaSubmission::STATUS_SUBMITTED,
             'submitted_at' => now(),
         ]);
+
+        AuditHelper::log('submit', 'desa_submissions', $id, $oldValues, $submission->fresh()->toArray());
 
         return redirect()->route('desa.musdes.index')
             ->with('success', 'Laporan Musdes berhasil dikirim ke Kecamatan. Terima kasih!');
@@ -314,7 +329,10 @@ class MusdesController extends Controller
             $submission->files()->delete();
             $submission->notes()->delete();
             $submission->logs()->delete();
+            $oldValues = $submission->toArray();
             $submission->delete();
+
+            AuditHelper::log('delete', 'desa_submissions', $id, $oldValues, null);
 
             DB::commit();
             return redirect()->route('desa.musdes.index')->with('success', 'Draf laporan Musdes telah dihapus.');

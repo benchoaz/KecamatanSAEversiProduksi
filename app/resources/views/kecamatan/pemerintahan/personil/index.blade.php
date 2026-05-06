@@ -128,12 +128,17 @@
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="personil-photo">
                                             @if($p->foto)
-                                                <img src="{{ route('kecamatan.file.personil-foto', $p->id) }}" alt="Foto {{ $p->nama }}"
-                                                    class="rounded-circle object-fit-cover shadow-sm"
-                                                    style="width: 50px; height: 50px; border: 2px solid #fff;">
+                                                <div class="position-relative group-photo" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#photoModal{{ $p->id }}">
+                                                    <img src="{{ route('kecamatan.file.personil-foto', $p->id) }}" alt="Foto {{ $p->nama }}"
+                                                        class="rounded-circle object-fit-cover shadow-sm transition-all"
+                                                        style="width: 60px; height: 60px; border: 3px solid #fff; image-rendering: -webkit-optimize-contrast;">
+                                                    <div class="position-absolute top-50 start-50 translate-middle opacity-0 group-photo-hover:opacity-100 transition-opacity">
+                                                        <i class="fas fa-search-plus text-white shadow-sm"></i>
+                                                    </div>
+                                                </div>
                                             @else
                                                 <div class="rounded-circle bg-brand-50 text-brand-600 d-flex align-items-center justify-content-center fw-bold shadow-sm"
-                                                    style="width: 50px; height: 50px; border: 2px solid #fff;">
+                                                    style="width: 60px; height: 60px; border: 3px solid #fff;">
                                                     {{ strtoupper(substr($p->nama, 0, 1)) }}
                                                 </div>
                                             @endif
@@ -472,6 +477,23 @@
 
     @if(isset($personils))
         @foreach($personils as $p)
+            <!-- Modal Foto Full -->
+            <div class="modal fade" id="photoModal{{ $p->id }}" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 bg-transparent shadow-none">
+                        <div class="modal-body p-0 text-center position-relative">
+                            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal"></button>
+                            <img src="{{ route('kecamatan.file.personil-foto', $p->id) }}" 
+                                 class="img-fluid rounded-4 shadow-lg" style="max-height: 80vh; border: 5px solid white;">
+                            <div class="mt-3 text-white">
+                                <h5 class="fw-bold mb-0">{{ $p->nama }}</h5>
+                                <p class="small opacity-75">{{ $p->jabatan }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Modal Revisi -->
             <div class="modal fade" id="revisionModal{{ $p->id }}" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
@@ -559,6 +581,19 @@
 
         .fw-500 {
             font-weight: 500;
+        }
+
+        .group-photo:hover img {
+            transform: scale(1.1);
+            filter: brightness(0.8);
+        }
+
+        .group-photo:hover .opacity-0 {
+            opacity: 1 !important;
+        }
+
+        .transition-all {
+            transition: all 0.3s ease-in-out;
         }
     </style>
 @endpush

@@ -15,6 +15,8 @@ class AppProfile extends Model
         'region_level',
         'tagline',
         'logo_path',
+        'branding_image_path',
+        'is_branding_active',
         'image_pariwisata',
         'image_festival',
         'hero_image_path',

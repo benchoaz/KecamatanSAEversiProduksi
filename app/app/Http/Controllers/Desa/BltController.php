@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Desa;
 
 use App\Http\Controllers\Controller;
 use App\Models\BltDesa;
-use App\Models\AuditLog;
+use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -54,14 +54,7 @@ class BltController extends Controller
 
         $blt = BltDesa::create($data);
 
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'event' => 'create',
-            'table_name' => 'blt_desa',
-            'record_id' => $blt->id,
-            'new_values' => $blt->toArray(),
-            'domain' => 'desa'
-        ]);
+        AuditHelper::log('create', 'blt_desa', $blt->id, null, $blt->toArray());
 
         return redirect()->route('desa.blt.index')->with('success', 'Data BLT berhasil disimpan sebagai draft.');
     }
@@ -108,15 +101,7 @@ class BltController extends Controller
 
         $item->update($data);
 
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'event' => 'update',
-            'table_name' => 'blt_desa',
-            'record_id' => $item->id,
-            'old_values' => $oldValues,
-            'new_values' => $item->fresh()->toArray(),
-            'domain' => 'desa'
-        ]);
+        AuditHelper::log('update', 'blt_desa', $item->id, $oldValues, $item->fresh()->toArray());
 
         return back()->with('success', 'Data BLT berhasil diperbarui.');
     }
@@ -135,8 +120,32 @@ class BltController extends Controller
             return back()->with('error', 'Laporan sudah dikirim atau dicatat.');
         }
 
+        $oldValues = $item->toArray();
         $item->update(['status_laporan' => 'Dikirim']);
 
+        AuditHelper::log('submit', 'blt_desa', $id, $oldValues, $item->fresh()->toArray());
+
         return back()->with('success', 'Laporan BLT berhasil dikirim ke Kecamatan.');
+    }
+
+    public function destroy($id)
+    {
+        $item = BltDesa::where('desa_id', auth()->user()->desa_id)->findOrFail($id);
+        
+        if ($item->status_laporan !== 'Draft' && $item->status_laporan !== 'Dikembalikan') {
+            return back()->with('error', 'Laporan yang sudah dikirim tidak dapat dihapus.');
+        }
+
+        // Delete files
+        if ($item->dokumen_ba) Storage::disk('public')->delete($item->dokumen_ba);
+        if ($item->foto_penyaluran) Storage::disk('public')->delete($item->foto_penyaluran);
+        if ($item->daftar_kpm_file) Storage::disk('public')->delete($item->daftar_kpm_file);
+
+        $oldValues = $item->toArray();
+        $item->delete();
+
+        AuditHelper::log('delete', 'blt_desa', $id, $oldValues, null);
+
+        return back()->with('success', 'Draft laporan BLT berhasil dihapus.');
     }
 }

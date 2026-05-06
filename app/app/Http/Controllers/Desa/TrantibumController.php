@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Submission;
 use App\Models\Menu;
 use App\Models\Aspek;
+use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 
 class TrantibumController extends Controller
@@ -83,6 +84,8 @@ class TrantibumController extends Controller
             'periode' => now()->format('Y-m'),
         ]);
 
+        AuditHelper::log('create', 'submissions', $submission->id, null, $submission->toArray());
+
         return redirect()->route('desa.trantibum.show', $submission->id)
             ->with('success', 'Data Trantibum berhasil disimpan sebagai draft.');
     }
@@ -140,9 +143,12 @@ class TrantibumController extends Controller
             'tanggal_kejadian' => 'nullable|date',
         ]);
 
+        $oldValues = $submission->toArray();
         $submission->update([
             'aspek_id' => $validated['aspek_id'],
         ]);
+
+        AuditHelper::log('update', 'submissions', $submission->id, $oldValues, $submission->fresh()->toArray());
 
         return redirect()->route('desa.trantibum.show', $submission->id)
             ->with('success', 'Data Trantibum berhasil diperbarui.');
@@ -161,10 +167,13 @@ class TrantibumController extends Controller
         abort_if($submission->status !== 'draft', 403, 'Hanya data dengan status draft yang dapat disubmit.');
 
         // Update status to submitted
+        $oldValues = $submission->toArray();
         $submission->update([
             'status' => 'submitted',
             'submitted_at' => now(),
         ]);
+
+        AuditHelper::log('submit', 'submissions', $id, $oldValues, $submission->fresh()->toArray());
 
         return redirect()->route('desa.trantibum.index')
             ->with('success', 'Data Trantibum berhasil dikirim untuk verifikasi Kecamatan.');

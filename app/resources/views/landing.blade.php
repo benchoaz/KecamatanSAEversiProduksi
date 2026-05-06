@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {{-- SEO Meta Tags --}}
-    <title>{{ appProfile()->full_region_name }}
+    <title>KECAMATAN BESUK - TEST MODAL
         {{ $appProfile->region_parent ?? 'Kabupaten Probolinggo' }} – Layanan & Informasi Publik
     </title>
     <meta name="description"
@@ -262,7 +262,6 @@
             background: #0d9488 !important;
         }
     </style>
-
     <!-- Dynamic Hero Swiper -->
     <div class="swiper hero-swiper">
         <div class="swiper-wrapper">
@@ -289,7 +288,6 @@
                             <p class="text-reveal delay-300 text-base md:text-lg lg:text-xl text-[#475569] mb-8 lg:mb-10 leading-relaxed font-medium max-w-xl">
                                 Akses berbagai layanan publik secara digital, cepat, dan transparan. Mudahkan urusan administrasi Anda dari mana saja.
                             </p>
-
                             <div class="text-reveal delay-400">
                                 <a href="#layanan" 
                                    class="btn bg-[#0f766e] hover:bg-[#115e59] text-white border-0 rounded-2xl px-12 h-16 font-black shadow-xl shadow-slate-200 transition-all flex items-center gap-2">
@@ -297,7 +295,6 @@
                                 </a>
                             </div>
                         </div>
-
                         <!-- Right: Visual Balance (Regional Leader Photo) - Hidden on Mobile -->
                         <div class="hidden lg:flex lg:w-2/5 justify-end relative order-last mb-0">
                             <div class="text-reveal delay-300 relative group scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100">
@@ -335,7 +332,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Slide 2: Digital Public Services -->
             <div class="swiper-slide hero-slide">
                 <div class="slide-bg opacity-70" style="background-image: url('{{ appProfile()->image_festival ? asset('storage/' . appProfile()->image_festival) : 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=1600' }}');"></div>
@@ -358,7 +354,6 @@
                             <p class="text-reveal delay-300 text-lg md:text-xl text-[#475569] mb-10 leading-relaxed font-medium max-w-xl">
                                 Nikmati kemudahan mengajukan berkas secara online dari mana saja. Transparan, akuntabel, dan bebas ribet.
                             </p>
-
                             <div class="text-reveal delay-400 flex flex-wrap gap-4">
                                 <a href="#layanan" 
                                    class="btn bg-[#0369a1] hover:bg-[#075985] text-white border-0 rounded-2xl px-12 h-16 font-black shadow-xl shadow-blue-200 transition-all">
@@ -366,7 +361,6 @@
                                 </a>
                             </div>
                         </div>
-
                         <!-- Right: Visual Balance -->
                         <div class="hidden lg:flex w-2/5 justify-end relative">
                             <div class="text-reveal delay-300 relative">
@@ -382,7 +376,6 @@
                     </div>
                 </div>
             </div>
-
             @if(appProfile()->is_menu_statistik_active)
             <!-- Slide 3: Regional Potential -->
             <div class="swiper-slide hero-slide">
@@ -407,7 +400,6 @@
                             <p class="text-reveal delay-300 text-lg md:text-xl text-[#475569] mb-10 leading-relaxed font-medium max-w-xl">
                                 Pantau perkembangan wilayah melalui data kependudukan, kesehatan, dan ekonomi yang akurat dan transparan dari 17 desa.
                             </p>
-
                             <div class="text-reveal delay-400 flex flex-wrap gap-4">
                                 <a href="{{ route('landing.statistik.index') }}" 
                                    class="btn bg-amber-600 hover:bg-amber-700 text-white border-0 rounded-2xl px-12 h-16 font-black shadow-xl shadow-amber-200 transition-all">
@@ -415,7 +407,6 @@
                                 </a>
                             </div>
                         </div>
-
                         <!-- Right: Visual Balance -->
                         <div class="hidden lg:flex w-2/5 justify-end relative">
                             <div class="text-reveal delay-300 relative">
@@ -433,13 +424,14 @@
             </div>
             @endif
         </div>
-
         <!-- Add Pagination -->
         <div class="swiper-pagination"></div>
         <!-- Add Arrows -->
         <div class="swiper-button-next hidden lg:flex"></div>
         <div class="swiper-button-prev hidden lg:flex"></div>
     </div>
+
+iv>
 
 
     <!-- Section: Pusat Layanan Digital (Unified) -->
@@ -1137,6 +1129,7 @@
         </button>
     </div>
 
+    @if(appProfile()->is_ai_active)
     <!-- Floating Action Button (Chatbot) -->
     <div class="fixed bottom-5 right-5 z-[60] group">
         <div class="absolute bottom-full right-0 mb-3 hidden group-hover:block transition-all animate-bounce">
@@ -1148,8 +1141,10 @@
             <i class="fas fa-robot text-white text-2xl"></i>
         </button>
     </div>
+    @endif
 
 
+    @if(appProfile()->is_menu_pelayanan_active)
     <!-- Service Submission Modal (PERFECTED & COMPACT) -->
     <dialog id="permohonanModal" class="modal modal-bottom sm:modal-middle">
         <div
@@ -1338,8 +1333,10 @@
             </form>
         </div>
     </dialog>
+    @endif
 
 
+    @if(appProfile()->is_ai_active)
     <!-- Administrative Bot Portal -->
     <dialog id="publicServiceModal" class="modal">
         <div
@@ -1429,7 +1426,9 @@
             </div>
         </div>
     </dialog>
+    @endif
 
+    @if(appProfile()->is_menu_pengaduan_active)
     <!-- SP4N-LAPOR Style Complaint Modal -->
     <dialog id="complaintModal" class="modal modal-bottom sm:modal-middle">
         <div
@@ -1561,7 +1560,9 @@
             </form>
         </div>
     </dialog>
+    @endif
 
+    @if(appProfile()->is_menu_statistik_active)
     <!-- Survei Kepuasan Masyarakat (SKM) Modal -->
     <dialog id="surveyModal" class="modal modal-bottom sm:modal-middle">
         <div class="modal-box max-w-md rounded-3xl bg-white p-0 overflow-hidden shadow-2xl border border-slate-100">
@@ -1614,6 +1615,7 @@
             </div>
         </div>
     </dialog>
+    @endif
 
     <script>
         // --- GLOBAL SHARED FUNCTIONS (Define First) ---
@@ -3058,7 +3060,6 @@
 
     <script src="{{ asset('voice-guide/min/voice.bundle.min.js') }}?v=3.3"></script>
 
-    {{-- Fix: Reset dark mode and close modals on page load --}}
     <script>
         (function () {
             // Reset accessibility theme to light on landing page
@@ -3082,12 +3083,6 @@
                     // Invalid JSON, ignore
                 }
             }
-
-            // Close any open native dialog modals
-            document.querySelectorAll('dialog[open]').forEach(function (dialog) {
-                dialog.close();
-            });
-
         })();
     </script>
 
@@ -3114,6 +3109,59 @@
             });
         });
     </script>
+    @if(appProfile()->branding_image_path && appProfile()->is_branding_active)
+    <!-- Welcome Branding Modal -->
+    <dialog id="welcome_branding_modal" class="modal modal-middle backdrop-blur-md transition-all duration-500">
+        <div class="modal-box p-0 bg-transparent shadow-none border-none max-w-4xl w-11/12 overflow-visible">
+            <div class="relative group">
+                <!-- Close Button (Floating) -->
+                <form method="dialog" class="absolute -top-12 right-0 md:-right-12 z-50">
+                    <button class="btn btn-circle bg-white/20 hover:bg-white/40 border-white/30 text-white backdrop-blur-md transition-all">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </form>
+
+                <!-- Branding Image -->
+                <div class="bg-white/10 backdrop-blur-xl p-2 md:p-4 rounded-[2.5rem] md:rounded-[4rem] border border-white/30 shadow-2xl overflow-hidden animate-zoom-in">
+                    <img src="{{ asset('storage/' . appProfile()->branding_image_path) }}" 
+                         alt="Welcome to {{ appProfile()->region_name }}" 
+                         class="w-full h-auto max-h-[80vh] object-contain rounded-[2rem] md:rounded-[3.5rem] shadow-2xl">
+                </div>
+
+                <!-- Glow Effect Behind -->
+                <div class="absolute -inset-10 bg-emerald-500/20 rounded-full blur-[100px] -z-10 animate-pulse"></div>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop bg-slate-900/60 backdrop-blur-sm">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <style>
+        @keyframes zoom-in {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-zoom-in {
+            animation: zoom-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+
+    <script>
+        window.onload = function() {
+            const modal = document.getElementById('welcome_branding_modal');
+            if (modal && window.innerWidth >= 1024) {
+                // Check if already shown in this session
+                if (!sessionStorage.getItem('branding_shown')) {
+                    setTimeout(() => {
+                        modal.showModal();
+                        sessionStorage.setItem('branding_shown', 'true');
+                    }, 1000);
+                }
+            }
+        };
+    </script>
+    @endif
 </body>
 
 </html>

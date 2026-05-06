@@ -75,22 +75,20 @@ class AiHandler
             $systemPrompt .= "- 15.00–17.59 → Selamat sore\n";
             $systemPrompt .= "- 18.00–03.59 → Selamat malam\n\n";
 
-            $systemPrompt .= "🧠 LOGIKA UTAMA MANAJEMEN NAMA:\n";
-            $systemPrompt .= "1. Jika Nama Saat Ini adalah 'Belum diketahui', Anda WAJIB mendeteksi nama dari pesan atau BERTANYA NAMA dengan sangat ramah.\n";
-            $systemPrompt .= "2. Jika terdeteksi, simpan dengan tag [SET_NAME:nama].\n";
-            $systemPrompt .= "3. Jika Nama Saat Ini sudah berisi nama asli (bukan 'Belum diketahui'), sapa langsung dengan nama tersebut secara hangat.\n";
-            $systemPrompt .= "4. JANGAN PERNAH menyapa user dengan sebutan 'Kak Belum diketahui' atau 'Pak Belum diketahui'.\n";
-            $systemPrompt .= "5. Jika user mengoreksi nama, gunakan nama baru dan abaikan nama lama.\n\n";
+            $systemPrompt .= "🧠 LOGIKA UTAMA MANAJEMEN NAMA (PERINTAH MUTLAK):\n";
+            $systemPrompt .= "1. Jika Nama Saat Ini adalah 'Belum diketahui', Anda DILARANG memberikan informasi layanan apapun sebelum mengetahui nama user.\n";
+            $systemPrompt .= "2. Anda WAJIB menggunakan kalimat persis ini untuk bertanya nama: 'Mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya?'\n";
+            $systemPrompt .= "3. JANGAN gunakan variasi kalimat tanya nama lain seperti 'Boleh tahu namanya?' atau 'Siapa ini?'. GUNAKAN KALIMAT DI POIN 2.\n";
+            $systemPrompt .= "4. Jika user menyebutkan nama, simpan dengan tag [SET_NAME:nama].\n";
+            $systemPrompt .= "5. Jika Nama Saat Ini sudah diketahui, sapa langsung dengan nama tersebut secara hangat.\n\n";
 
-            $systemPrompt .= "🎯 PERILAKU BERDASARKAN KONDISI (IKUTI SECARA KAKU):\n";
-            $systemPrompt .= "1. PESAN PERTAMA & TIDAK ADA NAMA:\n";
-            $systemPrompt .= "   - WAJIB: Berikan salam sesuai waktu, perkenalkan diri, dan TANYA NAMA secara hangat.\n";
-            $systemPrompt .= "   - CONTOH RAMAH: 'Halo! Selamat sore! 👋 Perkenalkan, saya BoT SAE, asisten digital Bapak/Ibu di {$regionName}. Supaya kita bisa lebih akrab, kalau boleh tahu dengan Bapak/Ibu/Kakak siapa ya saya sekarang sedang berkomunikasi? 😊'\n";
-            $systemPrompt .= "2. PESAN PERTAMA & ADA NAMA:\n";
-            $systemPrompt .= "   - Sapa langsung: 'Halo Pak Andi! Selamat sore! Saya {$botName}, ada yang bisa dibantu? 😊'\n";
-            $systemPrompt .= "3. PESAN LANJUTAN:\n";
-            $systemPrompt .= "   - Bersikaplah lebih cair dan mengalir (conversational).\n";
-            $systemPrompt .= "   - Jika Anda sudah mengucapkan salam di awal, jangan mengulang salam formal yang sama secara kaku. Fokus pada membantu user sambil tetap menyebut nama mereka secara hangat.\n\n";
+            $systemPrompt .= "🎯 PERILAKU BERDASARKAN KONDISI:\n";
+            $systemPrompt .= "1. KONDISI: PESAN PERTAMA & NAMA TIDAK DIKETAHUI:\n";
+            $systemPrompt .= "   - Respon Anda HARUS: 'Halo! Selamat [WAKTU]! 👋 Saya {$botName}, asisten digital resmi dari {$regionName}. Supaya saya dapat melayani dengan lebih baik, mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya? 😊'\n";
+            $systemPrompt .= "2. KONDISI: PESAN PERTAMA & NAMA SUDAH DIKETAHUI:\n";
+            $systemPrompt .= "   - Respon Anda: 'Halo Pak/Bu [Nama]! Selamat [WAKTU]! Saya {$botName}, ada yang bisa saya bantu terkait layanan di {$regionName}? 😊'\n";
+            $systemPrompt .= "3. KONDISI: USER BERTANYA TAPI NAMA BELUM DIKETAHUI:\n";
+            $systemPrompt .= "   - Jawab singkat bahwa Anda akan membantu, tapi minta nama dulu: 'Tentu, saya akan bantu informasinya. Namun sebelumnya mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya? 😊'\n\n";
 
             $systemPrompt .= "🎤 GAYA BAHASA:\n";
             $systemPrompt .= "- Sangat sopan, sangat ramah, natural (seperti manusia), tidak robotik.\n";
@@ -100,7 +98,7 @@ class AiHandler
 
             $systemPrompt .= "PERINTAH KHUSUS:\n";
             $systemPrompt .= "- JANGAN PERNAH memberikan jawaban template yang kaku. Jadilah asisten yang melayani dengan tulus.\n";
-            $systemPrompt .= "- Jika warga ingin LAPOR, MENGADU, ADUAN, CURHAT, atau LAPORAN: Tunjukkan empati yang mendalam, lalu WAJIB berikan link pengaduan resmi di: " . $this->getPublicUrl() . "/layanan/pengaduan\n";
+            $systemPrompt .= "- Jika warga ingin LAPOR, MENGADU, ADUAN, CURHAT, atau LAPORAN: Tunjukkan empati yang mendalam, lalu WAJIB berikan link pengaduan resmi di: " . $this->getPublicUrl() . "/#pengaduan\n";
             $systemPrompt .= "- Jika warga mencari JASA, UMKM, INFO MASAKAN, MAKANAN, atau hal terkait EKONOMI: Arahkan ke Pusat Ekonomi {$regionName} di: " . $this->getPublicUrl() . "/ekonomi\n\n";
 
             $systemPrompt .= "DATA RESMI & FAQ:\n";
@@ -292,18 +290,73 @@ class AiHandler
 
             $desas = Desa::all();
             $totalPenduduk = $desas->sum('jumlah_penduduk');
+            $totalLaki = $desas->sum('jumlah_laki_laki');
+            $totalPerempuan = $desas->sum('jumlah_perempuan');
+            $totalKk = $desas->sum('jumlah_kk');
             $villageNames = $desas->pluck('nama_desa')->join(', ');
 
-            $knowledge .= "\nSTATISTIK WILAYAH:\n";
+            // --- AGGREGATE JSON STATS ---
+            $eduStats = []; $jobStats = []; $religionStats = []; $totalStunting = 0; $desil1 = 0;
+
+            foreach ($desas as $desa) {
+                // Education
+                $edu = is_string($desa->stat_pendidikan) ? json_decode($desa->stat_pendidikan, true) : $desa->stat_pendidikan;
+                if (is_array($edu)) {
+                    foreach ($edu as $item) {
+                        $label = $item['nama'] ?? 'Lainnya';
+                        $eduStats[$label] = ($eduStats[$label] ?? 0) + ($item['jumlah'] ?? 0);
+                    }
+                }
+                // Job
+                $job = is_string($desa->stat_pekerjaan) ? json_decode($desa->stat_pekerjaan, true) : $desa->stat_pekerjaan;
+                if (is_array($job)) {
+                    foreach ($job as $item) {
+                        $label = $item['nama'] ?? 'Lainnya';
+                        $jobStats[$label] = ($jobStats[$label] ?? 0) + ($item['jumlah'] ?? 0);
+                    }
+                }
+                // Religion
+                $rel = is_string($desa->stat_agama) ? json_decode($desa->stat_agama, true) : $desa->stat_agama;
+                if (is_array($rel)) {
+                    foreach ($rel as $item) {
+                        $label = $item['nama'] ?? 'Lainnya';
+                        $religionStats[$label] = ($religionStats[$label] ?? 0) + ($item['jumlah'] ?? 0);
+                    }
+                }
+                // Health (Stunting)
+                $health = is_string($desa->stat_kesehatan) ? json_decode($desa->stat_kesehatan, true) : $desa->stat_kesehatan;
+                $totalStunting += $health['totalStunting'] ?? 0;
+                
+                // Welfare (DTSEN / Desil)
+                $desil = is_string($desa->stat_desil) ? json_decode($desa->stat_desil, true) : $desa->stat_desil;
+                $desil1 += $desil['totalDesil1'] ?? 0;
+            }
+
+            $knowledge .= "\nSTATISTIK WILAYAH LENGKAP:\n";
             $knowledge .= "- Daftar 17 Desa: {$villageNames}\n";
-            $knowledge .= "- Total Penduduk: {$totalPenduduk} jiwa\n";
+            $knowledge .= "- Total Penduduk: {$totalPenduduk} jiwa (Laki-laki: {$totalLaki}, Perempuan: {$totalPerempuan})\n";
+            $knowledge .= "- Total Keluarga (KK): {$totalKk}\n";
+            
+            $knowledge .= "\nPENDIDIKAN:\n";
+            foreach (array_slice($eduStats, 0, 8) as $label => $count) $knowledge .= "- {$label}: {$count} orang\n";
+
+            $knowledge .= "\nPEKERJAAN UTAMA:\n";
+            foreach (array_slice($jobStats, 0, 8) as $label => $count) $knowledge .= "- {$label}: {$count} orang\n";
+
+            $knowledge .= "\nAGAMA:\n";
+            foreach ($religionStats as $label => $count) $knowledge .= "- {$label}: {$count} orang\n";
+
+            $knowledge .= "\nKESEHATAN & SOSIAL (DTSEN):\n";
+            $knowledge .= "- Total Kasus Stunting: {$totalStunting} balita\n";
+            $knowledge .= "- Penduduk Kesejahteraan Rendah (Desil 1): {$desil1} jiwa\n";
             
             $serviceStats = [
                 'total_layanan' => PublicService::count(),
                 'total_umkm' => Umkm::count(),
             ];
-            $knowledge .= "- Layanan Digital: {$serviceStats['total_layanan']} Selesai\n";
-            $knowledge .= "- Total UMKM: {$serviceStats['total_umkm']}\n";
+            $knowledge .= "\nDATA LAYANAN DIGITAL:\n";
+            $knowledge .= "- Permohonan Berkas Selesai: {$serviceStats['total_layanan']}\n";
+            $knowledge .= "- Total UMKM Terdaftar: {$serviceStats['total_umkm']}\n";
 
             return $knowledge;
         });

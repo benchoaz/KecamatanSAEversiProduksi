@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Desa;
 
 use App\Http\Controllers\Controller;
 use App\Models\PembangunanDesa;
-use App\Models\AuditLog;
+use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -94,14 +94,7 @@ class PembangunanController extends Controller
 
         $pembangunan = PembangunanDesa::create($data);
 
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'event' => 'create',
-            'table_name' => 'pembangunan_desa',
-            'record_id' => $pembangunan->id,
-            'new_values' => $pembangunan->toArray(),
-            'domain' => 'desa'
-        ]);
+        AuditHelper::log('create', 'pembangunan_desa', $pembangunan->id, null, $pembangunan->toArray());
 
         return redirect()->route('desa.pembangunan.fisik.index')->with('success', 'Data pembangunan berhasil disimpan sebagai draft.');
     }
@@ -155,14 +148,7 @@ class PembangunanController extends Controller
 
         $pembangunan = PembangunanDesa::create($data);
 
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'event' => 'create',
-            'table_name' => 'pembangunan_desa',
-            'record_id' => $pembangunan->id,
-            'new_values' => $pembangunan->toArray(),
-            'domain' => 'desa'
-        ]);
+        AuditHelper::log('create', 'pembangunan_desa', $pembangunan->id, null, $pembangunan->toArray());
 
         return redirect()->route('desa.pembangunan.non-fisik.index')->with('success', 'Kegiatan non-fisik berhasil disimpan.');
     }
@@ -286,15 +272,7 @@ class PembangunanController extends Controller
 
         $item->update($data);
 
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'event' => 'update',
-            'table_name' => 'pembangunan_desa',
-            'record_id' => $item->id,
-            'old_values' => $oldValues,
-            'new_values' => $item->fresh()->toArray(),
-            'domain' => 'desa'
-        ]);
+        AuditHelper::log('update', 'pembangunan_desa', $item->id, $oldValues, $item->fresh()->toArray());
 
         return back()->with('success', 'Data berhasil diperbarui.');
     }
@@ -364,5 +342,28 @@ class PembangunanController extends Controller
             'status' => 'success',
             'estimation' => $estimation
         ]);
+    }
+
+    public function destroy($id)
+    {
+        $item = PembangunanDesa::where('desa_id', auth()->user()->desa_id)->findOrFail($id);
+        
+        if ($item->status_laporan !== 'Draft' && $item->status_laporan !== 'Dikembalikan') {
+            return back()->with('error', 'Laporan yang sudah dikirim tidak dapat dihapus.');
+        }
+
+        // Delete files
+        if ($item->rab_file) Storage::disk('public')->delete($item->rab_file);
+        if ($item->gambar_rencana_file) Storage::disk('public')->delete($item->gambar_rencana_file);
+        if ($item->foto_sebelum_file) Storage::disk('public')->delete($item->foto_sebelum_file);
+        if ($item->foto_progres_file) Storage::disk('public')->delete($item->foto_progres_file);
+        if ($item->foto_selesai_file) Storage::disk('public')->delete($item->foto_selesai_file);
+
+        $oldValues = $item->toArray();
+        $item->delete();
+
+        AuditHelper::log('delete', 'pembangunan_desa', $id, $oldValues, null);
+
+        return back()->with('success', 'Draft laporan berhasil dihapus.');
     }
 }

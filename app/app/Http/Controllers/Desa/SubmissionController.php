@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Desa;
 
 use App\Http\Controllers\Controller;
 use App\Models\Desa\DesaSubmission;
+use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -42,6 +43,8 @@ class SubmissionController extends Controller
                 'created_by' => auth()->id(),
             ]);
 
+            AuditHelper::log('create', 'desa_submissions', $submission->id, null, $submission->toArray());
+
             DB::commit();
             return redirect()->route('desa.submissions.edit', $submission->id)
                 ->with('success', 'Draft laporan berhasil dibuat.');
@@ -72,6 +75,8 @@ class SubmissionController extends Controller
             abort(403, 'Laporan tidak dapat dikirim.');
         }
 
+        $oldValues = $submission->toArray();
+
         // Simple validation: Ensure title is present or any other mandatory checks
         if (empty($submission->judul)) {
             return back()->with('error', 'Judul laporan wajib diisi.');
@@ -82,7 +87,7 @@ class SubmissionController extends Controller
             'submitted_at' => now(),
         ]);
 
-        // Audit Log logic would go here (e.g., AuditLog::create(...))
+        AuditHelper::log('submit', 'desa_submissions', $id, $oldValues, $submission->fresh()->toArray());
 
         return redirect()->route('desa.submissions.index')
             ->with('success', 'Laporan berhasil dikirim ke Kecamatan.');
@@ -98,8 +103,36 @@ class SubmissionController extends Controller
             abort(403, 'Laporan tidak dapat diedit.');
         }
 
+        $oldValues = $submission->toArray();
         $submission->update($request->only(['judul', 'periode']));
 
+        AuditHelper::log('update', 'desa_submissions', $id, $oldValues, $submission->fresh()->toArray());
+
         return back()->with('success', 'Perubahan disimpan.');
+    }
+
+    public function destroy($id)
+    {
+        $submission = DesaSubmission::where('desa_id', auth()->user()->desa_id)
+            ->findOrFail($id);
+
+        if (!$submission->isEditable()) {
+            abort(403, 'Laporan yang sudah dikirim tidak dapat dihapus.');
+        }
+
+        // Delete associated files if any
+        foreach ($submission->buktiDukung as $bukti) {
+            if ($bukti->file_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($bukti->file_path);
+            }
+            $bukti->delete();
+        }
+
+        $oldValues = $submission->toArray();
+        $submission->delete();
+
+        AuditHelper::log('delete', 'desa_submissions', $id, $oldValues, null);
+
+        return back()->with('success', 'Draft laporan berhasil dihapus.');
     }
 }

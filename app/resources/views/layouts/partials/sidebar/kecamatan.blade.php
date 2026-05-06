@@ -1,7 +1,7 @@
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo">
-            <div class="logo-icon bg-transparent text-white">
+            <div class="logo-icon bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-xl flex items-center justify-center shadow-lg">
                 @if(appProfile()->logo_path)
                     <img src="{{ asset('storage/' . appProfile()->logo_path) }}" class="img-fluid"
                         style="max-height: 48px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));">
@@ -16,6 +16,10 @@
         </div>
         <button class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
     </div>
+
+    @php
+        $ekbangMenu = \App\Models\Menu::where('kode_menu', 'ekbang')->first();
+    @endphp
 
     <nav class="sidebar-nav">
         <div class="nav-section">
@@ -65,18 +69,20 @@
             </ul>
         </div>
 
-        <div class="nav-section">
-            <span class="nav-section-title">EKBANG</span>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="{{ route('kecamatan.pelayanan.inbox', ['category' => 'ekonomi']) }}"
-                        class="nav-link {{ request()->fullUrlIs(route('kecamatan.pelayanan.inbox', ['category' => 'ekonomi']) . '*') ? 'active' : '' }}">
-                        <span class="nav-icon"><i class="fas fa-store"></i></span>
-                        <span class="nav-text">Manajemen UMKM & Jasa</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+        @if($ekbangMenu && $ekbangMenu->is_active)
+            <div class="nav-section">
+                <span class="nav-section-title">EKBANG</span>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="{{ route('kecamatan.pelayanan.inbox', ['category' => 'ekonomi']) }}"
+                            class="nav-link {{ request()->fullUrlIs(route('kecamatan.pelayanan.inbox', ['category' => 'ekonomi']) . '*') ? 'active' : '' }}">
+                            <span class="nav-icon"><i class="fas fa-store"></i></span>
+                            <span class="nav-text">Manajemen UMKM & Jasa</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        @endif
 
         {{-- Dynamic Menus Section --}}
         @php
