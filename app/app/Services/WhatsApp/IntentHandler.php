@@ -225,17 +225,17 @@ class IntentHandler
             return $this->ownerHandler->toggleHolidayStatus($phone, $messageLower);
         }
 
+        // --- AI SMART FALLBACK ---
+        $aiResponse = $this->aiHandler->handle($phone, $message);
+        if ($aiResponse !== null) {
+            return $aiResponse;
+        }
+
         // --- FAQ NATURAL LANGUAGE FALLBACK ---
         $faqData = $this->faqSearchService->search($messageLower);
         if ($faqData['found']) {
             // We can just use SyaratHandler to format it properly with links
             return $this->syaratHandler->search($messageLower);
-        }
-
-        // --- AI SMART FALLBACK ---
-        $aiResponse = $this->aiHandler->handle($phone, $message);
-        if ($aiResponse !== null) {
-            return $aiResponse;
         }
 
         // Unknown intent (Jika AI mati atau error)
@@ -249,6 +249,11 @@ class IntentHandler
 
     protected function matchesIntent(string $message, array $keywords): bool
     {
+        // Special case for menu typos
+        if (in_array('menu', $keywords) && in_array($message, ['mwnu', 'mennu', 'meenu', 'menuu'])) {
+            return true;
+        }
+
         foreach ($keywords as $keyword) {
             if ($message === $keyword || str_starts_with($message, $keyword . ' ')) {
                 return true;
@@ -260,7 +265,9 @@ class IntentHandler
     protected function containsIntent(string $message, array $keywords): bool
     {
         foreach ($keywords as $keyword) {
-            if (str_contains($message, $keyword)) {
+            // Use regex to match whole words only, avoiding substring matches like 'api' in 'tapi'
+            $pattern = '/\b' . preg_quote($keyword, '/') . '\b/i';
+            if (preg_match($pattern, $message)) {
                 return true;
             }
         }
