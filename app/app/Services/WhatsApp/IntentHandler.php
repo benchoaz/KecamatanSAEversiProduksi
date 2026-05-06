@@ -48,7 +48,7 @@ class IntentHandler
         $state = $session ? $session->state : null;
 
         // 1. GLOBAL KEYWORDS: Reset to main menu (HIGHEST PRIORITY)
-        if ($this->matchesIntent($messageLower, ['menu', 'help', 'bantuan', '0', 'batal', 'stop', 'berhenti', 'cancel'])) {
+        if ($this->matchesIntent($messageLower, ['menu', 'daftar menu', 'lihat menu', 'tampilkan menu', 'help', 'bantuan', '0', 'batal', 'stop', 'berhenti', 'cancel'])) {
             // If it's a cancel keyword, clear session first
             if (in_array($messageLower, ['batal', 'stop', 'berhenti', 'cancel'])) {
                 if ($session) $session->clear();
@@ -74,9 +74,19 @@ class IntentHandler
                 'success' => true,
                 'intent' => 'greeting',
                 'reply' => "👋 *Halo! Selamat datang di Layanan Digital " . $this->getRegionName() . "*.\n\n" .
-                    "Ada yang bisa saya bantu hari ini? Silakan ketik pertanyaan Anda atau ketik *MENU* untuk melihat daftar layanan kami. 😊",
+                    "Ada yang bisa saya bantu hari ini? Silakan ketik pertanyaan Anda (contoh: *syarat ktp*) atau ketik *MENU* untuk melihat daftar layanan lengkap kami. 😊",
                 'state_update' => null,
             ];
+        }
+
+        // 3. AI-PRIORITY KEYWORDS: Direct to AI for these specific topics as requested by user
+        $aiPriorityKeywords = [
+            'laporan', 'mengadu', 'curhat', 'aduan', 'lapor', 
+            'umkm', 'jasa', 'masakan', 'makanan', 'ekonomi', 'produk'
+        ];
+        if ($this->containsIntent($messageLower, $aiPriorityKeywords)) {
+            $aiResponse = $this->aiHandler->handle($phone, $message);
+            if ($aiResponse) return $aiResponse;
         }
 
         // 3. EMERGENCY DETECTOR: Handle emergency keywords (CONTAIN matching for safety)
@@ -227,28 +237,8 @@ class IntentHandler
         // --- FAQ NATURAL LANGUAGE FALLBACK ---
         $faqData = $this->faqSearchService->search($messageLower);
         if ($faqData['found']) {
-            if (isset($faqData['multiple']) && $faqData['multiple']) {
-                $reply = "Ditemukan beberapa topik yang mungkin relevan:\n\n";
-                foreach ($faqData['results'] as $i => $res) {
-                    $num = $i + 1;
-                    $reply .= "{$num}. SYARAT " . strtoupper($res['question']) . "\n";
-                }
-                $reply .= "\nKetik kata kunci yang lebih spesifik atau pilih dari menu.";
-                return [
-                    'success' => true,
-                    'intent' => 'faq_suggestions',
-                    'reply' => $reply,
-                    'state_update' => null,
-                ];
-            }
-
-            $top = $faqData['results'][0];
-            return [
-                'success' => true,
-                'intent' => 'faq_match',
-                'reply' => "✅ *{$top['question']}*\n\n{$top['answer']}\n\nKetik *MENU* untuk kembali.",
-                'state_update' => null,
-            ];
+            // We can just use SyaratHandler to format it properly with links
+            return $this->syaratHandler->search($messageLower);
         }
 
         // --- AI SMART FALLBACK ---
@@ -479,7 +469,9 @@ class IntentHandler
     protected function getUnknownIntentMessage(): string
     {
         return "🙏 *Mohon maaf*, saya belum mengenali pesan tersebut.\n\n" .
-            "Agar dapat kami layani dengan baik, silakan pilih nomor layanan (1-5) atau ketik *MENU* untuk melihat daftar layanan utama kami.\n\n" .
+            "Agar kami dapat melayani dengan baik, silakan:\n" .
+            "1️⃣ Ketik *MENU* untuk melihat layanan utama\n" .
+            "2️⃣ Ketik apa yang ingin Anda cari (Contoh: *syarat KK* atau *cek status*)\n\n" .
             "Terima kasih atas pengertiannya! 😊";
     }
 
@@ -543,16 +535,17 @@ class IntentHandler
         } elseif ($this->containsIntent($message, ['polisi', 'maling', 'rampok', 'begal', 'kriminal'])) {
             $reply .= "👮 *KEAMANAN (Polisi):* Hubungi Call Center Polri di *110*\n\n";
         } elseif ($this->containsIntent($message, ['ambulance', 'ambulans', 'kecelakaan', 'hamil', 'melahirkan', 'pingsan'])) {
-            $reply .= "🚑 *DARURAT MEDIS / AMBULANCE:* Segera hubungi Call Center Kesehatan di *119*\n\n";
+            $reply .= "🚑 *DARURAT MEDIS / AMBULANCE:*\n";
+            $reply .= "☎️ Hubungi: *119*\n";
+            $reply .= "🟢 WhatsApp: *081 8181 91 119* (Khusus Ambulans)\n\n";
             if (str_contains($message, 'hamil') || str_contains($message, 'melahirkan')) {
                 $reply .= "🤰 *INFO PERSALINAN:* Tetap tenang, siapkan buku KIA/KK, dan segera menuju Puskesmas/RS terdekat atau hubungi bidan desa.\n\n";
             }
         }
 
         if (!(str_contains($message, 'korupsi') || str_contains($message, 'pungli') || str_contains($message, 'penyelewengan'))) {
-            $reply .= "🆘 *CALL CENTER KAB. PROBOLINGGO:*\n";
-            $reply .= "☎️ Telp: (0298) 343 0000\n";
-            $reply .= "🟢 WA: 081 8181 91 119 *(Khusus Ambulans)*\n\n";
+            $reply .= "🆘 *PANGGILAN DARURAT (UMUM):*\n";
+            $reply .= "☎️ Hubungi: *112* (Bebas Pulsa)\n\n";
         }
 
         $reply .= "Ketik *MENU* untuk layanan lainnya.";

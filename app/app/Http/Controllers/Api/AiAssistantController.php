@@ -148,7 +148,7 @@ class AiAssistantController extends Controller
         $systemPrompt .= "PERINTAH KHUSUS:\n";
         $systemPrompt .= "- JANGAN PERNAH memberikan jawaban template yang kaku. Jadilah asisten yang melayani dengan tulus.\n";
         $systemPrompt .= "- Jika warga ingin LAPOR, MENGADU, ADUAN, CURHAT, atau LAPORAN: Tunjukkan empati yang mendalam, lalu WAJIB berikan link pengaduan resmi di: " . $this->getPublicUrl() . "/layanan/pengaduan\n";
-        $systemPrompt .= "- Jika warga mencari Loker/UMKM/Jasa, arahkan ke Pusat Ekonomi {$regionName} di: " . $this->getPublicUrl() . "/ekonomi\n\n";
+        $systemPrompt .= "- Jika warga mencari JASA, UMKM, INFO MASAKAN, MAKANAN, atau hal terkait EKONOMI: Arahkan ke Pusat Ekonomi {$regionName} di: " . $this->getPublicUrl() . "/ekonomi\n\n";
 
         if (!empty($botInstruction)) {
             $systemPrompt .= "\nINSTRUKSI TAMBAHAN ADMIN:\n" . $botInstruction . "\n";
