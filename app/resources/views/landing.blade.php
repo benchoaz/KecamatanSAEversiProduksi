@@ -669,6 +669,40 @@ iv>
                 <p class="text-slate-500 max-w-2xl mx-auto font-medium leading-relaxed">
                     Proses administrasi cepat untuk rekomendasi, validasi, dan koordinasi publik tingkat kecamatan.
                 </p>
+
+                {{-- Dynamic Branding Banner --}}
+                @if(appProfile()->branding_image_path && appProfile()->is_branding_active)
+                    <div class="mt-12 animate-fade-in">
+                        <div class="relative group">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                            <div class="relative bg-white rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
+                                <img src="{{ asset('storage/' . appProfile()->branding_image_path) }}" 
+                                     alt="Alur Pelayanan Terintegrasi"
+                                     class="w-full h-auto object-cover transform transition duration-700 group-hover:scale-[1.02]">
+                                
+                                {{-- Target Audience Specific Text Placeholder (If any announcement targeted here) --}}
+                                @php
+                                    $serviceAnnouncements = $publicAnnouncements->where('target_type', 'service')->first();
+                                @endphp
+                                @if($serviceAnnouncements)
+                                    <div class="bg-teal-50 p-6 border-t border-teal-100">
+                                        <div class="flex items-start gap-4">
+                                            <div class="w-10 h-10 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center shrink-0">
+                                                <i class="fas fa-bullhorn"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="text-sm font-black text-teal-800 uppercase tracking-wider mb-1">Informasi Khusus Pelayanan</h4>
+                                                <p class="text-xs text-teal-700 leading-relaxed font-medium">
+                                                    {{ $serviceAnnouncements->content }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

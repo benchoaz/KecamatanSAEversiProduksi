@@ -48,9 +48,18 @@
                                         <p class="text-slate-400 text-[11px] mb-0 text-truncate">{{ $item->content }}</p>
                                     </td>
                                     <td class="py-3">
-                                        <span
-                                            class="badge bg-slate-100 text-slate-600 rounded-pill px-2 py-1 text-[10px] fw-bold">
-                                            {{ strtoupper($item->target_type) }}
+                                        <span class="badge {{ $item->target_type == 'service' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-100 text-slate-600' }} rounded-pill px-2 py-1 text-[10px] fw-bold">
+                                            @if($item->target_type == 'service')
+                                                PELAYANAN
+                                            @elseif($item->target_type == 'public')
+                                                LANDING PAGE
+                                            @elseif($item->target_type == 'all_desa')
+                                                SEMUA DESA
+                                            @elseif($item->target_type == 'internal')
+                                                INTERNAL
+                                            @else
+                                                DESA TERPILIH
+                                            @endif
                                         </span>
                                         @if($item->target_type == 'specific_desa' && $item->target_desa_ids)
                                             <div class="text-[9px] text-slate-400 mt-1 italic">

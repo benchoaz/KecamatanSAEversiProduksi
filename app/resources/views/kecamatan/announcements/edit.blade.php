@@ -40,8 +40,8 @@
                                     <label class="form-label small fw-bold text-slate-700">Target Audiens</label>
                                     <select name="target_type" id="target_type"
                                         class="form-select bg-slate-50 border-slate-200" required>
-                                        <option value="public" {{ $announcement->target_type == 'public' ? 'selected' : '' }}>
-                                            Publik (Landing Page)</option>
+                                        <option value="public" {{ $announcement->target_type == 'public' ? 'selected' : '' }}>Publik (Landing Page)</option>
+                                        <option value="service" {{ $announcement->target_type == 'service' ? 'selected' : '' }}>Publik (Halaman Pelayanan)</option>
                                         <option value="all_desa" {{ $announcement->target_type == 'all_desa' ? 'selected' : '' }}>Semua Desa (Dashboard Desa)</option>
                                         <option value="specific_desa" {{ $announcement->target_type == 'specific_desa' ? 'selected' : '' }}>Desa Tertentu</option>
                                         <option value="internal" {{ $announcement->target_type == 'internal' ? 'selected' : '' }}>Internal Kecamatan Saja</option>

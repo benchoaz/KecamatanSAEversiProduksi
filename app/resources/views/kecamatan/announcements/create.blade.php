@@ -41,6 +41,7 @@
                                     <select name="target_type" id="target_type"
                                         class="form-select bg-slate-50 border-slate-200" required>
                                         <option value="public">Publik (Landing Page)</option>
+                                        <option value="service">Publik (Halaman Pelayanan)</option>
                                         <option value="all_desa">Semua Desa (Dashboard Desa)</option>
                                         <option value="specific_desa">Desa Tertentu</option>
                                         <option value="internal">Internal Kecamatan Saja</option>
