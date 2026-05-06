@@ -50,7 +50,7 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8faf8 0%, #f0f4f0 100%);
+            background: #ffffff !important;
         }
         
         /* Modern Sidebar with Sage Green */

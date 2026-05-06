@@ -42,7 +42,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--desa-bg);
+            background: #ffffff !important;
             color: var(--desa-text);
             font-size: 14px;
         }
