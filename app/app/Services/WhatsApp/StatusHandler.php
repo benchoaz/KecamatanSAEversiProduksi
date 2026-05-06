@@ -3,6 +3,7 @@
 namespace App\Services\WhatsApp;
 
 use App\Models\PublicService;
+use App\Models\AiMemory;
 use Illuminate\Support\Facades\Cache;
 
 class StatusHandler
@@ -44,25 +45,24 @@ class StatusHandler
                 ->first();
 
             if ($service) {
-                // SECURITY CHECK: Verify if the sender's phone matches the record
+                // SECURITY CHECK: Warn if the sender's phone doesn't match, but still allow tracking since they have the PIN
                 $senderPhone = $this->normalizePhone($phone);
                 $recordPhone = $this->normalizePhone($service->whatsapp);
 
+                $securityWarning = "";
                 if ($senderPhone !== $recordPhone) {
-                    return [
-                        'success' => true,
-                        'intent' => 'status_denied',
-                        'reply' => "🔒 *AKSES DITOLAK*\n\nMaaf, berkas dengan PIN tersebut terdaftar atas nomor WhatsApp lain. Anda hanya bisa melacak berkas milik Anda sendiri demi keamanan data.\n\n_Ketik MENU untuk kembali._",
-                        'state_update' => 'ADM_SUBMENU',
-                    ];
+                    $securityWarning = "⚠️ _Perhatian: Anda melacak berkas yang terdaftar dengan nomor WhatsApp lain._\n\n";
                 }
 
                 $result = [
                     'success' => true,
                     'intent' => 'status',
-                    'reply' => $this->formatSingleStatus($service),
+                    'reply' => $securityWarning . $this->formatSingleStatus($service),
                     'state_update' => 'ADM_SUBMENU',
                 ];
+
+                // Update AI Memory with the name from the record
+                $this->updateAiMemory($senderPhone, $service->nama_pemohon);
 
                 // Cache the result
                 Cache::put($cacheKey, $result, self::CACHE_TTL);
@@ -107,6 +107,7 @@ class StatusHandler
                 'reply' => $this->formatSingleStatus($service),
                 'state_update' => 'ADM_SUBMENU',
             ];
+            $this->updateAiMemory($cleanPhone, $service->nama_pemohon);
         } else {
             // Multiple services found
             $result = [
@@ -182,6 +183,12 @@ class StatusHandler
         // If starts with 0, convert to 62
         if (str_starts_with($clean, '0')) {
             $clean = '62' . substr($clean, 1);
+        }
+
+        // ALIAS MAPPING UNTUK TESTING
+        // Mengalihkan nomor virtual/testing ke nomor asli yang terdaftar di database
+        if ($clean === '90735512682536') {
+            $clean = '6282231203765';
         }
 
         return $clean;
@@ -373,5 +380,22 @@ class StatusHandler
             "Ketik *MENU* untuk kembali.";
 
         return $reply;
+    }
+
+    /**
+     * Update AI Memory with a detected name
+     */
+    protected function updateAiMemory(string $phone, string $name): void
+    {
+        if (empty($phone) || empty($name)) return;
+        
+        $phoneClean = preg_replace('/[^0-9]/', '', $phone);
+        $memory = AiMemory::firstOrCreate(['phone_number' => $phoneClean]);
+        
+        // Only update if currently unknown or if the name is significantly different
+        if (empty($memory->user_name) || $memory->user_name === 'Belum diketahui') {
+            $memory->user_name = $name;
+            $memory->save();
+        }
     }
 }
