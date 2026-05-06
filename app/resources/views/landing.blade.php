@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {{-- SEO Meta Tags --}}
-    <title>KECAMATAN BESUK - TEST MODAL
+    <title>{{ appProfile()->full_region_name }}
         {{ $appProfile->region_parent ?? 'Kabupaten Probolinggo' }} – Layanan & Informasi Publik
     </title>
     <meta name="description"

@@ -96,7 +96,7 @@
                     <p class="text-tertiary small mb-4 font-medium leading-relaxed">Cetak rekapitulasi data administrasi dalam format PDF Premium.</p>
                     
                     <div class="d-grid gap-2 mt-auto">
-                        <a href="{{ route('kecamatan.pemerintahan.print.rekap') }}" target="_blank" class="btn btn-sm bg-emerald-600 text-white rounded-pill py-2 font-bold text-[10px] uppercase shadow-sm">
+                        <a href="{{ route('kecamatan.pemerintahan.detail.print.rekap') }}" target="_blank" class="btn btn-sm bg-emerald-600 text-white rounded-pill py-2 font-bold text-[10px] uppercase shadow-sm">
                             <i class="fas fa-print me-2"></i> Rekap Sekecamatan
                         </a>
                         <button type="button" data-bs-toggle="modal" data-bs-target="#modalPrintPerDesa" class="btn btn-sm btn-outline-emerald rounded-pill py-2 font-bold text-[10px] uppercase">
@@ -291,7 +291,7 @@
                     <div class="row g-0 p-3">
                         @foreach($desas as $desa)
                             <div class="col-md-6 p-2">
-                                <a href="{{ route('kecamatan.pemerintahan.print.desa', ['desa_id' => $desa->id]) }}" target="_blank"
+                                <a href="{{ route('kecamatan.pemerintahan.detail.print.desa', ['desa_id' => $desa->id]) }}" target="_blank"
                                    class="d-flex align-items-center justify-content-between p-3 rounded-4 border bg-white text-decoration-none hover-shadow-emerald transition-all group-item">
                                     <div class="d-flex align-items-center">
                                         <div class="bg-slate-50 text-slate-400 rounded-3 d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
