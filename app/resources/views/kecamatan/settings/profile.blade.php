@@ -173,8 +173,8 @@
                                                 <!-- NEW: ON/OFF TOGGLE -->
                                                 <div class="mt-4 p-3 bg-white rounded-3 border border-emerald-100 d-flex align-items-center justify-content-between">
                                                     <div>
-                                                        <span class="d-block text-slate-700 fw-bold text-sm">Aktifkan Popup Selamat Datang</span>
-                                                        <span class="text-[10px] text-slate-500">Muncul otomatis saat pengunjung pertama kali membuka website.</span>
+                                                        <span class="d-block text-slate-700 fw-bold text-sm">Aktifkan Banner Branding Layanan</span>
+                                                        <span class="text-[10px] text-slate-500">Tampilkan banner visual branding di halaman pelayanan utama.</span>
                                                     </div>
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input" type="checkbox" name="is_branding_active" id="is_branding_active" 

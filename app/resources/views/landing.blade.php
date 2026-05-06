@@ -3143,58 +3143,6 @@ iv>
             });
         });
     </script>
-    @if(appProfile()->branding_image_path && appProfile()->is_branding_active)
-    <!-- Welcome Branding Modal -->
-    <dialog id="welcome_branding_modal" class="modal modal-middle backdrop-blur-md transition-all duration-500">
-        <div class="modal-box p-0 bg-transparent shadow-none border-none max-w-4xl w-11/12 overflow-visible">
-            <div class="relative group">
-                <!-- Close Button (Floating) -->
-                <form method="dialog" class="absolute -top-12 right-0 md:-right-12 z-50">
-                    <button class="btn btn-circle bg-white/20 hover:bg-white/40 border-white/30 text-white backdrop-blur-md transition-all">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </form>
-
-                <!-- Branding Image -->
-                <div class="bg-white/10 backdrop-blur-xl p-2 md:p-4 rounded-[2.5rem] md:rounded-[4rem] border border-white/30 shadow-2xl overflow-hidden animate-zoom-in">
-                    <img src="{{ asset('storage/' . appProfile()->branding_image_path) }}" 
-                         alt="Welcome to {{ appProfile()->region_name }}" 
-                         class="w-full h-auto max-h-[80vh] object-contain rounded-[2rem] md:rounded-[3.5rem] shadow-2xl">
-                </div>
-
-                <!-- Glow Effect Behind -->
-                <div class="absolute -inset-10 bg-emerald-500/20 rounded-full blur-[100px] -z-10 animate-pulse"></div>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop bg-slate-900/60 backdrop-blur-sm">
-            <button>close</button>
-        </form>
-    </dialog>
-
-    <style>
-        @keyframes zoom-in {
-            from { opacity: 0; transform: scale(0.9) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .animate-zoom-in {
-            animation: zoom-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-    </style>
-
-    <script>
-        window.onload = function() {
-            const modal = document.getElementById('welcome_branding_modal');
-            if (modal && window.innerWidth >= 1024) {
-                // Check if already shown in this session
-                if (!sessionStorage.getItem('branding_shown')) {
-                    setTimeout(() => {
-                        modal.showModal();
-                        sessionStorage.setItem('branding_shown', 'true');
-                    }, 1000);
-                }
-            }
-        };
-    </script>
     @endif
 </body>
 
