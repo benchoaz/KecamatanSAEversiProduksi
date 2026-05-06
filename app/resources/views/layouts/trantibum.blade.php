@@ -48,8 +48,9 @@
             --sage-950: #151b15;
         }
         
-        body {
+        body, .app-container, .main-content, .page-content {
             font-family: 'Inter', sans-serif;
+            background-color: #ffffff !important;
             background: #ffffff !important;
         }
         
@@ -204,7 +205,7 @@
             border: none;
             border-radius: 16px;
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-            background: rgba(255, 255, 255, 0.95);
+            background: #ffffff !important;
             backdrop-filter: blur(10px);
         }
         
