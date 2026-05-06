@@ -56,14 +56,16 @@
         
         /* Modern Sidebar with Sage Green */
         .sidebar {
-            background: linear-gradient(180deg, var(--sage-800) 0%, var(--sage-950) 100%) !important;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            border-right: 1px solid #e2e8f0 !important;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
         }
         
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+            border-bottom: 1px solid #f1f5f9;
+            background: #ffffff !important;
         }
         
         .sidebar-header .logo-icon {
@@ -75,16 +77,15 @@
         .logo-title {
             font-size: 0.85rem;
             letter-spacing: 0.1em;
-            background: linear-gradient(135deg, #fff 0%, var(--sage-200) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #1e293b !important;
+            font-weight: 800;
         }
         
         .logo-subtitle {
-            color: var(--sage-300) !important;
+            color: #64748b !important;
             font-size: 0.65rem;
             letter-spacing: 0.05em;
+            font-weight: 600;
         }
         
         /* Navigation Styling */
@@ -101,7 +102,7 @@
             padding: 0.75rem 1.25rem;
             margin: 0.15rem 0.75rem;
             border-radius: 12px;
-            color: rgba(255, 255, 255, 0.75);
+            color: #475569 !important;
             font-weight: 500;
             font-size: 0.875rem;
             transition: all 0.2s ease;
@@ -109,16 +110,16 @@
         }
         
         .nav-link:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
+            background: #f8fafc;
+            color: #1e293b !important;
             transform: translateX(4px);
         }
         
         .nav-link.active {
-            background: linear-gradient(135deg, rgba(163, 177, 163, 0.2) 0%, rgba(163, 177, 163, 0.1) 100%);
-            color: #fff;
-            border-left-color: var(--sage-400) !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: #f0fdf4 !important;
+            color: #16a34a !important;
+            border-left-color: #16a34a !important;
+            box-shadow: none;
         }
         
         .nav-icon {
@@ -127,29 +128,31 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.08);
+            background: #f1f5f9;
             border-radius: 10px;
             margin-right: 0.75rem;
             font-size: 0.9rem;
+            color: #64748b;
         }
         
         .nav-link.active .nav-icon {
-            background: linear-gradient(135deg, var(--sage-400) 0%, var(--sage-500) 100%);
-            box-shadow: 0 4px 12px rgba(95, 115, 95, 0.3);
+            background: #16a34a;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
         }
         
         /* Sidebar Footer */
         .sidebar-footer {
             padding: 1.25rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(0, 0, 0, 0.15);
+            border-top: 1px solid #f1f5f9;
+            background: #ffffff !important;
         }
         
         .user-card {
-            background: rgba(255, 255, 255, 0.05) !important;
+            background: #f8fafc !important;
             border-radius: 16px;
             padding: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid #e2e8f0 !important;
         }
         
         .user-avatar {
@@ -170,7 +173,8 @@
         
         .user-role {
             font-size: 0.7rem;
-            color: var(--sage-300) !important;
+            color: #64748b !important;
+            font-weight: 600;
         }
         
         /* Modern Button */
@@ -201,11 +205,14 @@
         }
         
         /* Modern Cards */
+        .card:not([class*="bg-"]) {
+            background: #ffffff !important;
+        }
+        
         .card {
             border: none;
             border-radius: 16px;
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-            background: #ffffff !important;
             backdrop-filter: blur(10px);
         }
         
