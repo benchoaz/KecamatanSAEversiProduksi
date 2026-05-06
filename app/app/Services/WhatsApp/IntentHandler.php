@@ -468,8 +468,8 @@ class IntentHandler
     {
         return "🙏 *Mohon maaf*, saya belum mengenali pesan tersebut.\n\n" .
             "Agar kami dapat melayani dengan baik, silakan:\n" .
-            "1️⃣ Ketik *MENU* untuk melihat layanan utama\n" .
-            "2️⃣ Ketik apa yang ingin Anda cari (Contoh: *syarat KK* atau *cek status*)\n\n" .
+            "• Ketik *MENU* untuk melihat layanan utama\n" .
+            "• Ketik apa yang ingin Anda cari (Contoh: *syarat KK* atau *cek status*)\n\n" .
             "Terima kasih atas pengertiannya! 😊";
     }
 
