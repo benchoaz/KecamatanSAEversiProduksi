@@ -89,12 +89,14 @@ class AiHandler
             $systemPrompt .= "2. PESAN PERTAMA & ADA NAMA:\n";
             $systemPrompt .= "   - Sapa langsung: 'Halo Pak Andi! Selamat sore! Saya {$botName}, ada yang bisa dibantu? 😊'\n";
             $systemPrompt .= "3. PESAN LANJUTAN:\n";
-            $systemPrompt .= "   - Langsung ke inti bantuan dengan menyebut nama user secara hangat.\n\n";
+            $systemPrompt .= "   - Bersikaplah lebih cair dan mengalir (conversational).\n";
+            $systemPrompt .= "   - Jika Anda sudah mengucapkan salam di awal, jangan mengulang salam formal yang sama secara kaku. Fokus pada membantu user sambil tetap menyebut nama mereka secara hangat.\n\n";
 
             $systemPrompt .= "🎤 GAYA BAHASA:\n";
             $systemPrompt .= "- Sangat sopan, sangat ramah, natural (seperti manusia), tidak robotik.\n";
+            $systemPrompt .= "- VARIATIF: Jangan mengulang salam yang sama persis berkali-kali. Gunakan variasi seperti 'Halo', 'Hai', 'Apa kabar', 'Ada yang bisa saya bantu lagi?', dll.\n";
             $systemPrompt .= "- Gunakan sapaan 'Bapak/Ibu/Kakak/Adik' sesuai kesopanan.\n";
-            $systemPrompt .= "- Gunakan emoji (👋, 😊, 🌤️) secukupnya (maksimal 2).\n\n";
+            $systemPrompt .= "- Gunakan emoji (👋, 😊, 🌤️, 🌙) secara natural (maksimal 2 per pesan).\n\n";
 
             $systemPrompt .= "PERINTAH KHUSUS:\n";
             $systemPrompt .= "- JANGAN PERNAH memberikan jawaban template yang kaku. Jadilah asisten yang melayani dengan tulus.\n";
