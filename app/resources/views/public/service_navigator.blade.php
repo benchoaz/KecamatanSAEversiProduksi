@@ -1207,9 +1207,6 @@ async function loadLeafForm(nodeId, nodeName, showIdentity = true, sopText = '')
         sopBox.classList.add('hidden');
     }
 
-    // Toggle Child Specific Fields & Labels
-    toggleChildFields(nodeName);
-
     // Toggle Identity Form
     const idSection = document.getElementById('snIdentitySection');
     const idInputs  = idSection?.querySelectorAll('input, select');
@@ -1220,6 +1217,9 @@ async function loadLeafForm(nodeId, nodeName, showIdentity = true, sopText = '')
         idSection?.classList.add('hidden');
         idInputs?.forEach(input => input.removeAttribute('required'));
     }
+
+    // Toggle Child Specific Fields & Labels (Must be after general identity toggle to override requirements)
+    toggleChildFields(nodeName);
 
     // Render requirements using shared function
     renderRequirements(reqs);
@@ -1319,6 +1319,9 @@ document.getElementById('snForm').addEventListener('submit', async function(e) {
     if (identitySection && !identitySection.classList.contains('hidden')) {
         const requiredInputs = identitySection.querySelectorAll('input[required], select[required]');
         for (const input of requiredInputs) {
+            // Abaikan field yang tersembunyi (seperti field anak pada layanan dewasa)
+            if (input.offsetParent === null) continue;
+
             if (!input.value || !input.value.trim()) {
                 const label = input.closest('.sn-field-group')?.querySelector('label')?.textContent?.trim()
                            || input.placeholder
