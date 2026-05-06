@@ -124,6 +124,11 @@
                                        minlength="16" maxlength="16" pattern="\d{16}" required>
                             </div>
                             <div class="sn-field">
+                                <label class="sn-label">Nomor KK (16 digit) <span>*</span></label>
+                                <input type="tel" name="no_kk" class="sn-input" placeholder="35XXXXXXXXXXXXXX"
+                                       minlength="16" maxlength="16" pattern="\d{16}" required>
+                            </div>
+                            <div class="sn-field">
                                 <label class="sn-label">WhatsApp Aktif <span>*</span></label>
                                 <div class="sn-input-prefix">
                                     <span>+62</span>

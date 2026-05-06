@@ -179,6 +179,7 @@ class LayananController extends Controller
             // Applicant Extra Info
             'applicant_name'     => 'nullable|string|max:255',
             'applicant_nik'      => 'nullable|string|size:16',
+            'no_kk'              => 'nullable|string|size:16|regex:/^[0-9]+$/',
             
             // Child Extra Info
             'child_gender'       => 'nullable|string|max:20',
@@ -216,6 +217,10 @@ class LayananController extends Controller
 
                 // Build rich Uraian with extra data
                 $extraUraian = "";
+
+                if ($request->no_kk) {
+                    $extraUraian .= "\nNO. KK: " . $request->no_kk;
+                }
                 
                 // Child Data (if birth service)
                 if ($request->child_gender || $request->child_pob || $request->child_dob) {
