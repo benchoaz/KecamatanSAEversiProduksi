@@ -170,11 +170,11 @@
                                         @if($pensiunDate && !$isExpired)
                                             <div class="mt-1">
                                                 @if($isUrgent)
-                                                    <span class="badge bg-warning-subtle text-warning-emphasis x-small border border-warning-subtle">
+                                                    <span class="badge bg-warning-100 text-amber-900 x-small border border-warning-200">
                                                         <i class="fas fa-exclamation-triangle me-1"></i> Sisa {{ now()->diffInMonths($pensiunDate) }} Bulan
                                                     </span>
                                                 @else
-                                                    <span class="badge bg-emerald-50 text-emerald-600 x-small border border-emerald-100">
+                                                    <span class="badge bg-emerald-100 text-emerald-900 x-small border border-emerald-200">
                                                         <i class="fas fa-check-circle me-1"></i> Aktif ({{ now()->diffInYears($pensiunDate) }} Thn lagi)
                                                     </span>
                                                 @endif
