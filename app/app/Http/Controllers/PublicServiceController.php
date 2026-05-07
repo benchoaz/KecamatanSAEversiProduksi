@@ -12,8 +12,11 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
+use App\Traits\HasWhatsAppNotifications;
+
 class PublicServiceController extends Controller
 {
+    use HasWhatsAppNotifications;
     protected $portalService;
 
     public function __construct(PortalService $portalService)
@@ -188,9 +191,13 @@ class PublicServiceController extends Controller
             }
         }
 
-        // 8. Send WhatsApp notification to reporter via standardized PortalService
+        // 8. Send WhatsApp notification to reporter & operator
         try {
+            // Send to reporter
             $this->portalService->sendComplaintConfirmation($service);
+            
+            // Send to operator (newly added for Pengaduan)
+            $this->sendToOperator($service);
         } catch (\Exception $e) {
             \Log::warning('WA notification gagal (non-fatal): ' . $e->getMessage());
         }
