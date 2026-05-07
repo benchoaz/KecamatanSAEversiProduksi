@@ -104,7 +104,8 @@ class PublicServiceController extends Controller
             'nik' => 'nullable|string|max:16',
             'uraian' => 'required|string|max:1000',
             'whatsapp' => 'required|string|regex:/^[0-9+]+$/',
-            'foto.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120'
+            'foto.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'privacy_type' => 'nullable|in:normal,rahasia,anonim'
         ]);
 
         if ($validator->fails()) {
@@ -116,11 +117,21 @@ class PublicServiceController extends Controller
             $desaId = null;
         }
 
+        // Mask data if Anonim
+        $namaPemohon = $request->nama_pemohon ?? 'Warga (Web)';
+        $nik = $request->nik;
+        $privacyType = $request->input('privacy_type', PublicService::PRIVACY_NORMAL);
+
+        if ($privacyType === PublicService::PRIVACY_ANONIM) {
+            $namaPemohon = 'ANONIM';
+            $nik = null;
+        }
+
         // 6. Create record (Status: Menunggu Verification)
         $service = PublicService::create([
             'uuid' => (string) Str::uuid(),
-            'nama_pemohon' => $request->nama_pemohon ?? 'Warga (Web)',
-            'nik' => $request->nik,
+            'nama_pemohon' => $namaPemohon,
+            'nik' => $nik,
             'desa_id' => $desaId,
             'jenis_layanan' => $request->jenis_layanan,
             'uraian' => $request->uraian,
@@ -129,7 +140,8 @@ class PublicServiceController extends Controller
             'ip_address' => $request->ip(),
             'status' => PublicService::STATUS_MENUNGGU,
             'category' => $request->input('category', PublicService::CATEGORY_PELAYANAN),
-            'source' => $request->input('source', 'web_form')
+            'source' => $request->input('source', 'web_form'),
+            'privacy_type' => $request->input('privacy_type', PublicService::PRIVACY_NORMAL)
         ]);
 
         // 6b. GUEST BOOK INTEGRATION: Create record in pengunjung_kecamatan
@@ -318,6 +330,8 @@ class PublicServiceController extends Controller
             'status_label' => $service->status_label,
             'status_color' => $service->status_color,
             'created_at' => $service->created_at->format('d M Y, H:i'),
+            'privacy_type' => $service->privacy_type,
+            'nama_pemohon' => ($service->privacy_type === 'anonim') ? 'ANONIM' : $service->nama_pemohon,
             'public_response' => $service->effective_public_response,
             'completion_type' => $service->completion_type,
             'rating' => $service->rating,

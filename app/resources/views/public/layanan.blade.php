@@ -312,6 +312,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
                         <div class="space-y-6">
                             <div class="group">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Nama Pelapor</span>
+                                <p class="text-lg font-black text-slate-800">${data.nama_pemohon}</p>
+                            </div>
+                            <div class="group">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Tipe Privasi</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-black uppercase tracking-widest border">
+                                        <i class="fas ${data.privacy_type === 'anonim' ? 'fa-user-secret' : (data.privacy_type === 'rahasia' ? 'fa-shield-alt' : 'fa-globe')} mr-1"></i>
+                                        ${data.privacy_type.toUpperCase()}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="group">
                                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Jenis Layanan</span>
                                 <p class="text-lg font-black text-slate-800">${data.jenis_layanan}</p>
                             </div>

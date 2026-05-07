@@ -1611,18 +1611,48 @@
                     <p class="text-[10px] text-slate-400 mt-1">JPG, PNG, atau PDF (Maks. 5MB per file)</p>
                 </div>
 
-                <!-- Anonim / Rahasia -->
-                <div class="flex items-center gap-5">
-                    <label class="flex items-center gap-2 cursor-pointer group">
-                        <input type="checkbox" name="is_anonim" class="checkbox checkbox-sm" value="1">
-                        <span
-                            class="text-sm text-slate-600 font-medium group-hover:text-rose-600 transition-colors">Anonim</span>
+                <!-- Privasi Pengaduan -->
+                <div class="space-y-3 pt-2">
+                    <label class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
+                        Privasi Pengaduan
+                        <div class="tooltip tooltip-right" data-tip="Pilih tingkat kerahasiaan identitas Anda">
+                            <i class="fas fa-question-circle text-slate-300"></i>
+                        </div>
                     </label>
-                    <label class="flex items-center gap-2 cursor-pointer group">
-                        <input type="checkbox" name="is_rahasia" class="checkbox checkbox-sm" value="1">
-                        <span
-                            class="text-sm text-slate-600 font-medium group-hover:text-rose-600 transition-colors">Rahasia</span>
-                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <!-- Normal -->
+                        <label class="flex flex-col p-3 border-2 border-slate-100 rounded-2xl cursor-pointer hover:border-teal-500 transition-all group">
+                            <div class="flex items-center gap-2 mb-1">
+                                <input type="radio" name="privacy_type" value="normal" class="radio radio-sm radio-primary" checked>
+                                <span class="text-sm font-bold text-slate-700 group-hover:text-teal-600">Publik</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-tight">Laporan dapat dilihat oleh publik sebagai transparansi.</p>
+                        </label>
+                        
+                        <!-- Rahasia -->
+                        <label class="flex flex-col p-3 border-2 border-slate-100 rounded-2xl cursor-pointer hover:border-rose-500 transition-all group">
+                            <div class="flex items-center gap-2 mb-1">
+                                <input type="radio" name="privacy_type" value="rahasia" class="radio radio-sm radio-error">
+                                <span class="text-sm font-bold text-slate-700 group-hover:text-rose-600">Rahasia</span>
+                                <div class="tooltip tooltip-top" data-tip="Identitas hanya dapat diakses petugas tertentu untuk tindak lanjut.">
+                                    <i class="fas fa-shield-alt text-[10px] text-slate-300 hover:text-rose-400"></i>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-tight">Identitas Anda dilindungi dan tidak dipublikasikan.</p>
+                        </label>
+
+                        <!-- Anonim -->
+                        <label class="flex flex-col p-3 border-2 border-slate-100 rounded-2xl cursor-pointer hover:border-rose-500 transition-all group">
+                            <div class="flex items-center gap-2 mb-1">
+                                <input type="radio" name="privacy_type" value="anonim" class="radio radio-sm radio-error">
+                                <span class="text-sm font-bold text-slate-700 group-hover:text-rose-600">Anonim</span>
+                                <div class="tooltip tooltip-top" data-tip="Nama dan identitas pelapor disembunyikan sepenuhnya.">
+                                    <i class="fas fa-user-secret text-[10px] text-slate-300 hover:text-rose-400"></i>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-tight">Identitas Anda tidak akan diketahui instansi.</p>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Disclaimer -->
@@ -2327,12 +2357,11 @@
                 return;
             }
 
-            // Build privacy flags from checkboxes
-            const _isAnonim = form.querySelector('[name="is_anonim"]')?.checked;
-            const _isRahasia = form.querySelector('[name="is_rahasia"]')?.checked;
+            // Build privacy flags from radio buttons
+            const privacyType = form.querySelector('[name="privacy_type"]:checked')?.value || 'normal';
             let _privTags = '';
-            if (_isAnonim) _privTags += '[ANONIM]';
-            if (_isRahasia) _privTags += '[RAHASIA]';
+            if (privacyType === 'anonim') _privTags = '[ANONIM]';
+            if (privacyType === 'rahasia') _privTags = '[RAHASIA]';
 
             // Build combined uraian string WITHOUT touching the visible textarea
             // This prevents [Aspirasi] from appearing in the textarea on any click

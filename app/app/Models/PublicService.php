@@ -23,6 +23,11 @@ class PublicService extends Model
     public const STATUS_SELESAI = 'selesai';
     public const STATUS_DITOLAK = 'ditolak';
 
+    // Privacy Types
+    public const PRIVACY_NORMAL = 'normal';
+    public const PRIVACY_RAHASIA = 'rahasia';
+    public const PRIVACY_ANONIM = 'anonim';
+
     protected $guarded = [];
 
     /**

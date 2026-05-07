@@ -34,11 +34,24 @@
                             'ditolak' => ['bg' => 'bg-rose-100', 'text' => 'text-rose-700', 'icon' => 'fa-times', 'label' => 'Ditolak'],
                         ];
                         $cfg = $statusConfig[$pengaduan->status] ?? $statusConfig['menunggu_verifikasi'];
+
+                        $privacyConfig = [
+                            'normal' => ['bg' => 'bg-slate-100', 'text' => 'text-slate-600', 'icon' => 'fa-globe', 'label' => 'Publik'],
+                            'rahasia' => ['bg' => 'bg-rose-100', 'text' => 'text-rose-700', 'icon' => 'fa-shield-alt', 'label' => 'Rahasia'],
+                            'anonim' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-700', 'icon' => 'fa-user-secret', 'label' => 'Anonim'],
+                        ];
+                        $pCfg = $privacyConfig[$pengaduan->privacy_type] ?? $privacyConfig['normal'];
                     @endphp
-                    <span class="badge {{ $cfg['bg'] }} {{ $cfg['text'] }} text-sm px-3 py-2 rounded-pill">
-                        <i class="fas {{ $cfg['icon'] }} me-1"></i>
-                        {{ $cfg['label'] }}
-                    </span>
+                    <div class="d-flex gap-2">
+                        <span class="badge {{ $pCfg['bg'] }} {{ $pCfg['text'] }} text-xs px-2 py-1.5 rounded-pill border">
+                            <i class="fas {{ $pCfg['icon'] }} me-1"></i>
+                            {{ $pCfg['label'] }}
+                        </span>
+                        <span class="badge {{ $cfg['bg'] }} {{ $cfg['text'] }} text-xs px-2 py-1.5 rounded-pill border">
+                            <i class="fas {{ $cfg['icon'] }} me-1"></i>
+                            {{ $cfg['label'] }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,6 +73,23 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    @if($pengaduan->privacy_type === 'anonim')
+                    <div class="alert alert-purple border-0 bg-purple-50 text-purple-700 rounded-3 py-2 px-3 mb-3 d-flex align-items-center gap-2">
+                        <i class="fas fa-user-secret fs-5"></i>
+                        <div class="small">
+                            <b class="d-block">Laporan Anonim</b>
+                            Identitas asli pelapor disembunyikan sesuai permintaan privasi.
+                        </div>
+                    </div>
+                    @elseif($pengaduan->privacy_type === 'rahasia')
+                    <div class="alert alert-danger border-0 bg-rose-50 text-rose-700 rounded-3 py-2 px-3 mb-3 d-flex align-items-center gap-2">
+                        <i class="fas fa-shield-alt fs-5"></i>
+                        <div class="small">
+                            <b class="d-block">Laporan Rahasia</b>
+                            Identitas pelapor harus dijaga kerahasiaannya dan tidak boleh dipublikasikan.
+                        </div>
+                    </div>
+                    @endif
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-1 d-block">Nama Lengkap</label>

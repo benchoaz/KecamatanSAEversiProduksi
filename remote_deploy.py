@@ -18,7 +18,7 @@ if __name__ == "__main__":
     pw = "nebula-57@-ocean"
     
     # Combined command for the VPS
-    vps_command = f"cd kecamatanSAE && echo '{pw}' | sudo -S chown -R ubuntu:ubuntu app/storage && git reset --hard origin/main && git pull origin main && docker compose -f docker-compose.vps.yml up -d --build && docker exec kecamatan-app php artisan optimize:clear"
+    vps_command = f"cd kecamatanSAE && echo '{pw}' | sudo -S chown -R ubuntu:ubuntu app/storage && git reset --hard origin/main && git pull origin main && docker compose -f docker-compose.vps.yml up -d --build && docker exec kecamatan-app php artisan migrate --force && docker exec kecamatan-app php artisan optimize:clear"
     
     # I'll try to use sshpass directly in a subprocess
     try:
