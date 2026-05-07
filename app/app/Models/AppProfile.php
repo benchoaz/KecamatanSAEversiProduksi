@@ -33,6 +33,7 @@ class AppProfile extends Model
         'address',
         'phone',
         'whatsapp_complaint',
+        'whatsapp_service',
         'whatsapp_bot_number',
         'is_ai_active',
         'facebook_url',

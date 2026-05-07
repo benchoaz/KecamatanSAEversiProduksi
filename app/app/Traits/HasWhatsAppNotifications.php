@@ -125,10 +125,23 @@ trait HasWhatsAppNotifications
                 return;
             }
 
-            $operatorPhone = $profile ? $this->normalizePhone($profile->whatsapp_complaint) : null;
+            // Route based on category: Layanan vs Pengaduan
+            $operatorPhone = null;
+            if ($profile) {
+                if ($model->category === PublicService::CATEGORY_PENGADUAN) {
+                    $operatorPhone = $this->normalizePhone($profile->whatsapp_complaint);
+                } else {
+                    $operatorPhone = $this->normalizePhone($profile->whatsapp_service);
+                    
+                    // Fallback to complaint number if service number is empty
+                    if (!$operatorPhone) {
+                        $operatorPhone = $this->normalizePhone($profile->whatsapp_complaint);
+                    }
+                }
+            }
 
             if (!$operatorPhone) {
-                // Fallback: check WahaN8nSetting if profile is empty
+                // Global Fallback: check WahaN8nSetting if profile numbers are empty
                 $settings = WahaN8nSetting::getSettings();
                 $operatorPhone = $settings ? $this->normalizePhone($settings->operator_number) : null;
             }
