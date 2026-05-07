@@ -14,7 +14,7 @@ def run_remote(cmd):
         full_output = b""
         password_sent = False
         start = time.time()
-        while time.time() - start < 30:
+        while time.time() - start < 15:
             try:
                 chunk = os.read(fd, 4096)
                 if not chunk: break
@@ -26,21 +26,5 @@ def run_remote(cmd):
                 break
         return full_output.decode(errors='ignore')
 
-# 1. Pull changes
-print("Pulling changes...")
-print(run_remote("cd ~/kecamatanSAE && git pull origin main"))
-
-# 2. Fix permissions and clear cache
-print("\nFixing permissions and clearing cache...")
-cmds = [
-    "docker exec -u root kecamatan-app chown -R www-data:www-data storage bootstrap/cache",
-    "docker exec -u root kecamatan-app chmod -R 775 storage bootstrap/cache",
-    "docker exec kecamatan-app php artisan view:clear",
-    "docker exec kecamatan-app php artisan cache:clear",
-    "docker exec kecamatan-app php artisan config:clear"
-]
-for cmd in cmds:
-    print(f"Running: {cmd}")
-    print(run_remote(f"cd ~/kecamatanSAE && {cmd}"))
-
-print("\nDeployment complete.")
+print("Listing home:")
+print(run_remote("ls -F ~"))

@@ -560,7 +560,10 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    @forelse($publicAnnouncements->take(3) as $ann)
+                    @php
+                        $combinedAnnouncements = $publicAnnouncements->merge($serviceAnnouncements)->sortByDesc('priority')->take(3);
+                    @endphp
+                    @forelse($combinedAnnouncements as $ann)
                         <div
                             class="bg-slate-50 p-5 rounded-2xl border border-slate-200/50 hover:bg-white hover:border-teal-200 transition-all flex flex-col h-full">
                             <div class="flex justify-between items-start mb-3">
@@ -684,34 +687,8 @@
                 @endif
             </div>
 
-            {{-- Unified Service Announcement --}}
-            @php
-                $activeAnnouncement = $serviceAnnouncements->sortByDesc('priority')->first() ?? $publicAnnouncements->sortByDesc('priority')->first();
-            @endphp
-            
-            @if($activeAnnouncement)
-                <div class="max-w-4xl mx-auto mb-16 animate-fade-in">
-                    <div class="bg-teal-50 p-8 rounded-3xl border-2 border-teal-100 shadow-sm relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-teal-100/30 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-                        <div class="flex flex-col md:flex-row items-center md:items-start gap-6 relative">
-                            <div class="w-16 h-16 bg-white text-teal-600 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-teal-50">
-                                <i class="fas fa-bullhorn text-2xl"></i>
-                            </div>
-                            <div class="text-center md:text-left">
-                                <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
-                                    <h4 class="text-xs font-black text-teal-900 uppercase tracking-[0.2em]">Pusat Informasi Pelayanan</h4>
-                                    <span class="px-3 py-1 bg-teal-600 text-white text-[9px] font-black rounded-full shadow-sm animate-pulse">BERITA TERBARU</span>
-                                </div>
-                                <p class="text-base text-teal-800 leading-relaxed font-bold">
-                                    {{ $activeAnnouncement->content }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {{-- Spacing Fallback if no announcement --}}
+            {{-- Removed redundant large announcement block --}}
             <div class="h-8"></div>
-            @endif
 
             {{-- Tulisan Berjalan (Ticker) - Using Service Announcements if available, otherwise Public --}}
             @if($serviceAnnouncements->isNotEmpty() || $publicAnnouncements->isNotEmpty())
