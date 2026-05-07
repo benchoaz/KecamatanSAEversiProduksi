@@ -65,10 +65,16 @@ class AppProfile extends Model
         'alpha_vantage_api_key',
         'ai_bot_name',
         'ai_bot_instruction',
+        'google_drive_json',
+        'google_drive_folder_id',
+        'is_backup_active',
+        'backup_frequency',
     ];
 
     protected $casts = [
         'whatsapp_bot_menu' => 'array',
+        'is_backup_active' => 'boolean',
+        'google_drive_json' => 'encrypted',
         'openai_api_key' => 'encrypted',
         'google_api_key' => 'encrypted',
         'anthropic_api_key' => 'encrypted',

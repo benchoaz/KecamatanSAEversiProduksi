@@ -71,15 +71,20 @@ trait ImageOptimizer
                 $image = $resizedImage;
             }
 
-            // 4. Generate filename and final path
-            $filename = Str::random(40) . '.webp';
-            $finalPath = $directory . '/' . $filename;
-            
-            // 5. Save as WebP to a temporary buffer
+            // 5. Save image to a temporary buffer
             ob_start();
-            imagewebp($image, null, $quality);
-            $content = ob_get_clean();
+            if (function_exists('imagewebp')) {
+                imagewebp($image, null, $quality);
+                $content = ob_get_clean();
+                $filename = Str::random(40) . '.webp';
+            } else {
+                // Fallback to JPEG if WebP is not supported
+                imagejpeg($image, null, $quality);
+                $content = ob_get_clean();
+                $filename = Str::random(40) . '.jpg';
+            }
             
+            $finalPath = $directory . '/' . $filename;
             imagedestroy($image);
 
             // 6. Store to disk

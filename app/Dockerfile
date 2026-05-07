@@ -14,6 +14,7 @@ RUN apk add --no-cache \
     icu-libs \
     oniguruma \
     libpq \
+    libwebp \
     imagemagick \
     shadow \
     mysql-client
@@ -28,7 +29,8 @@ RUN apk add --no-cache --virtual .build-deps \
     icu-dev \
     oniguruma-dev \
     postgresql-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    libwebp-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) \
         pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath opcache zip intl gd \
     && pecl install redis-6.0.2 \

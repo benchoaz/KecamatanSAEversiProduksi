@@ -687,7 +687,52 @@
                                     </div>
                                 </div>
 
-                            {{-- Section Bot WhatsApp was moved to WahaN8n settings --}}
+                             {{-- Section Backup Otomatis --}}
+                             <div class="col-md-12 mt-4">
+                                 <div class="p-4 border border-warning-100 bg-warning-50 bg-opacity-20 rounded-4 shadow-sm">
+                                     <div class="d-flex align-items-center justify-content-between mb-4">
+                                         <div class="d-flex align-items-center gap-2">
+                                             <div class="p-2 bg-warning-100 text-warning-700 rounded-3">
+                                                 <i class="fab fa-google-drive"></i>
+                                             </div>
+                                             <div>
+                                                 <h6 class="mb-0 fw-bold text-warning-900">Backup Otomatis (Google Drive)</h6>
+                                                 <p class="text-[10px] text-warning-700 mb-0">Simpan database dan file penting ke cloud secara berkala.</p>
+                                             </div>
+                                         </div>
+                                         <div class="form-check form-switch">
+                                             <input class="form-check-input" type="checkbox" name="is_backup_active" value="1" 
+                                                 {{ $profile->is_backup_active ? 'checked' : '' }}
+                                                 style="width: 2.5em; height: 1.25em; cursor: pointer;">
+                                         </div>
+                                     </div>
+
+                                     <div class="row g-4">
+                                         <div class="col-md-12">
+                                             <label class="form-label text-slate-700 fw-bold small">Google Service Account (JSON Key)</label>
+                                             <textarea name="google_drive_json" class="form-control bg-white border-slate-200 rounded-3 text-xs font-monospace" 
+                                                 rows="5" placeholder='Paste isi file JSON key di sini...'>{{ old('google_drive_json', $profile->google_drive_json) }}</textarea>
+                                             <div class="form-text text-[10px] text-slate-500 mt-2">
+                                                 <i class="fas fa-info-circle me-1 text-warning-600"></i> Dapatkan file ini dari Google Cloud Console (Service Account). Pastikan email service account sudah di-share ke folder tujuan.
+                                             </div>
+                                         </div>
+                                         <div class="col-md-8">
+                                             <label class="form-label text-slate-700 fw-bold small">ID Folder Google Drive</label>
+                                             <input type="text" name="google_drive_folder_id" value="{{ old('google_drive_folder_id', $profile->google_drive_folder_id) }}"
+                                                 class="form-control bg-white border-slate-200 rounded-3 text-sm"
+                                                 placeholder="Contoh: 1abc123... (dari URL folder)">
+                                         </div>
+                                         <div class="col-md-4">
+                                             <label class="form-label text-slate-700 fw-bold small">Frekuensi Backup</label>
+                                             <select name="backup_frequency" class="form-select bg-white border-slate-200 rounded-3 text-sm">
+                                                 <option value="daily" {{ $profile->backup_frequency == 'daily' ? 'selected' : '' }}>Setiap Hari (Daily)</option>
+                                                 <option value="weekly" {{ $profile->backup_frequency == 'weekly' ? 'selected' : '' }}>Setiap Minggu (Weekly)</option>
+                                                 <option value="monthly" {{ $profile->backup_frequency == 'monthly' ? 'selected' : '' }}>Setiap Bulan (Monthly)</option>
+                                             </select>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
 
                             <div class="d-flex justify-content-end mt-5 pt-3 border-top border-light">
                                 <button type="submit" class="btn btn-primary btn-lg px-5 rounded-3 fw-bold shadow-sm"

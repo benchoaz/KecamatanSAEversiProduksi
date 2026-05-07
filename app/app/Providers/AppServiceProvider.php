@@ -29,18 +29,40 @@ class AppServiceProvider extends ServiceProvider
     {
         try {
             \Illuminate\Support\Facades\Storage::extend('google', function ($app, $config) {
-                $options = [];
+                $profile = \App\Models\AppProfile::first();
+                $jsonContent = $profile->google_drive_json ?? null;
+                $folderId = $profile->google_drive_folder_id ?? $config['folderId'] ?? '/';
+
+                $client = new \Google\Client();
+                
+                if ($jsonContent) {
+                    $authData = json_decode($jsonContent, true);
+                    if ($authData && isset($authData['type']) && $authData['type'] === 'service_account') {
+                        $client->setAuthConfig($authData);
+                    } else {
+                        $client->setClientId($config['clientId'] ?? '');
+                        $client->setClientSecret($config['clientSecret'] ?? '');
+                        $client->refreshToken($config['refreshToken'] ?? '');
+                    }
+                } else {
+                    $client->setClientId($config['clientId'] ?? '');
+                    $client->setClientSecret($config['clientSecret'] ?? '');
+                    $client->refreshToken($config['refreshToken'] ?? '');
+                }
+
+                $client->addScope(\Google\Service\Drive::DRIVE);
+                $service = new \Google\Service\Drive($client);
+                
+                $options = [
+                    'supportsAllDrives' => true,
+                    'includeItemsFromAllDrives' => true,
+                ];
+
                 if (!empty($config['teamDriveId'] ?? null)) {
                     $options['teamDriveId'] = $config['teamDriveId'];
                 }
 
-                $client = new \Google\Client();
-                $client->setClientId($config['clientId']);
-                $client->setClientSecret($config['clientSecret']);
-                $client->refreshToken($config['refreshToken']);
-
-                $service = new \Google\Service\Drive($client);
-                $adapter = new \Masbug\Flysystem\GoogleDriveAdapter($service, $config['folderId'] ?? '/', $options);
+                $adapter = new \Masbug\Flysystem\GoogleDriveAdapter($service, $folderId, $options);
                 $driver = new \League\Flysystem\Filesystem($adapter);
 
                 return new \Illuminate\Filesystem\FilesystemAdapter($driver, $adapter);

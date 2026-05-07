@@ -61,6 +61,7 @@ return [
             'clientId' => env('GOOGLE_DRIVE_CLIENT_ID'),
             'clientSecret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
             'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
+            'serviceAccountJson' => env('GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON'), // Path to JSON file
             'folderId' => env('GOOGLE_DRIVE_FOLDER_ID'),
         ],
 

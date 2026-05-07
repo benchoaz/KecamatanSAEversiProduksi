@@ -17,6 +17,30 @@ class Kernel extends ConsoleKernel
         // Polling APIs & Scraping for news updates
         $schedule->command('scrape:desa-news')->everyTwoHours()->withoutOverlapping();
         $schedule->command('scrape:kecamatan-news')->cron('0 */6 * * *')->withoutOverlapping();
+
+        // Automated Google Drive Backup
+        try {
+            $profile = \App\Models\AppProfile::first();
+            if ($profile && $profile->is_backup_active) {
+                $backupTask = $schedule->command('backup:run --only-db --disable-notifications');
+                
+                switch ($profile->backup_frequency) {
+                    case 'daily':
+                        $backupTask->dailyAt('01:00');
+                        break;
+                    case 'weekly':
+                        $backupTask->weeklyOn(1, '01:00'); // Mondays
+                        break;
+                    case 'monthly':
+                        $backupTask->monthlyOn(1, '01:00'); // 1st of month
+                        break;
+                    default:
+                        $backupTask->dailyAt('01:00');
+                }
+            }
+        } catch (\Exception $e) {
+            // Prevent failure if DB is not ready
+        }
     }
 
     /**

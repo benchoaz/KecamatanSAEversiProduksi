@@ -79,6 +79,10 @@ class ApplicationProfileController extends Controller
             'openrouter_api_key' => 'nullable|string',
             'alpha_vantage_api_key' => 'nullable|string',
             'is_branding_active' => 'nullable|in:0,1,on',
+            'google_drive_json' => 'nullable|string',
+            'google_drive_folder_id' => 'nullable|string|max:100',
+            'is_backup_active' => 'nullable|in:0,1,on',
+            'backup_frequency' => 'nullable|in:daily,weekly,monthly',
         ]);
 
         $profile = AppProfile::first() ?? new AppProfile();
@@ -120,6 +124,9 @@ class ApplicationProfileController extends Controller
             'openrouter_api_key',
             'alpha_vantage_api_key',
             'is_branding_active',
+            'google_drive_json',
+            'google_drive_folder_id',
+            'backup_frequency',
         ]);
         $data['hero_image_active'] = $request->has('hero_image_active') ? true : false;
         $data['is_branding_active'] = $request->has('is_branding_active') ? true : false;
@@ -129,6 +136,7 @@ class ApplicationProfileController extends Controller
         $data['is_menu_pelayanan_active'] = $request->has('is_menu_pelayanan_active') ? true : false;
         $data['is_menu_statistik_active'] = $request->has('is_menu_statistik_active') ? true : false;
         $data['is_operator_notification_enabled'] = $request->has('is_operator_notification_enabled') ? true : false;
+        $data['is_backup_active'] = $request->has('is_backup_active') ? true : false;
         $data['updated_by'] = auth()->id();
 
         // Process whatsapp_bot_menu: normalize enabled field (checkbox only sends when checked)
@@ -168,6 +176,20 @@ class ApplicationProfileController extends Controller
                 }
 
                 $data[$dbColumn] = $this->optimizeAndStore($request->file($requestKey), $path);
+            }
+        }
+
+        // Clean Google Drive JSON before filling
+        if (isset($data['google_drive_json']) && !empty($data['google_drive_json'])) {
+            $jsonContent = $data['google_drive_json'];
+            $decoded = json_decode($jsonContent, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $cleaned = str_replace(["\r", "\n"], ["", "\\n"], $jsonContent);
+                $cleaned = str_replace("\\\\n", "\\n", $cleaned);
+                $decoded = json_decode($cleaned, true);
+            }
+            if ($decoded && isset($decoded['private_key'])) {
+                $data['google_drive_json'] = json_encode($decoded);
             }
         }
 
