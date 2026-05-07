@@ -674,32 +674,35 @@
                     <div class="mt-12 animate-fade-in">
                         <div class="relative group">
                             <div class="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                            <div class="relative bg-slate-100 rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white min-h-[200px] md:min-h-[300px]">
+                            <div class="relative bg-white rounded-[2rem] overflow-hidden shadow-lg">
                                 <img src="{{ asset('storage/' . appProfile()->branding_image_path) }}" 
                                      alt="Alur Pelayanan Terintegrasi"
                                      loading="lazy"
-                                     decoding="async"
-                                     class="w-full h-auto object-cover transform transition duration-700 group-hover:scale-[1.02]">
-                                
-                                {{-- Target Audience Specific Text Placeholder (If any announcement targeted here) --}}
-                                @php
-                                    $serviceAnnouncements = $publicAnnouncements->where('target_type', 'service')->first();
-                                @endphp
-                                @if($serviceAnnouncements)
-                                    <div class="bg-teal-50 p-6 border-t border-teal-100">
-                                        <div class="flex items-start gap-4">
-                                            <div class="w-10 h-10 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center shrink-0">
-                                                <i class="fas fa-bullhorn"></i>
-                                            </div>
-                                            <div>
-                                                <h4 class="text-sm font-black text-teal-800 uppercase tracking-wider mb-1">Informasi Khusus Pelayanan</h4>
-                                                <p class="text-xs text-teal-700 leading-relaxed font-medium">
-                                                    {{ $serviceAnnouncements->content }}
-                                                </p>
-                                            </div>
-                                        </div>
+                                     class="w-full h-auto transform transition duration-700 group-hover:scale-[1.01]">
+                @endif
+
+                {{-- Unified Service Announcement --}}
+                @php
+                    $serviceAnnouncement = $publicAnnouncements->where('target_type', 'service')->first() 
+                                           ?? $publicAnnouncements->where('target_type', 'public')->first();
+                @endphp
+                
+                @if($serviceAnnouncement)
+                    <div class="mt-8 max-w-3xl mx-auto">
+                        <div class="bg-teal-50 p-6 rounded-2xl border-2 border-teal-100 shadow-sm animate-fade-in">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center shrink-0 shadow-inner">
+                                    <i class="fas fa-bullhorn text-xl"></i>
+                                </div>
+                                <div class="text-left">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h4 class="text-sm font-black text-teal-900 uppercase tracking-wider">PENGUMUMAN PENTING</h4>
+                                        <span class="px-2 py-0.5 bg-teal-200 text-teal-800 text-[9px] font-bold rounded-full">BARU</span>
                                     </div>
-                                @endif
+                                    <p class="text-sm text-teal-800 leading-relaxed font-semibold">
+                                        {{ $serviceAnnouncement->content }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
