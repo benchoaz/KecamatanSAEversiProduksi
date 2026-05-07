@@ -18,6 +18,8 @@ use PhpZip\ZipFile;
 
 class PemerintahanController extends Controller
 {
+    use \App\Traits\ImageOptimizer;
+
     protected $submissionRepo;
     protected $masterData;
 
@@ -99,7 +101,7 @@ class PemerintahanController extends Controller
         }
 
         if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('personil_foto', 'local');
+            $path = $this->optimizeAndStore($request->file('foto'), 'personil_foto', 1200, 80, 'local');
             $personil->foto = $path;
         }
 

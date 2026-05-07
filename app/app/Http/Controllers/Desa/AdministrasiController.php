@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class AdministrasiController extends Controller
 {
+    use \App\Traits\ImageOptimizer;
+
     /**
      * Menu Utama Administrasi Desa
      */
@@ -108,7 +110,7 @@ class AdministrasiController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
-            $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('foto_personil', 'local') : null;
+            $fotoPath = $request->hasFile('foto') ? $this->optimizeAndStore($request->file('foto'), 'foto_personil', 1200, 80, 'local') : null;
 
             $personil = new PersonilDesa();
             $personil->desa_id = auth()->user()->desa_id;
@@ -281,7 +283,11 @@ class AdministrasiController extends Controller
             }
 
             if ($request->hasFile('foto')) {
-                $personil->foto = $request->file('foto')->store('foto_personil', 'local');
+                // Delete old photo if exists
+                if ($personil->foto && \Illuminate\Support\Facades\Storage::disk('local')->exists($personil->foto)) {
+                    \Illuminate\Support\Facades\Storage::disk('local')->delete($personil->foto);
+                }
+                $personil->foto = $this->optimizeAndStore($request->file('foto'), 'foto_personil', 1200, 80, 'local');
             }
             
             $oldValues = $personil->getRawOriginal(); // Since we are mid-transaction and some fields might be assigned

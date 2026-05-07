@@ -6,7 +6,7 @@
     <div class="content-header mb-5">
         <div class="d-flex align-items-center gap-2 mb-2">
             <a href="{{ auth()->user()->desa_id ? route('desa.pemerintahan.index') : route('kecamatan.pemerintahan.index') }}"
-                class="btn btn-xs btn-light rounded-pill px-3 text-secondary text-decoration-none border shadow-sm">
+                class="btn btn-xs btn-light rounded-pill px-3 text-dark fw-bold text-decoration-none border shadow-sm">
                 <i class="fas fa-arrow-left-long me-2"></i> Kembali ke Menu Utama
             </a>
         </div>
@@ -145,8 +145,8 @@
                                         </div>
                                         <div>
                                             <div class="fw-bold text-primary-900">{{ $p->nama }}</div>
-                                            <div class="small text-tertiary">NIK: {{ $p->nik }}</div>
-                                            <span class="badge bg-slate-100 text-slate-600 x-small mt-1">Umur: {{ $umur }} Thn</span>
+                                            <div class="small text-dark opacity-75">NIK: {{ $p->nik }}</div>
+                                            <span class="badge bg-slate-200 text-slate-800 x-small mt-1">Umur: {{ $umur }} Thn</span>
                                         </div>
                                     </div>
                                 </td>
@@ -155,7 +155,7 @@
                                     @if($p->nama_dusun)
                                         <div class="x-small text-brand-600 fw-bold"><i class="fas fa-map-marker-alt me-1"></i> Dusun {{ $p->nama_dusun }}</div>
                                     @endif
-                                    <small class="text-tertiary">{{ $p->kategori == 'perangkat' ? 'Perangkat Desa' : 'BPD' }}</small>
+                                    <small class="text-dark fw-medium">{{ $p->kategori == 'perangkat' ? 'Perangkat Desa' : 'BPD' }}</small>
                                 </td>
                                 <td>
                                     <div class="d-flex flex-column">

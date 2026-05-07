@@ -15,21 +15,25 @@ class FileController extends Controller
     {
         if (!$path) return null;
 
-        // Try exact path
-        if (Storage::disk('local')->exists($path)) {
-            return storage_path('app/' . $path);
+        $disks = ['local', 'public'];
+        $prefixes = ['', 'local/', 'public/', 'app/', 'storage/app/'];
+
+        foreach ($disks as $disk) {
+            foreach ($prefixes as $prefix) {
+                $testPath = $prefix . $path;
+                if (Storage::disk($disk)->exists($testPath)) {
+                    $root = ($disk === 'public') ? storage_path('app/public/') : storage_path('app/');
+                    return $root . $testPath;
+                }
+            }
         }
 
-        // Try with 'local/' prefix (often used in VPS deployments)
-        if (Storage::disk('local')->exists('local/' . $path)) {
-            return storage_path('app/local/' . $path);
+        // Final attempt: check if it's already an absolute path that exists
+        if (file_exists($path)) {
+            return $path;
         }
 
-        // Try with 'public/' prefix
-        if (Storage::disk('local')->exists('public/' . $path)) {
-            return storage_path('app/public/' . $path);
-        }
-
+        \Illuminate\Support\Facades\Log::warning("File not found in any expected location: " . $path);
         return null;
     }
 
@@ -51,7 +55,14 @@ class FileController extends Controller
         $fullPath = $this->resolvePath($personil->foto);
 
         if (!$fullPath) {
-            abort(404, 'Foto not found.');
+            // Return default placeholder if photo not found
+            $defaultPath = public_path('assets/images/default-user.png');
+            if (file_exists($defaultPath)) {
+                return response()->file($defaultPath);
+            }
+            
+            // Fallback to a remote placeholder if local one missing
+            return redirect('https://ui-avatars.com/api/?name=' . urlencode($personil->nama) . '&background=random&color=fff');
         }
 
         return response()->file($fullPath);

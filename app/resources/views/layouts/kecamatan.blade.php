@@ -219,12 +219,12 @@
                             @if($ann->display_mode == 'ticker')
                                 <div class="bg-blue-50/50 border border-blue-100 rounded-3 overflow-hidden py-1 mb-2">
                                     <div class="d-flex align-items-center">
-                                        <div class="px-3 border-end border-blue-100 text-[10px] fw-bold text-blue-500 uppercase tracking-tighter">
+                                        <div class="px-3 border-end border-blue-100 text-[10px] fw-bold text-blue-900 uppercase tracking-tighter">
                                             INFO KECAMATAN
                                         </div>
                                         <div class="flex-grow-1 overflow-hidden whitespace-nowrap">
                                             <div class="ticker-move-internal hover:pause-animation">
-                                                <span class="text-slate-600 small fw-medium px-3">
+                                                <span class="text-slate-900 small fw-bold px-3">
                                                     {{ $ann->content }} &nbsp;&bull;&nbsp; {{ $ann->title }}
                                                 </span>
                                                 <span class="text-slate-600 small fw-medium px-3">

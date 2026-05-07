@@ -18,7 +18,7 @@ trait ImageOptimizer
      * @param int $quality
      * @return string|false Path to the stored optimized image
      */
-    public function optimizeAndStore(UploadedFile $file, string $directory, int $maxWidth = 1200, int $quality = 80)
+    public function optimizeAndStore(UploadedFile $file, string $directory, int $maxWidth = 1200, int $quality = 80, string $disk = 'public')
     {
         try {
             $extension = strtolower($file->getClientOriginalExtension());
@@ -42,11 +42,11 @@ trait ImageOptimizer
                     break;
                 default:
                     // If unsupported by our optimizer, just store normally
-                    return $file->store($directory, 'public');
+                    return $file->store($directory, $disk);
             }
 
             if (!$image) {
-                return $file->store($directory, 'public');
+                return $file->store($directory, $disk);
             }
 
             // 2. Get original dimensions
@@ -83,13 +83,13 @@ trait ImageOptimizer
             imagedestroy($image);
 
             // 6. Store to disk
-            Storage::disk('public')->put($finalPath, $content);
+            Storage::disk($disk)->put($finalPath, $content);
 
             return $finalPath;
         } catch (\Exception $e) {
             \Log::error('Image Optimization Failed: ' . $e->getMessage());
             // Fallback to normal storage if anything fails
-            return $file->store($directory, 'public');
+            return $file->store($directory, $disk);
         }
     }
 }
