@@ -686,7 +686,7 @@
 
             {{-- Unified Service Announcement --}}
             @php
-                $activeAnnouncement = $publicAnnouncements->sortByDesc('priority')->first();
+                $activeAnnouncement = $serviceAnnouncements->sortByDesc('priority')->first() ?? $publicAnnouncements->sortByDesc('priority')->first();
             @endphp
             
             @if($activeAnnouncement)
@@ -713,16 +713,19 @@
             <div class="h-8"></div>
             @endif
 
-            {{-- Tulisan Berjalan (Ticker) --}}
-            @if($publicAnnouncements->isNotEmpty())
+            {{-- Tulisan Berjalan (Ticker) - Using Service Announcements if available, otherwise Public --}}
+            @if($serviceAnnouncements->isNotEmpty() || $publicAnnouncements->isNotEmpty())
+                @php
+                    $tickerAnnouncements = $serviceAnnouncements->isNotEmpty() ? $serviceAnnouncements : $publicAnnouncements;
+                @endphp
                 <div class="max-w-6xl mx-auto mb-16">
                     <div class="bg-white border-2 border-teal-50 rounded-2xl p-2 flex items-center gap-4 shadow-sm overflow-hidden group">
                         <div class="bg-teal-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shrink-0 shadow-lg z-10">
-                            <i class="fas fa-bullhorn animate-bounce-slow"></i> &nbsp; INFO KECAMATAN
+                            <i class="fas fa-bullhorn animate-bounce-slow"></i> &nbsp; INFO LAYANAN
                         </div>
                         <div class="relative flex-grow overflow-hidden h-8">
                             <div class="absolute whitespace-nowrap animate-ticker flex items-center gap-16 py-1">
-                                @foreach($publicAnnouncements as $ann)
+                                @foreach($tickerAnnouncements as $ann)
                                     <div class="flex items-center gap-3">
                                         <div class="w-2 h-2 bg-teal-400 rounded-full"></div>
                                         <span class="text-sm font-bold text-slate-800 tracking-tight">
@@ -731,7 +734,7 @@
                                     </div>
                                 @endforeach
                                 {{-- Duplicate for seamless loop --}}
-                                @foreach($publicAnnouncements as $ann)
+                                @foreach($tickerAnnouncements as $ann)
                                     <div class="flex items-center gap-3">
                                         <div class="w-2 h-2 bg-teal-400 rounded-full"></div>
                                         <span class="text-sm font-bold text-slate-800 tracking-tight">

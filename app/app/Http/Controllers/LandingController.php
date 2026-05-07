@@ -23,7 +23,15 @@ class LandingController extends Controller
         $profileService = app(ApplicationProfileService::class);
         $appProfile = $profileService->getProfile();
 
-        $publicAnnouncements = Announcement::whereIn('target_type', ['public', 'service'])
+        $publicAnnouncements = Announcement::where('target_type', 'public')
+            ->where('is_active', true)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->orderBy('priority', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $serviceAnnouncements = Announcement::where('target_type', 'service')
             ->where('is_active', true)
             ->where('start_date', '<=', now())
             ->where('end_date', '>=', now())
@@ -65,6 +73,7 @@ class LandingController extends Controller
 
         return view('landing', compact(
             'publicAnnouncements',
+            'serviceAnnouncements',
             'latestBerita',
             'faqKeywords',
             'featuredLayanan',
@@ -225,7 +234,7 @@ class LandingController extends Controller
             ->values()
             ->toArray();
 
-        $publicAnnouncements = Announcement::whereIn('target_type', ['public', 'service'])
+        $publicAnnouncements = Announcement::where('target_type', 'public')
             ->where('is_active', true)
             ->where('start_date', '<=', now())
             ->where('end_date', '>=', now())
