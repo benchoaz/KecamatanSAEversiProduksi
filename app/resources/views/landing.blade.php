@@ -668,7 +668,19 @@
                 <p class="text-slate-500 max-w-2xl mx-auto font-medium leading-relaxed">
                     Proses administrasi cepat untuk rekomendasi, validasi, dan koordinasi publik tingkat kecamatan.
                 </p>
-
+                {{-- Dynamic Branding Banner --}}
+                @if(appProfile()->branding_image_path && appProfile()->is_branding_active)
+                    <div class="mt-12 animate-fade-in">
+                        <div class="relative group">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                            <div class="relative bg-white rounded-[2rem] overflow-hidden shadow-lg">
+                                <img src="{{ asset('storage/' . appProfile()->branding_image_path) }}" 
+                                     alt="Alur Pelayanan Terintegrasi"
+                                     loading="lazy"
+                                     class="w-full h-auto transform transition duration-700 group-hover:scale-[1.01]">
+                            </div>
+                        </div>
+                    </div>
                 @endif
             </div>
 
