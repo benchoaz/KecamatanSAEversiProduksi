@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 
 class NewsBannerController extends Controller
 {
+    use \App\Traits\ImageOptimizer;
+
     public function index()
     {
         // This will be handled by BeritaController@index as part of the tabs
@@ -32,7 +34,7 @@ class NewsBannerController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('berita/banners', 'public');
+            $path = $this->optimizeAndStore($request->file('image'), 'berita/banners');
             $validated['image_path'] = $path;
         }
 
@@ -68,7 +70,7 @@ class NewsBannerController extends Controller
             if ($banner->image_path) {
                 Storage::disk('public')->delete($banner->image_path);
             }
-            $path = $request->file('image')->store('berita/banners', 'public');
+            $path = $this->optimizeAndStore($request->file('image'), 'berita/banners');
             $validated['image_path'] = $path;
         }
 

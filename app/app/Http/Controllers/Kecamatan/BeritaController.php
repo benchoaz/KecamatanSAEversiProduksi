@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
 
 class BeritaController extends Controller
 {
+    use \App\Traits\ImageOptimizer;
+
     /**
      * List semua berita untuk dashboard internal.
      */
@@ -63,7 +65,7 @@ class BeritaController extends Controller
         ]);
 
         if ($request->hasFile('thumbnail')) {
-            $path = $request->file('thumbnail')->store('berita/thumbnails', 'public');
+            $path = $this->optimizeAndStore($request->file('thumbnail'), 'berita/thumbnails');
             $validated['thumbnail'] = $path;
         }
 
@@ -114,7 +116,7 @@ class BeritaController extends Controller
             if ($berita->thumbnail) {
                 Storage::disk('public')->delete($berita->thumbnail);
             }
-            $path = $request->file('thumbnail')->store('berita/thumbnails', 'public');
+            $path = $this->optimizeAndStore($request->file('thumbnail'), 'berita/thumbnails');
             $validated['thumbnail'] = $path;
         }
 

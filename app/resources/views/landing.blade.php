@@ -304,6 +304,7 @@
                                         @if($appProfile->hero_image_path)
                                             <img src="{{ asset('storage/' . $appProfile->hero_image_path) }}" 
                                                  alt="{{ $appProfile->hero_image_alt ?? 'Pimpinan' }}"
+                                                 fetchpriority="high"
                                                  class="w-full h-full object-contain md:object-cover object-top">
                                         @else
                                             <div class="w-full h-full flex items-center justify-center text-slate-300">
@@ -675,9 +676,11 @@ iv>
                     <div class="mt-12 animate-fade-in">
                         <div class="relative group">
                             <div class="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                            <div class="relative bg-white rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
+                            <div class="relative bg-slate-100 rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white min-h-[200px] md:min-h-[300px]">
                                 <img src="{{ asset('storage/' . appProfile()->branding_image_path) }}" 
                                      alt="Alur Pelayanan Terintegrasi"
+                                     loading="lazy"
+                                     decoding="async"
                                      class="w-full h-auto object-cover transform transition duration-700 group-hover:scale-[1.02]">
                                 
                                 {{-- Target Audience Specific Text Placeholder (If any announcement targeted here) --}}
@@ -813,6 +816,8 @@ iv>
                         <div class="w-full lg:w-1/2 group relative">
                             <div class="aspect-video rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white">
                                 <img src="{{ asset('storage/' . appProfile()->image_pariwisata) }}" 
+                                     loading="lazy"
+                                     decoding="async"
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
                                 <div class="absolute inset-0 bg-gradient-to-t from-teal-900/60 to-transparent"></div>
                                 <div class="absolute bottom-10 left-10 text-white text-left">
@@ -827,6 +832,8 @@ iv>
                         <div class="w-full lg:w-1/2 group relative">
                             <div class="aspect-video rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white">
                                 <img src="{{ asset('storage/' . appProfile()->image_festival) }}" 
+                                     loading="lazy"
+                                     decoding="async"
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
                                 <div class="absolute inset-0 bg-gradient-to-t from-amber-900/60 to-transparent"></div>
                                 <div class="absolute bottom-10 left-10 text-white text-left">
@@ -877,6 +884,8 @@ iv>
                         <div class="group bg-white rounded-[2.5rem] p-4 border border-slate-100 hover:border-teal-200 transition-all duration-500 hover:shadow-2xl hover:shadow-teal-900/5">
                             <div class="aspect-[4/3] rounded-[2rem] overflow-hidden mb-5 relative">
                                 <img src="{{ $fp->image_path ? asset('storage/' . $fp->image_path) : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&auto=format&fit=crop&q=60' }}" 
+                                     loading="lazy"
+                                     decoding="async"
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                                 <div class="absolute top-4 right-4 flex flex-col items-end gap-2">
                                     <span class="bg-white/90 backdrop-blur-md text-slate-800 text-[10px] font-black px-3 py-1.5 rounded-xl shadow-sm border border-white">
@@ -913,7 +922,10 @@ iv>
                             <a href="{{ route('umkm_rakyat.show', $ou->slug) }}" class="flex items-center gap-4 group/toko">
                                 <div class="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 shrink-0 border border-slate-100 group-hover/toko:scale-110 transition-transform">
                                     @if($ou->foto_usaha)
-                                        <img src="{{ asset('storage/' . $ou->foto_usaha) }}" class="w-full h-full object-cover">
+                                        <img src="{{ asset('storage/' . $ou->foto_usaha) }}" 
+                                             loading="lazy"
+                                             decoding="async"
+                                             class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-slate-300"><i class="fas fa-store"></i></div>
                                     @endif
@@ -964,6 +976,8 @@ iv>
                             
                             <img src="{{ $item->thumbnail_url }}" 
                                  alt="{{ $item->judul }}"
+                                 loading="lazy"
+                                 decoding="async"
                                  onerror="this.src='https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800'; this.onerror=null;"
                                  class="relative z-10 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
                             

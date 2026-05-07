@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ApplicationProfileController extends Controller
 {
+    use \App\Traits\ImageOptimizer;
+
     protected $profileService;
 
     public function __construct(ApplicationProfileService $profileService)
@@ -157,15 +159,13 @@ class ApplicationProfileController extends Controller
                 $path = 'app';
                 if ($requestKey === 'logo_path' || $requestKey === 'branding_image_path') {
                     $path = 'logos';
-                }
-                if ($requestKey === 'hero_image_path') {
+                } elseif ($requestKey === 'hero_image_path') {
                     $path = 'media';
-                }
-                if ($requestKey === 'hero_bg_path') {
+                } elseif ($requestKey === 'hero_bg_path') {
                     $path = 'backgrounds';
                 }
 
-                $data[$dbColumn] = $request->file($requestKey)->store($path, 'public');
+                $data[$dbColumn] = $this->optimizeAndStore($request->file($requestKey), $path);
             }
         }
 

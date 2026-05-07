@@ -58,6 +58,8 @@
                         <div class="aspect-square relative overflow-hidden shrink-0">
                             <img src="{{ $u->image_path ? asset('storage/' . $u->image_path) : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&auto=format&fit=crop&q=60' }}"
                                 alt="{{ $u->product }}"
+                                loading="lazy"
+                                decoding="async"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                         </div>
 

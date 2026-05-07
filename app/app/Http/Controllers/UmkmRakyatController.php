@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Log;
 
 class UmkmRakyatController extends Controller
 {
+    use \App\Traits\ImageOptimizer;
+
     public function index(Request $request)
     {
         $query = Umkm::where('status', 'aktif');
@@ -66,7 +68,7 @@ class UmkmRakyatController extends Controller
         $umkm->source = Umkm::SOURCE_SELF;
 
         if ($request->hasFile('foto_usaha')) {
-            $path = $request->file('foto_usaha')->store('umkm/usaha', 'public');
+            $path = $this->optimizeAndStore($request->file('foto_usaha'), 'umkm/usaha');
             $umkm->foto_usaha = $path;
         }
 
@@ -214,7 +216,7 @@ class UmkmRakyatController extends Controller
         $data = $request->except('foto_usaha');
 
         if ($request->hasFile('foto_usaha')) {
-            $path = $request->file('foto_usaha')->store('umkm/usaha', 'public');
+            $path = $this->optimizeAndStore($request->file('foto_usaha'), 'umkm/usaha');
             $data['foto_usaha'] = $path;
         }
 
@@ -239,7 +241,7 @@ class UmkmRakyatController extends Controller
         $product->is_available = true;
 
         if ($request->hasFile('foto_produk')) {
-            $path = $request->file('foto_produk')->store('umkm/products', 'public');
+            $path = $this->optimizeAndStore($request->file('foto_produk'), 'umkm/products');
             $product->foto_produk = $path;
         }
 

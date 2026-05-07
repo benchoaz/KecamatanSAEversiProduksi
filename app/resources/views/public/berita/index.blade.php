@@ -152,6 +152,8 @@
                     <div class="md:w-3/5 overflow-hidden relative">
                         <img src="{{ $highlight->thumbnail_url }}"
                             alt="{{ $highlight->judul }}"
+                            loading="lazy"
+                            decoding="async"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                         @if($highlight->desa)
                             <div class="absolute top-6 left-6">
@@ -192,6 +194,8 @@
                             <div class="relative aspect-video overflow-hidden">
                                 <img src="{{ $item->thumbnail_url }}"
                                     alt="{{ $item->judul }}"
+                                    loading="lazy"
+                                    decoding="async"
                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 <div class="absolute top-4 left-4">
                                     <span
@@ -286,6 +290,8 @@
                                 <a href="{{ $banner->link_url ?: '#' }}" {{ $banner->link_url ? 'target="_blank"' : '' }}>
                                     <img src="{{ asset('storage/' . $banner->image_path) }}" 
                                         alt="{{ $banner->title }}" 
+                                        loading="lazy"
+                                        decoding="async"
                                         class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500">
                                 </a>
                             </div>
