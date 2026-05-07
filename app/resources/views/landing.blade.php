@@ -669,45 +669,44 @@
                     Proses administrasi cepat untuk rekomendasi, validasi, dan koordinasi publik tingkat kecamatan.
                 </p>
 
-                {{-- Dynamic Branding Banner --}}
-                @if(appProfile()->branding_image_path && appProfile()->is_branding_active)
-                    <div class="mt-12 animate-fade-in">
-                        <div class="relative group">
-                            <div class="absolute -inset-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                            <div class="relative bg-white rounded-[2rem] overflow-hidden shadow-lg">
-                                <img src="{{ asset('storage/' . appProfile()->branding_image_path) }}" 
-                                     alt="Alur Pelayanan Terintegrasi"
-                                     loading="lazy"
-                                     class="w-full h-auto transform transition duration-700 group-hover:scale-[1.01]">
                 @endif
+            </div>
 
-                {{-- Unified Service Announcement --}}
-                @php
-                    $serviceAnnouncement = $publicAnnouncements->where('target_type', 'service')->first() 
-                                           ?? $publicAnnouncements->where('target_type', 'public')->first();
-                @endphp
-                
-                @if($serviceAnnouncement)
-                    <div class="mt-8 max-w-3xl mx-auto">
-                        <div class="bg-teal-50 p-6 rounded-2xl border-2 border-teal-100 shadow-sm animate-fade-in">
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center shrink-0 shadow-inner">
-                                    <i class="fas fa-bullhorn text-xl"></i>
+            {{-- Unified Service Announcement --}}
+            @php
+                $activeAnnouncement = \App\Models\Announcement::where('is_active', true)
+                    ->where('start_date', '<=', now())
+                    ->where('end_date', '>=', now())
+                    ->whereIn('target_type', ['service', 'public'])
+                    ->orderBy('target_type', 'desc') // prioritize 'service'
+                    ->orderBy('priority', 'desc')
+                    ->first();
+            @endphp
+            
+            @if($activeAnnouncement)
+                <div class="max-w-4xl mx-auto mb-16 animate-fade-in">
+                    <div class="bg-teal-50 p-8 rounded-3xl border-2 border-teal-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-teal-100/30 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                        <div class="flex flex-col md:flex-row items-center md:items-start gap-6 relative">
+                            <div class="w-16 h-16 bg-white text-teal-600 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-teal-50">
+                                <i class="fas fa-bullhorn text-2xl"></i>
+                            </div>
+                            <div class="text-center md:text-left">
+                                <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
+                                    <h4 class="text-xs font-black text-teal-900 uppercase tracking-[0.2em]">Pusat Informasi Pelayanan</h4>
+                                    <span class="px-3 py-1 bg-teal-600 text-white text-[9px] font-black rounded-full shadow-sm animate-pulse">BERITA TERBARU</span>
                                 </div>
-                                <div class="text-left">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <h4 class="text-sm font-black text-teal-900 uppercase tracking-wider">PENGUMUMAN PENTING</h4>
-                                        <span class="px-2 py-0.5 bg-teal-200 text-teal-800 text-[9px] font-bold rounded-full">BARU</span>
-                                    </div>
-                                    <p class="text-sm text-teal-800 leading-relaxed font-semibold">
-                                        {{ $serviceAnnouncement->content }}
-                                    </p>
-                                </div>
+                                <p class="text-base text-teal-800 leading-relaxed font-bold">
+                                    {{ $activeAnnouncement->content }}
+                                </p>
                             </div>
                         </div>
                     </div>
-                @endif
-            </div>
+                </div>
+            @else
+                {{-- Spacing Fallback if no announcement --}}
+                <div class="h-12"></div>
+            @endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($masterLayanan as $svc)
