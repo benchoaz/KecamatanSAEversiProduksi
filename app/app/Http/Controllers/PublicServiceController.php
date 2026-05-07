@@ -171,7 +171,8 @@ class PublicServiceController extends Controller
 
             foreach ($files as $i => $file) {
                 if ($file->isValid()) {
-                    $path = $file->store('public_services', 'local');
+                    $filename = $file->hashName();
+                    $path = $file->storeAs('public_services/' . $service->id, $filename, 'public');
                     $label = $labels[$i] ?? 'Berkas ' . ($i + 1);
 
                     PublicServiceAttachment::create([
