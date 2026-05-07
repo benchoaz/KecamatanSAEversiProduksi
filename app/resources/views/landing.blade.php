@@ -674,13 +674,7 @@
 
             {{-- Unified Service Announcement --}}
             @php
-                $activeAnnouncement = \App\Models\Announcement::where('is_active', true)
-                    ->where('start_date', '<=', now())
-                    ->where('end_date', '>=', now())
-                    ->whereIn('target_type', ['service', 'public'])
-                    ->orderBy('target_type', 'desc') // prioritize 'service'
-                    ->orderBy('priority', 'desc')
-                    ->first();
+                $activeAnnouncement = $publicAnnouncements->sortByDesc('priority')->first();
             @endphp
             
             @if($activeAnnouncement)
