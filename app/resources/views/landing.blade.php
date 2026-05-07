@@ -703,9 +703,40 @@
                         </div>
                     </div>
                 </div>
-            @else
-                {{-- Spacing Fallback if no announcement --}}
-                <div class="h-12"></div>
+            {{-- Spacing Fallback if no announcement --}}
+            <div class="h-8"></div>
+            @endif
+
+            {{-- Tulisan Berjalan (Ticker) --}}
+            @if($publicAnnouncements->isNotEmpty())
+                <div class="max-w-6xl mx-auto mb-16">
+                    <div class="bg-white border-2 border-teal-50 rounded-2xl p-2 flex items-center gap-4 shadow-sm overflow-hidden group">
+                        <div class="bg-teal-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shrink-0 shadow-lg z-10">
+                            <i class="fas fa-bullhorn animate-bounce-slow"></i> &nbsp; INFO KECAMATAN
+                        </div>
+                        <div class="relative flex-grow overflow-hidden h-8">
+                            <div class="absolute whitespace-nowrap animate-ticker flex items-center gap-16 py-1">
+                                @foreach($publicAnnouncements as $ann)
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2 h-2 bg-teal-400 rounded-full"></div>
+                                        <span class="text-sm font-bold text-slate-800 tracking-tight">
+                                            {{ $ann->content }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                                {{-- Duplicate for seamless loop --}}
+                                @foreach($publicAnnouncements as $ann)
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-2 h-2 bg-teal-400 rounded-full"></div>
+                                        <span class="text-sm font-bold text-slate-800 tracking-tight">
+                                            {{ $ann->content }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -3157,6 +3188,18 @@
             });
         });
     </script>
+    <style>
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-ticker {
+            animation: ticker 30s linear infinite;
+        }
+        .animate-ticker:hover {
+            animation-play-state: paused;
+        }
+    </style>
 </body>
 
 </html>
