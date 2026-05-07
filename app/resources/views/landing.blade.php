@@ -432,8 +432,6 @@
         <div class="swiper-button-prev hidden lg:flex"></div>
     </div>
 
-iv>
-
 
     <!-- Section: Pusat Layanan Digital (Unified) -->
     @if($featuredLayanan->isNotEmpty())
@@ -3157,7 +3155,6 @@ iv>
             });
         });
     </script>
-    @endif
 </body>
 
 </html>
