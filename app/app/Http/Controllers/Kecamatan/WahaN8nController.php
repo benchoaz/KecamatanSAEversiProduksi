@@ -39,6 +39,7 @@ class WahaN8nController extends Controller
             'is_operator_notification_enabled'=> 'nullable|boolean',
             'broadcast_group_ids'             => 'nullable|string',
             'is_weather_alert_enabled'        => 'nullable|boolean',
+            'bmkg_adm4_code'                  => 'nullable|string|max:20',
         ]);
 
         $validated['bot_enabled'] = $request->has('bot_enabled') ? true : false;
@@ -93,6 +94,7 @@ class WahaN8nController extends Controller
         }
 
         $profileData['public_url'] = $validated['public_url'] ?? null;
+        $profileData['bmkg_adm4_code'] = $validated['bmkg_adm4_code'] ?? '35.13.13.2012';
         
         // Save AI Settings to Profile
         if ($request->has('ai_provider')) {

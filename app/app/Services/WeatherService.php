@@ -19,7 +19,8 @@ class WeatherService
      */
     public function getForecast(?string $adm4 = null): array
     {
-        $adm4 = $adm4 ?: $this->defaultAdm4;
+        $profile = appProfile();
+        $adm4 = $adm4 ?: ($profile->bmkg_adm4_code ?? $this->defaultAdm4);
         $cacheKey = "weather_forecast_{$adm4}";
 
         return Cache::remember($cacheKey, 1800, function() use ($adm4) {
@@ -120,8 +121,11 @@ class WeatherService
                 return ['success' => false, 'message' => 'Format data BMKG tidak valid'];
             }
 
+            $profile = appProfile();
+            $regionName = $profile->region_name ?? 'Besuk';
+            
             $alerts = [];
-            $targetKeywords = ['Besuk', 'Probolinggo'];
+            $targetKeywords = [$regionName, 'Probolinggo']; // Probolinggo is the Parent Regency, keep it for context
             
             foreach ($xml->channel->item as $item) {
                 $description = (string) $item->description;

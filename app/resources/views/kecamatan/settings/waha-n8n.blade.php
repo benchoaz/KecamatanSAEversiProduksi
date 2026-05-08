@@ -238,6 +238,13 @@
                                 </div>
 
                                 <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label text-slate-700 fw-semibold">Kode Wilayah BMKG (ADM4)</label>
+                                        <input type="text" name="bmkg_adm4_code" value="{{ old('bmkg_adm4_code', $profile->bmkg_adm4_code ?? '35.13.13.2012') }}" class="form-control bg-white border-slate-200 rounded-3 text-sm" placeholder="Contoh: 35.13.13.2012">
+                                        <div class="form-text text-slate-400 small">
+                                            Digunakan untuk prakiraan cuaca otomatis. Cari kode wilayah Anda di <a href="https://api.bmkg.go.id/publik/prakiraan-cuaca" target="_blank">API BMKG</a>.
+                                        </div>
+                                    </div>
                                     <div class="col-md-12">
                                         <label class="form-label text-slate-700 fw-semibold">ID Group WhatsApp untuk Broadcast</label>
                                         <textarea name="broadcast_group_ids" class="form-control bg-white border-slate-200 rounded-3 text-sm" rows="2" placeholder="Contoh: 120363023948572635@g.us, 120363049586721034@g.us">{{ old('broadcast_group_ids', $settings->broadcast_group_ids) }}</textarea>

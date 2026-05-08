@@ -69,6 +69,7 @@ class AppProfile extends Model
         'google_drive_folder_id',
         'is_backup_active',
         'backup_frequency',
+        'bmkg_adm4_code',
     ];
 
     protected $casts = [
