@@ -1,89 +1,80 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.seller')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pusat Bisnis UMKM - {{ appProfile()->nama_kecamatan ?? 'Kecamatan' }} SAE</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fafafa; }
-        .shop-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .shop-card:hover { transform: translateY(-5px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); }
-    </style>
-</head>
+@section('title', 'Beranda UMKM')
 
-<body class="text-slate-900 pb-20">
-
-    <!-- NAVIGATION: BRAND FOCUS -->
-    <nav class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50">
-        <div class="max-w-xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                    <i class="fas fa-shopping-bag"></i>
-                </div>
-                <div>
-                    <h1 class="text-base font-black text-slate-800 leading-none">Dasbor UMKM</h1>
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Pusat Kendali Bisnis</p>
-                </div>
-            </div>
-            <a href="{{ route('portal_warga.logout') }}" class="w-10 h-10 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center hover:bg-rose-50 hover:text-rose-500 transition-all">
-                <i class="fas fa-power-off"></i>
-            </a>
-        </div>
-    </nav>
-
-    <main class="max-w-xl mx-auto px-6 py-8 space-y-10">
-
-        @if(session('success'))
-        <div class="bg-emerald-500 text-white px-6 py-4 rounded-3xl flex items-center gap-3 font-bold text-sm shadow-xl shadow-emerald-200">
-            <i class="fas fa-check-circle"></i>
-            <span>{{ session('success') }}</span>
-        </div>
-        @endif
-
-        <!-- BUSINESS PROFILE HEADER -->
-        <div class="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
+@section('content')
+<div class="space-y-8 pb-10">
+    
+    <!-- TOP SECTION: Welcome & Quick Stats -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Hero Welcome -->
+        <div class="lg:col-span-2 bg-white rounded-[2.5rem] p-8 md:p-10 border border-slate-100 shadow-sm relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 group-hover:bg-blue-100 transition-colors duration-700"></div>
+            
             <div class="relative z-10">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-100">Pemilik Toko</span>
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="px-4 py-1.5 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-100">Pemilik Toko Terverifikasi</span>
                 </div>
-                <h2 class="text-3xl font-black text-slate-900 leading-tight">Halo, {{ $userName }}</h2>
-                <div class="flex items-center gap-3 mt-6">
-                    <div class="flex -space-x-2">
-                        <div class="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold">W</div>
-                        <div class="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-blue-600">A</div>
+                
+                <div class="flex items-start justify-between gap-6">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl font-black text-slate-900 leading-tight">Halo, {{ $userName }}</h2>
+                        <p class="text-slate-500 font-medium mt-4 max-w-md leading-relaxed">Selamat datang kembali! Lapak Anda terpantau aman hari ini. Siap untuk melayani pesanan baru?</p>
+                        
+                        <div class="flex items-center gap-6 mt-8">
+                            <div class="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                                <i class="fab fa-whatsapp text-emerald-500 text-lg"></i>
+                                <span class="text-xs font-bold text-slate-600">+{{ $phone }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <span class="text-xs font-bold text-slate-400">+{{ $phone }}</span>
+                    <div class="hidden md:block">
+                        <div class="w-32 h-32 bg-slate-100 rounded-[2.5rem] overflow-hidden border-4 border-white shadow-lg">
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($userName) }}&background=0D8ABC&color=fff&size=200" alt="Avatar" class="w-full h-full object-cover">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- MY ASSETS / SHOP LIST -->
-        <section class="space-y-6">
+        <!-- Sales Today Chart (Mockup Style) -->
+        <div class="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm flex flex-col">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-sm font-black text-slate-800">Penjualan Hari Ini</h3>
+                    <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Update 5 menit lalu</p>
+                </div>
+                <div class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-tighter">
+                    Sedang Buka
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col justify-center">
+                <div class="text-3xl font-black text-slate-900 mb-2">Rp 129.000</div>
+                <div class="text-xs font-bold text-emerald-500 flex items-center gap-1">
+                    <i class="fas fa-arrow-up"></i> +12% dari kemarin
+                </div>
+                <div class="h-24 mt-6">
+                    <canvas id="miniChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MIDDLE SECTION: Assets & Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Lapak & Bisnis List -->
+        <div class="lg:col-span-2 space-y-6">
             <div class="flex items-center justify-between px-2">
                 <h3 class="font-black text-xl text-slate-800">Lapak & Bisnis Saya</h3>
-                <a href="{{ route('umkm_rakyat.create') }}" class="text-[10px] font-black text-blue-600 bg-blue-50 px-4 py-2 rounded-xl uppercase tracking-widest border border-blue-100">
-                    + Tambah Baru
+                <a href="{{ route('umkm_rakyat.create') }}" class="text-[10px] font-black text-blue-600 hover:underline uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-plus-circle"></i> Tambah Baru
                 </a>
             </div>
 
             @if(count($allAssets) > 0)
-            <div class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 @foreach($allAssets as $asset)
                     @php 
                         $item = $asset['data'];
@@ -94,46 +85,20 @@
                         $products = $type === 'umkm_local' ? explode(',', $item->product) : [];
                     @endphp
                     
-                    <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 shop-card group">
-                        
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                            <div class="flex items-center gap-6">
-                                <div class="w-20 h-20 {{ $opStatus['bg'] }} {{ $opStatus['text'] }} rounded-[2rem] flex items-center justify-center text-3xl shadow-inner border-4 border-white flex-shrink-0">
-                                    <i class="fas {{ $opStatus['icon'] }}"></i>
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-3 mb-2">
-                                        <h4 class="text-2xl font-black text-slate-800 leading-tight">{{ $name }}</h4>
-                                        <span class="text-[9px] font-black px-2.5 py-1 rounded-full {{ $opStatus['bg'] }} {{ $opStatus['text'] }} uppercase tracking-wider">{{ $opStatus['label'] }}</span>
-                                    </div>
-                                    <div class="flex items-center gap-4 text-xs font-bold text-slate-400">
-                                        <span><i class="fas fa-clock mr-1 opacity-50"></i> {{ $item->operating_hours ?: '24 Jam' }}</span>
-                                        @if(isset($item->product_count))
-                                            <span><i class="fas fa-tag mr-1 opacity-50"></i> {{ $item->product_count }} Produk</span>
-                                        @endif
-                                    </div>
-                                </div>
+                    <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-blue-900/5 transition-all group">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-16 h-16 {{ $opStatus['bg'] }} {{ $opStatus['text'] }} rounded-2xl flex items-center justify-center text-2xl shadow-inner border-2 border-white">
+                                <i class="fas {{ $opStatus['icon'] }}"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-lg font-black text-slate-800 leading-tight truncate">{{ $name }}</h4>
+                                <span class="text-[9px] font-black px-2 py-0.5 rounded-full {{ $opStatus['bg'] }} {{ $opStatus['text'] }} uppercase tracking-wider">{{ $opStatus['label'] }}</span>
                             </div>
                         </div>
 
-                        <!-- ETALASE MINI (Visual Focus) -->
-                        @if($type === 'umkm_local' && count($products) > 0)
-                        <div class="mb-8">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Etalase Produk</p>
-                            <div class="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-                                @foreach($products as $p)
-                                <div class="bg-slate-50 border border-slate-100 px-4 py-3 rounded-2xl flex-shrink-0">
-                                    <span class="text-xs font-bold text-slate-700">{{ trim($p) }}</span>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        @endif
-
-                        <!-- CONTROLS -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <a href="{{ $manageUrl }}" class="flex items-center justify-center gap-3 py-4 bg-slate-900 text-white rounded-2xl font-black text-xs shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all">
-                                <i class="fas fa-edit opacity-50"></i> Kelola Toko
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <a href="{{ $manageUrl }}" class="flex items-center justify-center gap-2 py-3 bg-slate-900 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all">
+                                <i class="fas fa-tools opacity-50"></i> Kelola
                             </a>
                             
                             <form action="{{ route('portal_warga.status_update') }}" method="POST">
@@ -144,60 +109,152 @@
                                 
                                 @if($item->is_on_holiday)
                                     <input type="hidden" name="is_on_holiday" value="0">
-                                    <button type="submit" class="w-full flex items-center justify-center gap-3 py-4 bg-emerald-500 text-white rounded-2xl font-black text-xs shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">
-                                        <i class="fas fa-play opacity-50"></i> Buka Sekarang
+                                    <button type="submit" class="w-full flex items-center justify-center gap-2 py-3 bg-emerald-500 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all">
+                                        <i class="fas fa-play opacity-50"></i> Buka
                                     </button>
                                 @else
                                     <input type="hidden" name="is_on_holiday" value="1">
-                                    <button type="submit" class="w-full flex items-center justify-center gap-3 py-4 bg-white border border-rose-100 text-rose-500 rounded-2xl font-black text-xs hover:bg-rose-50 transition-all">
-                                        <i class="fas fa-calendar-times opacity-50"></i> Setel Libur
+                                    <button type="submit" class="w-full flex items-center justify-center gap-2 py-3 bg-white border border-rose-100 text-rose-500 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-rose-50 transition-all">
+                                        <i class="fas fa-pause opacity-50"></i> Libur
                                     </button>
                                 @endif
                             </form>
                         </div>
-                        
-                        <div class="mt-6 pt-6 border-t border-slate-50 flex justify-center">
-                            @php
-                                $previewUrl = match($type) {
-                                    'umkm' => route('umkm_rakyat.show', $item->slug),
-                                    'jasa' => route('economy.show', $item->id),
-                                    'umkm_local' => route('economy.produk.show', $item->id),
-                                    default => '#'
-                                };
-                            @endphp
-                            <a href="{{ $previewUrl }}" target="_blank" class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] flex items-center gap-2 hover:underline">
-                                <i class="fas fa-external-link-alt"></i> Lihat Lapak Publik
-                            </a>
-                        </div>
+
+                        <a href="{{ match($type) { 'umkm' => route('umkm_rakyat.show', $item->slug), 'jasa' => route('economy.show', $item->id), 'umkm_local' => route('economy.produk.show', $item->id), default => '#' } }}" target="_blank" class="text-[9px] font-bold text-slate-400 hover:text-blue-600 uppercase tracking-widest flex items-center justify-center gap-2 border-t border-slate-50 pt-4">
+                            <i class="fas fa-eye text-[10px]"></i> Lihat Lapak Publik
+                        </a>
                     </div>
                 @endforeach
             </div>
             @else
-            <!-- EMPTY STATE -->
-            <div class="bg-white rounded-[3rem] p-16 text-center border-2 border-dashed border-slate-100">
-                <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-300">
-                    <i class="fas fa-store-alt-slash text-4xl"></i>
+            <div class="bg-white rounded-[2.5rem] p-12 text-center border-2 border-dashed border-slate-100">
+                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                    <i class="fas fa-store-alt-slash text-3xl"></i>
                 </div>
-                <h4 class="text-xl font-black text-slate-800 mb-2">Belum Ada Lapak Aktif</h4>
-                <p class="text-sm text-slate-500 font-medium mb-10 leading-relaxed">Daftarkan usaha atau jasa Anda untuk mulai berjualan online di platform SAE.</p>
-                <div class="flex flex-col gap-3">
-                    <a href="{{ route('umkm_rakyat.create') }}" class="w-full py-5 bg-blue-600 text-white rounded-[2rem] font-black text-sm shadow-2xl shadow-blue-200 hover:bg-blue-700 transition-all">
-                        Daftar Toko UMKM
-                    </a>
-                    <a href="{{ route('economy.create') }}" class="w-full py-5 bg-white border border-slate-200 text-slate-700 rounded-[2rem] font-black text-sm hover:bg-slate-50 transition-all">
-                        Daftar Jasa / Tenaga
-                    </a>
-                </div>
+                <h4 class="text-lg font-black text-slate-800 mb-2">Belum Ada Lapak</h4>
+                <p class="text-xs text-slate-500 font-medium mb-8">Daftarkan usaha Anda sekarang.</p>
+                <a href="{{ route('umkm_rakyat.create') }}" class="inline-flex py-4 px-8 bg-blue-600 text-white rounded-2xl font-black text-xs shadow-lg shadow-blue-200">
+                    Daftar UMKM Baru
+                </a>
             </div>
             @endif
-        </section>
+        </div>
 
-        <!-- FOOTER: PURE BUSINESS FOCUS -->
-        <footer class="text-center pt-10 opacity-30">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Business Dashboard &bull; Kecamatan SAE</p>
-        </footer>
+        <!-- Order Status / Distribution -->
+        <div class="space-y-6">
+            <h3 class="font-black text-xl text-slate-800 px-2">Status Pesanan</h3>
+            <div class="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+                <div class="h-64">
+                    <canvas id="statusChart"></canvas>
+                </div>
+                
+                <div class="mt-8 space-y-4">
+                    <div class="flex items-center justify-between text-xs font-bold">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
+                            <span class="text-slate-500">Menunggu</span>
+                        </div>
+                        <span class="text-slate-800">12 Pesanan</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs font-bold">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
+                            <span class="text-slate-500">Diproses</span>
+                        </div>
+                        <span class="text-slate-800">8 Pesanan</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs font-bold">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                            <span class="text-slate-500">Selesai</span>
+                        </div>
+                        <span class="text-slate-800">45 Pesanan</span>
+                    </div>
+                </div>
+            </div>
 
-    </main>
+            <!-- Promotion Card -->
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl shadow-slate-900/10">
+                <h4 class="text-lg font-black mb-2">Mau Dagangan Laris?</h4>
+                <p class="text-[10px] font-medium text-slate-400 leading-relaxed mb-6">Gunakan fitur promosi untuk menampilkan produk Anda di halaman utama portal.</p>
+                <button class="w-full py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all">
+                    Pelajari Promosi
+                </button>
+            </div>
+        </div>
 
-</body>
-</html>
+    </div>
+</div>
+@endsection
+
+@section('extra_js')
+<script>
+    // Mini Chart for Sales
+    const miniCtx = document.getElementById('miniChart').getContext('2d');
+    new Chart(miniCtx, {
+        type: 'line',
+        data: {
+            labels: ['08', '10', '12', '14', '16', '18', '20'],
+            datasets: [{
+                data: [10, 40, 20, 80, 50, 90, 70],
+                borderColor: '#10b981',
+                borderWidth: 3,
+                tension: 0.4,
+                pointRadius: 0,
+                fill: true,
+                backgroundColor: (context) => {
+                    const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 100);
+                    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+                    gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+                    return gradient;
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { display: false }, y: { display: false } }
+        }
+    });
+
+    // Status Distribution Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'bar',
+        data: {
+            labels: ['2024', '2025', '2026'],
+            datasets: [
+                {
+                    label: 'Pending',
+                    data: [10, 12, 20],
+                    backgroundColor: '#2563eb',
+                    borderRadius: 10
+                },
+                {
+                    label: 'Processed',
+                    data: [8, 15, 12],
+                    backgroundColor: '#f59e0b',
+                    borderRadius: 10
+                },
+                {
+                    label: 'Shipped',
+                    data: [5, 10, 8],
+                    backgroundColor: '#10b981',
+                    borderRadius: 10
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { stacked: true, grid: { display: false } },
+                y: { stacked: true, grid: { borderDash: [5, 5] }, ticks: { display: false } }
+            }
+        }
+    });
+</script>
+@endsection
