@@ -53,6 +53,36 @@
     </nav>
 
     <div class="p-6 border-t border-slate-100">
+        <!-- GLOBAL STATUS TOGGLE (Pindah dari Dashboard ke Sidebar) -->
+        @if(count($allAssets) > 0)
+            @php 
+                $activeAsset = $allAssets->first(); // Default to first asset for global toggle
+                $item = $activeAsset['data'];
+                $type = $activeAsset['type'];
+            @endphp
+            <div class="mb-6 px-4">
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 text-center">Status Toko Utama</p>
+                <form action="{{ route('portal_warga.status_update') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="type" value="{{ $type }}">
+                    <input type="hidden" name="id" value="{{ $item->id }}">
+                    <input type="hidden" name="operating_hours" value="{{ $item->operating_hours }}">
+                    
+                    @if($item->is_on_holiday)
+                        <input type="hidden" name="is_on_holiday" value="0">
+                        <button type="submit" class="w-full py-3 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-200 flex items-center justify-center gap-2">
+                            <i class="fas fa-play text-[8px]"></i> Buka Toko
+                        </button>
+                    @else
+                        <input type="hidden" name="is_on_holiday" value="1">
+                        <button type="submit" class="w-full py-3 bg-rose-50 text-rose-500 border border-rose-100 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-100 flex items-center justify-center gap-2">
+                            <i class="fas fa-pause text-[8px]"></i> Setel Libur
+                        </button>
+                    @endif
+                </form>
+            </div>
+        @endif
+
         <a href="{{ route('portal_warga.logout') }}" class="flex items-center gap-4 px-5 py-4 text-rose-500 hover:bg-rose-50 rounded-2xl transition-all font-bold text-sm">
             <i class="fas fa-power-off"></i>
             <span>Keluar Sesi</span>

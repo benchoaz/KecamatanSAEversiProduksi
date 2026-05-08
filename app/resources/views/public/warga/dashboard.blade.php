@@ -96,29 +96,10 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3 mb-6">
-                            <a href="{{ $manageUrl }}" class="flex items-center justify-center gap-2 py-3 bg-slate-900 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all">
-                                <i class="fas fa-tools opacity-50"></i> Kelola
+                        <div class="mb-6">
+                            <a href="{{ $manageUrl }}" class="w-full flex items-center justify-center gap-3 py-4 bg-slate-900 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all">
+                                <i class="fas fa-box-open opacity-50 text-base"></i> Atur Toko & Produk
                             </a>
-                            
-                            <form action="{{ route('portal_warga.status_update') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="type" value="{{ $type }}">
-                                <input type="hidden" name="id" value="{{ $item->id }}">
-                                <input type="hidden" name="operating_hours" value="{{ $item->operating_hours }}">
-                                
-                                @if($item->is_on_holiday)
-                                    <input type="hidden" name="is_on_holiday" value="0">
-                                    <button type="submit" class="w-full flex items-center justify-center gap-2 py-3 bg-emerald-500 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all">
-                                        <i class="fas fa-play opacity-50"></i> Buka
-                                    </button>
-                                @else
-                                    <input type="hidden" name="is_on_holiday" value="1">
-                                    <button type="submit" class="w-full flex items-center justify-center gap-2 py-3 bg-white border border-rose-100 text-rose-500 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-rose-50 transition-all">
-                                        <i class="fas fa-pause opacity-50"></i> Libur
-                                    </button>
-                                @endif
-                            </form>
                         </div>
 
                         <a href="{{ match($type) { 'umkm' => route('umkm_rakyat.show', $item->slug), 'jasa' => route('economy.show', $item->id), 'umkm_local' => route('economy.produk.show', $item->id), default => '#' } }}" target="_blank" class="text-[9px] font-bold text-slate-400 hover:text-blue-600 uppercase tracking-widest flex items-center justify-center gap-2 border-t border-slate-50 pt-4">
