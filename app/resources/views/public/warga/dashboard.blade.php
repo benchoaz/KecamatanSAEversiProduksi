@@ -122,11 +122,13 @@
 
         <!-- Quick Access Services (PERFECTING) -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{{ route('public.service.create') }}?cat=pengaduan" class="bg-rose-500 p-5 rounded-3xl text-white shadow-lg shadow-rose-900/20 group hover:-translate-y-1 transition-all">
+            <a href="{{ route('apply.layanan', 'pengaduan') }}" class="bg-rose-500 p-5 rounded-3xl text-white shadow-lg shadow-rose-900/20 group hover:-translate-y-1 transition-all">
+
                 <i class="fas fa-bullhorn text-2xl mb-3 opacity-80 group-hover:opacity-100"></i>
                 <h4 class="font-black text-xs uppercase tracking-wider">Lapor Masalah</h4>
             </a>
-            <a href="{{ route('public.service.create') }}?cat=pelayanan" class="bg-indigo-600 p-5 rounded-3xl text-white shadow-lg shadow-indigo-900/20 group hover:-translate-y-1 transition-all">
+            <a href="{{ route('layanan') }}" class="bg-indigo-600 p-5 rounded-3xl text-white shadow-lg shadow-indigo-900/20 group hover:-translate-y-1 transition-all">
+
                 <i class="fas fa-file-contract text-2xl mb-3 opacity-80 group-hover:opacity-100"></i>
                 <h4 class="font-black text-xs uppercase tracking-wider">Minta Surat</h4>
             </a>
