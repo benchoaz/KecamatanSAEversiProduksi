@@ -21,25 +21,18 @@ class Kernel extends ConsoleKernel
         // Check BMKG weather alerts every 15 minutes
         $schedule->command('app:check-weather-alerts')->everyFifteenMinutes()->withoutOverlapping();
 
-        // Automated Google Drive Backup
+        // Automated Google Drive Backup Strategy
         try {
             $profile = \App\Models\AppProfile::first();
             if ($profile && $profile->is_backup_active) {
-                $backupTask = $schedule->command('backup:run --only-db --disable-notifications');
+                // 1. Daily Database Backup (Fast & Critical) - 02:00 AM
+                $schedule->command('backup:run --only-db --disable-notifications')->dailyAt('02:00')->withoutOverlapping();
                 
-                switch ($profile->backup_frequency) {
-                    case 'daily':
-                        $backupTask->dailyAt('01:00');
-                        break;
-                    case 'weekly':
-                        $backupTask->weeklyOn(1, '01:00'); // Mondays
-                        break;
-                    case 'monthly':
-                        $backupTask->monthlyOn(1, '01:00'); // 1st of month
-                        break;
-                    default:
-                        $backupTask->dailyAt('01:00');
-                }
+                // 2. Weekly Full Backup (Photos, PDFs, DB) - Sunday 03:00 AM
+                $schedule->command('backup:run --disable-notifications')->weeklyOn(0, '03:00')->withoutOverlapping();
+
+                // 3. Daily Cleanup (Remove old backups) - 04:00 AM
+                $schedule->command('backup:clean')->dailyAt('04:00')->withoutOverlapping();
             }
         } catch (\Exception $e) {
             // Prevent failure if DB is not ready
