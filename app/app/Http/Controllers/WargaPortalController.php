@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
 
 class WargaPortalController extends Controller
 {
@@ -53,6 +55,15 @@ class WargaPortalController extends Controller
         if (!$loginToken || !$loginToken->isValid()) {
             return redirect()->route('portal_warga.login')->with('error', 'Link ini sudah pernah digunakan atau tidak valid. Silakan request link baru.');
         }
+
+        // 2.5 Bot Detection (Prevent WhatsApp Link Preview from consuming the token)
+        $ua = $request->userAgent() ?? '';
+        $bots = ['WhatsApp', 'facebookexternalhit', 'TelegramBot', 'Twitterbot', 'Slackbot', 'LinkedInBot', 'Embedly'];
+        if (Str::contains($ua, $bots)) {
+            Log::info('PortalService: Bot detected, skipping token consumption: ' . $ua);
+            return response('Preview Mode', 200);
+        }
+
 
         // 3. Mark as Used (Invalidate for future clicks)
         $loginToken->markAsUsed();
