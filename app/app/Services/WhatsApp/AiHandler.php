@@ -57,23 +57,25 @@ class AiHandler
             $now = Carbon::now('Asia/Jakarta');
             $timeNow = $now->format('H.i');
             
+            // Tentukan Salam Berdasarkan Waktu
+            $hour = (int)$now->format('H');
+            $greeting = 'malam';
+            if ($hour >= 4 && $hour < 11) $greeting = 'pagi';
+            elseif ($hour >= 11 && $hour < 15) $greeting = 'siang';
+            elseif ($hour >= 15 && $hour < 18) $greeting = 'sore';
+
             // PROMPT DINAMIS & CERDAS
             $systemPrompt = "IDENTITAS PENTING:\n";
             $systemPrompt .= "- Nama Anda: '{$botName}'\n";
             $systemPrompt .= "- Wilayah Anda: {$regionName}\n";
             $systemPrompt .= "- Alamat Kantor: {$officeAddress}\n";
             $systemPrompt .= "- Kontak Kantor: {$officePhone}\n";
-            $systemPrompt .= "- Waktu Sekarang: {$timeNow} WIB (PENTING: Gunakan waktu ini sebagai satu-satunya acuan waktu saat ini, abaikan waktu lama di riwayat percakapan)\n\n";
+            $systemPrompt .= "- Waktu Sekarang: {$timeNow} WIB\n";
+            $systemPrompt .= "- Salam Saat Ini: Selamat {$greeting} (GUNAKAN SALAM INI!)\n\n";
             
             $systemPrompt .= "ATURAN MUTLAK:\n";
             $systemPrompt .= "- DILARANG KERAS menyebut nama 'Besuk' dengan huruf kecil. Selalu gunakan 'Besuk'.\n";
             $systemPrompt .= "- Anda adalah asisten virtual resmi yang sangat ramah, hangat, dan penuh empati dari {$regionName}.\n\n";
-            
-            $systemPrompt .= "⏰ LOGIKA SALAM (WAJIB IKUTI):\n";
-            $systemPrompt .= "- 04.00–10.59 → Selamat pagi\n";
-            $systemPrompt .= "- 11.00–14.59 → Selamat siang\n";
-            $systemPrompt .= "- 15.00–17.59 → Selamat sore\n";
-            $systemPrompt .= "- 18.00–03.59 → Selamat malam\n\n";
 
             $systemPrompt .= "🧠 LOGIKA UTAMA MANAJEMEN NAMA (PERINTAH MUTLAK):\n";
             $systemPrompt .= "1. Jika Nama Saat Ini adalah 'Belum diketahui', Anda DILARANG memberikan informasi layanan apapun sebelum mengetahui nama user.\n";
@@ -99,7 +101,8 @@ class AiHandler
             $systemPrompt .= "PERINTAH KHUSUS:\n";
             $systemPrompt .= "- JANGAN PERNAH memberikan jawaban template yang kaku. Jadilah asisten yang melayani dengan tulus.\n";
             $systemPrompt .= "- Jika warga ingin LAPOR, MENGADU, ADUAN, CURHAT, atau LAPORAN: Tunjukkan empati yang mendalam, lalu WAJIB berikan link pengaduan resmi di: " . $this->getPublicUrl() . "/#pengaduan\n";
-            $systemPrompt .= "- Jika warga mencari JASA, UMKM, INFO MASAKAN, MAKANAN, atau hal terkait EKONOMI: Arahkan ke Pusat Ekonomi {$regionName} di: " . $this->getPublicUrl() . "/ekonomi\n\n";
+            $systemPrompt .= "- Jika warga mencari JASA, UMKM, INFO MASAKAN, MAKANAN, atau hal terkait EKONOMI: Arahkan ke Pusat Ekonomi {$regionName} di: " . $this->getPublicUrl() . "/ekonomi\n";
+            $systemPrompt .= "- Jika warga bertanya CUACA: Katakan Anda tidak punya sensor cuaca langsung, tapi sarankan cek di bmkg.go.id atau cari 'cuaca {$regionName}' di Google.\n\n";
 
             $systemPrompt .= "DATA RESMI & FAQ:\n";
             $systemPrompt .= "{$knowledgeBase}\n\n";
@@ -300,7 +303,7 @@ class AiHandler
 
             foreach ($desas as $desa) {
                 // Education
-                $edu = is_string($desa->stat_pendidikan) ? json_decode($desa->stat_pendidikan, true) : $desa->stat_pendidikan;
+                $edu = $desa->stat_pendidikan;
                 if (is_array($edu)) {
                     foreach ($edu as $item) {
                         $label = $item['nama'] ?? 'Lainnya';
@@ -308,7 +311,7 @@ class AiHandler
                     }
                 }
                 // Job
-                $job = is_string($desa->stat_pekerjaan) ? json_decode($desa->stat_pekerjaan, true) : $desa->stat_pekerjaan;
+                $job = $desa->stat_pekerjaan;
                 if (is_array($job)) {
                     foreach ($job as $item) {
                         $label = $item['nama'] ?? 'Lainnya';
@@ -316,7 +319,7 @@ class AiHandler
                     }
                 }
                 // Religion
-                $rel = is_string($desa->stat_agama) ? json_decode($desa->stat_agama, true) : $desa->stat_agama;
+                $rel = $desa->stat_agama;
                 if (is_array($rel)) {
                     foreach ($rel as $item) {
                         $label = $item['nama'] ?? 'Lainnya';
@@ -324,12 +327,16 @@ class AiHandler
                     }
                 }
                 // Health (Stunting)
-                $health = is_string($desa->stat_kesehatan) ? json_decode($desa->stat_kesehatan, true) : $desa->stat_kesehatan;
-                $totalStunting += $health['totalStunting'] ?? 0;
+                $health = $desa->stat_kesehatan;
+                if (is_array($health)) {
+                    $totalStunting += $health['totalStunting'] ?? 0;
+                }
                 
                 // Welfare (DTSEN / Desil)
-                $desil = is_string($desa->stat_desil) ? json_decode($desa->stat_desil, true) : $desa->stat_desil;
-                $desil1 += $desil['totalDesil1'] ?? 0;
+                $desil = $desa->stat_desil;
+                if (is_array($desil)) {
+                    $desil1 += $desil['totalDesil1'] ?? 0;
+                }
             }
 
             $knowledge .= "\nSTATISTIK WILAYAH LENGKAP:\n";

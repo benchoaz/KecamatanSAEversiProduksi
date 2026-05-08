@@ -281,6 +281,7 @@ class WahaN8nController extends Controller
         // 1. Clear Laravel Application Cache
         app(\App\Services\ApplicationProfileService::class)->clearCache();
         WahaN8nSetting::clearCache();
+        Cache::forget('ai_context_data');
 
         // 2. Notify n8n via Webhook to refresh instructions/memory
         $settings = WahaN8nSetting::getSettings();

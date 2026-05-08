@@ -15,7 +15,7 @@ def run_remote(cmd):
         full_output = b""
         password_sent = False
         start = time.time()
-        while time.time() - start < 30:
+        while time.time() - start < 600:
             try:
                 chunk = os.read(fd, 4096)
                 if not chunk: break

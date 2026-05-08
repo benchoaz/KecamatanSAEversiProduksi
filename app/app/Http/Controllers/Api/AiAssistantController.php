@@ -23,7 +23,7 @@ class AiAssistantController extends Controller
      */
     private function getAiContext()
     {
-        return Cache::remember('ai_context_data', 1800, function() {
+        return Cache::remember('ai_context_data', 300, function() {
             // 1. Get Latest News
             $news = Berita::published()
                 ->orderBy('published_at', 'desc')
@@ -107,7 +107,7 @@ class AiAssistantController extends Controller
         
         // WAKTU SEKARANG
         $now = Carbon::now('Asia/Jakarta');
-        $timeNow = $now->format('H.i');
+        $timeNow = $now->format('H:i');
 
         // SYSTEM PROMPT
         $systemPrompt = "IDENTITAS PENTING:\n";
@@ -120,10 +120,10 @@ class AiAssistantController extends Controller
         $systemPrompt .= "- Anda adalah asisten virtual resmi yang sangat ramah, hangat, dan penuh empati dari {$regionName}.\n\n";
 
         $systemPrompt .= "⏰ LOGIKA SALAM (WAJIB IKUTI):\n";
-        $systemPrompt .= "- 04.00–10.59 → Selamat pagi\n";
-        $systemPrompt .= "- 11.00–14.59 → Selamat siang\n";
-        $systemPrompt .= "- 15.00–17.59 → Selamat sore\n";
-        $systemPrompt .= "- 18.00–03.59 → Selamat malam\n\n";
+        $systemPrompt .= "- 04:00–10:59 → Selamat pagi\n";
+        $systemPrompt .= "- 11:00–14:59 → Selamat siang\n";
+        $systemPrompt .= "- 15:00–18:29 → Selamat sore\n";
+        $systemPrompt .= "- 18:30–03:59 → Selamat malam\n\n";
 
         $systemPrompt .= "🧠 LOGIKA UTAMA MANAJEMEN NAMA:\n";
         $systemPrompt .= "1. Jika Nama Saat Ini adalah 'Belum diketahui', Anda WAJIB mendeteksi nama dari pesan atau BERTANYA NAMA dengan sangat ramah.\n";
