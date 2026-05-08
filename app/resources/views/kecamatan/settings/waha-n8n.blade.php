@@ -223,6 +223,33 @@
                             </div>
                         </div>
 
+                        {{-- Broadcase Groups & Weather Alerts --}}
+                        <div class="col-md-12 mt-2 mb-2">
+                            <div class="p-4 border border-success-100 bg-success-50 bg-opacity-30 rounded-4 shadow-sm">
+                                <div class="d-flex align-items-center justify-content-between mb-4 border-bottom border-success-200 pb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-bullhorn text-success-600 fs-5"></i>
+                                        <h6 class="mb-0 fw-bold text-success-900">Broadcast & Peringatan Dini Cuaca</h6>
+                                    </div>
+                                    <div class="form-check form-switch mb-0">
+                                        <label class="form-check-label small fw-bold me-2" for="is_weather_alert_enabled">Aktifkan Alert Cuaca</label>
+                                        <input class="form-check-input" type="checkbox" name="is_weather_alert_enabled" id="is_weather_alert_enabled" value="1" {{ ($settings->is_weather_alert_enabled) ? 'checked' : '' }} style="width: 2.5em; height: 1.25em;">
+                                    </div>
+                                </div>
+
+                                <div class="row g-4">
+                                    <div class="col-md-12">
+                                        <label class="form-label text-slate-700 fw-semibold">ID Group WhatsApp untuk Broadcast</label>
+                                        <textarea name="broadcast_group_ids" class="form-control bg-white border-slate-200 rounded-3 text-sm" rows="2" placeholder="Contoh: 120363023948572635@g.us, 120363049586721034@g.us">{{ old('broadcast_group_ids', $settings->broadcast_group_ids) }}</textarea>
+                                        <div class="form-text text-slate-400 small">
+                                            Masukkan ID Group WhatsApp (akhiran @g.us), pisahkan dengan koma jika lebih dari satu.
+                                            <br><i class="fas fa-info-circle me-1"></i> Bot akan otomatis membroadcast **Peringatan Dini Cuaca Ekstrem** dari BMKG ke group-group ini jika terdeteksi untuk wilayah Besuk/Probolinggo.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="col-md-12">
                             <hr class="my-4 text-light">
                         </div>

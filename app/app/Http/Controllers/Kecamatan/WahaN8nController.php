@@ -37,6 +37,8 @@ class WahaN8nController extends Controller
             'whatsapp_bot_menu.*.enabled'     => 'nullable',
             'operator_number'                 => 'nullable|string|max:20',
             'is_operator_notification_enabled'=> 'nullable|boolean',
+            'broadcast_group_ids'             => 'nullable|string',
+            'is_weather_alert_enabled'        => 'nullable|boolean',
         ]);
 
         $validated['bot_enabled'] = $request->has('bot_enabled') ? true : false;
@@ -68,6 +70,8 @@ class WahaN8nController extends Controller
                 'bot_number' => $validated['bot_number'] ?? null,
                 'operator_number' => $validated['operator_number'] ?? null,
                 'is_operator_notification_enabled' => $validated['is_operator_notification_enabled'],
+                'broadcast_group_ids' => $validated['broadcast_group_ids'] ?? null,
+                'is_weather_alert_enabled' => $request->has('is_weather_alert_enabled'),
                 'bot_enabled' => $validated['bot_enabled'],
             ]);
         } else {
@@ -75,6 +79,8 @@ class WahaN8nController extends Controller
                 'bot_number' => $validated['bot_number'] ?? null,
                 'operator_number' => $validated['operator_number'] ?? null,
                 'is_operator_notification_enabled' => $validated['is_operator_notification_enabled'],
+                'broadcast_group_ids' => $validated['broadcast_group_ids'] ?? null,
+                'is_weather_alert_enabled' => $request->has('is_weather_alert_enabled'),
                 'bot_enabled' => $validated['bot_enabled'],
             ]);
         }

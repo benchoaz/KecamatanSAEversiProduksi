@@ -102,12 +102,69 @@ class WeatherService
     }
 
     /**
-     * Get real-time alert summary (Mock for now, can be connected to radar scraping)
+     * Get real-time alert summary from BMKG CAP RSS
+     */
+    public function checkBmkgAlerts(): array
+    {
+        try {
+            // Get the RSS feed of active alerts
+            $response = Http::timeout(10)->get("https://www.bmkg.go.id/alerts/nowcast/id");
+            
+            if (!$response->successful()) {
+                return ['success' => false, 'message' => 'Gagal terhubung ke server BMKG Alerts'];
+            }
+
+            // Simple XML parsing using SimpleXML
+            $xml = simplexml_load_string($response->body());
+            if (!$xml) {
+                return ['success' => false, 'message' => 'Format data BMKG tidak valid'];
+            }
+
+            $alerts = [];
+            $targetKeywords = ['Besuk', 'Probolinggo'];
+            
+            foreach ($xml->channel->item as $item) {
+                $description = (string) $item->description;
+                $title = (string) $item->title;
+                $link = (string) $item->link;
+                $guid = (string) $item->guid; // Unique ID for this alert
+
+                // Check if any target keywords match in title or description
+                $isMatch = false;
+                foreach ($targetKeywords as $kw) {
+                    if (stripos($description, $kw) !== false || stripos($title, $kw) !== false) {
+                        $isMatch = true;
+                        break;
+                    }
+                }
+
+                if ($isMatch) {
+                    $alerts[] = [
+                        'id' => $guid,
+                        'title' => $title,
+                        'description' => $description,
+                        'link' => $link,
+                        'pubDate' => (string) $item->pubDate,
+                    ];
+                }
+            }
+
+            return [
+                'success' => true,
+                'alerts' => $alerts
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("Error checking BMKG alerts: " . $e->getMessage());
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Get real-time radar alert summary
      */
     public function getRadarAlert(): string
     {
-        // In the future, this can parse the dataradar-update.json from Juanda
-        // For now, we return a general notice or "No intense rain detected"
         return "Pantauan Radar Juanda saat ini menunjukkan kondisi awan normal di wilayah Probolinggo Timur.";
     }
 }

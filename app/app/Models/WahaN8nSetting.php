@@ -54,6 +54,10 @@ class WahaN8nSetting extends Model
         'qr_code',
         'operator_number',
         'is_operator_notification_enabled',
+        'broadcast_group_ids',
+        'is_weather_alert_enabled',
+        'last_weather_alert_check',
+        'last_alert_id',
     ];
 
     protected $casts = [
@@ -61,8 +65,10 @@ class WahaN8nSetting extends Model
         'is_n8n_connected'                 => 'boolean',
         'bot_enabled'                      => 'boolean',
         'is_operator_notification_enabled' => 'boolean',
+        'is_weather_alert_enabled'         => 'boolean',
         'connection_details'      => 'array',
         'last_connection_check'   => 'datetime',
+        'last_weather_alert_check' => 'datetime',
         'generic_http_headers'    => 'array',
         'generic_http_extra_body' => 'array',
     ];

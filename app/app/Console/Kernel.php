@@ -17,6 +17,9 @@ class Kernel extends ConsoleKernel
         // Polling APIs & Scraping for news updates
         $schedule->command('scrape:desa-news')->everyTwoHours()->withoutOverlapping();
         $schedule->command('scrape:kecamatan-news')->cron('0 */6 * * *')->withoutOverlapping();
+        
+        // Check BMKG weather alerts every 15 minutes
+        $schedule->command('app:check-weather-alerts')->everyFifteenMinutes()->withoutOverlapping();
 
         // Automated Google Drive Backup
         try {
