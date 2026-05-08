@@ -62,7 +62,7 @@
                 <div class="flex items-center gap-2 mb-4">
                     <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-100">Pemilik Toko</span>
                 </div>
-                <h2 class="text-3xl font-black text-slate-900 leading-tight">Halo, Warga Kreatif</h2>
+                <h2 class="text-3xl font-black text-slate-900 leading-tight">Halo, {{ $userName }}</h2>
                 <div class="flex items-center gap-3 mt-6">
                     <div class="flex -space-x-2">
                         <div class="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold">W</div>

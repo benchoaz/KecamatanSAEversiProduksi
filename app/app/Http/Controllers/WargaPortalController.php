@@ -142,8 +142,19 @@ class WargaPortalController extends Controller
             ]);
         }
 
+        // 4. Try to find the person's real name from their assets
+        $userName = 'Warga';
+        if ($umkms->isNotEmpty()) {
+            $userName = $umkms->first()->nama_pemilik;
+        } elseif ($jasas->isNotEmpty()) {
+            $userName = $jasas->first()->name;
+        } elseif ($umkmLocals->isNotEmpty()) {
+            $userName = $umkmLocals->first()->contact_person ?? 'Warga';
+        }
+
         return view('public.warga.dashboard', [
             'allAssets' => $allAssets,
+            'userName' => $userName,
             'umkms' => $umkms,
             'jasas' => $jasas,
             'umkmLocals' => $umkmLocals,
