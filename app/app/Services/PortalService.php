@@ -52,9 +52,9 @@ class PortalService
         $likeClause = '%' . $basePhone . '%';
 
         return [
-            'umkm' => Umkm::where('no_wa', 'like', $likeClause)->get(),
-            'jasa' => WorkDirectory::where('contact_phone', 'like', $likeClause)->get(),
-            'umkmLocal' => UmkmLocal::where('contact_wa', 'like', $likeClause)->get(),
+            'umkm' => Umkm::where('no_wa', 'like', $likeClause)->first(),
+            'jasa' => WorkDirectory::where('contact_phone', 'like', $likeClause)->first(),
+            'umkmLocal' => UmkmLocal::where('contact_wa', 'like', $likeClause)->first(),
             'services' => PublicService::where('whatsapp', 'like', $likeClause)->latest()->get(),
         ];
     }
