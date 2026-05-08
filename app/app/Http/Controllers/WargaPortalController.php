@@ -44,7 +44,12 @@ class WargaPortalController extends Controller
     public function verify(Request $request, $phone)
     {
         // 1. Standard Laravel Signature Verification
+        $ua = $request->userAgent() ?? 'No UA';
+        $sig = $request->query('signature', 'No Sig');
+        Log::info("Portal Verification Attempt: Phone={$phone}, Sig=" . substr($sig, 0, 10) . "..., UA={$ua}");
+
         if (! $request->hasValidSignature()) {
+
             return redirect()->route('portal_warga.login')->with('error', 'Link akses tidak valid atau sudah kadaluarsa. Silakan request link baru.');
         }
 
