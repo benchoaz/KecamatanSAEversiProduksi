@@ -89,11 +89,10 @@ class AiHandler
             $systemPrompt .= "- Anda adalah asisten virtual resmi yang sangat ramah, hangat, dan penuh empati dari {$regionName}.\n\n";
 
             $systemPrompt .= "🧠 LOGIKA UTAMA MANAJEMEN NAMA (PERINTAH MUTLAK):\n";
-            $systemPrompt .= "1. Jika Nama Saat Ini adalah 'Belum diketahui', Anda DILARANG memberikan informasi layanan apapun sebelum mengetahui nama user.\n";
-            $systemPrompt .= "2. Anda WAJIB menggunakan kalimat persis ini untuk bertanya nama: 'Mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya?'\n";
-            $systemPrompt .= "3. JANGAN gunakan variasi kalimat tanya nama lain seperti 'Boleh tahu namanya?' atau 'Siapa ini?'. GUNAKAN KALIMAT DI POIN 2.\n";
-            $systemPrompt .= "4. Jika user menyebutkan nama, simpan dengan tag [SET_NAME:nama].\n";
-            $systemPrompt .= "5. Jika Nama Saat Ini sudah diketahui, sapa langsung dengan nama tersebut secara hangat.\n\n";
+            $systemPrompt .= "1. Jika Nama Saat Ini adalah 'Belum diketahui', Anda WAJIB mengetahui nama user sebelum melayani hal lain.\n";
+            $systemPrompt .= "2. Jika user menyebutkan namanya (misal: 'Nama saya Budi' atau 'Panggil saya Dewi'), Anda WAJIB menyertakan tag [SET_NAME:nama] di akhir jawaban Anda agar saya bisa mengingatnya selamanya.\n";
+            $systemPrompt .= "3. Anda WAJIB menggunakan kalimat persis ini untuk bertanya nama jika belum tahu: 'Mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya?'\n";
+            $systemPrompt .= "4. Sekali nama sudah disimpan, sapa selalu user dengan nama tersebut secara hangat.\n\n";
 
             $systemPrompt .= "🎯 PERILAKU BERDASARKAN KONDISI:\n";
             $systemPrompt .= "1. KONDISI: PESAN PERTAMA & NAMA TIDAK DIKETAHUI:\n";
@@ -110,10 +109,11 @@ class AiHandler
             $systemPrompt .= "- Gunakan emoji (👋, 😊, 🌤️, 🌙) secara natural (maksimal 2 per pesan).\n\n";
 
             $systemPrompt .= "PERINTAH KHUSUS:\n";
-            $systemPrompt .= "- JANGAN PERNAH memberikan jawaban template yang kaku. Jadilah asisten yang melayani dengan tulus.\n";
-            $systemPrompt .= "- Jika warga ingin LAPOR, MENGADU, ADUAN, CURHAT, atau LAPORAN: Tunjukkan empati yang mendalam, lalu WAJIB berikan link pengaduan resmi di: " . $this->getPublicUrl() . "/#pengaduan\n";
+            $systemPrompt .= "- HINDARI memberikan daftar menu angka yang kaku (1, 2, 3) kecuali user memintanya.\n";
+            $systemPrompt .= "- Jika user mengetik typo (salah ketik) atau terlihat bingung, berikan saran layanan yang relevan dalam bentuk kalimat ramah, bukan menu angka.\n";
+            $systemPrompt .= "- Jika warga ingin LAPOR, MENGADU, ADUAN, CURHAT, atau LAPORAN: Tunjukkan empati yang mendalam, lalu berikan link pengaduan resmi: " . $this->getPublicUrl() . "/#pengaduan\n";
             $systemPrompt .= "- Jika warga mencari JASA, UMKM, INFO MASAKAN, MAKANAN, atau hal terkait EKONOMI: Arahkan ke Pusat Ekonomi {$regionName} di: " . $this->getPublicUrl() . "/ekonomi\n";
-            $systemPrompt .= "- Jika warga bertanya CUACA: Gunakan data resmi dari BMKG yang tersedia di bagian DATA RESMI di bawah untuk memberikan informasi prakiraan cuaca yang akurat dan ramah.\n\n";
+            $systemPrompt .= "- Jika warga bertanya CUACA: Gunakan data resmi dari BMKG yang tersedia di bagian DATA RESMI di bawah untuk memberikan informasi prakiraan cuaca yang akurat.\n\n";
 
             $systemPrompt .= "DATA RESMI & FAQ:\n";
             $systemPrompt .= "{$knowledgeBase}\n\n";
@@ -148,8 +148,22 @@ class AiHandler
                 if ($memory && !empty($detectedName)) {
                     $memory->user_name = $detectedName;
                     $userName = $detectedName;
+                    $memory->save();
+                    \Log::info("AI SET NAME DETECTED: " . $detectedName);
                 }
                 $reply = str_replace($matches[0], '', $reply);
+            }
+            
+            // Fallback Name Detection if AI says "Halo Pak/Bu [Name]" and we have no name
+            if (empty($userName) || $userName === 'Belum diketahui') {
+                if (preg_match('/Halo (Pak|Bu|Bapak|Ibu|Kak|Kakak) ([A-Z][a-z]+)/', $reply, $m)) {
+                    $detectedName = $m[2];
+                    if ($memory) {
+                        $memory->user_name = $detectedName;
+                        $memory->save();
+                        \Log::info("FALLBACK NAME DETECTED: " . $detectedName);
+                    }
+                }
             }
 
             // Garansi Navigasi
