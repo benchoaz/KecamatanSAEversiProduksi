@@ -59,7 +59,7 @@ class IntentHandler
                     'state_update' => null
                 ];
             }
-            return $this->getMainMenu();
+            return $this->getMainMenu($phone);
         }
 
         // 2. GREETINGS: Warm response for hello/hi
@@ -116,7 +116,7 @@ class IntentHandler
                 return $this->getLayananLink();
             }
             if ($this->isSelection($messageLower, '3') || $messageLower === 'menu' || $messageLower === 'kembali') {
-                return $this->getMainMenu();
+                return $this->getMainMenu($phone);
             }
         }
 
@@ -311,7 +311,7 @@ class IntentHandler
                 $parentLabel = $currentMenu[$idx]['label'];
                 $currentMenu = $currentMenu[$idx]['children'];
             } else {
-                return $this->getMainMenu();
+                return $this->getMainMenu($phone);
             }
         }
 
@@ -324,7 +324,7 @@ class IntentHandler
                 }
                 if ($action === 'back') {
                     $newPath = count($indices) > 1 ? implode('.', array_slice($indices, 0, -1)) : null;
-                    if ($newPath === null) return $this->getMainMenu();
+                    if ($newPath === null) return $this->getMainMenu($phone);
                     return $this->handleMenuNavigation($phone, 'RE-RENDER', $newPath);
                 }
                 return $this->executeMenuAction($action, $phone, $item);
@@ -334,7 +334,7 @@ class IntentHandler
         return [
             'success' => true,
             'intent' => 'submenu_render',
-            'reply' => $this->renderMenu($activeMapping, $parentLabel),
+            'reply' => $this->renderMenu($activeMapping, $parentLabel, $phone),
             'state_update' => 'NAV_PATH:' . $path,
         ];
     }
@@ -347,7 +347,7 @@ class IntentHandler
         return [
             'success' => true,
             'intent' => 'submenu_enter',
-            'reply' => $this->renderMenu($activeMapping, $item['label'] ?? 'Sub-Menu'),
+            'reply' => $this->renderMenu($activeMapping, $item['label'] ?? 'Sub-Menu', $phone),
             'state_update' => 'NAV_PATH:' . $newPath,
         ];
     }
@@ -356,7 +356,7 @@ class IntentHandler
     {
         switch ($action) {
             case 'administrasi':
-                return $this->getAdministrasiSubmenu();
+                return $this->getAdministrasiSubmenu($phone);
             case 'umkm_produk':
                 $baseUrl = $this->getPublicUrl();
                 return [
@@ -386,13 +386,13 @@ class IntentHandler
                         'state_update' => null,
                     ];
                 }
-                return $this->getMainMenu();
+                return $this->getMainMenu($phone);
             default:
-                return $this->getMainMenu();
+                return $this->getMainMenu($phone);
         }
     }
 
-    protected function getMainMenu(): array
+    protected function getMainMenu(?string $phone = null): array
     {
         $regionName = strtoupper(appProfile()->region_name ?? 'BESUK');
         $activeMapping = $this->getActiveMenuMapping();
@@ -400,14 +400,15 @@ class IntentHandler
         return [
             'success'      => true,
             'intent'       => 'menu',
-            'reply'        => $this->renderMenu($activeMapping, "KECAMATAN {$regionName}"),
+            'reply'        => $this->renderMenu($activeMapping, "KECAMATAN {$regionName}", $phone),
             'state_update' => null,
         ];
     }
 
-    protected function renderMenu(array $mapping, string $title): string
+    protected function renderMenu(array $mapping, string $title, ?string $phone = null): string
     {
-        $menu  = "🏛️ *LAYANAN DIGITAL " . strtoupper($title) . "*\n\n";
+        $greeting = $this->getUserGreeting($phone);
+        $menu  = ($greeting ? $greeting . "\n\n" : "") . "🏛️ *LAYANAN DIGITAL " . strtoupper($title) . "*\n\n";
         $menu .= "Silakan pilih layanan (Ketik angka):\n\n";
 
         foreach ($mapping as $num => $item) {
@@ -505,9 +506,10 @@ class IntentHandler
         return $profile->region_name ?? 'Kecamatan';
     }
 
-    public function getAdministrasiSubmenu(): array
+    public function getAdministrasiSubmenu(?string $phone = null): array
     {
-        $reply = "🏛️ *MENU ADMINISTRASI*\n\n";
+        $greeting = $this->getUserGreeting($phone);
+        $reply = ($greeting ? $greeting . "\n\n" : "") . "🏛️ *MENU ADMINISTRASI*\n\n";
         $reply .= "Silakan pilih layanan yang diinginkan:\n\n";
         $reply .= "1. *STATUS* - Lacak Berkas Anda\n";
         $reply .= "2. *SYARAT* - Syarat & Ajukan Online\n";
@@ -554,5 +556,19 @@ class IntentHandler
             'reply' => $reply,
             'state_update' => null,
         ];
+    }
+
+    protected function getUserGreeting(?string $phone): ?string
+    {
+        if (!$phone) return null;
+        
+        $phoneClean = preg_replace('/[^0-9]/', '', $phone);
+        $memory = \App\Models\AiMemory::where('phone_number', $phoneClean)->first();
+        
+        if ($memory && !empty($memory->user_name) && $memory->user_name !== 'Belum diketahui') {
+            return "Baik Pak/Bu *{$memory->user_name}*, silakan pilih menu di bawah ini:";
+        }
+        
+        return null;
     }
 }
