@@ -269,11 +269,20 @@ class AiHandler
     private function getDynamicKnowledge(): string
     {
         return Cache::remember('whatsapp_ai_knowledge', 600, function() {
-            $knowledge = "DAFTAR LAYANAN TERSEDIA:\n";
+            $knowledge = "🏢 INFORMASI LAYANAN UTAMA & ESTIMASI WAKTU:\n";
+            $masters = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
+            foreach ($masters as $master) {
+                $knowledge .= "- " . strtoupper($master->nama_layanan) . " (Slug: {$master->slug})\n";
+                $knowledge .= "  Persyaratan Umum: " . ($master->deskripsi_syarat ?: '-') . ".\n";
+                $knowledge .= "  Estimasi Selesai: " . ($master->estimasi_waktu ?: '-') . ".\n\n";
+            }
+
+            $knowledge .= "📂 SUB-LAYANAN SPESIFIK:\n";
             $nodes = ServiceNode::where('is_active', true)->get();
             foreach ($nodes as $node) {
-                $knowledge .= "- " . strtoupper($node->name) . ": " . ($node->description ?? 'Layanan administrasi') . "\n";
-                $requirements = ServiceRequirement::where('node_id', $node->id)->get();
+                $masterName = $node->masterLayanan->nama_layanan ?? 'Umum';
+                $knowledge .= "- " . strtoupper($node->name) . " (Kategori: {$masterName}): " . ($node->description ?: ($node->requirement_text ?: 'Layanan administrasi')) . "\n";
+                $requirements = \App\Models\ServiceRequirement::where('node_id', $node->id)->get();
                 if ($requirements->count() > 0) {
                     $knowledge .= "  Persyaratan: " . $requirements->pluck('label')->implode(', ') . ".\n";
                 }

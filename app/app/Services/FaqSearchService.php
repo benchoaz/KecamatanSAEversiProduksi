@@ -63,7 +63,46 @@ class FaqSearchService
         // 4. Weighted Scoring Match
         $matches = collect();
 
-        // 4a. Match FAQ
+        // 4a. Match Master Layanan (HIGHER PRIORITY - Official SOP)
+        $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)->get();
+        foreach ($masterLayanan as $layanan) {
+            $score = 0;
+            $lowTitle = strtolower($layanan->nama_layanan);
+
+            if ($lowTitle == $query || $lowTitle == $originalQuery) $score += 120; // Boosted
+            if (str_contains($lowTitle, $query) || str_contains($lowTitle, $originalQuery)) $score += 60;
+
+            // Boost score if user asks for 'syarat', 'dokumen', or 'buat'
+            if (preg_match('/\b(syarat|persyaratan|dokumen|buat|cara|ngurus|bikin)\b/i', $query) || 
+                preg_match('/\b(syarat|persyaratan|dokumen|buat|cara|ngurus|bikin)\b/i', $originalQuery)) {
+                if ($score > 0) $score += 40;
+            }
+
+            if ($score > 0) {
+                $reqsText = is_array($layanan->attachment_requirements) 
+                    ? implode("\n- ", $layanan->attachment_requirements)
+                    : $layanan->attachment_requirements;
+
+                $answer = "**SOP Layanan: {$layanan->nama_layanan}**\n";
+                $answer .= "⏱️ Estimasi Waktu: {$layanan->estimasi_waktu}\n\n";
+                if (!empty($layanan->deskripsi_syarat)) {
+                    $answer .= "📋 **Syarat:**\n" . strip_tags(html_entity_decode($layanan->deskripsi_syarat)) . "\n\n";
+                }
+                if (!empty($reqsText)) {
+                    $answer .= "**Persyaratan Dokumen Tambahan:**\n- " . $reqsText;
+                }
+
+                $matches->push([
+                    'id' => 'master_' . $layanan->id,
+                    'is_emergency' => false,
+                    'question' => "Syarat " . $layanan->nama_layanan,
+                    'answer' => trim($answer),
+                    'score' => $score
+                ]);
+            }
+        }
+
+        // 4b. Match FAQ (Secondary - General Questions)
         $activeFaqs = \App\Models\PelayananFaq::where('is_active', true)->get();
         foreach ($activeFaqs as $faq) {
             $score = 0;
@@ -95,46 +134,6 @@ class FaqSearchService
                     'is_emergency' => $faq->category === 'Darurat',
                     'question' => $faq->question,
                     'answer' => $faq->answer,
-                    'score' => $score
-                ]);
-            }
-        }
-
-        // 4b. Match Master Layanan
-        $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)->get();
-        foreach ($masterLayanan as $layanan) {
-            $score = 0;
-            $lowTitle = strtolower($layanan->nama_layanan);
-
-            if ($lowTitle == $query || $lowTitle == $originalQuery) $score += 100;
-            if (str_contains($lowTitle, $query) || str_contains($lowTitle, $originalQuery)) $score += 50;
-
-            // Boost score if user asks for 'syarat' or 'dokumen'
-            if (str_contains($query, 'syarat') || str_contains($query, 'persyaratan') || str_contains($query, 'dokumen') || str_contains($query, 'buat')) {
-                if ($score > 0) $score += 40;
-            }
-
-            if ($score > 0) {
-                $reqsText = is_array($layanan->attachment_requirements) 
-                    ? implode("\n- ", $layanan->attachment_requirements)
-                    : $layanan->attachment_requirements;
-
-                $answer = "**SOP Layanan: {$layanan->nama_layanan}**\n";
-                $answer .= "⏱️ Waktu Pelayanan: {$layanan->estimasi_waktu}\n\n";
-                if (!empty($layanan->deskripsi_syarat)) {
-                    $answer .= strip_tags(html_entity_decode($layanan->deskripsi_syarat)) . "\n\n";
-                }
-                if (!empty($reqsText)) {
-                    $answer .= "**Persyaratan Dokumen:**\n- " . $reqsText;
-                } else {
-                    $answer .= "Sampaikan detail permohonan Anda ke petugas untuk syarat spesifik.";
-                }
-
-                $matches->push([
-                    'id' => 'master_' . $layanan->id,
-                    'is_emergency' => false,
-                    'question' => "Syarat " . $layanan->nama_layanan,
-                    'answer' => trim($answer),
                     'score' => $score
                 ]);
             }
