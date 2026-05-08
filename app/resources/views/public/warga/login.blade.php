@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pusat Kendali Warga - Kecamatan Digital</title>
+    <title>Login Seller UMKM - Beniwijaya.id</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -60,7 +60,7 @@
                     <div class="w-20 h-20 bg-gradient-to-br from-slate-50 to-white rounded-3xl shadow-lg border border-white mx-auto mb-6 flex items-center justify-center transform rotate-3 hover:rotate-0 transition-transform duration-500">
                         <i class="fas fa-id-badge text-3xl text-transparent bg-clip-text bg-gradient-to-br from-blue-500 to-indigo-600"></i>
                     </div>
-                    <h1 class="text-2xl font-black text-slate-800 mb-2">Portal Warga</h1>
+                    <h1 class="text-2xl font-black text-slate-800 mb-2">Login Seller</h1>
                     <p class="text-slate-500 text-xs font-medium leading-relaxed">
                         Satu pintu aman untuk mengelola Toko UMKM dan Profil Jasa Anda secara langsung tanpa PIN.
                     </p>
@@ -135,8 +135,8 @@
         </div>
 
         <!-- Footer -->
-        <p class="text-center text-[10px] text-slate-400 mt-8 font-medium opacity-60">
-            &copy; {{ date('Y') }} Portal Warga Terpadu. Aman & Tanpa Password.
+        <p class="text-center text-[10px] text-slate-400 mt-8 font-medium">
+            &copy; {{ date('Y') }} Beniwijaya.id – Inovasi Teknologi dari Besuk untuk Negeri.
         </p>
     </div>
 

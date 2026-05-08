@@ -172,9 +172,7 @@
         <div class="pt-10 border-t border-slate-800/80 flex flex-col lg:flex-row justify-between items-center gap-8">
             <div class="order-2 lg:order-1 text-center lg:text-left space-y-2">
                 <p class="text-sm text-slate-500 font-medium">
-                    &copy; {{ date('Y') }} <span
-                        class="text-white font-black uppercase tracking-tighter">{{ appProfile()->full_region_name }}</span>.
-                    Seluruh Hak Cipta Dilindungi.
+                    &copy; {{ date('Y') }} <span class="text-white font-black">Beniwijaya.id</span> – Inovasi Teknologi dari Besuk untuk Negeri.
                 </p>
                 <div
                     class="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2 text-[11px] font-bold uppercase tracking-widest text-slate-600">

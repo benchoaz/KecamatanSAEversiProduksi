@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konfirmasi Akses - Kecamatan Digital</title>
+    <title>Konfirmasi Akses - Beniwijaya.id</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -64,7 +64,7 @@
 
                 <h1 class="text-2xl font-black text-slate-800 mb-3">Konfirmasi Akses</h1>
                 <p class="text-slate-500 text-xs font-medium leading-relaxed mb-8 px-4">
-                    Sistem mendeteksi permintaan masuk ke Dasbor Warga untuk nomor:
+                    Sistem mendeteksi permintaan masuk ke Dasbor UMKM untuk nomor:
                     <span class="block mt-2 font-black text-slate-700 text-sm tracking-widest">+{{ substr($phone, 0, 4) }}xxxx{{ substr($phone, -4) }}</span>
                 </p>
 
@@ -93,8 +93,8 @@
         </div>
 
         <!-- Footer -->
-        <p class="text-center text-[10px] text-slate-400 mt-8 font-medium opacity-60">
-            &copy; {{ date('Y') }} Keamanan Terpadu Kecamatan.
+        <p class="text-center text-[10px] text-slate-400 mt-8 font-medium">
+            &copy; {{ date('Y') }} Beniwijaya.id – Inovasi Teknologi dari Besuk untuk Negeri.
         </p>
     </div>
 
