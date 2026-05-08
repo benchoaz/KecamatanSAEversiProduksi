@@ -307,7 +307,7 @@
                 <a href="#" class="text-slate-400 hover:text-blue-600 text-sm font-medium transition">Kontak Kami</a>
                 <a href="#" class="text-slate-400 hover:text-blue-600 text-sm font-medium transition">Sitemap</a>
             </div>
-            <p class="text-slate-400 text-sm">© 2026 Pemerintah Kecamatan. Dikembangkan oleh Tim IT Kecamatan.</p>
+            <p class="text-slate-400 text-sm">© 2026 Beniwijaya.id – Inovasi Teknologi dari Besuk untuk Negeri.</p>
         </div>
     </footer>
 

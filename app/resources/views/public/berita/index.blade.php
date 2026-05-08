@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Berita & Informasi - Kecamatan Official</title>
+    <title>Berita & Informasi - Beniwijaya.id</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -324,7 +324,7 @@
                 <a href="#" class="text-slate-400 hover:text-blue-600 text-sm font-medium transition">Kontak</a>
                 <a href="#" class="text-slate-400 hover:text-blue-600 text-sm font-medium transition">Sitemap</a>
             </div>
-            <p class="text-slate-400 text-sm">© 2026 Pemerintah Kecamatan. Informasi Publik bersifat Terbuka.</p>
+            <p class="text-slate-400 text-sm">© 2026 Beniwijaya.id – Inovasi Teknologi dari Besuk untuk Negeri.</p>
         </div>
     </footer>
 
