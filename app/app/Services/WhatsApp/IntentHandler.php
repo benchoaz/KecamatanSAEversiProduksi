@@ -132,16 +132,18 @@ class IntentHandler
             }
         }
 
-        // 5. ROOT MENU NAVIGATION
-        $activeMenu = $this->getActiveMenuMapping();
-        foreach ($activeMenu as $number => $item) {
-            if ($this->isSelection($messageLower, (string)$number)) {
-                // If this is a submenu, enter it
-                if (($item['action'] ?? '') === 'submenu') {
-                    return $this->enterSubmenu($phone, (string)($number - 1), $item);
+        // 5. ROOT MENU NAVIGATION (Only if state is MAIN_MENU)
+        if ($state === 'MAIN_MENU') {
+            $activeMenu = $this->getActiveMenuMapping();
+            foreach ($activeMenu as $number => $item) {
+                if ($this->isSelection($messageLower, (string)$number)) {
+                    // If this is a submenu, enter it
+                    if (($item['action'] ?? '') === 'submenu') {
+                        return $this->enterSubmenu($phone, (string)($number - 1), $item);
+                    }
+                    // Otherwise execute the direct action
+                    return $this->executeMenuAction($item['action'] ?? 'custom', $phone, $item);
                 }
-                // Otherwise execute the direct action
-                return $this->executeMenuAction($item['action'] ?? 'custom', $phone, $item);
             }
         }
 
@@ -401,7 +403,7 @@ class IntentHandler
             'success'      => true,
             'intent'       => 'menu',
             'reply'        => $this->renderMenu($activeMapping, "KECAMATAN {$regionName}", $phone),
-            'state_update' => null,
+            'state_update' => 'MAIN_MENU',
         ];
     }
 
