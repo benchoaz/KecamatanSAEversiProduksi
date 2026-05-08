@@ -17,7 +17,7 @@ Route::prefix('portal-warga')->name('portal_warga.')->group(function () {
     Route::post('/masuk/request', [WargaPortalController::class, 'requestAccess'])
         ->middleware('throttle:5,10')
         ->name('request');
-    Route::get('/verify/{phone}', [WargaPortalController::class, 'verify'])->name('verify');
+    Route::match(['get', 'post'], '/verify/{phone}', [WargaPortalController::class, 'verify'])->name('verify');
     Route::get('/dashboard', [WargaPortalController::class, 'dashboard'])->name('dashboard');
     Route::get('/keluar', [WargaPortalController::class, 'logout'])->name('logout');
     

@@ -26,6 +26,14 @@ def run_step(cmd):
                 break
         return output.decode(errors='ignore')
 
-print("--- GREPPING LOGS ---")
-cmd = "cd kecamatanSAE && sudo docker compose -f docker-compose.vps.yml exec -T app grep 'Portal Verification Attempt' storage/logs/laravel.log | tail -n 10"
+print("--- CHECKING VPS TOKENS (V2) ---")
+phone = '82231203765'
+tinker_cmd = f"""
+\$tokens = \\App\\Models\\PortalLoginToken::where('phone', 'like', '%{phone}%')->latest()->limit(5)->get();
+foreach (\$tokens as \$t) {{
+    echo 'SIG: ' . substr(\$t->signature, 0, 10) . '... UsedAt=' . (\$t->used_at ? \$t->used_at->toDateTimeString() : 'NULL') . ', Expired=' . (\$t->expires_at->isPast() ? 'YES' : 'NO') . ', Created=' . \$t->created_at->toDateTimeString() . PHP_EOL;
+}}
+"""
+tinker_cmd_escaped = tinker_cmd.replace('"', '\\"').replace('\n', ' ')
+cmd = f"cd kecamatanSAE && sudo docker compose -f docker-compose.vps.yml exec -T app php artisan tinker --execute=\"{tinker_cmd_escaped}\""
 print(run_step(cmd))
