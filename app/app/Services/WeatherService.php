@@ -50,11 +50,26 @@ class WeatherService
      */
     protected function parseBmkgData(array $data): array
     {
-        // BMKG API structure can be complex, we extract what's important
-        // Usually it contains 'data' array with forecast per time period
+        $location = $data['lokasi']['kecamatan'] ?? ($data['lokasi']['nama'] ?? 'Besuk');
         
-        $location = $data['lokasi']['nama'] ?? 'Besuk';
-        $forecasts = $data['data'][0]['cuaca'] ?? []; // Array of forecasts
+        // BMKG New API: cuaca is often a nested array [[{}, {}]]
+        $rawCuaca = $data['data'][0]['cuaca'] ?? [];
+        $forecasts = [];
+        
+        // Flatten the array if it's nested
+        foreach ($rawCuaca as $item) {
+            if (is_array($item)) {
+                if (isset($item['datetime'])) {
+                    $forecasts[] = $item;
+                } else {
+                    foreach ($item as $subItem) {
+                        if (is_array($subItem) && isset($subItem['datetime'])) {
+                            $forecasts[] = $subItem;
+                        }
+                    }
+                }
+            }
+        }
         
         if (empty($forecasts)) {
             return ['success' => false, 'message' => 'Data ramalan tidak tersedia'];
@@ -72,15 +87,17 @@ class WeatherService
         $text = "Prakiraan Cuaca di {$location}:\n";
 
         foreach ($forecasts as $f) {
-            // BMKG usually gives 'datetime' in format like '2026-05-08 12:00:00'
-            $time = isset($f['datetime']) ? \Carbon\Carbon::parse($f['datetime']) : null;
+            // BMKG uses ISO8601 or similar
+            $time = isset($f['local_datetime']) ? \Carbon\Carbon::parse($f['local_datetime']) : 
+                   (isset($f['datetime']) ? \Carbon\Carbon::parse($f['datetime'])->setProperty('timezone', 'Asia/Jakarta') : null);
+            
             if (!$time) continue;
 
             // Only take forecasts for today and tomorrow
             if ($time->diffInDays($now) > 1) continue;
 
-            $condition = $f['condition_name'] ?? 'Berawan';
-            $temp = $f['temp'] ?? '??';
+            $condition = $f['weather_desc'] ?? ($f['condition_name'] ?? 'Berawan');
+            $temp = $f['t'] ?? ($f['temp'] ?? '??');
             $humidity = $f['hu'] ?? '??';
             
             $timeStr = $time->format('H:i');
