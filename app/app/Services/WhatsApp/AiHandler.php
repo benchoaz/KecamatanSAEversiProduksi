@@ -109,7 +109,8 @@ class AiHandler
             $systemPrompt .= "- Gunakan emoji (👋, 😊, 🌤️, 🌙) secara natural (maksimal 2 per pesan).\n\n";
 
             $systemPrompt .= "PERINTAH KHUSUS:\n";
-            $systemPrompt .= "- HINDARI memberikan daftar menu angka yang kaku (1, 2, 3) kecuali user memintanya.\n";
+            $systemPrompt .= "- DILARANG KERAS menggunakan daftar angka (1, 2, 3...) untuk memberikan pilihan kepada user.\n";
+            $systemPrompt .= "- Gunakan KATA KUNCI teks (misal: 'Ketik CUACA', 'Ketik STATUS', atau 'Ketik MENU') sebagai arahan navigasi.\n";
             $systemPrompt .= "- Jika user mengetik typo (salah ketik) atau terlihat bingung, berikan saran layanan yang relevan dalam bentuk kalimat ramah, bukan menu angka.\n";
             $systemPrompt .= "- Jika warga ingin LAPOR, MENGADU, ADUAN, CURHAT, atau LAPORAN: Tunjukkan empati yang mendalam, lalu berikan link pengaduan resmi: " . $this->getPublicUrl() . "/#pengaduan\n";
             $systemPrompt .= "- Jika warga mencari JASA, UMKM, INFO MASAKAN, MAKANAN, atau hal terkait EKONOMI: Arahkan ke Pusat Ekonomi {$regionName} di: " . $this->getPublicUrl() . "/ekonomi\n";
