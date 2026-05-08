@@ -73,65 +73,17 @@
         </div>
         @endif
 
-        <!-- Services Tracking Section (NEW & PERFECTED) -->
-        <div class="space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 class="font-extrabold text-xl text-slate-800">Lacak Laporan & Layanan</h3>
-                <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase">Otomatis Terlacak</span>
-            </div>
-
-            @if($services->isNotEmpty())
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach($services as $service)
-                <div class="bg-white rounded-[2rem] p-5 shadow-sm border border-slate-200 hover:border-blue-200 transition-all group">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg {{ $service->category === 'pengaduan' ? 'bg-rose-50 text-rose-500' : 'bg-indigo-50 text-indigo-500' }}">
-                            <i class="fas {{ $service->category === 'pengaduan' ? 'fa-bullhorn' : 'fa-file-alt' }}"></i>
-                        </div>
-                        <span class="text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-wider
-                            {{ $service->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : 
-                               ($service->status === 'proses' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700') }}">
-                            {{ $service->status }}
-                        </span>
-                    </div>
-                    <h4 class="font-bold text-sm text-slate-800 line-clamp-1 mb-1">{{ $service->jenis_layanan }}</h4>
-                    <p class="text-[10px] text-slate-500 font-medium mb-4 line-clamp-2">{{ $service->uraian }}</p>
-                    
-                    <div class="flex items-center justify-between pt-3 border-t border-slate-50">
-                        <div class="flex flex-col">
-                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Kode Tracking</span>
-                            <span class="text-xs font-black text-slate-700">{{ $service->tracking_code }}</span>
-                        </div>
-                        <a href="{{ route('public.tracking') }}?q={{ $service->tracking_code }}" target="_blank" class="text-[10px] font-black text-blue-600 hover:underline">
-                            Detail <i class="fas fa-chevron-right ml-1"></i>
-                        </a>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-            @else
-            <div class="bg-slate-50 rounded-3xl p-8 text-center border border-dashed border-slate-200">
-                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300 shadow-sm">
-                    <i class="fas fa-search text-2xl"></i>
-                </div>
-                <p class="text-sm font-bold text-slate-500">Tidak ada laporan aktif</p>
-                <p class="text-xs text-slate-400 mt-1">Laporan yang Anda ajukan via WhatsApp atau Web akan muncul di sini secara otomatis.</p>
-            </div>
-            @endif
-        </div>
-
         <!-- Quick Access Services (PERFECTING) -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <a href="{{ route('apply.layanan', 'pengaduan') }}" class="bg-rose-500 p-5 rounded-3xl text-white shadow-lg shadow-rose-900/20 group hover:-translate-y-1 transition-all">
-
                 <i class="fas fa-bullhorn text-2xl mb-3 opacity-80 group-hover:opacity-100"></i>
                 <h4 class="font-black text-xs uppercase tracking-wider">Lapor Masalah</h4>
             </a>
             <a href="{{ route('layanan') }}" class="bg-indigo-600 p-5 rounded-3xl text-white shadow-lg shadow-indigo-900/20 group hover:-translate-y-1 transition-all">
-
                 <i class="fas fa-file-contract text-2xl mb-3 opacity-80 group-hover:opacity-100"></i>
                 <h4 class="font-black text-xs uppercase tracking-wider">Minta Surat</h4>
             </a>
+
             <a href="{{ route('umkm_rakyat.create') }}" class="bg-emerald-600 p-5 rounded-3xl text-white shadow-lg shadow-emerald-900/20 group hover:-translate-y-1 transition-all">
                 <i class="fas fa-store text-2xl mb-3 opacity-80 group-hover:opacity-100"></i>
                 <h4 class="font-black text-xs uppercase tracking-wider">Daftar UMKM</h4>
@@ -142,7 +94,14 @@
             </a>
         </div>
 
-
+        <!-- Section: Aset Toko & Bisnis Anda (PRIORITIZED) -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between">
+                <h3 class="font-extrabold text-xl text-slate-800">Kelola Toko & Bisnis Anda</h3>
+                <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-widest">Pusat Ekonomi</span>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-4">
                 @foreach($allAssets as $asset)
                 @php 
                     $item = $asset['data'];
@@ -443,6 +402,41 @@
             </div>
 
         </div>
+
+        <!-- Services Tracking Section (MOVED TO BOTTOM FOR FOCUS) -->
+        @if($services->isNotEmpty())
+        <div class="space-y-4 pt-12 border-t border-slate-200">
+            <div class="flex items-center justify-between">
+                <h3 class="font-extrabold text-xs text-slate-400 uppercase tracking-widest">Status Laporan & Layanan Pribadi</h3>
+                <span class="text-[8px] font-black text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">ARSIP AKTIF</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-80 hover:opacity-100 transition-opacity">
+                @foreach($services as $service)
+                <div class="bg-white rounded-[1.5rem] p-4 shadow-sm border border-slate-100 hover:border-blue-200 transition-all group">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm {{ $service->category === 'pengaduan' ? 'bg-rose-50 text-rose-500' : 'bg-indigo-50 text-indigo-500' }}">
+                            <i class="fas {{ $service->category === 'pengaduan' ? 'fa-bullhorn' : 'fa-file-alt' }}"></i>
+                        </div>
+                        <span class="text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider
+                            {{ $service->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : 
+                               ($service->status === 'proses' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700') }}">
+                            {{ $service->status }}
+                        </span>
+                    </div>
+                    <h4 class="font-bold text-xs text-slate-800 line-clamp-1 mb-1">{{ $service->jenis_layanan }}</h4>
+                    
+                    <div class="flex items-center justify-between pt-2">
+                        <span class="text-[9px] font-black text-slate-400">{{ $service->tracking_code }}</span>
+                        <a href="{{ route('public.tracking') }}?q={{ $service->tracking_code }}" target="_blank" class="text-[9px] font-black text-blue-600">
+                            Lacak <i class="fas fa-chevron-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
     </main>
 
 </body>
