@@ -296,7 +296,8 @@ class AiHandler
 
     private function getDynamicKnowledge(): string
     {
-        return Cache::remember('whatsapp_ai_knowledge', 600, function() {
+        // Disable cache temporarily to ensure fresh data for 3-day KTP fix
+        // return Cache::remember('whatsapp_ai_knowledge', 600, function() {
             $knowledge = "🏢 INFORMASI LAYANAN UTAMA & ESTIMASI WAKTU:\n";
             $masters = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
             foreach ($masters as $master) {
@@ -314,6 +315,7 @@ class AiHandler
                 if ($requirements->count() > 0) {
                     $knowledge .= "  Persyaratan: " . $requirements->pluck('label')->implode(', ') . ".\n";
                 }
+                $knowledge .= "  LINK AJUKAN: " . $this->getPublicUrl() . "/#syarat\n";
             }
             $faqs = PelayananFaq::all();
             if ($faqs->count() > 0) {
@@ -416,7 +418,7 @@ class AiHandler
             }
 
             return $knowledge;
-        });
+        // });
     }
 
     protected function getPublicUrl(): string
