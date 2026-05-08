@@ -20,6 +20,7 @@ use Carbon\Carbon;
 class AiHandler
 {
     protected \App\Services\WeatherService $weatherService;
+    protected \App\Models\MasterLayanan $masterLayanan;
 
     public function __construct(\App\Services\WeatherService $weatherService)
     {
@@ -109,6 +110,8 @@ class AiHandler
             $systemPrompt .= "- Gunakan emoji (👋, 😊, 🌤️, 🌙) secara natural (maksimal 2 per pesan).\n\n";
 
             $systemPrompt .= "PERINTAH KHUSUS:\n";
+            $systemPrompt .= "- PRIORITAS DATA: Jika ada perbedaan antara DATA RESMI (Master Layanan) dan FAQ, Anda WAJIB menggunakan DATA RESMI.\n";
+            $systemPrompt .= "- Estimasi waktu pengerjaan berkas WAJIB merujuk pada bagian 'Estimasi Selesai' di DATA RESMI.\n";
             $systemPrompt .= "- DILARANG KERAS menggunakan daftar angka (1, 2, 3...) untuk memberikan pilihan kepada user.\n";
             $systemPrompt .= "- Gunakan KATA KUNCI teks (misal: 'Ketik CUACA', 'Ketik STATUS', atau 'Ketik MENU') sebagai arahan navigasi.\n";
             $systemPrompt .= "- Jika user mengetik typo (salah ketik) atau terlihat bingung, berikan saran layanan yang relevan dalam bentuk kalimat ramah, bukan menu angka.\n";
