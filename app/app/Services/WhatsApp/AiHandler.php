@@ -19,6 +19,13 @@ use Carbon\Carbon;
 
 class AiHandler
 {
+    protected \App\Services\WeatherService $weatherService;
+
+    public function __construct(\App\Services\WeatherService $weatherService)
+    {
+        $this->weatherService = $weatherService;
+    }
+
     /**
      * Handle the incoming message using AI if active.
      */
@@ -377,6 +384,15 @@ class AiHandler
             $knowledge .= "\nDATA LAYANAN DIGITAL:\n";
             $knowledge .= "- Permohonan Berkas Selesai: {$serviceStats['total_layanan']}\n";
             $knowledge .= "- Total UMKM Terdaftar: {$serviceStats['total_umkm']}\n";
+
+            $knowledge .= "\nINFORMASI CUACA & RADAR (BMKG):\n";
+            $weather = $this->weatherService->getForecast();
+            if ($weather['success']) {
+                $knowledge .= $weather['raw_text'] . "\n";
+                $knowledge .= "PANTAUAN RADAR: " . $this->weatherService->getRadarAlert() . "\n";
+            } else {
+                $knowledge .= "Layanan cuaca BMKG sedang tidak tersedia.\n";
+            }
 
             return $knowledge;
         });
