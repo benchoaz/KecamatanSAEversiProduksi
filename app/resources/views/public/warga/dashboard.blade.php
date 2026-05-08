@@ -4,440 +4,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dasbor Terpadu - Pusat Kendali Warga</title>
+    <title>Seller Center - {{ appProfile()->nama_kecamatan ?? 'Kecamatan' }} SAE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
                     }
                 }
             }
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Outfit', sans-serif; background: #f1f5f9; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .sidebar-item-active { background: #e0f2fe; color: #0369a1; border-right: 4px solid #0369a1; }
     </style>
 </head>
 
-<body class="text-slate-800 pb-20">
+<body class="text-slate-700">
 
-    <!-- Top Navigation -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-md">
-                        <i class="fas fa-id-badge text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-lg leading-none">Dasbor Warga</h1>
-                        <p class="text-xs text-slate-500 font-medium">Pusat Kendali Ekonomi Terpadu</p>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <a href="{{ route('portal_warga.logout') }}" class="text-xs font-bold text-rose-500 bg-rose-50 px-4 py-2 rounded-lg hover:bg-rose-100 transition-colors flex items-center gap-2">
-                        <i class="fas fa-sign-out-alt"></i> Keluar
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div class="min-h-screen flex flex-col md:flex-row">
         
-        <!-- Welcome Banner -->
-        <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
-            <div class="relative z-10">
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="px-3 py-1 bg-white/10 rounded-full text-xs font-bold tracking-wide backdrop-blur-md border border-white/10 uppercase">
-                        Identitas Terverifikasi
-                    </span>
+        <!-- SIDEBAR (Navigation) -->
+        <aside class="w-full md:w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col sticky top-0 h-auto md:h-screen z-40">
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white">
+                    <i class="fas fa-store-alt"></i>
                 </div>
-                <h2 class="text-2xl md:text-3xl font-black mb-1">Halo, Identitas Warga</h2>
-                <p class="text-slate-300 text-sm md:text-base font-medium flex items-center gap-2">
-                    <i class="fab fa-whatsapp text-emerald-400"></i> +{{ $phone }}
-                </p>
+                <h1 class="font-bold text-lg text-slate-800">Seller Center</h1>
             </div>
-        </div>
 
-        @if(session('success'))
-        <div class="bg-emerald-50 border border-emerald-100 text-emerald-700 px-6 py-4 rounded-2xl flex items-center gap-3 animate-pulse">
-            <i class="fas fa-check-circle text-xl"></i>
-            <span class="font-bold text-sm">{{ session('success') }}</span>
-        </div>
-        @endif
+            <nav class="flex-1 space-y-1 px-3">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl sidebar-item-active font-bold transition-all">
+                    <i class="fas fa-home"></i> Beranda
+                </a>
+                <a href="{{ route('umkm_rakyat.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-500 font-semibold transition-all">
+                    <i class="fas fa-plus-circle"></i> Tambah Toko
+                </a>
+                <a href="{{ route('economy.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-500 font-semibold transition-all">
+                    <i class="fas fa-tools"></i> Tawarkan Jasa
+                </a>
+                <div class="pt-4 pb-2 px-4">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Layanan Warga</span>
+                </div>
+                <a href="{{ route('layanan') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-500 font-semibold transition-all text-sm">
+                    <i class="fas fa-file-invoice"></i> Portal Layanan
+                </a>
+                <a href="{{ route('apply.layanan', 'pengaduan') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-500 font-semibold transition-all text-sm">
+                    <i class="fas fa-bullhorn"></i> Lapor Masalah
+                </a>
+            </nav>
 
-        <!-- Quick Access Services (PERFECTING) -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{{ route('apply.layanan', 'pengaduan') }}" class="bg-rose-500 p-5 rounded-3xl text-white shadow-lg shadow-rose-900/20 group hover:-translate-y-1 transition-all">
-                <i class="fas fa-bullhorn text-2xl mb-3 opacity-80 group-hover:opacity-100"></i>
-                <h4 class="font-black text-xs uppercase tracking-wider">Lapor Masalah</h4>
-            </a>
-            <a href="{{ route('layanan') }}" class="bg-indigo-600 p-5 rounded-3xl text-white shadow-lg shadow-indigo-900/20 group hover:-translate-y-1 transition-all">
-                <i class="fas fa-file-contract text-2xl mb-3 opacity-80 group-hover:opacity-100"></i>
-                <h4 class="font-black text-xs uppercase tracking-wider">Minta Surat</h4>
-            </a>
-
-            <a href="{{ route('umkm_rakyat.create') }}" class="bg-emerald-600 p-5 rounded-3xl text-white shadow-lg shadow-emerald-900/20 group hover:-translate-y-1 transition-all">
-                <i class="fas fa-store text-2xl mb-3 opacity-80 group-hover:opacity-100"></i>
-                <h4 class="font-black text-xs uppercase tracking-wider">Daftar UMKM</h4>
-            </a>
-            <a href="{{ route('economy.create') }}" class="bg-blue-600 p-5 rounded-3xl text-white shadow-lg shadow-blue-900/20 group hover:-translate-y-1 transition-all">
-                <i class="fas fa-tools text-2xl mb-3 opacity-80 group-hover:opacity-100"></i>
-                <h4 class="font-black text-xs uppercase tracking-wider">Tawarkan Jasa</h4>
-            </a>
-        </div>
-
-        <!-- Section: Aset Toko & Bisnis Anda (PRIORITIZED) -->
-        <div class="space-y-6">
-            <div class="flex items-center justify-between">
-                <h3 class="font-extrabold text-xl text-slate-800">Kelola Toko & Bisnis Anda</h3>
-                <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-widest">Pusat Ekonomi</span>
+            <div class="p-4 border-t border-slate-100">
+                <a href="{{ route('portal_warga.logout') }}" class="flex items-center justify-center gap-2 w-full py-3 bg-rose-50 text-rose-600 rounded-xl font-bold text-xs hover:bg-rose-100 transition-all">
+                    <i class="fas fa-sign-out-alt"></i> Keluar Portal
+                </a>
             </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 p-4 md:p-10 overflow-y-auto">
             
-            <div class="grid grid-cols-1 gap-4">
-                @foreach($allAssets as $asset)
-                @php 
-                    $item = $asset['data'];
-                    $type = $asset['type'];
-                    $name = $type === 'umkm' ? $item->nama_usaha : ($type === 'jasa' ? $item->job_title : $item->name);
-                    $opStatus = $item->operational_status;
-                @endphp
-                <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 {{ $opStatus['bg'] }} {{ $opStatus['text'] }} rounded-2xl flex items-center justify-center text-2xl shadow-inner">
-                            <i class="fas {{ $opStatus['icon'] }}"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <h4 class="font-black text-slate-800">{{ $name }}</h4>
-                                <button onclick="openRenameModal('{{ $type }}', '{{ $item->id }}', '{{ addslashes($name) }}', {{ $asset['name_cooldown'] }})" class="w-6 h-6 bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 rounded-lg flex items-center justify-center transition-all text-[10px]" title="Ubah Nama">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </button>
-                                @if(isset($item->product_count))
-                                    <span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200" title="Terdiri dari {{ $item->product_count }} produk">
-                                        {{ $item->product_count }} Produk
-                                    </span>
-                                @endif
-                                <span class="text-[9px] font-black px-2 py-0.5 rounded-md {{ $opStatus['bg'] }} {{ $opStatus['text'] }} uppercase">{{ $opStatus['label'] }}</span>
-                            </div>
-                            <p class="text-xs font-bold text-slate-400">
-                                <i class="fas fa-clock mr-1 opacity-50"></i> {{ $item->operating_hours ?: 'Buka Full 24 Jam' }}
-                            </p>
-                            @if(isset($item->all_products))
-                                <p class="text-[10px] text-slate-400 font-medium mt-1 italic truncate max-w-[200px]">
-                                    Produk: {{ $item->all_products }}
-                                </p>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <!-- Update Hours Modal Toggle (Future) -->
-                        <button onclick="openHoursModal('{{ $type }}', '{{ $item->id }}', '{{ $item->operating_hours }}')" class="p-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl transition-all" title="Ubah Jam">
-                            <i class="fas fa-clock"></i>
-                        </button>
-                        
-                        <form action="{{ route('portal_warga.status_update') }}" method="POST" class="inline">
-                            @csrf
-                            <input type="hidden" name="type" value="{{ $type }}">
-                            <input type="hidden" name="id" value="{{ $item->id }}">
-                            <input type="hidden" name="operating_hours" value="{{ $item->operating_hours }}">
-                            
-                            @if($item->is_on_holiday)
-                                <input type="hidden" name="is_on_holiday" value="0">
-                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl text-xs font-black shadow-lg shadow-emerald-900/10 transition-all flex items-center gap-2">
-                                    <i class="fas fa-play"></i> Buka Toko Kembali
-                                </button>
-                            @else
-                                <input type="hidden" name="is_on_holiday" value="1">
-                                <button type="submit" class="bg-rose-50 text-rose-600 hover:bg-rose-100 px-6 py-3 rounded-xl text-xs font-black transition-all flex items-center gap-2">
-                                    <i class="fas fa-calendar-times"></i> Libur Hari Ini
-                                </button>
-                            @endif
-                        </form>
-
-                        @php
-                            $previewUrl = match($type) {
-                                'umkm' => route('umkm_rakyat.show', $item->slug),
-                                'jasa' => route('economy.show', $item->id),
-                                'umkm_local' => route('economy.produk.show', $item->id),
-                                default => '#'
-                            };
-                        @endphp
-                        <a href="{{ $previewUrl }}" target="_blank" class="p-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl transition-all" title="Lihat Tampilan Publik">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                    </div>
+            <!-- Top Header Info -->
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">Halo, Warga Kreatif</h2>
+                    <p class="text-slate-500 font-medium">Kelola toko dan aset ekonomi Anda di sini.</p>
                 </div>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Hours Modal Shell -->
-        <dialog id="hoursModal" class="modal">
-            <div class="modal-box rounded-3xl p-8 bg-white max-w-sm">
-                <h3 class="font-black text-xl mb-4">Setel Jam Operasional</h3>
-                <form id="hoursForm" action="{{ route('portal_warga.status_update') }}" method="POST" class="space-y-4">
-                    @csrf
-                    <input type="hidden" name="type" id="modal_type">
-                    <input type="hidden" name="id" id="modal_id">
-                    <input type="hidden" name="is_on_holiday" id="modal_is_holiday">
-                    
-                    <div class="space-y-2">
-                        <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Jam Buka - Tutup</label>
-                        <input type="text" name="operating_hours" id="modal_hours" placeholder="Contoh: 08:00 - 17:00" 
-                               class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-slate-800 focus:ring-2 focus:ring-teal-500 transition-all">
-                        <p class="text-[10px] text-slate-400 font-medium italic">* Gunakan format HH:mm - HH:mm</p>
-                    </div>
-
-                    <div class="pt-4 flex gap-3">
-                        <button type="button" onclick="hoursModal.close()" class="flex-1 bg-slate-100 text-slate-600 p-4 rounded-2xl font-black text-xs hover:bg-slate-200 transition-all">Batal</button>
-                        <button type="submit" class="flex-1 bg-slate-900 text-white p-4 rounded-2xl font-black text-xs shadow-lg shadow-slate-900/20 transition-all">Simpan Jam</button>
-                    </div>
-                </form>
-            </div>
-            <form method="dialog" class="modal-backdrop">
-                <button>close</button>
-            </form>
-        </dialog>
-        
-        <!-- Rename Modal -->
-        <dialog id="renameModal" class="modal">
-            <div class="modal-box rounded-3xl p-8 bg-white max-w-sm">
-                <h3 class="font-black text-xl mb-4 text-slate-800">Ubah Nama Identitas</h3>
-                <form id="renameForm" action="{{ route('portal_warga.update_name') }}" method="POST" class="space-y-4">
-                    @csrf
-                    <input type="hidden" name="type" id="rename_type">
-                    <input type="hidden" name="id" id="rename_id">
-                    
-                    <div id="renameCooldownMsg" class="hidden bg-amber-50 border border-amber-100 p-4 rounded-2xl mb-4">
-                        <div class="flex gap-3">
-                            <i class="fas fa-history text-amber-500 mt-1"></i>
-                            <div>
-                                <p class="text-xs font-black text-amber-800 uppercase tracking-tight">Cooldown Aktif</p>
-                                <p class="text-[11px] text-amber-700 leading-relaxed">Nama hanya bisa diubah setiap 30 hari. Anda perlu menunggu <span id="renameDaysLeft" class="font-black">0</span> hari lagi.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="renameInputGroup" class="space-y-2">
-                        <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Nama Toko / Jasa</label>
-                        <input type="text" name="name" id="rename_input" placeholder="Masukkan nama baru..." 
-                               class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 font-bold text-slate-800 focus:ring-2 focus:ring-teal-500 transition-all">
-                        <p class="text-[10px] text-slate-400 font-medium italic">* Nama ini akan tampil di katalog publik kecamanatan.</p>
-                    </div>
-
-                    <div class="pt-4 flex gap-3">
-                        <button type="button" onclick="renameModal.close()" class="flex-1 bg-slate-100 text-slate-600 p-4 rounded-2xl font-black text-xs hover:bg-slate-200 transition-all">Batal</button>
-                        <button type="submit" id="renameSubmitBtn" class="flex-1 bg-blue-600 text-white p-4 rounded-2xl font-black text-xs shadow-lg shadow-blue-900/20 transition-all hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">Simpan Perubahan</button>
-                    </div>
-                </form>
-            </div>
-            <form method="dialog" class="modal-backdrop bg-slate-900/20 backdrop-blur-sm">
-                <button>close</button>
-            </form>
-        </dialog>
-
-        <script>
-            function openHoursModal(type, id, currentHours) {
-                document.getElementById('modal_type').value = type;
-                document.getElementById('modal_id').value = id;
-                document.getElementById('modal_hours').value = currentHours || '08:00 - 17:00';
-                document.getElementById('modal_is_holiday').value = 0; // Assume we want them open if setting hours
-                document.getElementById('hoursModal').showModal();
-            }
-
-            function openRenameModal(type, id, currentName, cooldownDays) {
-                document.getElementById('rename_type').value = type;
-                document.getElementById('rename_id').value = id;
-                document.getElementById('rename_input').value = currentName;
-                
-                const cooldownMsg = document.getElementById('renameCooldownMsg');
-                const inputGroup = document.getElementById('renameInputGroup');
-                const submitBtn = document.getElementById('renameSubmitBtn');
-                const daysLeftSpan = document.getElementById('renameDaysLeft');
-
-                if (cooldownDays > 0) {
-                    cooldownMsg.classList.remove('hidden');
-                    inputGroup.classList.add('opacity-50', 'pointer-events-none');
-                    submitBtn.disabled = true;
-                    daysLeftSpan.innerText = cooldownDays;
-                } else {
-                    cooldownMsg.classList.add('hidden');
-                    inputGroup.classList.remove('opacity-50', 'pointer-events-none');
-                    submitBtn.disabled = false;
-                }
-
-                document.getElementById('renameModal').showModal();
-            }
-        </script>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-            <!-- UMKM Section -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 flex flex-col h-full">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-teal-50 rounded-2xl flex items-center justify-center text-teal-600">
-                        <i class="fas fa-store text-xl"></i>
+                <div class="flex items-center gap-4 bg-white p-2 pr-6 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fab fa-whatsapp"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-lg text-slate-800 leading-tight">Bisnis UMKM</h3>
-                        <p class="text-xs font-medium text-slate-500">Kelola toko dan etalase produk</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">Terhubung Ke</p>
+                        <p class="font-bold text-slate-800 text-sm">+{{ $phone }}</p>
                     </div>
                 </div>
+            </header>
 
-                <div class="flex-grow space-y-4">
-                    {{-- Blok 1: Bisnis Resmi (Model Umkm) --}}
-                    @foreach($umkms as $umkm)
-                    <div class="p-4 rounded-2xl border border-teal-100 bg-teal-50/10 hover:bg-teal-50 transition-colors group">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h4 class="font-bold text-slate-800">{{ $umkm->nama_usaha }}</h4>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $umkm->status == 'aktif' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }} uppercase tracking-wider">
-                                        {{ $umkm->status }}
-                                    </span>
-                                    <span class="text-[9px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full uppercase">Verified UMKM</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <a href="{{ route('umkm_rakyat.manage', $umkm->manage_token) }}" class="flex-1 inline-flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-slate-400 px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all text-slate-600">
-                                <i class="fas fa-cog"></i> Pengaturan
-                            </a>
-                            <a href="{{ route('umkm_rakyat.manage.seller.dashboard', $umkm->manage_token) }}" class="flex-1 inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">
-                                <i class="fas fa-chart-line"></i> Pusat Penjual
-                            </a>
-                        </div>
-                    </div>
-                    @endforeach
+            @if(session('success'))
+            <div class="bg-emerald-50 border border-emerald-100 text-emerald-700 px-6 py-4 rounded-2xl flex items-center gap-3 mb-8 animate-bounce">
+                <i class="fas fa-check-circle text-xl"></i>
+                <span class="font-bold text-sm">{{ session('success') }}</span>
+            </div>
+            @endif
 
-                    {{-- Blok 2: Katalog Produk Cepat (Model UmkmLocal) --}}
-                    @foreach($umkmLocals as $ul)
-                    <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors group relative">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h4 class="font-bold text-slate-800">{{ $ul->name }}</h4>
-                                <p class="text-[10px] text-slate-500 font-medium truncate max-w-[200px]">{{ $ul->product }}</p>
-                            </div>
-                            <span class="text-[9px] font-bold text-slate-400 border border-slate-100 px-2 py-0.5 rounded-full uppercase">Katalog Cepat</span>
-                        </div>
-                        <div class="flex gap-2">
-                             <a href="{{ route('economy.produk.show', $ul->id) }}" target="_blank" class="flex-1 inline-flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-2 rounded-xl text-xs font-bold transition-all">
-                                <i class="fas fa-eye"></i> Lihat
-                            </a>
-                            {{-- Bridge button for management could be added here later --}}
-                        </div>
-                    </div>
-                    @endforeach
-
-                    @if($umkms->isEmpty() && $umkmLocals->isEmpty())
-                    <div class="text-center py-6">
-                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-300">
-                            <i class="fas fa-box-open text-2xl"></i>
-                        </div>
-                        <p class="text-sm font-bold text-slate-500 mb-1">Daftar UMKM Belum Ada</p>
-                        <p class="text-xs text-slate-400">Anda belum mendaftarkan UMKM.</p>
-                    </div>
+            <!-- Business Assets (THE HERO SECTION) -->
+            <section class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-black text-xl text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-boxes-packing text-brand-600"></i>
+                        Aset Toko & Jasa Anda
+                    </h3>
+                    @if(count($allAssets) > 0)
+                    <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-100">
+                        {{ count($allAssets) }} Aktif
+                    </span>
                     @endif
                 </div>
 
-                <div class="mt-6 pt-6 border-t border-slate-100">
-                    <a href="{{ route('umkm_rakyat.create') }}" class="w-full inline-flex items-center justify-center gap-2 bg-teal-50 hover:bg-teal-100 text-teal-700 px-4 py-3 rounded-xl text-sm font-bold transition-all">
-                        <i class="fas fa-plus"></i> Buka Toko UMKM Baru
-                    </a>
-                </div>
-            </div>
+                @if(count($allAssets) > 0)
+                <div class="grid grid-cols-1 gap-6">
+                    @foreach($allAssets as $asset)
+                        @php 
+                            $item = $asset['data'];
+                            $type = $asset['type'];
+                            $name = $type === 'umkm' ? $item->nama_usaha : ($type === 'jasa' ? $item->job_title : $item->name);
+                            $opStatus = $item->operational_status;
+                            $manageUrl = $type === 'umkm' ? route('umkm_rakyat.manage.seller.dashboard', $item->manage_token) : route('portal_warga.bridge.jasa', $item->id);
+                        @endphp
+                        
+                        <div class="bg-white rounded-[2.5rem] p-6 md:p-8 shadow-md border border-slate-100 hover:shadow-xl transition-all group relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
+                                <i class="fas {{ $type === 'umkm' ? 'fa-store' : 'fa-hand-sparkles' }} text-8xl"></i>
+                            </div>
+                            
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
+                                <div class="flex items-center gap-6">
+                                    <div class="w-20 h-20 {{ $opStatus['bg'] }} {{ $opStatus['text'] }} rounded-[2rem] flex items-center justify-center text-3xl shadow-inner border-4 border-white">
+                                        <i class="fas {{ $opStatus['icon'] }}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex flex-wrap items-center gap-3 mb-2">
+                                            <h4 class="text-2xl font-black text-slate-900 tracking-tight">{{ $name }}</h4>
+                                            <span class="text-[10px] font-black px-3 py-1 rounded-full {{ $opStatus['bg'] }} {{ $opStatus['text'] }} uppercase tracking-wider shadow-sm">{{ $opStatus['label'] }}</span>
+                                            @if($type === 'umkm')
+                                                <span class="text-[10px] font-black px-3 py-1 rounded-full bg-slate-900 text-white uppercase tracking-widest">Official UMKM</span>
+                                            @endif
+                                        </div>
+                                        <div class="flex flex-wrap items-center gap-y-2 gap-x-4 text-sm font-semibold text-slate-400">
+                                            <span class="flex items-center gap-1.5">
+                                                <i class="fas fa-clock text-slate-300"></i> {{ $item->operating_hours ?: '24 Jam' }}
+                                            </span>
+                                            @if(isset($item->product_count))
+                                            <span class="flex items-center gap-1.5">
+                                                <i class="fas fa-layer-group text-slate-300"></i> {{ $item->product_count }} Produk Tersedia
+                                            </span>
+                                            @endif
+                                            @if($item->is_on_holiday)
+                                            <span class="flex items-center gap-1.5 text-rose-500">
+                                                <i class="fas fa-umbrella-beach"></i> Sedang Libur
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
 
-            <!-- Jasa & Pekerjaan Section -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 flex flex-col h-full">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                        <i class="fas fa-tools text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-lg text-slate-800 leading-tight">Jasa & Pekerjaan</h3>
-                        <p class="text-xs font-medium text-slate-500">Kelola profil penyedia jasa / kerja</p>
-                    </div>
-                </div>
+                                <div class="flex items-center gap-3">
+                                    <form action="{{ route('portal_warga.status_update') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="type" value="{{ $type }}">
+                                        <input type="hidden" name="id" value="{{ $item->id }}">
+                                        <input type="hidden" name="operating_hours" value="{{ $item->operating_hours }}">
+                                        @if($item->is_on_holiday)
+                                            <input type="hidden" name="is_on_holiday" value="0">
+                                            <button type="submit" class="h-14 px-6 bg-emerald-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all flex items-center gap-3">
+                                                <i class="fas fa-play"></i> Buka Toko Sekarang
+                                            </button>
+                                        @else
+                                            <input type="hidden" name="is_on_holiday" value="1">
+                                            <button type="submit" class="h-14 px-6 bg-slate-100 text-slate-600 rounded-2xl font-black text-sm hover:bg-rose-50 hover:text-rose-600 transition-all flex items-center gap-3">
+                                                <i class="fas fa-calendar-minus"></i> Setel Libur
+                                            </button>
+                                        @endif
+                                    </form>
 
-                <div class="flex-grow space-y-4">
-                    @forelse($jasas as $jasa)
-                    <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors group">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h4 class="font-bold text-slate-800">{{ $jasa->job_title }}</h4>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $jasa->status == 'active' ? 'bg-emerald-100 text-emerald-700' : ($jasa->status == 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-600') }} uppercase tracking-wider">
-                                    {{ $jasa->status }}
-                                </span>
+                                    <a href="{{ $manageUrl }}" class="h-14 px-8 bg-slate-900 text-white rounded-2xl font-black text-sm shadow-xl shadow-slate-900/30 hover:translate-y-[-2px] transition-all flex items-center gap-3">
+                                        <i class="fas fa-external-link-alt text-slate-400"></i> Kelola Bisnis
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                        <a href="{{ route('portal_warga.bridge.jasa', $jasa->id) }}" class="w-full inline-flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-blue-500 hover:text-blue-600 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all">
-                            Kelola Jasa <i class="fas fa-arrow-right text-xs"></i>
+                    @endforeach
+                </div>
+                @else
+                <!-- Empty State -->
+                <div class="bg-white rounded-[3rem] p-16 text-center border border-dashed border-slate-200">
+                    <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                        <i class="fas fa-store-slash text-4xl"></i>
+                    </div>
+                    <h4 class="text-xl font-black text-slate-800 mb-2">Anda Belum Memiliki Toko</h4>
+                    <p class="text-slate-500 font-medium mb-8 max-w-sm mx-auto">Daftarkan usaha atau jasa Anda untuk mulai berjualan di portal kecamatan.</p>
+                    <div class="flex justify-center gap-4">
+                        <a href="{{ route('umkm_rakyat.create') }}" class="px-8 py-4 bg-brand-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-brand-900/20 hover:bg-brand-700 transition-all">
+                            Daftar UMKM Baru
                         </a>
-                    </div>
-                    @empty
-                    <div class="text-center py-6">
-                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-300">
-                            <i class="fas fa-hard-hat text-2xl"></i>
-                        </div>
-                        <p class="text-sm font-bold text-slate-500 mb-1">Profil Jasa Belum Ada</p>
-                        <p class="text-xs text-slate-400">Anda belum mendaftar sebagai penyedia jasa.</p>
-                    </div>
-                    @endforelse
-                </div>
-
-                <div class="mt-6 pt-6 border-t border-slate-100">
-                    <a href="{{ route('economy.create') }}" class="w-full inline-flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-3 rounded-xl text-sm font-bold transition-all">
-                        <i class="fas fa-plus"></i> Tawarkan Jasa Anda
-                    </a>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Services Tracking Section (MOVED TO BOTTOM FOR FOCUS) -->
-        @if($services->isNotEmpty())
-        <div class="space-y-4 pt-12 border-t border-slate-200">
-            <div class="flex items-center justify-between">
-                <h3 class="font-extrabold text-xs text-slate-400 uppercase tracking-widest">Status Laporan & Layanan Pribadi</h3>
-                <span class="text-[8px] font-black text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">ARSIP AKTIF</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-80 hover:opacity-100 transition-opacity">
-                @foreach($services as $service)
-                <div class="bg-white rounded-[1.5rem] p-4 shadow-sm border border-slate-100 hover:border-blue-200 transition-all group">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm {{ $service->category === 'pengaduan' ? 'bg-rose-50 text-rose-500' : 'bg-indigo-50 text-indigo-500' }}">
-                            <i class="fas {{ $service->category === 'pengaduan' ? 'fa-bullhorn' : 'fa-file-alt' }}"></i>
-                        </div>
-                        <span class="text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider
-                            {{ $service->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : 
-                               ($service->status === 'proses' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700') }}">
-                            {{ $service->status }}
-                        </span>
-                    </div>
-                    <h4 class="font-bold text-xs text-slate-800 line-clamp-1 mb-1">{{ $service->jenis_layanan }}</h4>
-                    
-                    <div class="flex items-center justify-between pt-2">
-                        <span class="text-[9px] font-black text-slate-400">{{ $service->tracking_code }}</span>
-                        <a href="{{ route('public.tracking') }}?q={{ $service->tracking_code }}" target="_blank" class="text-[9px] font-black text-blue-600">
-                            Lacak <i class="fas fa-chevron-right ml-1"></i>
+                        <a href="{{ route('economy.create') }}" class="px-8 py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl font-black text-sm hover:bg-slate-50 transition-all">
+                            Daftar Jasa
                         </a>
                     </div>
                 </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
-    </main>
+                @endif
+            </section>
+
+            <!-- Services Tracking (MINIMALIST LIST) -->
+            @if($services->isNotEmpty())
+            <section class="mt-20 pt-10 border-t border-slate-200">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-black text-sm text-slate-400 uppercase tracking-[0.2em]">Riwayat Layanan & Laporan</h3>
+                </div>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 divide-y divide-slate-50 overflow-hidden">
+                    @foreach($services as $service)
+                    <div class="flex items-center justify-between p-5 hover:bg-slate-50 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm {{ $service->category === 'pengaduan' ? 'bg-rose-50 text-rose-500' : 'bg-brand-50 text-brand-600' }}">
+                                <i class="fas {{ $service->category === 'pengaduan' ? 'fa-bullhorn' : 'fa-file-invoice' }}"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 text-sm">{{ $service->jenis_layanan }}</h5>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $service->tracking_code }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter
+                                {{ $service->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : 
+                                   ($service->status === 'proses' ? 'bg-brand-100 text-brand-700' : 'bg-amber-100 text-amber-700') }}">
+                                {{ $service->status }}
+                            </span>
+                            <a href="{{ route('public.tracking') }}?q={{ $service->tracking_code }}" class="w-8 h-8 rounded-lg border border-slate-100 flex items-center justify-center text-slate-400 hover:text-brand-600 hover:border-brand-200 transition-all">
+                                <i class="fas fa-chevron-right text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </section>
+            @endif
+
+        </main>
+    </div>
 
 </body>
 </html>
