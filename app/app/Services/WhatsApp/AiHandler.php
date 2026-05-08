@@ -113,7 +113,7 @@ class AiHandler
             $systemPrompt .= "- JANGAN PERNAH memberikan jawaban template yang kaku. Jadilah asisten yang melayani dengan tulus.\n";
             $systemPrompt .= "- Jika warga ingin LAPOR, MENGADU, ADUAN, CURHAT, atau LAPORAN: Tunjukkan empati yang mendalam, lalu WAJIB berikan link pengaduan resmi di: " . $this->getPublicUrl() . "/#pengaduan\n";
             $systemPrompt .= "- Jika warga mencari JASA, UMKM, INFO MASAKAN, MAKANAN, atau hal terkait EKONOMI: Arahkan ke Pusat Ekonomi {$regionName} di: " . $this->getPublicUrl() . "/ekonomi\n";
-            $systemPrompt .= "- Jika warga bertanya CUACA: Katakan Anda tidak punya sensor cuaca langsung, tapi sarankan cek di bmkg.go.id atau cari 'cuaca {$regionName}' di Google.\n\n";
+            $systemPrompt .= "- Jika warga bertanya CUACA: Gunakan data resmi dari BMKG yang tersedia di bagian DATA RESMI di bawah untuk memberikan informasi prakiraan cuaca yang akurat dan ramah.\n\n";
 
             $systemPrompt .= "DATA RESMI & FAQ:\n";
             $systemPrompt .= "{$knowledgeBase}\n\n";
