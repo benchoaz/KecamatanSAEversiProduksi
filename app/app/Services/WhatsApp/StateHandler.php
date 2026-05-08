@@ -66,6 +66,7 @@ class StateHandler
 
         return match ($session->state) {
             'ADM_SUBMENU', 'MENU_ADMIN' => $this->handleMenuAdmin($session, $messageLower),
+            'MAIN_MENU' => $this->intentHandler->handle($session->phone, $message),
             'MENU_EKONOMI' => $this->handleMenuEkonomi($session, $messageLower),
             'MENU_JASA' => $this->jasaHandler->search($message),
             'WAITING_UMKM_SEARCH' => $this->umkmHandler->search($message),

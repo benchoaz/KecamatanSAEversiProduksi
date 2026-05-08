@@ -188,6 +188,14 @@ class AiHandler
                 $reply = trim($reply) . "\n\nKetik *MENU* untuk melihat daftar layanan kami. 😊";
             }
 
+            // ANTI-HALLUCINATION SHIELD (KTP 14-day fix)
+            if (str_contains($reply, '14')) {
+                $ktpService = \App\Models\MasterLayanan::where('nama_layanan', 'like', '%KTP%')->first();
+                if ($ktpService && $ktpService->estimasi_waktu) {
+                    $reply = str_replace(['14 Hari Kerja', '14 hari kerja', '14 Hari', '14 hari'], $ktpService->estimasi_waktu, $reply);
+                }
+            }
+
             // Update Memory
             if ($memory) {
                 $history[] = ['role' => 'user', 'content' => $message];
@@ -416,6 +424,11 @@ class AiHandler
             } else {
                 $knowledge .= "Layanan cuaca BMKG sedang tidak tersedia.\n";
             }
+
+            $knowledge .= "\n🚨 PERINGATAN KERAS UNTUK ANDA (AI):\n";
+            $knowledge .= "- JANGAN PERNAH menyebutkan estimasi '14 hari' atau '14 hari kerja' untuk layanan KTP atau layanan apapun di sini.\n";
+            $knowledge .= "- Gunakan HANYA data estimasi yang tertulis di DATA RESMI di atas.\n";
+            $knowledge .= "- Jika di DATA RESMI tertulis '3 Hari Kerja', maka Anda WAJIB menyebutkan '3 Hari Kerja'.\n";
 
             return $knowledge;
         // });
