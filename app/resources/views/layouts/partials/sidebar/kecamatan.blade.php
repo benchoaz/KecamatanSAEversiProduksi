@@ -69,21 +69,6 @@
             </ul>
         </div>
 
-        @if($ekbangMenu && $ekbangMenu->is_active)
-            <div class="nav-section">
-                <span class="nav-section-title">EKBANG</span>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="{{ route('kecamatan.pelayanan.inbox', ['category' => 'ekonomi']) }}"
-                            class="nav-link {{ request()->fullUrlIs(route('kecamatan.pelayanan.inbox', ['category' => 'ekonomi']) . '*') ? 'active' : '' }}">
-                            <span class="nav-icon"><i class="fas fa-store"></i></span>
-                            <span class="nav-text">Manajemen UMKM & Jasa</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        @endif
-
         {{-- Dynamic Menus Section --}}
         @php
             $navigationService = app(\App\Services\NavigationService::class);
