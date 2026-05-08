@@ -39,15 +39,7 @@ class AppServiceProvider extends ServiceProvider
                     $authData = json_decode($jsonContent, true);
                     if ($authData && isset($authData['type']) && $authData['type'] === 'service_account') {
                         $client->setAuthConfig($authData);
-                    } else {
-                        $client->setClientId($config['clientId'] ?? '');
-                        $client->setClientSecret($config['clientSecret'] ?? '');
-                        $client->refreshToken($config['refreshToken'] ?? '');
                     }
-                } else {
-                    $client->setClientId($config['clientId'] ?? '');
-                    $client->setClientSecret($config['clientSecret'] ?? '');
-                    $client->refreshToken($config['refreshToken'] ?? '');
                 }
 
                 $client->addScope(\Google\Service\Drive::DRIVE);
@@ -58,8 +50,16 @@ class AppServiceProvider extends ServiceProvider
                     'includeItemsFromAllDrives' => true,
                 ];
 
-                if (!empty($config['teamDriveId'] ?? null)) {
-                    $options['teamDriveId'] = $config['teamDriveId'];
+                // Automatically detect TeamDrive/SharedDrive ID if possible
+                if ($folderId !== '/' && !empty($folderId)) {
+                    try {
+                        $file = $service->files->get($folderId, ['fields' => 'driveId', 'supportsAllDrives' => true]);
+                        if (!empty($file->driveId)) {
+                            $options['teamDriveId'] = $file->driveId;
+                        }
+                    } catch (\Exception $e) {
+                        // Fallback or ignore
+                    }
                 }
 
                 $adapter = new \Masbug\Flysystem\GoogleDriveAdapter($service, $folderId, $options);

@@ -17,7 +17,8 @@ RUN apk add --no-cache \
     libwebp \
     imagemagick \
     shadow \
-    mysql-client
+    mysql-client \
+    postgresql-client
 
 # Install PHP extensions
 RUN apk add --no-cache --virtual .build-deps \
