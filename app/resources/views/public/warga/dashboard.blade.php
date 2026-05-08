@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Toko - {{ appProfile()->nama_kecamatan ?? 'Kecamatan' }} SAE</title>
+    <title>Dasbor UMKM - {{ appProfile()->nama_kecamatan ?? 'Kecamatan' }} SAE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -36,8 +36,8 @@
                 <i class="fas fa-store"></i>
             </div>
             <div>
-                <h1 class="text-sm font-black text-slate-800 leading-none">Dashboard Toko</h1>
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Portal Warga</p>
+                <h1 class="text-sm font-black text-slate-800 leading-none">Dasbor UMKM</h1>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Kelola Usaha</p>
             </div>
         </div>
         <a href="{{ route('portal_warga.logout') }}" class="w-10 h-10 bg-slate-50 text-rose-500 rounded-full flex items-center justify-center hover:bg-rose-50 transition-all">
