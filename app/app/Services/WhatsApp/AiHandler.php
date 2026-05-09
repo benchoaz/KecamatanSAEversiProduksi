@@ -106,7 +106,7 @@ class AiHandler
 
             $systemPrompt .= "PERINTAH KHUSUS LAINNYA:\n";
             $systemPrompt .= "- Jika warga ingin LAPOR/MENGADU: Berikan link pengaduan: " . $this->getPublicUrl() . "/#pengaduan\n";
-            $systemPrompt .= "- Jika warga mencari JASA/UMKM: Arahkan ke: " . $this->getPublicUrl() . "/ekonomi\n";
+            $systemPrompt .= "- Jika warga mencari JASA, UMKM, MAKANAN, KULINER, atau merasa LAPAR: Arahkan ke Pusat Ekonomi {$regionName} di: " . $this->getPublicUrl() . "/ekonomi\n";
             $systemPrompt .= "- Jika warga bertanya CUACA: Gunakan data resmi BMKG di bawah.\n\n";
 
             $systemPrompt .= "📚 DATA RESMI (SUMBER INFORMASI TUNGGAL):\n";
