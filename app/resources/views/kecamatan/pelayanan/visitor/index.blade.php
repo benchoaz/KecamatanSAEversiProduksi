@@ -81,9 +81,18 @@
             <div class="card border-0 shadow-premium rounded-4 h-100 overflow-hidden">
                 <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
                     <h5 class="card-title text-primary-900 mb-0 fw-bold">Antrian & Riwayat Hari Ini</h5>
-                    <span
-                        class="badge rounded-pill bg-brand-50 text-brand-600 px-3 py-2 fw-bold">{{ $visitors->where('created_at', '>=', today())->count() }}
-                        Pengunjung</span>
+                    <div class="d-flex align-items-center gap-2">
+                        @if(auth()->user()->hasRole('Super Admin'))
+                            <button type="button" 
+                                    onclick="confirmClearVisitors()"
+                                    class="btn btn-xs btn-outline-danger rounded-pill px-3 fw-bold">
+                                <i class="fas fa-trash-alt me-1"></i> Bersihkan Data
+                            </button>
+                        @endif
+                        <span class="badge rounded-pill bg-brand-50 text-brand-600 px-3 py-2 fw-bold">
+                            {{ $visitors->where('created_at', '>=', today())->count() }} Pengunjung
+                        </span>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -160,4 +169,27 @@
             </div>
         </div>
     </div>
+    @if(auth()->user()->hasRole('Super Admin'))
+        <form id="clearVisitorsForm" action="{{ route('kecamatan.pelayanan.visitor.clear') }}" method="POST" style="display:none;">
+            @csrf
+        </form>
+        <script>
+        function confirmClearVisitors() {
+            Swal.fire({
+                title: 'Bersihkan Buku Tamu?',
+                text: "Seluruh data riwayat pengunjung akan dihapus permanen dari database!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Bersihkan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('clearVisitorsForm').submit();
+                }
+            })
+        }
+        </script>
+    @endif
 @endsection

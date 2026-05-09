@@ -297,10 +297,9 @@
                         </div>
                         <!-- Right: Visual Balance (Regional Leader Photo) - Hidden on Mobile -->
                         <div class="hidden lg:flex lg:w-2/5 justify-end relative order-last mb-0">
-                            <div class="text-reveal delay-300 relative group scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100">
-                                <div class="absolute -inset-10 bg-emerald-100 rounded-full blur-3xl opacity-50 animate-pulse"></div>
-                                <div class="relative bg-white/20 backdrop-blur-md p-2.5 md:p-4 rounded-[2.5rem] md:rounded-[3.5rem] border border-white/50 shadow-2xl transition-all duration-700 hover:rotate-2">
-                                    <div class="aspect-video md:aspect-[4/5] w-[280px] sm:w-[320px] md:w-[280px] lg:w-[320px] rounded-[2rem] md:rounded-[3rem] overflow-hidden border-4 border-white shadow-inner bg-white">
+                            <div class="text-reveal delay-300 relative scale-[0.8] sm:scale-90 md:scale-95 lg:scale-100">
+                                <div class="relative bg-white p-3 md:p-5 rounded-3xl border border-slate-200 shadow-xl">
+                                    <div class="aspect-video md:aspect-[4/5] w-[280px] sm:w-[320px] md:w-[280px] lg:w-[320px] rounded-2xl overflow-hidden border border-slate-100 shadow-sm bg-slate-50">
                                         @if($appProfile->hero_image_path)
                                             <img src="{{ asset('storage/' . $appProfile->hero_image_path) }}" 
                                                  alt="{{ $appProfile->hero_image_alt ?? 'Pimpinan' }}"
@@ -315,15 +314,12 @@
                                     
                                     <!-- Leader Floating Badge -->
                                     @if($appProfile->leader_name)
-                                    <div class="absolute -bottom-10 -left-2 md:-left-6 bg-white/90 backdrop-blur-md p-3 md:p-5 rounded-2xl md:rounded-3xl shadow-xl border border-emerald-50 min-w-[180px] md:min-w-[240px] transform -rotate-2 group-hover:rotate-0 transition-transform z-20">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-1 h-8 md:w-1.5 md:h-10 bg-emerald-500 rounded-full"></div>
-                                            <div>
+                                    <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-white px-6 py-4 rounded-2xl shadow-lg border border-slate-100 min-w-[260px] z-20 text-center">
+                                        <div class="flex flex-col items-center">
                                                 <h4 class="text-slate-900 font-black text-xs md:text-sm leading-tight">{{ $appProfile->leader_name }}</h4>
                                                 <p class="text-[8px] md:text-[10px] text-emerald-600 font-bold uppercase tracking-widest mt-1">
                                                     {{ $appProfile->leader_title ?? 'Pimpinan Wilayah' }}
                                                 </p>
-                                            </div>
                                         </div>
                                     </div>
                                     @endif
@@ -366,7 +362,7 @@
                         <div class="hidden lg:flex w-2/5 justify-end relative">
                             <div class="text-reveal delay-300 relative">
                                 <div class="absolute -inset-10 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
-                                <div class="relative bg-white/20 backdrop-blur-sm p-12 rounded-[3rem] border border-white/30 shadow-2xl -rotate-3 hover:rotate-0 transition-all duration-700">
+                                <div class="relative bg-white/20 backdrop-blur-sm p-12 rounded-[3rem] border border-white/30 shadow-2xl hover:scale-105 transition-all duration-700">
                                     <i class="fas fa-file-invoice text-blue-600 text-[150px] drop-shadow-2xl"></i>
                                     <div class="absolute -bottom-4 -left-4 bg-white p-4 rounded-2xl shadow-xl border border-blue-50">
                                         <i class="fas fa-check-circle text-emerald-500 text-2xl"></i>
@@ -412,7 +408,7 @@
                         <div class="hidden lg:flex w-2/5 justify-end relative">
                             <div class="text-reveal delay-300 relative">
                                 <div class="absolute -inset-10 bg-amber-100 rounded-full blur-3xl opacity-50"></div>
-                                <div class="relative bg-white/20 backdrop-blur-sm p-12 rounded-[3rem] border border-white/30 shadow-2xl rotate-6 hover:rotate-0 transition-all duration-700">
+                                <div class="relative bg-white/20 backdrop-blur-sm p-12 rounded-[3rem] border border-white/30 shadow-2xl hover:scale-105 transition-all duration-700">
                                     <i class="fas fa-map-marked-alt text-amber-600 text-[150px] drop-shadow-2xl"></i>
                                     <div class="absolute -top-4 -left-4 bg-white p-4 rounded-2xl shadow-xl border border-amber-50">
                                         <i class="fas fa-heart text-red-500 text-2xl"></i>
@@ -485,7 +481,7 @@
                         </div>
                     @empty
                         <div class="col-span-full text-center py-12 bg-white/40 backdrop-blur-md rounded-[3rem] border border-white/50 border-dashed">
-                            <p class="text-slate-400 text-sm font-black italic">Belum ada layanan populer yang diatur.</p>
+                            <p class="text-slate-400 text-sm font-black">Belum ada layanan populer yang diatur.</p>
                         </div>
                     @endforelse
                 </div>
@@ -507,9 +503,27 @@
             <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-1 rounded-[2rem] shadow-xl shadow-emerald-900/10 transition-transform hover:scale-[1.01]">
                 <div class="bg-white/10 backdrop-blur-md rounded-[1.9rem] px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white text-2xl animate-pulse">
-                            <i class="fab fa-whatsapp"></i>
+                        @php
+                            $waNumber = preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot_number ?? '');
+                            $waLink = str_starts_with($waNumber, '0') ? '62' . substr($waNumber, 1) : $waNumber;
+                            $qrData = urlencode("https://wa.me/{$waLink}");
+                        @endphp
+                        
+                        <!-- QR Code (Always Visible Now) -->
+                        <div class="shrink-0 group relative">
+                            <div class="bg-white p-1 rounded-2xl shadow-lg transform group-hover:scale-110 transition-all duration-300 cursor-zoom-in" onclick="showMobileQR()">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ $qrData }}&margin=4" 
+                                     alt="QR Code WA"
+                                     class="w-12 h-12 md:w-16 md:h-16 rounded-xl">
+                            </div>
+                            <!-- Tooltip for Desktop -->
+                            <div class="absolute -top-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 hidden md:block">
+                                <div class="bg-slate-800 text-white text-[10px] px-3 py-1 rounded-lg whitespace-nowrap shadow-xl">
+                                    Scan / Klik untuk QR
+                                </div>
+                            </div>
                         </div>
+
                         <div>
                             <h4 class="text-white font-black text-sm md:text-base leading-tight">Butuh Bantuan Cepat?</h4>
                             <p class="text-white/80 text-[10px] font-bold uppercase tracking-wider">Konsultasi Layanan via Chatbot 24/7</p>
@@ -523,10 +537,6 @@
                                 <p class="text-white font-black text-[13px]">{{ appProfile()->whatsapp_bot_number ?? '08xxxxxxxxxx' }}</p>
                             </div>
                         </div>
-                        @php
-                            $waNumber = preg_replace('/[^0-9]/', '', appProfile()->whatsapp_bot_number ?? '');
-                            $waLink = str_starts_with($waNumber, '0') ? '62' . substr($waNumber, 1) : $waNumber;
-                        @endphp
                         <a href="https://wa.me/{{ $waLink }}" 
                            target="_blank"
                            class="btn bg-white hover:bg-emerald-50 text-emerald-700 border-0 rounded-2xl px-8 h-12 font-black transition-all flex items-center gap-2 w-full sm:w-auto justify-center">
@@ -2027,7 +2037,7 @@
                 let result = {};
                 try { result = await response.json(); } catch(e) {}
 
-                if (response.ok && (result.tracking_code || result.uuid || result.message)) {
+                if (response.ok && (result.tracking_code || result.uuid)) {
                     const pin = result.tracking_code ? `\n🔑 *PIN Lacak:* ${result.tracking_code}` : '';
                     appendMessage('bot',
                         `✅ *Permintaan Resmi Tercatat!*\n\n` +
@@ -2037,6 +2047,9 @@
                         `${pin}\n\n` +
                         `Petugas akan menghubungi Anda melalui WhatsApp dalam *1x24 jam kerja*.`
                     );
+                } else if (response.ok && result.message) {
+                    // This handles referrals (SIAK, SP4N) or FAQ matches that returned 200 but didn't create a record
+                    appendMessage('bot', `💡 *Informasi:* \n\n${result.message}`);
                 } else if (response.status === 429) {
                     appendMessage('bot', '⏳ Permintaan dari nomor ini sudah tercatat hari ini. Petugas akan segera menghubungi Anda. Terima kasih!');
                 } else if (result.errors) {
@@ -3202,6 +3215,23 @@
                 },
             });
         });
+        function showMobileQR() {
+            Swal.fire({
+                title: 'WhatsApp QR Code',
+                html: `
+                    <div class="flex flex-col items-center p-4">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://wa.me/{{ $waLink }}&margin=4" 
+                             class="w-64 h-64 rounded-2xl shadow-xl mb-4" alt="QR Code">
+                        <p class="text-slate-500 text-sm">Scan barcode ini dari perangkat lain untuk memulai chat.</p>
+                    </div>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true,
+                customClass: {
+                    container: 'z-[9999]'
+                }
+            });
+        }
     </script>
     <style>
         @keyframes ticker {

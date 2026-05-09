@@ -272,6 +272,21 @@ class PelayananController extends Controller
     }
 
     /**
+     * Clear all visitor data (Super Admin Only)
+     */
+    public function visitorClear()
+    {
+        if (!auth()->user()->hasRole('Super Admin')) {
+            abort(403, 'Hanya Super Admin yang dapat menghapus seluruh data.');
+        }
+
+        $count = PengunjungKecamatan::count();
+        PengunjungKecamatan::truncate();
+
+        return redirect()->back()->with('success', "Seluruh data buku tamu ({$count} baris) telah dibersihkan.");
+    }
+
+    /**
      * Master Layanan (Self Service)
      */
     /**

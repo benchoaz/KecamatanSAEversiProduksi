@@ -44,6 +44,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
             Route::get('/', [PelayananController::class, 'visitorIndex'])->name('index');
             Route::post('/', [PelayananController::class, 'visitorStore'])->name('store');
             Route::put('/{id}', [PelayananController::class, 'visitorUpdate'])->name('update');
+            Route::post('/clear', [PelayananController::class, 'visitorClear'])->name('clear');
         });
 
         Route::prefix('faq')->name('faq.')->group(function () {

@@ -43,7 +43,9 @@ class PublicServiceController extends Controller
         }
 
         // 3. Security Keyword filtering (Soft redirection to SP4N-LAPOR)
-        $isHandoff = Str::startsWith($request->uraian, '[Diteruskan dari Bot FAQ]');
+        $isHandoff = Str::startsWith($request->uraian, '[Diteruskan dari Bot FAQ]') || 
+                     Str::startsWith($request->uraian, '[Chatbot]') ||
+                     $request->input('source') === 'chatbox';
 
         if (!$isHandoff) {
             $securityKeywords = ['korupsi', 'suap', 'pencurian', 'pidana', 'dana desa'];
