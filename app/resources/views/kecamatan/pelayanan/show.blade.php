@@ -17,6 +17,22 @@
             </div>
         @endif
 
+        @if($complaint->recent_similar_service)
+            <div class="alert alert-rose border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center gap-3">
+                <div class="icon-box icon-box-rose rounded-circle flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle fs-4 text-rose-600"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1 fw-bold text-rose-900">Peringatan: Potensi Anomali Perubahan Berulang</h6>
+                    <p class="mb-0 text-rose-700 small leading-relaxed">
+                        Warga dengan NIK ini telah memiliki permohonan <strong>{{ $complaint->jenis_layanan }}</strong> yang berstatus <strong>Selesai</strong> pada tanggal 
+                        <strong>{{ $complaint->recent_similar_service->created_at->format('d M Y') }}</strong> ({{ $complaint->recent_similar_service->created_at->diffForHumans() }}).
+                        Mohon verifikasi alasan perubahan kembali dalam waktu singkat untuk mencegah kesalahan data atau penyalahgunaan.
+                    </p>
+                </div>
+            </div>
+        @endif
+
         <div class="row">
             <!-- Complaint Content -->
             <div class="col-xl-8">
@@ -91,7 +107,14 @@
                                     @endif
                                 </p>
                                 @if($complaint->nik)
-                                    <small class="text-[9px] text-slate-500 font-medium">NIK: {{ $complaint->nik }}</small>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <small class="text-[9px] text-slate-500 font-medium">NIK: {{ $complaint->nik }}</small>
+                                        @if($complaint->recent_similar_service)
+                                            <span class="badge bg-rose-500 text-white text-[8px] px-1 rounded-1" title="Pernah merubah status ini dalam 3 bulan terakhir">
+                                                <i class="fas fa-exclamation-triangle me-1"></i> ANOMALI
+                                            </span>
+                                        @endif
+                                    </div>
                                 @endif
                             </div>
                             <div class="col-md-6 col-lg-3">
@@ -483,6 +506,25 @@
         .attachment-preview:hover {
             transform: scale(1.05);
         }
+
+        /* Anomaly Colors */
+        .alert-rose {
+            background-color: #fff1f2;
+            border: 1px solid rgba(225, 29, 72, 0.1) !important;
+        }
+        .icon-box-rose {
+            background-color: #e11d48;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(225, 29, 72, 0.2);
+        }
+        .text-rose-900 { color: #4c0519; }
+        .text-rose-700 { color: #be123c; }
     </style>
 
     <script>

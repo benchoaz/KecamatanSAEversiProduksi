@@ -120,6 +120,9 @@
                                                 @if(str_contains($item->uraian, '[RAHASIA]'))
                                                     <span class="badge bg-rose-100 text-rose-600 border border-rose-200 text-[8px] ms-1 px-1 py-0"><i class="fas fa-lock me-1"></i>RAHASIA</span>
                                                 @endif
+                                                @if($item->recent_similar_service)
+                                                    <span class="badge bg-rose-500 text-white text-[8px] ms-1 px-1 py-0" title="Terdeteksi Perubahan Berulang"><i class="fas fa-exclamation-triangle"></i></span>
+                                                @endif
                                             @endif
                                         </div>
                                         <div class="text-[10px] text-slate-400 d-flex align-items-center gap-1 flex-wrap">

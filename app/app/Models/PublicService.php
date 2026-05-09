@@ -173,4 +173,37 @@ class PublicService extends Model
 
         return null;
     }
+
+    /**
+     * Relationship for eager loading anomaly detection
+     */
+    public function previousSimilarSuccess()
+    {
+        return $this->hasOne(self::class, 'nik', 'nik')
+            ->where('id', '!=', $this->id)
+            ->whereColumn('jenis_layanan', 'jenis_layanan')
+            ->where('status', self::STATUS_SELESAI)
+            ->where('created_at', '>=', now()->subDays(90))
+            ->latest();
+    }
+
+    /**
+     * Check if this NIK has a completed service of a similar type within the last X days.
+     */
+    public function getRecentSimilarServiceAttribute()
+    {
+        if (!$this->nik) return null;
+
+        if ($this->relationLoaded('previousSimilarSuccess')) {
+            return $this->previousSimilarSuccess;
+        }
+
+        return self::where('nik', $this->nik)
+            ->where('id', '!=', $this->id)
+            ->where('jenis_layanan', $this->jenis_layanan)
+            ->where('status', self::STATUS_SELESAI)
+            ->where('created_at', '>=', now()->subDays(90))
+            ->latest()
+            ->first();
+    }
 }

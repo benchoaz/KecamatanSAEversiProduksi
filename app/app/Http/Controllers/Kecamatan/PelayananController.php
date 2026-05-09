@@ -29,7 +29,7 @@ class PelayananController extends Controller
         $search = $request->query('search');
         $statusFilter = $request->query('status');
 
-        $query = PublicService::with('desa')->withCount('attachments');
+        $query = PublicService::with(['desa', 'previousSimilarSuccess'])->withCount('attachments');
 
         // Mapping logic for strict separation
         if ($category === 'pelayanan') {
@@ -67,7 +67,7 @@ class PelayananController extends Controller
      */
     public function show($id)
     {
-        $complaint = PublicService::with(['desa', 'handler'])->findOrFail($id);
+        $complaint = PublicService::with(['desa', 'handler', 'previousSimilarSuccess'])->findOrFail($id);
 
         if (in_array($complaint->category, [PublicService::CATEGORY_UMKM, PublicService::CATEGORY_PEKERJAAN])) {
             $workDir = \App\Models\WorkDirectory::where('contact_phone', $complaint->whatsapp)
