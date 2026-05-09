@@ -84,6 +84,7 @@ Route::prefix('umkm-rakyat')->name('umkm_rakyat.')->group(function () {
         // Produk
         Route::get('/products', [UmkmRakyatController::class, 'manageProducts'])->name('.products');
         Route::post('/products', [UmkmRakyatController::class, 'storeProduct'])->name('.product.store');
+        Route::put('/products/{productId}', [UmkmRakyatController::class, 'updateProduct'])->name('.product.update');
         Route::patch('/products/{productId}/toggle', [UmkmRakyatController::class, 'toggleProductAvailability'])->name('.product.toggle');
         Route::delete('/products/{productId}', [UmkmRakyatController::class, 'deleteProduct'])->name('.product.delete');
         

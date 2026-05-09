@@ -233,6 +233,7 @@ class UmkmRakyatController extends Controller
             'nama_produk' => 'required|string|max:255',
             'harga' => 'required|numeric',
             'satuan_harga' => 'nullable|string|max:50',
+            'deskripsi' => 'nullable|string',
             'foto_produk' => 'nullable|image|max:2048',
         ]);
 
@@ -248,6 +249,32 @@ class UmkmRakyatController extends Controller
         $product->save();
 
         return back()->with('success', 'Produk berhasil ditambahkan.');
+    }
+
+    public function updateProduct(Request $request, $token, $productId)
+    {
+        $umkm = Umkm::where('manage_token', $token)->firstOrFail();
+        $product = UmkmProduct::where('umkm_id', $umkm->id)->findOrFail($productId);
+
+        $request->validate([
+            'nama_produk' => 'required|string|max:255',
+            'harga' => 'required|numeric',
+            'satuan_harga' => 'nullable|string|max:50',
+            'deskripsi' => 'nullable|string',
+            'foto_produk' => 'nullable|image|max:2048',
+        ]);
+
+        $data = $request->except('foto_produk');
+
+        if ($request->hasFile('foto_produk')) {
+            // Optional: delete old photo
+            $path = $this->optimizeAndStore($request->file('foto_produk'), 'umkm/products');
+            $data['foto_produk'] = $path;
+        }
+
+        $product->update($data);
+
+        return back()->with('success', 'Produk berhasil diperbarui.');
     }
 
     public function deleteProduct($token, $productId)
