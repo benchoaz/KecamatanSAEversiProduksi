@@ -599,6 +599,20 @@
                                                     placeholder="(0335) 123456">
                                             </div>
                                             <div class="col-md-6">
+                                                <label class="form-label text-primary fw-bold">
+                                                    <i class="fab fa-whatsapp me-1"></i> Nomor WhatsApp Bot (Utama)
+                                                </label>
+                                                <div class="input-group">
+                                                    <input type="text" id="whatsapp_bot_number" name="whatsapp_bot_number" value="{{ old('whatsapp_bot_number', $profile->whatsapp_bot_number) }}"
+                                                        class="form-control bg-white border-slate-200 rounded-start-3"
+                                                        placeholder="08xxxxxxxxxx" oninput="updateQRPreview(this.value)">
+                                                    <button class="btn btn-outline-primary rounded-end-3" type="button" onclick="showQRModal()">
+                                                        <i class="fas fa-qrcode"></i> Lihat QR
+                                                    </button>
+                                                </div>
+                                                <div class="form-text text-[10px] text-primary mt-1 fw-bold">Nomor ini yang akan muncul sebagai QR Code di Landing Page.</div>
+                                            </div>
+                                            <div class="col-md-6">
                                                 <label class="form-label text-slate-700 fw-semibold">
                                                     <i class="fab fa-whatsapp text-success me-1"></i> WA Admin Layanan (KTP/KK)
                                                 </label>
@@ -792,6 +806,36 @@
                 
                 reader.readAsDataURL(input.files[0]);
             }
+        }
+
+        function updateQRPreview(val) {
+            // Optional: You could show a small preview somewhere
+        }
+
+        function showQRModal() {
+            const num = document.getElementById('whatsapp_bot_number').value.replace(/[^0-9]/g, '');
+            if (!num) {
+                Swal.fire('Peringatan', 'Silakan isi nomor WhatsApp terlebih dahulu', 'warning');
+                return;
+            }
+            
+            const cleanNum = num.startsWith('0') ? '62' + num.substring(1) : num;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://wa.me/${cleanNum}&margin=4`;
+            
+            Swal.fire({
+                title: 'Preview QR Code WhatsApp',
+                html: `
+                    <div class="text-center p-3">
+                        <div class="bg-white p-2 rounded-4 shadow-sm d-inline-block mb-3 border">
+                            <img src="${qrUrl}" class="img-fluid rounded-3" style="width: 250px; height: 250px;">
+                        </div>
+                        <p class="text-slate-500 small mb-0">Ini adalah tampilan barcode yang akan muncul di Landing Page.</p>
+                        <h5 class="fw-bold text-primary mt-2">+${cleanNum}</h5>
+                    </div>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true
+            });
         }
     </script>
 @endsection
