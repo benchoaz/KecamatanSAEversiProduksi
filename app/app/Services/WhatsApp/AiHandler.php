@@ -98,9 +98,12 @@ class AiHandler
             $systemPrompt .= "🎯 PERILAKU BERDASARKAN KONDISI:\n";
             $systemPrompt .= "1. KONDISI: PESAN PERTAMA & NAMA TIDAK DIKETAHUI:\n";
             $systemPrompt .= "   - Respon Anda HARUS: 'Halo! Selamat [WAKTU]! 👋 Saya {$botName}, asisten digital resmi dari {$regionName}. Supaya saya dapat melayani dengan lebih baik, mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya? 😊'\n";
-            $systemPrompt .= "2. KONDISI: PESAN PERTAMA & NAMA SUDAH DIKETAHUI:\n";
+            $systemPrompt .= "2. KONDISI: MEMBERIKAN INFORMASI LAYANAN:\n";
+            $systemPrompt .= "   - Jika Anda memberikan syarat layanan, Anda WAJIB menyertakan 'LINK PENGAJUAN' yang ada di DATA PENGETAHUAN di bawah.\n";
+            $systemPrompt .= "   - JANGAN PERNAH membuat link sendiri atau menggunakan link '#syarat'. Gunakan link yang saya berikan.\n\n";
+            $systemPrompt .= "3. KONDISI: PESAN PERTAMA & NAMA SUDAH DIKETAHUI:\n";
             $systemPrompt .= "   - Respon Anda: 'Halo Pak/Bu [Nama]! Selamat [WAKTU]! Saya {$botName}, ada yang bisa saya bantu terkait layanan di {$regionName}? 😊'\n";
-            $systemPrompt .= "3. KONDISI: USER BERTANYA TAPI NAMA BELUM DIKETAHUI:\n";
+            $systemPrompt .= "4. KONDISI: USER BERTANYA TAPI NAMA BELUM DIKETAHUI:\n";
             $systemPrompt .= "   - Jawab singkat bahwa Anda akan membantu, tapi minta nama dulu: 'Tentu, saya akan bantu informasinya. Namun sebelumnya mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya? 😊'\n\n";
 
             $systemPrompt .= "🎤 GAYA BAHASA & MEMORI (SHORT-TERM MEMORY):\n";
@@ -309,21 +312,26 @@ class AiHandler
             $knowledge = "🏢 INFORMASI LAYANAN UTAMA & ESTIMASI WAKTU:\n";
             $masters = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
             foreach ($masters as $master) {
+                $serviceUrl = $this->getPublicUrl() . "/layanan/" . $master->slug;
                 $knowledge .= "- " . strtoupper($master->nama_layanan) . " (Slug: {$master->slug})\n";
                 $knowledge .= "  Persyaratan Umum: " . ($master->deskripsi_syarat ?: '-') . ".\n";
-                $knowledge .= "  Estimasi Selesai: " . ($master->estimasi_waktu ?: '-') . ".\n\n";
+                $knowledge .= "  Estimasi Selesai: " . ($master->estimasi_waktu ?: '-') . ".\n";
+                $knowledge .= "  LINK PENGAJUAN: {$serviceUrl}\n\n";
             }
 
             $knowledge .= "📂 SUB-LAYANAN SPESIFIK:\n";
             $nodes = ServiceNode::where('is_active', true)->get();
             foreach ($nodes as $node) {
+                $masterSlug = $node->masterLayanan->slug ?? 'umum';
+                $serviceUrl = $this->getPublicUrl() . "/layanan/" . $masterSlug;
+                
                 $masterName = $node->masterLayanan->nama_layanan ?? 'Umum';
                 $knowledge .= "- " . strtoupper($node->name) . " (Kategori: {$masterName}): " . ($node->description ?: ($node->requirement_text ?: 'Layanan administrasi')) . "\n";
                 $requirements = \App\Models\ServiceRequirement::where('node_id', $node->id)->get();
                 if ($requirements->count() > 0) {
                     $knowledge .= "  Persyaratan: " . $requirements->pluck('label')->implode(', ') . ".\n";
                 }
-                $knowledge .= "  LINK AJUKAN: " . $this->getPublicUrl() . "/#syarat\n";
+                $knowledge .= "  LINK PENGAJUAN: {$serviceUrl}\n";
             }
             $faqs = PelayananFaq::all();
             if ($faqs->count() > 0) {
