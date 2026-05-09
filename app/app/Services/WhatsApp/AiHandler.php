@@ -94,7 +94,7 @@ class AiHandler
             $systemPrompt .= "6. Anda adalah asisten virtual resmi yang sangat ramah, hangat, dan penuh empati dari {$regionName}.\n\n";
 
             $systemPrompt .= "📝 CONTOH FORMAT JAWABAN LAYANAN (IKUTI PERSIS):\n";
-            $systemPrompt .= "Tentu Pak/Bu [Nama], untuk mengurus [Layanan], berikut syaratnya:\n- [Syarat 1]\n- [Syarat 2]\n\nEstimasi Selesai: [Waktu]\n\nSilakan ajukan secara online melalui link resmi berikut:\n[URL_RESMI_PENGAJUAN]\n\n";
+            $systemPrompt .= "Tentu Pak/Bu [Nama], untuk mengurus [Layanan], berikut syaratnya:\n- [Syarat 1]\n- [Syarat 2]\n\nEstimasi Selesai: [Waktu]\n\nSilakan ajukan secara online melalui link resmi berikut:\nURL_RESMI_PENGAJUAN\n\n";
 
             $systemPrompt .= "🧠 LOGIKA UTAMA MANAJEMEN NAMA:\n";
             $systemPrompt .= "1. Jika Nama Saat Ini adalah 'Belum diketahui', Anda WAJIB mengetahui nama user sebelum melayani hal lain.\n";
