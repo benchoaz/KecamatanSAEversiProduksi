@@ -116,12 +116,20 @@ class AiHandler
             $systemPrompt .= "- Nama: {$userName}\n";
             $systemPrompt .= "- Nomor WA: {$phone}\n\n";
             
-            $systemPrompt .= "ATURAN PENUTUP:\n";
-            $systemPrompt .= "- Setiap jawaban HARUS ditutup dengan arahan navigasi (MENU/STATUS).\n";
+            $systemPrompt .= "ATURAN PENUTUP (WAJIB):\n";
+            $systemPrompt .= "- Setiap jawaban HARUS ditutup dengan arahan navigasi (contoh: Ketik MENU untuk layanan lain).\n\n";
 
             if (!empty($botInstruction)) {
                 $systemPrompt .= "\n\nINSTRUKSI TAMBAHAN ADMIN:\n" . $botInstruction;
             }
+
+            // DEBUG LOG: See what is sent to AI
+            Log::info("WA_AI_PROMPT_SENT", [
+                'phone' => $phone,
+                'message' => $message,
+                'system_prompt_length' => strlen($systemPrompt),
+                'knowledge_base_preview' => substr($knowledgeBase, 0, 100)
+            ]);
 
             $provider = $profile->ai_provider ?? 'gemini';
             $reply = "";
@@ -297,25 +305,15 @@ class AiHandler
             $masters = \App\Models\MasterLayanan::where('is_active', true)->orderBy('urutan')->get();
             foreach ($masters as $master) {
                 $serviceUrl = $this->getPublicUrl() . "/layanan/" . $master->slug;
-                $knowledge .= "- " . strtoupper($master->nama_layanan) . " (Slug: {$master->slug})\n";
-                $knowledge .= "  Persyaratan Umum: " . ($master->deskripsi_syarat ?: '-') . ".\n";
-                $knowledge .= "  Estimasi Selesai: " . ($master->estimasi_waktu ?: '-') . ".\n";
-                $knowledge .= "  URL_RESMI_PENGAJUAN: {$serviceUrl}\n\n";
+                $knowledge .= "SERVICE: " . strtoupper($master->nama_layanan) . " | ESTIMASI: " . ($master->estimasi_waktu ?: '3 Hari') . " | SYARAT: " . ($master->deskripsi_syarat ?: '-') . " | URL: {$serviceUrl}\n";
             }
 
-            $knowledge .= "📂 SUB-LAYANAN SPESIFIK:\n";
+            $knowledge .= "\nSERVICE NODES (SUB-LAYANAN):\n";
             $nodes = ServiceNode::where('is_active', true)->get();
             foreach ($nodes as $node) {
                 $masterSlug = $node->masterLayanan->slug ?? 'umum';
                 $serviceUrl = $this->getPublicUrl() . "/layanan/" . $masterSlug;
-                
-                $masterName = $node->masterLayanan->nama_layanan ?? 'Umum';
-                $knowledge .= "- " . strtoupper($node->name) . " (Kategori: {$masterName}): " . ($node->description ?: ($node->requirement_text ?: 'Layanan administrasi')) . "\n";
-                $requirements = \App\Models\ServiceRequirement::where('node_id', $node->id)->get();
-                if ($requirements->count() > 0) {
-                    $knowledge .= "  Persyaratan: " . $requirements->pluck('label')->implode(', ') . ".\n";
-                }
-                $knowledge .= "  URL_RESMI_PENGAJUAN: {$serviceUrl}\n";
+                $knowledge .= "NODE: " . strtoupper($node->name) . " | URL: {$serviceUrl}\n";
             }
             $faqs = PelayananFaq::all();
             if ($faqs->count() > 0) {
