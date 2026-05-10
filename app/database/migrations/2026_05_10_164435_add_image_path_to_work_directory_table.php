@@ -7,15 +7,15 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('work_directory', function (Blueprint ) {
-            ->string('image_path')->nullable()->after('job_title');
+        Schema::table('work_directory', function (Blueprint $table) {
+            $table->string('image_path')->nullable()->after('job_title');
         });
     }
 
     public function down(): void
     {
-        Schema::table('work_directory', function (Blueprint ) {
-            ->dropColumn('image_path');
+        Schema::table('work_directory', function (Blueprint $table) {
+            $table->dropColumn('image_path');
         });
     }
 };
