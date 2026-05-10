@@ -30,6 +30,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         @forelse($products as $product)
+            @php if(!is_object($product)) continue; @endphp
             <div
                 class="bg-white rounded-[2.5rem] p-4 shadow-xl shadow-slate-200/50 border border-slate-100 group transition-all hover:-translate-y-2">
                 <div class="relative aspect-square rounded-[2rem] overflow-hidden mb-6 bg-slate-50">
@@ -44,7 +45,7 @@
                     <div class="absolute bottom-4 right-4">
                         <span
                             class="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl text-sm font-black text-slate-800 shadow-sm border border-white/20">
-                            Rp {{ number_format($product->harga, 0, ',', '.') }}
+                            Rp {{ number_format($product->harga ?? 0, 0, ',', '.') }}
                         </span>
                     </div>
                 </div>
@@ -55,14 +56,14 @@
                             <p class="text-[10px] text-slate-400 font-medium line-clamp-1">{{ $product->deskripsi ?? 'Tidak ada deskripsi' }}</p>
                         </div>
                         <div class="flex flex-col items-end shrink-0">
-                            <span class="text-[9px] font-black uppercase tracking-widest {{ $product->is_available ? 'text-emerald-500' : 'text-rose-500' }} mb-1">
-                                {{ $product->is_available ? 'Tersedia' : 'Habis' }}
+                            <span class="text-[9px] font-black uppercase tracking-widest {{ ($product->is_available ?? false) ? 'text-emerald-500' : 'text-rose-500' }}">
+                                {{ ($product->is_available ?? false) ? 'Tersedia' : 'Habis' }}
                             </span>
                             <form action="{{ route('umkm_rakyat.manage.product.toggle', ['token' => $umkm->manage_token, 'productId' => $product->id]) }}" method="POST">
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="w-10 h-5 {{ $product->is_available ? 'bg-emerald-400' : 'bg-slate-200' }} rounded-full relative shadow-inner block">
-                                    <div class="w-4 h-4 bg-white rounded-full absolute top-0.5 {{ $product->is_available ? 'right-0.5' : 'left-0.5' }} shadow-sm transition-all"></div>
+                                <button type="submit" class="w-10 h-5 {{ ($product->is_available ?? false) ? 'bg-emerald-400' : 'bg-slate-200' }} rounded-full relative shadow-inner block mt-1">
+                                    <div class="w-4 h-4 bg-white rounded-full absolute top-0.5 {{ ($product->is_available ?? false) ? 'right-0.5' : 'left-0.5' }} shadow-sm transition-all"></div>
                                 </button>
                             </form>
                         </div>
