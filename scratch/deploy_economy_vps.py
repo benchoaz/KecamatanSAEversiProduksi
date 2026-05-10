@@ -45,7 +45,10 @@ run_step("cd kecamatanSAE && sudo docker compose -f docker-compose.vps.yml exec 
 # Step 4: Clear Cache & Optimize
 run_step("cd kecamatanSAE && sudo docker compose -f docker-compose.vps.yml exec -T app php artisan optimize:clear", "Clearing Caches")
 
-# Step 5: Fix Permissions
+# Step 5: Apply Docker Changes (in case docker-compose.vps.yml changed)
+run_step("cd kecamatanSAE && sudo docker compose -f docker-compose.vps.yml up -d", "Applying Container Config Changes")
+
+# Step 6: Fix Permissions
 run_step("cd kecamatanSAE && sudo docker compose -f docker-compose.vps.yml exec -T app chmod -R 775 storage bootstrap/cache && sudo docker compose -f docker-compose.vps.yml exec -T app chown -R www-data:www-data storage", "Setting Permissions")
 
 print("\n" + "="*50)

@@ -58,6 +58,8 @@ services:
       - ./app/storage:/var/www/storage:rw
       - ./app/resources/views:/var/www/resources/views
       - ./app/app/Http/Controllers:/var/www/app/Http/Controllers
+      - ./app/app/Models:/var/www/app/Models
+      - ./app/database:/var/www/database
       - ./app/app/Traits:/var/www/app/Traits
       - ./app/app/Services/WhatsApp:/var/www/app/Services/WhatsApp
       - ./app/app/Services/NavigationService.php:/var/www/app/Services/NavigationService.php
