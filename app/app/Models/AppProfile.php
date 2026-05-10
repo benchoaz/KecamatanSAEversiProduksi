@@ -70,6 +70,10 @@ class AppProfile extends Model
         'is_backup_active',
         'backup_frequency',
         'bmkg_adm4_code',
+        'document_ai_provider',
+        'document_ai_key',
+        'is_document_ai_active',
+        'validation_sop_text',
     ];
 
     protected $casts = [
@@ -85,6 +89,7 @@ class AppProfile extends Model
         'zhipu_api_key' => 'encrypted',
         'openrouter_api_key' => 'encrypted',
         'alpha_vantage_api_key' => 'encrypted',
+        'document_ai_key' => 'encrypted',
     ];
 
     public function editor()

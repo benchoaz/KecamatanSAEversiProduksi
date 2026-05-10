@@ -273,4 +273,38 @@ class ApplicationProfileController extends Controller
             return response()->json(['success' => false, 'message' => 'Gagal menghubungi server: ' . $e->getMessage()]);
         }
     }
+
+    public function pelayananSettings()
+    {
+        $profile = $this->profileService->getProfile();
+        return view('kecamatan.settings.pelayanan', compact('profile'));
+    }
+
+    public function updatePelayananSettings(Request $request)
+    {
+        $request->validate([
+            'document_ai_provider' => 'required|in:none,gemini,vision_api',
+            'document_ai_key' => 'nullable|string',
+            'is_document_ai_active' => 'nullable|in:0,1,on',
+            'validation_sop_text' => 'nullable|string',
+        ]);
+
+        $profile = AppProfile::first() ?? new AppProfile();
+        
+        $data = $request->only([
+            'document_ai_provider',
+            'document_ai_key',
+            'validation_sop_text'
+        ]);
+        
+        $data['is_document_ai_active'] = $request->has('is_document_ai_active') ? true : false;
+        $data['updated_by'] = auth()->id();
+
+        $profile->fill($data);
+        $profile->save();
+
+        $this->profileService->clearCache();
+
+        return redirect()->back()->with('success', 'Pengaturan layanan publik berhasil diperbarui.');
+    }
 }

@@ -66,6 +66,13 @@
                         <span class="nav-text">Hasil Survei (Feedback)</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('kecamatan.settings.pelayanan') }}"
+                        class="nav-link {{ request()->is('kecamatan/settings/pelayanan*') ? 'active' : '' }}">
+                        <span class="nav-icon"><i class="fas fa-cog text-indigo-500"></i></span>
+                        <span class="nav-text">Pengaturan Layanan</span>
+                    </a>
+                </li>
             </ul>
         </div>
 

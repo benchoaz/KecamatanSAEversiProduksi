@@ -195,6 +195,10 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
         Route::get('/settings/geospasial', [\App\Http\Controllers\Kecamatan\GeospasialWilayahController::class, 'index'])->name('settings.geospasial');
         Route::post('/settings/geospasial/upload', [\App\Http\Controllers\Kecamatan\GeospasialWilayahController::class, 'upload'])->name('settings.geospasial.upload');
 
+        // Pelayanan / Public Service Settings
+        Route::get('/settings/pelayanan', [ApplicationProfileController::class, 'pelayananSettings'])->name('settings.pelayanan');
+        Route::put('/settings/pelayanan', [ApplicationProfileController::class, 'updatePelayananSettings'])->name('settings.pelayanan.update');
+
         // API Token Management (Super Admin only)
         Route::prefix('settings/api-tokens')->name('settings.api-tokens.')->group(function () {
             Route::get('/', [\App\Http\Controllers\ApiTokenController::class, 'index'])->name('index');

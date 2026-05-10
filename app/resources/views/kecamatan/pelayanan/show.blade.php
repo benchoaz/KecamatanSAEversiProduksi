@@ -17,6 +17,20 @@
             </div>
         @endif
 
+        @if(appProfile()->validation_sop_text)
+            <div class="alert alert-indigo border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-start gap-3 animate__animated animate__fadeInDown">
+                <div class="icon-box icon-box-indigo rounded-circle flex-shrink-0" style="background: #e0e7ff; color: #4338ca; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-clipboard-check fs-4"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1 fw-bold text-indigo-900">Prosedur Standar Verifikasi (SOP)</h6>
+                    <div class="mb-0 text-indigo-700 small leading-relaxed whitespace-pre-line">
+                        {!! nl2br(e(appProfile()->validation_sop_text)) !!}
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @if($complaint->recent_similar_service)
             <div class="alert alert-rose border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center gap-3">
                 <div class="icon-box icon-box-rose rounded-circle flex-shrink-0">
