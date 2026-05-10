@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('application_profiles', function (Blueprint $table) {
-            $table->string('document_ai_provider')->default('none')->after('ai_provider');
+        Schema::table('app_profiles', function (Blueprint $table) {
+            $table->string('document_ai_provider')->default('none')->after('whatsapp_bot_menu');
             $table->string('document_ai_key')->nullable()->after('document_ai_provider');
             $table->boolean('is_document_ai_active')->default(false)->after('document_ai_key');
             $table->text('validation_sop_text')->nullable()->after('is_document_ai_active');
@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('application_profiles', function (Blueprint $table) {
+        Schema::table('app_profiles', function (Blueprint $table) {
             $table->dropColumn([
                 'document_ai_provider',
                 'document_ai_key',
