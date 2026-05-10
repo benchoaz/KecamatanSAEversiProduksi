@@ -197,6 +197,28 @@
         .nav-sublink.active i {
             color: var(--sidebar-active) !important;
         }
+
+        /* GLOBAL CONTRAST FIX - USER ACCESSIBILITY */
+        .badge {
+            color: #0f172a !important; /* Hitam Pekat */
+            font-weight: 800 !important;
+            letter-spacing: 0.02em;
+            border: 1px solid rgba(0,0,0,0.1) !important;
+        }
+        /* Keep white only on very dark backgrounds */
+        .badge.bg-success, .badge.bg-danger, .badge.bg-primary, .badge.bg-indigo, .badge.bg-slate-900 {
+            color: #ffffff !important;
+        }
+        /* Specific Fix for Status Badges in screenshots */
+        .badge.bg-amber-100, .badge.bg-blue-100, .badge.bg-slate-100, .badge.bg-emerald-100, .badge.bg-teal-100 {
+            color: #0f172a !important;
+            border-color: rgba(0,0,0,0.15) !important;
+        }
+        /* Button Text Sharpness */
+        .btn-primary, .btn-indigo, .btn-success {
+            font-weight: 800 !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
     </style>
     @stack('styles')
 </head>
