@@ -136,7 +136,13 @@ class LayananPublikController extends Controller
         $waMessage .= $manageLink . "\n\n";
         $waMessage .= "Simpan link ini baik-baik. Jangan berikan kepada orang lain.";
 
-        $waUrl = "https://wa.me/{$umkm->no_wa}?text=" . urlencode($waMessage);
+        // Normalize number
+        $cleanPhone = preg_replace('/[^0-9]/', '', $umkm->no_wa);
+        if (str_starts_with($cleanPhone, '0')) {
+            $cleanPhone = '62' . substr($cleanPhone, 1);
+        }
+
+        $waUrl = "https://wa.me/{$cleanPhone}?text=" . urlencode($waMessage);
 
         return view('kecamatan.layanan.umkm.handover', compact('umkm', 'manageLink', 'waUrl', 'waMessage'));
     }
@@ -267,7 +273,13 @@ class LayananPublikController extends Controller
         $waMessage .= "Silakan login menggunakan nomor WhatsApp Anda di:\n";
         $waMessage .= $manageLink . "\n\n";
         
-        $waUrl = "https://wa.me/{$jasa->contact_phone}?text=" . urlencode($waMessage);
+        // Normalize number
+        $cleanPhone = preg_replace('/[^0-9]/', '', $jasa->contact_phone);
+        if (str_starts_with($cleanPhone, '0')) {
+            $cleanPhone = '62' . substr($cleanPhone, 1);
+        }
+        
+        $waUrl = "https://wa.me/{$cleanPhone}?text=" . urlencode($waMessage);
 
         return view('kecamatan.layanan.umkm.jasa_handover', compact('jasa', 'manageLink', 'waUrl', 'waMessage'));
     }

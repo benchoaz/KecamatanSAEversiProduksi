@@ -119,6 +119,13 @@ class UmkmRakyatController extends Controller
 
         // WhatsApp Link generation
         $adminWa = appProfile()->whatsapp_complaint ?? appProfile()->phone ?? "6282121212121";
+        
+        // Normalize admin number (remove non-digits, fix 0 to 62)
+        $adminWa = preg_replace('/[^0-9]/', '', $adminWa);
+        if (str_starts_with($adminWa, '0')) {
+            $adminWa = '62' . substr($adminWa, 1);
+        }
+
         $text = "VERIFIKASI UMKM " . $verification->kode_verifikasi;
         $waUrl = "https://wa.me/{$adminWa}?text=" . urlencode($text);
 
