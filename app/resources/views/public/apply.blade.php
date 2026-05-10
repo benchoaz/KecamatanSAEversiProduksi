@@ -331,21 +331,24 @@
 
             const data = await response.json();
 
-            if(data.success) {
+            if(response.ok) {
                 submittedUuid = data.uuid;
                 document.getElementById('tracking-pin-display').innerText = data.tracking_code;
                 
-                // Add PIN and Phone to the redirect link for auto-fill
                 const phone = form.querySelector('[name="whatsapp"]').value;
                 document.getElementById('redirect-btn').href = `{{ route('public.tracking') }}?q=${data.tracking_code}&wa=${phone}`;
                 
                 successModal.showModal();
+            } else if(response.status === 422) {
+                // Validation Error
+                const firstError = Object.values(data.errors)[0][0];
+                alert('⚠️ ' + firstError);
             } else {
-                alert(data.message || 'Gagal mengirim pengajuan.');
+                alert(data.message || 'Gagal mengirim pengajuan. Silakan cek kembali isian Anda.');
             }
         } catch (error) {
             console.error(error);
-            alert('Terjadi kesalahan sistem.');
+            alert('Terjadi kesalahan koneksi atau sistem. Silakan coba lagi nanti.');
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;

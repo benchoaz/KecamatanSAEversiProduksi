@@ -92,6 +92,18 @@ class LayananController extends Controller
      */
     public function store(Request $request)
     {
+        $messages = [
+            'nama_pemohon.required' => 'Nama lengkap wajib diisi sesuai KTP.',
+            'nik.required' => 'Nomor NIK wajib diisi.',
+            'nik.size' => 'Nomor NIK harus tepat 16 digit angka.',
+            'whatsapp.required' => 'Nomor WhatsApp wajib diisi untuk pengiriman PIN.',
+            'whatsapp.min' => 'Nomor WhatsApp tidak valid (minimal 10 digit).',
+            'desa_id.required' => 'Silakan pilih desa domisili Anda.',
+            'uraian.max' => 'Catatan terlalu panjang (maksimal 1000 karakter).',
+            'attachments.*.mimes' => 'Format file harus berupa JPG, PNG, atau PDF.',
+            'attachments.*.max' => 'Ukuran file maksimal adalah 5MB.',
+        ];
+
         $request->validate([
             'type' => 'required|string',
             'nama_pemohon' => 'required|string|max:255',
@@ -100,7 +112,7 @@ class LayananController extends Controller
             'desa_id' => 'required|exists:desa,id',
             'uraian' => 'nullable|string|max:1000',
             'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-        ]);
+        ], $messages);
 
         try {
             return DB::transaction(function () use ($request) {
@@ -164,6 +176,21 @@ class LayananController extends Controller
         $node = $request->node_id ? ServiceNode::find($request->node_id) : null;
         $showIdentity = $node ? $node->show_identity_form : true;
 
+        $messages = [
+            'nama_pemohon.required' => 'Nama lengkap wajib diisi.',
+            'nik.required'          => 'Nomor NIK wajib diisi.',
+            'nik.size'              => 'Nomor NIK harus 16 digit.',
+            'nik.regex'             => 'Nomor NIK harus berupa angka.',
+            'whatsapp.required'     => 'Nomor WhatsApp wajib diisi.',
+            'whatsapp.min'          => 'Nomor WhatsApp minimal 9 digit.',
+            'no_kk.size'            => 'Nomor KK harus 16 digit.',
+            'no_kk.regex'           => 'Nomor KK harus berupa angka.',
+            'desa_id.required'      => 'Silakan pilih desa domisili.',
+            'is_agreed.accepted'    => 'Anda harus menyetujui pernyataan kebenaran data.',
+            'attachments.*.max'     => 'Ukuran file maksimal 10MB.',
+            'child_dob.date'        => 'Format tanggal lahir anak tidak valid.',
+        ];
+
         $request->validate([
             'node_id'            => 'nullable|exists:service_nodes,id',
             'master_layanan_id'  => 'required|exists:master_layanan,id',
@@ -185,7 +212,7 @@ class LayananController extends Controller
             'child_gender'       => 'nullable|string|max:20',
             'child_pob'          => 'nullable|string|max:255',
             'child_dob'          => 'nullable|date',
-        ]);
+        ], $messages);
 
         try {
             return DB::transaction(function () use ($request) {

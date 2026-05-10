@@ -1369,23 +1369,27 @@ document.getElementById('snForm').addEventListener('submit', async function(e) {
             body: fd
         });
         const data = await res.json();
-        if (data.success) {
+        if (res.ok) {
             window.submittedUuid = data.uuid;
             document.getElementById('snPinDisplay').textContent = data.tracking_code;
             
             // Auto-fill redirect link
             const phone = this.querySelector('input[name="whatsapp"]').value;
-            document.getElementById('snRedirectBtn').href = `{{ route('public.tracking') }}?identifier=${data.tracking_code}&whatsapp_verify=${phone}`;
+            document.getElementById('snRedirectBtn').href = `{{ route('public.tracking') }}?id=${data.tracking_code}&wa=${phone}`;
             
             updateProgress(100);
             const modal = document.getElementById('snSuccessModal');
             modal.classList.add('show');
+        } else if(res.status === 422) {
+            // Validation Error from Server
+            const firstError = Object.values(data.errors)[0][0];
+            alert('⚠️ ' + firstError);
         } else {
-            alert(data.message || 'Gagal mengirim. Silakan coba lagi.');
+            alert(data.message || 'Gagal mengirim. Silakan cek kembali isian Anda.');
         }
     } catch(err) {
         console.error(err);
-        alert('Terjadi kesalahan sistem. Silakan coba lagi atau hubungi petugas.');
+        alert('Terjadi kesalahan koneksi atau sistem. Silakan coba lagi nanti.');
     } finally {
         btn.disabled = false;
         btn.innerHTML = `<i class="fas fa-paper-plane"></i> <span>Kirim Permohonan</span>`;
