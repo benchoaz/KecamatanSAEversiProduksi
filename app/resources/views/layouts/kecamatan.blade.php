@@ -214,10 +214,35 @@
             color: #0f172a !important;
             border-color: rgba(0,0,0,0.15) !important;
         }
-        /* Button Text Sharpness */
-        .btn-primary, .btn-indigo, .btn-success {
+        /* Button Text Sharpness & SOLID Background Force */
+        .btn-primary {
+            background-color: #2563eb !important; /* Blue 600 */
+            color: #ffffff !important;
+            border: none !important;
             font-weight: 800 !important;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .btn-indigo {
+            background-color: #4f46e5 !important; /* Indigo 600 */
+            color: #ffffff !important;
+            border: none !important;
+            font-weight: 800 !important;
+        }
+        .btn-success {
+            background-color: #16a34a !important; /* Green 600 */
+            color: #ffffff !important;
+            border: none !important;
+            font-weight: 800 !important;
+        }
+        .btn-primary:hover, .btn-indigo:hover, .btn-success:hover {
+            filter: brightness(90%);
+            color: #ffffff !important;
+        }
+
+        /* Tab Contrast */
+        .nav-tabs .nav-link.active {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+            border-radius: 10px !important;
         }
     </style>
     @stack('styles')
