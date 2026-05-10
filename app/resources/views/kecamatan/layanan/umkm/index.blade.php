@@ -158,19 +158,21 @@
                                                     <i class="fas fa-key text-amber-600"></i>
                                                 </a>
 
-                                                <div class="dropdown d-inline-block ms-1">
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="z-index: 1050;">
-                                                        <i class="fas fa-ellipsis-h text-slate-400"></i>
+                                                {{-- Direct Action: Deactivate --}}
+                                                <form action="{{ route('kecamatan.umkm.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Nonaktifkan UMKM ini?')" class="d-inline">
+                                                    @csrf @method('DELETE')
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 ms-1" type="submit" title="Nonaktifkan">
+                                                        <i class="fas fa-ban text-orange-500"></i>
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end border shadow-lg rounded-4 p-2" style="z-index: 1060;">
-                                                        <li>
-                                                            <form action="{{ route('kecamatan.umkm.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Nonaktifkan UMKM ini?')">
-                                                                @csrf @method('DELETE')
-                                                                <button type="submit" class="dropdown-item rounded-3 text-sm font-medium text-rose-600"><i class="fas fa-ban text-rose-400 me-2"></i> Nonaktifkan</button>
-                                                            </form>
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                                </form>
+
+                                                {{-- Direct Action: Delete --}}
+                                                <form action="{{ route('kecamatan.umkm.hard-delete', $item->id) }}" method="POST" onsubmit="return confirm('Hapus Permanen UMKM ini?')" class="d-inline">
+                                                    @csrf @method('DELETE')
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 ms-1" type="submit" title="Hapus Permanen">
+                                                        <i class="fas fa-trash-alt text-red-500"></i>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>
@@ -236,19 +238,21 @@
                                                     <i class="fas fa-key text-amber-600"></i>
                                                 </a>
 
-                                                <div class="dropdown d-inline-block ms-1">
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="z-index: 1050;">
-                                                        <i class="fas fa-ellipsis-h text-slate-400"></i>
+                                                {{-- Direct Action: Deactivate --}}
+                                                <form action="{{ route('kecamatan.jasa.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Nonaktifkan Jasa ini?')" class="d-inline">
+                                                    @csrf @method('DELETE')
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 ms-1" type="submit" title="Nonaktifkan">
+                                                        <i class="fas fa-ban text-orange-500"></i>
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end border shadow-lg rounded-4 p-2" style="z-index: 1060;">
-                                                        <li>
-                                                            <form action="{{ route('kecamatan.jasa.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus Jasa ini?')">
-                                                                @csrf @method('DELETE')
-                                                                <button type="submit" class="dropdown-item rounded-3 text-sm font-medium text-rose-600"><i class="fas fa-trash text-rose-400 me-2"></i> Hapus Jasa</button>
-                                                            </form>
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                                </form>
+
+                                                {{-- Direct Action: Delete --}}
+                                                <form action="{{ route('kecamatan.jasa.hard-delete', $item->id) }}" method="POST" onsubmit="return confirm('Hapus Permanen Jasa ini?')" class="d-inline">
+                                                    @csrf @method('DELETE')
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 ms-1" type="submit" title="Hapus Permanen">
+                                                        <i class="fas fa-trash-alt text-red-500"></i>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>
