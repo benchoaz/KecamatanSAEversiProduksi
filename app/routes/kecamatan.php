@@ -18,6 +18,8 @@ use App\Http\Controllers\Kecamatan\PelayananController;
 use App\Http\Controllers\Kecamatan\AnnouncementController;
 use App\Http\Controllers\Kecamatan\LayananPublikController;
 use App\Http\Controllers\Kecamatan\BeritaController;
+use App\Http\Controllers\Kecamatan\ServiceNodeController;
+use App\Http\Controllers\Kecamatan\NewsBannerController;
 use App\Http\Controllers\Pemerintahan\AparaturController; // Keep for now or move
 use Illuminate\Support\Facades\Route;
 
@@ -63,13 +65,13 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
             Route::delete('/{id}', [PelayananController::class, 'layananDestroy'])->name('destroy');
 
             // Node Manager (Decision Tree Builder)
-            Route::get('/{id}/nodes', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'index'])->name('nodes.index');
-            Route::post('/nodes', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'store'])->name('nodes.store');
-            Route::put('/nodes/{node}', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'update'])->name('nodes.update');
-            Route::delete('/nodes/{node}', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'destroy'])->name('nodes.destroy');
+            Route::get('/{id}/nodes', [ServiceNodeController::class, 'index'])->name('nodes.index');
+            Route::post('/nodes', [ServiceNodeController::class, 'store'])->name('nodes.store');
+            Route::put('/nodes/{node}', [ServiceNodeController::class, 'update'])->name('nodes.update');
+            Route::delete('/nodes/{node}', [ServiceNodeController::class, 'destroy'])->name('nodes.destroy');
 
             // Requirements (per node)
-            Route::post('/requirements', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'storeRequirement'])->name('requirements.store');
+            Route::post('/requirements', [ServiceNodeController::class, 'storeRequirement'])->name('requirements.store');
         });
 
         // Pelayanan Detail & Status Update: Catch-all ID routes moved to end 
@@ -312,18 +314,18 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
 
         // Modul Berita & Informasi (Kecamatan Internal CRUD)
         Route::prefix('berita')->name('berita.')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'index'])->name('index');
-            Route::get('/create', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'create'])->name('create');
-            Route::post('/', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'store'])->name('store');
-            Route::get('/{id}/edit', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'edit'])->name('edit');
-            Route::put('/{id}', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'update'])->name('update');
-            Route::delete('/{id}', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'destroy'])->name('destroy');
-            Route::delete('/{id}/force', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'forceDestroy'])->name('force-destroy');
-            Route::patch('/{id}/toggle-status', [\App\Http\Controllers\Kecamatan\BeritaController::class, 'toggleStatus'])->name('toggle-status');
+            Route::get('/', [BeritaController::class, 'index'])->name('index');
+            Route::get('/create', [BeritaController::class, 'create'])->name('create');
+            Route::post('/', [BeritaController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [BeritaController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [BeritaController::class, 'update'])->name('update');
+            Route::delete('/{id}', [BeritaController::class, 'destroy'])->name('destroy');
+            Route::delete('/{id}/force', [BeritaController::class, 'forceDestroy'])->name('force-destroy');
+            Route::patch('/{id}/toggle-status', [BeritaController::class, 'toggleStatus'])->name('toggle-status');
 
             // Sub-Modul: Banner Iklan
-            Route::resource('banners', \App\Http\Controllers\Kecamatan\NewsBannerController::class)->except(['show']);
-            Route::patch('banners/{id}/toggle-status', [\App\Http\Controllers\Kecamatan\NewsBannerController::class, 'toggleStatus'])->name('banners.toggle-status');
+            Route::resource('banners', NewsBannerController::class)->except(['show']);
+            Route::patch('banners/{id}/toggle-status', [NewsBannerController::class, 'toggleStatus'])->name('banners.toggle-status');
         });
     });
 });
