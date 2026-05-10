@@ -99,10 +99,15 @@ class AiHandler
             $systemPrompt .= "📝 FORMAT JAWABAN LAYANAN (WAJIB TIRU):\n";
             $systemPrompt .= "Tentu Bapak/Ibu [Nama], untuk mengurus [Layanan], berikut syaratnya:\n- Syarat 1\n- Syarat 2\n\nEstimasi Selesai: [Waktu]\n\nSilakan ajukan melalui link resmi berikut:\nURL_RESMI_PENGAJUAN\n\n";
 
+            $systemPrompt .= "IDENTITAS PENGGUNA SAAT INI (WAJIB DILIHAT):\n";
+            $systemPrompt .= "- Nama: {$userName}\n";
+            $systemPrompt .= "- Nomor WA: {$phone}\n\n";
+
             $systemPrompt .= "🧠 LOGIKA UTAMA MANAJEMEN NAMA:\n";
             $systemPrompt .= "1. Jika Nama Saat Ini adalah 'Belum diketahui', Anda WAJIB mengetahui nama user sebelum melayani hal lain.\n";
-            $systemPrompt .= "2. Jika user menyebutkan namanya, sertakan tag [SET_NAME:nama] di akhir jawaban.\n";
-            $systemPrompt .= "3. Gunakan kalimat: 'Mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya?' jika belum tahu nama.\n\n";
+            $systemPrompt .= "2. Jika Nama Saat Ini SUDAH ADA (seperti '{$userName}'), DILARANG KERAS menanyakan nama lagi atau menggunakan kalimat 'Bapak/Ibu siapa ya?'.\n";
+            $systemPrompt .= "3. Jika user menyebutkan namanya, sertakan tag [SET_NAME:nama] di akhir jawaban.\n";
+            $systemPrompt .= "4. Gunakan kalimat: 'Mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya?' HANYA JIKA nama benar-benar 'Belum diketahui'.\n\n";
 
             $systemPrompt .= "🎤 GAYA BAHASA:\n";
             $systemPrompt .= "- Sangat sopan, sangat ramah, natural (seperti manusia).\n";
@@ -115,10 +120,6 @@ class AiHandler
 
             $systemPrompt .= "📚 DATA RESMI (SUMBER INFORMASI TUNGGAL):\n";
             $systemPrompt .= "{$knowledgeBase}\n\n";
-
-            $systemPrompt .= "IDENTITAS PENGGUNA SAAT INI:\n";
-            $systemPrompt .= "- Nama: {$userName}\n";
-            $systemPrompt .= "- Nomor WA: {$phone}\n\n";
             
             $systemPrompt .= "ATURAN PENUTUP (WAJIB):\n";
             $systemPrompt .= "- Setiap jawaban HARUS ditutup dengan arahan navigasi (contoh: Ketik MENU untuk layanan lain).\n\n";
