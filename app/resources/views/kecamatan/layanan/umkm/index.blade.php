@@ -26,7 +26,7 @@
                         <i class="fas fa-hand-holding-heart me-2"></i> Bantu Daftar UMKM
                     </a>
                 @else
-                    <a href="{{ route('kecamatan.jasa.create') }}" class="btn btn-indigo text-white px-4 rounded-3 fw-bold shadow-sm">
+                    <a href="{{ route('kecamatan.jasa.create') }}" class="btn btn-primary px-4 rounded-3 fw-bold shadow-sm">
                         <i class="fas fa-tools me-2"></i> Bantu Daftar Jasa
                     </a>
                 @endif
