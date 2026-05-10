@@ -158,8 +158,8 @@
                                                     <i class="fas fa-key text-amber-600"></i>
                                                 </a>
 
-                                                <div class="dropdown d-inline-block ms-1">
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false">
+                                                <div class="dropdown d-inline-block ms-1 dropup">
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">
                                                         <i class="fas fa-ellipsis-h text-slate-400"></i>
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
@@ -236,8 +236,8 @@
                                                     <i class="fas fa-key text-amber-600"></i>
                                                 </a>
 
-                                                <div class="dropdown d-inline-block ms-1">
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false">
+                                                <div class="dropdown d-inline-block ms-1 dropup">
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">
                                                         <i class="fas fa-ellipsis-h text-slate-400"></i>
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
