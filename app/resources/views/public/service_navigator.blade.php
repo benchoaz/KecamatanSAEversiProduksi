@@ -1365,7 +1365,10 @@ document.getElementById('snForm').addEventListener('submit', async function(e) {
         const fd = new FormData(this);
         const res = await fetch('{{ route("apply.node.store") }}', {
             method: 'POST',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            headers: { 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
             body: fd
         });
         const data = await res.json();
