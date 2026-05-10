@@ -641,4 +641,93 @@ class PelayananController extends Controller
 
         return redirect()->back()->with('success', "Seluruh data ({$count} baris) telah dibersihkan.");
     }
+
+    /**
+     * Validate attachment using AI (Gemini Vision)
+     */
+    public function validateAttachment(\Illuminate\Http\Request $request, $attachmentId)
+    {
+        $attachment = \App\Models\PublicServiceAttachment::findOrFail($attachmentId);
+        $profile = appProfile();
+
+        if (!$profile->is_document_ai_active || !$profile->document_ai_key) {
+            return response()->json(['success' => false, 'message' => 'Layanan AI belum dikonfigurasi atau sedang dinonaktifkan.']);
+        }
+
+        try {
+            $apiKey = $profile->document_ai_key;
+            $filePath = storage_path('app/public/' . $attachment->file_path);
+            
+            if (!file_exists($filePath)) {
+                $filePath = public_path('storage/' . $attachment->file_path);
+                if (!file_exists($filePath)) {
+                    return response()->json(['success' => false, 'message' => 'File tidak ditemukan di server.']);
+                }
+            }
+
+            $fileData = base64_encode(file_get_contents($filePath));
+            $mimeType = mime_content_type($filePath);
+
+            $prompt = "Tolong analisa dokumen ini untuk membantu tugas operator pelayanan publik kecamatan. 
+            Dokumen ini seharusnya adalah: {$attachment->label}.
+            Tugas Anda:
+            1. Verifikasi apakah foto/file ini benar adalah {$attachment->label}.
+            2. Periksa apakah ada indikasi manipulasi digital (editan Photoshop/tempelan) yang mencurigakan secara visual.
+            3. Berikan skor status: 'valid' (jika aman), 'suspicious' (jika ada keraguan/buram/mirip editan), atau 'invalid' (jika salah dokumen).
+            4. Berikan penjelasan singkat kenapa Anda memberikan status tersebut.
+
+            PENTING: Balas HANYA dengan format JSON seperti ini:
+            {
+              \"status\": \"valid|suspicious|invalid\",
+              \"reason\": \"penjelasan singkat bahasa indonesia max 20 kata\"
+            }";
+
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
+            
+            $payload = [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $prompt],
+                            [
+                                'inline_data' => [
+                                    'mime_type' => $mimeType,
+                                    'data' => $fileData
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'generationConfig' => [
+                    'response_mime_type' => 'application/json'
+                ]
+            ];
+
+            $response = \Illuminate\Support\Facades\Http::timeout(30)->post($url, $payload);
+
+            if ($response->successful()) {
+                $result = $response->json();
+                $textResult = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+                $jsonResult = json_decode($textResult, true);
+
+                if ($jsonResult) {
+                    $attachment->update([
+                        'ai_status' => $jsonResult['status'],
+                        'ai_analysis_result' => $jsonResult['reason']
+                    ]);
+
+                    return response()->json([
+                        'success' => true,
+                        'status' => $jsonResult['status'],
+                        'reason' => $jsonResult['reason']
+                    ]);
+                }
+            }
+
+            return response()->json(['success' => false, 'message' => 'AI gagal menganalisis dokumen. Coba lagi nanti.']);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan teknis: ' . $e->getMessage()]);
+        }
+    }
 }

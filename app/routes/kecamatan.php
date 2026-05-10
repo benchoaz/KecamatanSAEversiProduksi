@@ -82,6 +82,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
         Route::post('/bulk-destroy', [PelayananController::class, 'bulkDestroy'])->name('bulk-destroy');
         Route::post('/clear-all', [PelayananController::class, 'clearAll'])->name('clear-all');
         Route::post('/{id}/history-comment', [PelayananController::class, 'addHistoryComment'])->name('history-comment');
+        Route::post('/attachment/{attachmentId}/validate', [PelayananController::class, 'validateAttachment'])->name('attachment.validate');
         Route::get('/feedback/results', [PelayananController::class, 'feedbackIndex'])->name('feedback.index');
     });
 

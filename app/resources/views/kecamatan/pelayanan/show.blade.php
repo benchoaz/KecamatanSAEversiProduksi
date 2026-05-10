@@ -199,7 +199,17 @@
                                                     <p class="mb-0 text-[10px] fw-bold text-slate-700 truncate" title="{{ $attachment->label }}">
                                                         {{ $attachment->label }}
                                                     </p>
-                                                    <small class="text-[8px] text-slate-400 truncate d-block">{{ $attachment->original_name }}</small>
+                                                    <div id="ai-result-{{ $attachment->id }}" class="mt-1">
+                                                        @if($attachment->ai_status)
+                                                            <div class="badge bg-{{ $attachment->ai_status == 'valid' ? 'emerald' : ($attachment->ai_status == 'suspicious' ? 'amber' : 'rose') }}-50 text-{{ $attachment->ai_status == 'valid' ? 'emerald' : ($attachment->ai_status == 'suspicious' ? 'amber' : 'rose') }}-700 border border-{{ $attachment->ai_status == 'valid' ? 'emerald' : ($attachment->ai_status == 'suspicious' ? 'amber' : 'rose') }}-100 p-1 w-100 text-start" style="font-size: 8px;">
+                                                                <i class="fas fa-{{ $attachment->ai_status == 'valid' ? 'check-circle' : ($attachment->ai_status == 'suspicious' ? 'exclamation-circle' : 'times-circle') }} me-1"></i>
+                                                                AI: {{ $attachment->ai_analysis_result }}
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    <button type="button" onclick="validateAttachment({{ $attachment->id }})" class="btn btn-outline-indigo btn-xs w-100 mt-2 py-1" style="font-size: 9px;">
+                                                        <i class="fas fa-magic me-1"></i> Cek AI
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -584,5 +594,64 @@
         completionSelect?.addEventListener('change', checkRequirements);
         statusSelect?.addEventListener('change', checkRequirements);
         checkRequirements(); // run once on load
+
+        function validateAttachment(attachmentId) {
+            const btn = event.currentTarget;
+            const originalContent = btn.innerHTML;
+            const resultDiv = document.getElementById(`ai-result-${attachmentId}`);
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Menganalisa...';
+            
+            fetch(`/kecamatan/pelayanan/attachment/${attachmentId}/validate`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const color = data.status === 'valid' ? 'emerald' : (data.status === 'suspicious' ? 'amber' : 'rose');
+                    const icon = data.status === 'valid' ? 'check-circle' : (data.status === 'suspicious' ? 'exclamation-circle' : 'times-circle');
+                    
+                    resultDiv.innerHTML = `
+                        <div class="badge bg-${color}-50 text-${color}-700 border border-${color}-100 p-1 w-100 text-start animate__animated animate__fadeIn" style="font-size: 8px;">
+                            <i class="fas fa-${icon} me-1"></i>
+                            AI: ${data.reason}
+                        </div>
+                    `;
+                    
+                    Swal.fire({
+                        icon: data.status === 'valid' ? 'success' : 'warning',
+                        title: 'Analisa AI Selesai',
+                        text: data.reason,
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 4000
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Sistem',
+                    text: 'Gagal menghubungi server AI.'
+                });
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            });
+        }
     </script>
 @endsection
