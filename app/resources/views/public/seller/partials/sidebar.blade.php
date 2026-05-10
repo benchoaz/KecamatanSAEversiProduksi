@@ -13,7 +13,7 @@
         <div class="pb-2 px-4">
             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Utama</span>
         </div>
-        <a href="{{ route('portal_warga.dashboard') }}" class="flex items-center gap-4 px-5 py-4 sidebar-item-active transition-all group">
+        <a href="{{ route('portal_warga.dashboard') }}" class="flex items-center gap-4 px-5 py-4 {{ Route::is('portal_warga.dashboard') ? 'sidebar-item-active' : 'text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-2xl' }} transition-all group">
             <i class="fas fa-th-large text-lg"></i>
             <span class="text-sm font-bold">Home</span>
         </a>
@@ -21,15 +21,15 @@
         <div class="pt-6 pb-2 px-4">
             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Manajemen</span>
         </div>
-        <a href="#" class="flex items-center gap-4 px-5 py-4 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all group">
-            <i class="fas fa-box-open text-lg opacity-50 group-hover:opacity-100"></i>
+        <a href="{{ isset($primaryUmkm) ? route('umkm_rakyat.manage.products', $primaryUmkm->manage_token) : '#' }}" class="flex items-center gap-4 px-5 py-4 {{ Route::is('umkm_rakyat.manage.products') ? 'sidebar-item-active' : 'text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-2xl' }} transition-all group">
+            <i class="fas fa-box-open text-lg {{ Route::is('umkm_rakyat.manage.products') ? 'text-blue-600' : 'opacity-50 group-hover:opacity-100' }}"></i>
             <div>
                 <span class="text-sm font-bold block">Produk</span>
                 <span class="text-[9px] font-medium opacity-70">Kelola barang jualan</span>
             </div>
         </a>
-        <a href="#" class="flex items-center gap-4 px-5 py-4 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all group">
-            <i class="fas fa-shopping-cart text-lg opacity-50 group-hover:opacity-100"></i>
+        <a href="{{ isset($primaryUmkm) ? route('umkm_rakyat.manage.seller.dashboard', $primaryUmkm->manage_token) : '#' }}" class="flex items-center gap-4 px-5 py-4 {{ Route::is('umkm_rakyat.manage.seller.dashboard') ? 'sidebar-item-active' : 'text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-2xl' }} transition-all group">
+            <i class="fas fa-shopping-cart text-lg {{ Route::is('umkm_rakyat.manage.seller.dashboard') ? 'text-blue-600' : 'opacity-50 group-hover:opacity-100' }}"></i>
             <div>
                 <span class="text-sm font-bold block">Pesanan</span>
                 <span class="text-[9px] font-medium opacity-70">Cek orderan masuk</span>

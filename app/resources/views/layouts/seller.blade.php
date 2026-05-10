@@ -59,15 +59,15 @@
 
     <!-- MOBILE BOTTOM NAVIGATION (Improvisasi untuk kenyamanan HP) -->
     <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-100 px-6 py-3 flex justify-between items-center z-50">
-        <a href="{{ route('portal_warga.dashboard') }}" class="flex flex-col items-center gap-1 text-blue-600">
+        <a href="{{ route('portal_warga.dashboard') }}" class="flex flex-col items-center gap-1 {{ Route::is('portal_warga.dashboard') ? 'text-blue-600' : 'text-slate-400' }}">
             <i class="fas fa-home text-lg"></i>
             <span class="text-[9px] font-black uppercase">Home</span>
         </a>
-        <a href="#" class="flex flex-col items-center gap-1 text-slate-400">
+        <a href="{{ isset($primaryUmkm) ? route('umkm_rakyat.manage.products', $primaryUmkm->manage_token) : '#' }}" class="flex flex-col items-center gap-1 {{ Route::is('umkm_rakyat.manage.products') ? 'text-blue-600' : 'text-slate-400' }}">
             <i class="fas fa-box-open text-lg"></i>
             <span class="text-[9px] font-black uppercase">Produk</span>
         </a>
-        <a href="#" class="flex flex-col items-center gap-1 text-slate-400">
+        <a href="{{ isset($primaryUmkm) ? route('umkm_rakyat.manage.seller.dashboard', $primaryUmkm->manage_token) : '#' }}" class="flex flex-col items-center gap-1 {{ Route::is('umkm_rakyat.manage.seller.dashboard') ? 'text-blue-600' : 'text-slate-400' }}">
             <i class="fas fa-shopping-cart text-lg"></i>
             <span class="text-[9px] font-black uppercase">Pesanan</span>
         </a>

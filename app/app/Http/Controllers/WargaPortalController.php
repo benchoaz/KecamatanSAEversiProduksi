@@ -159,7 +159,8 @@ class WargaPortalController extends Controller
             'jasas' => $jasas,
             'umkmLocals' => $umkmLocals,
             'services' => $services,
-            'phone' => $phone
+            'phone' => $phone,
+            'primaryUmkm' => $umkms->first()
         ]);
     }
 
