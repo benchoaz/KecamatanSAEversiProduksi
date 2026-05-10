@@ -138,8 +138,8 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="px-4 py-3 text-end">
-                                            <div class="d-flex justify-content-end gap-1">
+                                        <td class="px-4 py-3 text-end" style="white-space: nowrap;">
+                                            <div class="d-inline-block">
                                                 {{-- Quick Action: Verify --}}
                                                 <form action="{{ route('kecamatan.umkm.toggle-verify', $item->id) }}" method="POST" class="d-inline">
                                                     @csrf
@@ -158,8 +158,8 @@
                                                     <i class="fas fa-key text-amber-600"></i>
                                                 </a>
 
-                                                <div class="dropdown d-inline">
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+                                                <div class="dropdown d-inline-block ms-1">
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false">
                                                         <i class="fas fa-ellipsis-h text-slate-400"></i>
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
@@ -217,8 +217,8 @@
                                                 {{ $item->status == 'active' ? 'Aktif' : 'Nonaktif' }}
                                             </span>
                                         </td>
-                                        <td class="px-4 py-3 text-end">
-                                            <div class="d-flex justify-content-end gap-1">
+                                        <td class="px-4 py-3 text-end" style="white-space: nowrap;">
+                                            <div class="d-inline-block">
                                                 {{-- Quick Action: Verify --}}
                                                 <form action="{{ route('kecamatan.jasa.toggle-verify', $item->id) }}" method="POST" class="d-inline">
                                                     @csrf
@@ -236,8 +236,8 @@
                                                     <i class="fas fa-key text-amber-600"></i>
                                                 </a>
 
-                                                <div class="dropdown d-inline">
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+                                                <div class="dropdown d-inline-block ms-1">
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false">
                                                         <i class="fas fa-ellipsis-h text-slate-400"></i>
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
