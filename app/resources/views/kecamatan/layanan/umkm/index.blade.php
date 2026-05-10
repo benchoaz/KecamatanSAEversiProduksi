@@ -159,7 +159,7 @@
                                                 </a>
 
                                                 <div class="dropdown d-inline">
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-strategy="fixed">
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
                                                         <i class="fas fa-ellipsis-h text-slate-400"></i>
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
@@ -237,7 +237,7 @@
                                                 </a>
 
                                                 <div class="dropdown d-inline">
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-strategy="fixed">
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
                                                         <i class="fas fa-ellipsis-h text-slate-400"></i>
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
