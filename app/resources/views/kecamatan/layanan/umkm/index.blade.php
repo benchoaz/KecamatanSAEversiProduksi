@@ -72,7 +72,7 @@
 
         <div class="card border-0 shadow-premium rounded-4">
             <div class="card-body p-0">
-                <div class="table-responsive">
+                <div class="table-responsive" style="overflow: visible !important;">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-slate-50 border-bottom border-slate-100">
                             <tr>
@@ -158,11 +158,11 @@
                                                     <i class="fas fa-key text-amber-600"></i>
                                                 </a>
 
-                                                <div class="dropdown d-inline-block ms-1 dropup">
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">
+                                                <div class="dropdown d-inline-block ms-1">
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="z-index: 1050;">
                                                         <i class="fas fa-ellipsis-h text-slate-400"></i>
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
+                                                    <ul class="dropdown-menu dropdown-menu-end border shadow-lg rounded-4 p-2" style="z-index: 1060;">
                                                         <li>
                                                             <form action="{{ route('kecamatan.umkm.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Nonaktifkan UMKM ini?')">
                                                                 @csrf @method('DELETE')
@@ -236,11 +236,11 @@
                                                     <i class="fas fa-key text-amber-600"></i>
                                                 </a>
 
-                                                <div class="dropdown d-inline-block ms-1 dropup">
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">
+                                                <div class="dropdown d-inline-block ms-1">
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="z-index: 1050;">
                                                         <i class="fas fa-ellipsis-h text-slate-400"></i>
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2">
+                                                    <ul class="dropdown-menu dropdown-menu-end border shadow-lg rounded-4 p-2" style="z-index: 1060;">
                                                         <li>
                                                             <form action="{{ route('kecamatan.jasa.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus Jasa ini?')">
                                                                 @csrf @method('DELETE')
