@@ -100,7 +100,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
         Route::post('/{id}/reset-akses', [LayananPublikController::class, 'resetAkses'])->name('reset-akses');
         Route::post('/{id}/toggle-verify', [LayananPublikController::class, 'umkmToggleVerify'])->name('toggle-verify');
         Route::post('/{id}/toggle-status', [LayananPublikController::class, 'umkmToggleStatus'])->name('toggle-status');
-        Route::delete('/{id}/hard-delete', [LayananPublikController::class, 'umkmHardDelete'])->name('hard-delete');
+        Route::post('/{id}/hard-delete', [LayananPublikController::class, 'umkmHardDelete'])->name('hard-delete');
     });
 
     // Jasa Management (Parallel to UMKM) (Akses: Seksi Ekbang & Pembangunan)
@@ -114,7 +114,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
         Route::post('/{id}/reset-akses', [LayananPublikController::class, 'jasaResetAkses'])->name('reset-akses');
         Route::post('/{id}/toggle-verify', [LayananPublikController::class, 'jasaToggleVerify'])->name('toggle-verify');
         Route::post('/{id}/toggle-status', [LayananPublikController::class, 'jasaToggleStatus'])->name('toggle-status');
-        Route::delete('/{id}/hard-delete', [LayananPublikController::class, 'jasaHardDelete'])->name('hard-delete');
+        Route::post('/{id}/hard-delete', [LayananPublikController::class, 'jasaHardDelete'])->name('hard-delete');
     });
 
 

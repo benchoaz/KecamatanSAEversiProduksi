@@ -168,7 +168,7 @@
 
                                                 {{-- Direct Action: Delete --}}
                                                 <form action="{{ route('kecamatan.umkm.hard-delete', $item->id) }}" method="POST" onsubmit="return confirm('Hapus Permanen UMKM ini?')" class="d-inline">
-                                                    @csrf @method('DELETE')
+                                                    @csrf
                                                     <button class="btn btn-sm btn-light border shadow-sm rounded-3 ms-1" type="submit" title="Hapus Permanen">
                                                         <i class="fas fa-trash-alt text-red-500"></i>
                                                     </button>
@@ -248,7 +248,7 @@
 
                                                 {{-- Direct Action: Delete --}}
                                                 <form action="{{ route('kecamatan.jasa.hard-delete', $item->id) }}" method="POST" onsubmit="return confirm('Hapus Permanen Jasa ini?')" class="d-inline">
-                                                    @csrf @method('DELETE')
+                                                    @csrf
                                                     <button class="btn btn-sm btn-light border shadow-sm rounded-3 ms-1" type="submit" title="Hapus Permanen">
                                                         <i class="fas fa-trash-alt text-red-500"></i>
                                                     </button>
