@@ -158,11 +158,11 @@
                                                     <i class="fas fa-key text-amber-600"></i>
                                                 </a>
 
-                                                {{-- Direct Action: Deactivate --}}
-                                                <form action="{{ route('kecamatan.umkm.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Nonaktifkan UMKM ini?')" class="d-inline">
-                                                    @csrf @method('DELETE')
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 ms-1" type="submit" title="Nonaktifkan">
-                                                        <i class="fas fa-ban text-orange-500"></i>
+                                                {{-- Direct Action: Toggle Status --}}
+                                                <form action="{{ route('kecamatan.umkm.toggle-status', $item->id) }}" method="POST" onsubmit="return confirm('Ubah status aktif UMKM ini?')" class="d-inline">
+                                                    @csrf
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 ms-1" type="submit" title="{{ $item->status == 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}">
+                                                        <i class="fas {{ $item->status == 'aktif' ? 'fa-ban text-orange-500' : 'fa-check-circle text-emerald-500' }}"></i>
                                                     </button>
                                                 </form>
 
@@ -238,11 +238,11 @@
                                                     <i class="fas fa-key text-amber-600"></i>
                                                 </a>
 
-                                                {{-- Direct Action: Deactivate --}}
-                                                <form action="{{ route('kecamatan.jasa.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Nonaktifkan Jasa ini?')" class="d-inline">
-                                                    @csrf @method('DELETE')
-                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 ms-1" type="submit" title="Nonaktifkan">
-                                                        <i class="fas fa-ban text-orange-500"></i>
+                                                {{-- Direct Action: Toggle Status --}}
+                                                <form action="{{ route('kecamatan.jasa.toggle-status', $item->id) }}" method="POST" onsubmit="return confirm('Ubah status aktif Jasa ini?')" class="d-inline">
+                                                    @csrf
+                                                    <button class="btn btn-sm btn-light border shadow-sm rounded-3 ms-1" type="submit" title="{{ $item->status == 'active' ? 'Nonaktifkan' : 'Aktifkan' }}">
+                                                        <i class="fas {{ $item->status == 'active' ? 'fa-ban text-orange-500' : 'fa-check-circle text-emerald-500' }}"></i>
                                                     </button>
                                                 </form>
 

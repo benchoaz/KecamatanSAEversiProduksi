@@ -343,4 +343,51 @@ class LayananPublikController extends Controller
 
         return back()->with('success', "Jasa {$jasa->job_title} berhasil {$status}.");
     }
+
+    public function umkmToggleStatus($id)
+    {
+        $umkm = Umkm::findOrFail($id);
+        $umkm->status = ($umkm->status == 'aktif') ? 'nonaktif' : 'aktif';
+        $umkm->save();
+
+        $statusLabel = ($umkm->status == 'aktif') ? 'diaktifkan kembali' : 'dinonaktifkan';
+
+        UmkmAdminLog::create([
+            'umkm_id' => $umkm->id,
+            'action' => ($umkm->status == 'aktif') ? 'activate' : 'deactivate',
+            'actor' => 'admin',
+            'notes' => "Status unit usaha {$statusLabel} oleh kecamatan.",
+        ]);
+
+        return back()->with('success', "UMKM {$umkm->nama_usaha} berhasil {$statusLabel}.");
+    }
+
+    public function umkmHardDelete($id)
+    {
+        $umkm = Umkm::findOrFail($id);
+        $name = $umkm->nama_usaha;
+        $umkm->delete(); // This is already a hard delete since No SoftDeletes trait
+
+        return redirect()->route('kecamatan.umkm.index')->with('success', "UMKM {$name} telah dihapus permanen.");
+    }
+
+    public function jasaToggleStatus($id)
+    {
+        $jasa = WorkDirectory::findOrFail($id);
+        $jasa->status = ($jasa->status == 'active') ? 'inactive' : 'active';
+        $jasa->save();
+
+        $statusLabel = ($jasa->status == 'active') ? 'diaktifkan' : 'dinonaktifkan';
+
+        return back()->with('success', "Jasa {$jasa->job_title} berhasil {$statusLabel}.");
+    }
+
+    public function jasaHardDelete($id)
+    {
+        $jasa = WorkDirectory::findOrFail($id);
+        $title = $jasa->job_title;
+        $jasa->delete();
+
+        return redirect()->route('kecamatan.umkm.index', ['tab' => 'jasa'])->with('success', "Jasa {$title} telah dihapus permanen.");
+    }
 }
