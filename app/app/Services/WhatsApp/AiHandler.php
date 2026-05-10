@@ -104,10 +104,11 @@ class AiHandler
             $systemPrompt .= "- Nomor WA: {$phone}\n\n";
 
             $systemPrompt .= "🧠 LOGIKA UTAMA MANAJEMEN NAMA:\n";
-            $systemPrompt .= "1. Jika Nama Saat Ini adalah 'Belum diketahui', Anda WAJIB mengetahui nama user sebelum melayani hal lain.\n";
-            $systemPrompt .= "2. Jika Nama Saat Ini SUDAH ADA (seperti '{$userName}'), DILARANG KERAS menanyakan nama lagi atau menggunakan kalimat 'Bapak/Ibu siapa ya?'.\n";
-            $systemPrompt .= "3. Jika user menyebutkan namanya, sertakan tag [SET_NAME:nama] di akhir jawaban.\n";
-            $systemPrompt .= "4. Gunakan kalimat: 'Mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya?' HANYA JIKA nama benar-benar 'Belum diketahui'.\n\n";
+            $systemPrompt .= "1. Nama user saat ini adalah: '{$userName}'.\n";
+            $systemPrompt .= "2. Jika Nama adalah 'Belum diketahui', Anda WAJIB menyapa dengan 'Bapak/Ibu' saja dan tanyakan namanya dengan sopan.\n";
+            $systemPrompt .= "3. Jika Nama SUDAH ADA (bukan 'Belum diketahui'), Anda WAJIB menggunakan nama tersebut (panggil 'Bapak {$userName}' atau 'Ibu {$userName}').\n";
+            $systemPrompt .= "4. DILARANG KERAS berasumsi atau menebak-nebak nama lain (seperti Dewi, dsb) jika nama sudah ada di data di atas.\n";
+            $systemPrompt .= "5. Jika user ingin mengganti nama atau menyebutkan nama baru, gunakan tag [SET_NAME:nama] di akhir jawaban untuk memperbarui memori saya.\n\n";
 
             $systemPrompt .= "🎤 GAYA BAHASA:\n";
             $systemPrompt .= "- Sangat sopan, sangat ramah, natural (seperti manusia).\n";
@@ -161,17 +162,8 @@ class AiHandler
                 $reply = str_replace($matches[0], '', $reply);
             }
             
-            // Fallback Name Detection if AI says "Halo Pak/Bu [Name]" and we have no name
-            if (empty($userName) || $userName === 'Belum diketahui') {
-                if (preg_match('/Halo (Pak|Bu|Bapak|Ibu|Kak|Kakak) ([A-Z][a-z]+)/', $reply, $m)) {
-                    $detectedName = $m[2];
-                    if ($memory) {
-                        $memory->user_name = $detectedName;
-                        $memory->save();
-                        \Log::info("FALLBACK NAME DETECTED: " . $detectedName);
-                    }
-                }
-            }
+            // Fallback Name Detection is DISABLED because it causes hallucinations to be saved as real names.
+            // Only SET_NAME tag is allowed to change the name.
 
             // Garansi Navigasi
             $replyLower = strtolower($reply);
