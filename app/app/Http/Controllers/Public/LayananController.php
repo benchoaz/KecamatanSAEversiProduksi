@@ -135,7 +135,7 @@ class LayananController extends Controller
                 // 2. Handle Attachments
                 if ($request->hasFile('attachments')) {
                     foreach ($request->file('attachments') as $index => $file) {
-                        $path = $file->store('public_services', 'local');
+                        $path = $file->store('public_services', 'public');
                         
                         PublicServiceAttachment::create([
                             'public_service_id' => $service->id,
@@ -284,7 +284,7 @@ class LayananController extends Controller
                     }
 
                     foreach ($request->file('attachments') as $idx => $file) {
-                        $path = $file->store('public_services/' . $service->id, 'local');
+                        $path = $file->store('public_services', 'public');
                         $reqId = $reqIds[$idx] ?? null;
 
                         PublicServiceAttachment::create([
