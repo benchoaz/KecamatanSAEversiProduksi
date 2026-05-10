@@ -37,27 +37,38 @@
                     <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
 
                         {{-- Header - Compact --}}
-                        <div class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white p-6">
-                            <div class="flex items-start gap-4">
-                                <div
-                                    class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-3xl shadow-lg">
-                                    <i class="fas {{ $workItem->icon }}"></i>
+                        <div class="relative overflow-hidden">
+                            @if($workItem->image_path)
+                                <div class="absolute inset-0 z-0">
+                                    <img src="{{ asset('storage/' . $workItem->image_path) }}" class="w-full h-full object-cover blur-sm opacity-30 scale-110" />
                                 </div>
-                                <div class="flex-1">
-                                    <span
-                                        class="inline-block px-2 py-0.5 bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold rounded-full mb-2">
-                                        {{ $workItem->job_category }}
-                                    </span>
-                                    <h1 class="text-2xl md:text-3xl font-black mb-1 flex items-center gap-2">
-                                        {{ $workItem->job_title }}
-                                        @if($workItem->is_verified)
-                                            <i class="fas fa-check-circle text-blue-400 text-xl shadow-sm" title="Terverifikasi Resmi oleh Kecamatan"></i>
+                            @endif
+                            <div class="bg-gradient-to-r from-teal-600/90 to-emerald-600/90 text-white p-6 relative z-10">
+                                <div class="flex items-start gap-4">
+                                    <div
+                                        class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-3xl shadow-lg overflow-hidden border border-white/30">
+                                        @if($workItem->image_path)
+                                            <img src="{{ asset('storage/' . $workItem->image_path) }}" class="w-full h-full object-cover" />
+                                        @else
+                                            <i class="fas {{ $workItem->icon }}"></i>
                                         @endif
-                                    </h1>
-                                    <p class="text-base text-teal-50 opacity-90">
-                                        <i class="fas fa-user mr-1.5 text-xs"></i>
-                                        {{ $workItem->display_name }}
-                                    </p>
+                                    </div>
+                                    <div class="flex-1">
+                                        <span
+                                            class="inline-block px-2 py-0.5 bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold rounded-full mb-2">
+                                            {{ $workItem->job_category }}
+                                        </span>
+                                        <h1 class="text-2xl md:text-3xl font-black mb-1 flex items-center gap-2">
+                                            {{ $workItem->job_title }}
+                                            @if($workItem->is_verified)
+                                                <i class="fas fa-check-circle text-blue-400 text-xl shadow-sm" title="Terverifikasi Resmi oleh Kecamatan"></i>
+                                            @endif
+                                        </h1>
+                                        <p class="text-base text-teal-50 opacity-90">
+                                            <i class="fas fa-user mr-1.5 text-xs"></i>
+                                            {{ $workItem->display_name }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

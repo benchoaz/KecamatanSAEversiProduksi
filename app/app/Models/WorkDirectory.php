@@ -32,6 +32,7 @@ class WorkDirectory extends Model
         'is_on_holiday',
         'name_updated_at',
         'is_verified',
+        'image_path',
     ];
 
     protected $casts = [

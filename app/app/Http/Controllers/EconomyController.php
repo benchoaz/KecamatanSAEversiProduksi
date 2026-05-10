@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Log;
 
 class EconomyController extends Controller
 {
+    use \App\Traits\ImageOptimizer;
+
     /**
      * Display listing of economy (Jobs & UMKM)
      */
@@ -166,7 +168,13 @@ class EconomyController extends Controller
             'service_area' => 'nullable|string|max:255',
             'service_time' => 'nullable|string|max:100',
             'short_description' => 'nullable|string|max:500',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $this->optimizeAndStore($request->file('image'), 'work_directory');
+        }
 
         // Create WorkDirectory entry
         $workDir = WorkDirectory::create([
@@ -179,6 +187,7 @@ class EconomyController extends Controller
             'service_area' => $request->service_area,
             'service_time' => $request->service_time,
             'short_description' => $request->short_description,
+            'image_path' => $imagePath,
             'consent_public' => true,
             'status' => 'pending',
             'data_source' => 'web_form'

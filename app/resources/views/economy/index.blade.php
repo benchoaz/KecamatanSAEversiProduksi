@@ -187,8 +187,12 @@
                                 <div class="p-6">
                                     <div class="flex items-start justify-between mb-4">
                                         <div
-                                            class="w-14 h-14 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 text-2xl group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300">
-                                            <i class="fas {{ $item->icon }}"></i>
+                                            class="w-14 h-14 bg-teal-50 rounded-xl flex items-center justify-center text-teal-600 text-2xl group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300 overflow-hidden">
+                                            @if($item->image_path)
+                                                <img src="{{ asset('storage/' . $item->image_path) }}" class="w-full h-full object-cover" />
+                                            @else
+                                                <i class="fas {{ $item->icon }}"></i>
+                                            @endif
                                         </div>
                                         <div class="flex flex-wrap items-center gap-2">
                                             <span

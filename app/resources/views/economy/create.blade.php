@@ -25,7 +25,7 @@
                 <div
                     class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-white p-2 md:p-3 animate__animated animate__fadeInUp">
                     <div class="bg-slate-50/50 rounded-[2rem] border border-slate-100 p-8 md:p-12">
-                        <form action="{{ route('economy.store') }}" method="POST" class="space-y-10">
+                        <form action="{{ route('economy.store') }}" method="POST" enctype="multipart/form-data" class="space-y-10">
                             @csrf
 
                             {{-- Section 1: Data Diri --}}
@@ -38,7 +38,7 @@
                                 </div>
 
                                 <div class="form-control w-full">
-                                    <label class="label mb-1">
+                                    <label class="label mb-1" for="display_name">
                                         <span class="label-text font-bold text-slate-700">Nama Lengkap / Nama Usaha <span
                                                 class="text-rose-500">*</span></span>
                                     </label>
@@ -47,7 +47,7 @@
                                             class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-teal-500 text-slate-400">
                                             <i class="fas fa-user"></i>
                                         </div>
-                                        <input type="text" name="display_name" required
+                                        <input type="text" name="display_name" id="display_name" required
                                             placeholder="Contoh: Budi Santoso atau Toko Bangunan Budi"
                                             class="input input-lg w-full pl-12 bg-white border-slate-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 rounded-2xl transition-all font-medium text-slate-700 placeholder:text-slate-300" />
                                     </div>
@@ -88,13 +88,31 @@
                                                 class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10 text-slate-400 group-focus-within:text-teal-500">
                                                 <i class="fas fa-tags"></i>
                                             </div>
-                                            <select name="job_type" required
+                                            <select name="job_type" id="job_type_select" required
                                                 class="select select-lg w-full pl-12 bg-white border-slate-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 rounded-2xl transition-all font-medium text-slate-700">
                                                 <option disabled selected value="">Pilih Tipe...</option>
                                                 @foreach($jobTypes as $key => $label)
                                                     <option value="{{ $key }}">{{ $label }}</option>
                                                 @endforeach
                                             </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- UMKM Pro Notice --}}
+                                <div id="umkm-pro-notice" class="hidden animate__animated animate__fadeIn">
+                                    <div class="bg-amber-50 border border-amber-200 rounded-3xl p-6 flex gap-4">
+                                        <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-amber-500 flex-shrink-0">
+                                            <i class="fas fa-store text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-amber-900 text-sm mb-1">Ingin Buka Toko Online Profesional?</h4>
+                                            <p class="text-xs text-amber-700 leading-relaxed mb-3">
+                                                Jika Anda ingin fitur <strong>Upload Produk, Foto Katalog, dan Keranjang Belanja</strong>, kami sarankan daftar melalui jalur <strong>UMKM Rakyat</strong>.
+                                            </p>
+                                            <a href="{{ route('umkm_rakyat.create') }}" class="btn btn-xs bg-amber-500 hover:bg-amber-600 border-none text-white rounded-lg px-4 font-bold">
+                                                Daftar Toko Profesional <i class="fas fa-arrow-right ml-1"></i>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -115,7 +133,7 @@
                                 <div class="grid grid-cols-1 gap-6">
                                     {{-- Judul Jasa --}}
                                     <div class="form-control w-full">
-                                        <label class="label mb-1">
+                                        <label class="label mb-1" for="job_title">
                                             <span class="label-text font-bold text-slate-700">Judul Usaha / Jasa <span
                                                     class="text-rose-500">*</span></span>
                                         </label>
@@ -124,7 +142,7 @@
                                                 class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors group-focus-within:text-blue-500 text-slate-400">
                                                 <i class="fas fa-hammer"></i>
                                             </div>
-                                            <input type="text" name="job_title" required
+                                            <input type="text" name="job_title" id="job_title" required
                                                 placeholder="Contoh: Tukang Bangunan specializing in Rumah"
                                                 class="input input-lg w-full pl-12 bg-white border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-slate-700 placeholder:text-slate-300" />
                                         </div>
@@ -203,6 +221,23 @@
                                             <textarea name="short_description" rows="4"
                                                 placeholder="Jelaskan keahlian, pengalaman, atau layanan yang Anda tawarkan..."
                                                 class="textarea textarea-lg w-full pl-12 pt-4 bg-white border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-slate-700 placeholder:text-slate-300 leading-relaxed"></textarea>
+                                        </div>
+                                    </div>
+
+                                    {{-- Image Upload --}}
+                                    <div id="image-upload-section" class="hidden animate__animated animate__fadeIn">
+                                        <div class="form-control w-full">
+                                            <label class="label mb-1">
+                                                <span class="label-text font-bold text-slate-700">Foto Produk / Toko <span
+                                                        class="text-rose-500">*</span></span>
+                                            </label>
+                                            <div class="relative group">
+                                                <input type="file" name="image" id="image_input"
+                                                    class="file-input file-input-bordered file-input-md w-full bg-white border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl transition-all font-medium text-slate-700" />
+                                            </div>
+                                            <label class="label mt-1">
+                                                <span class="label-text-alt text-slate-400">Pilih foto terbaik untuk menarik pelanggan. Maks 2MB.</span>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -294,6 +329,34 @@
     <script>
         function setServiceTime(value) {
             document.getElementById('service_time_input').value = value;
+        }
+
+        // Dynamic Labels Logic
+        const jobTypeSelect = document.getElementById('job_type_select');
+        if (jobTypeSelect) {
+            jobTypeSelect.addEventListener('change', function() {
+                const type = this.value;
+                const nameLabel = document.querySelector('label[for="display_name"] .label-text');
+                const titleLabel = document.querySelector('label[for="job_title"] .label-text');
+                const sectionHeader = document.querySelector('.space-y-6:nth-child(4) h2') || document.querySelector('h2:contains("Detail")');
+                
+                const umkmNotice = document.getElementById('umkm-pro-notice');
+                const imageSection = document.getElementById('image-upload-section');
+
+                if (type === 'umkm') {
+                    if(nameLabel) nameLabel.innerHTML = 'Nama Pemilik / Pengelola <span class="text-rose-500">*</span>';
+                    if(titleLabel) titleLabel.innerHTML = 'Nama Toko / Usaha <span class="text-rose-500">*</span>';
+                    if(sectionHeader) sectionHeader.innerText = 'Detail Bisnis UMKM';
+                    umkmNotice.classList.remove('hidden');
+                    imageSection.classList.remove('hidden');
+                } else {
+                    if(nameLabel) nameLabel.innerHTML = 'Nama Lengkap / Nama Usaha <span class="text-rose-500">*</span>';
+                    if(titleLabel) titleLabel.innerHTML = 'Judul Usaha / Jasa <span class="text-rose-500">*</span>';
+                    if(sectionHeader) sectionHeader.innerText = 'Detail Usaha / Jasa';
+                    umkmNotice.classList.add('hidden');
+                    imageSection.classList.add('hidden');
+                }
+            });
         }
     </script>
 @endsection
