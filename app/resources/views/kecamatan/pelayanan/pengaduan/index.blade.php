@@ -13,7 +13,7 @@
                             <i class="fab fa-whatsapp text-success me-2"></i>
                             Pengaduan WhatsApp
                         </h1>
-                        <p class="text-slate-400 small mb-0">
+                        <p class="text-slate-600 small mb-0 fw-medium">
                             Daftar pengaduan yang masuk melalui bot WhatsApp terintegrasi
                         </p>
                     </div>
@@ -49,7 +49,7 @@
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <h3 class="fw-bold text-slate-900 mb-0">{{ $stats['total'] }}</h3>
-                                <p class="text-[10px] text-slate-400 mt-1 font-medium mb-0">Total Pengaduan</p>
+                                <p class="text-[10px] text-slate-600 mt-1 font-bold mb-0 uppercase tracking-wider">Total Pengaduan</p>
                             </div>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <h3 class="fw-bold text-slate-900 mb-0">{{ $stats['menunggu'] }}</h3>
-                                <p class="text-[10px] text-slate-400 mt-1 font-medium mb-0">Menunggu</p>
+                                <p class="text-[10px] text-slate-600 mt-1 font-bold mb-0 uppercase tracking-wider">Menunggu</p>
                             </div>
                         </div>
                     </div>
@@ -83,7 +83,7 @@
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <h3 class="fw-bold text-slate-900 mb-0">{{ $stats['diproses'] }}</h3>
-                                <p class="text-[10px] text-slate-400 mt-1 font-medium mb-0">Diproses</p>
+                                <p class="text-[10px] text-slate-600 mt-1 font-bold mb-0 uppercase tracking-wider">Diproses</p>
                             </div>
                         </div>
                     </div>
@@ -100,7 +100,7 @@
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <h3 class="fw-bold text-slate-900 mb-0">{{ $stats['selesai'] }}</h3>
-                                <p class="text-[10px] text-slate-400 mt-1 font-medium mb-0">Selesai</p>
+                                <p class="text-[10px] text-slate-600 mt-1 font-bold mb-0 uppercase tracking-wider">Selesai</p>
                             </div>
                         </div>
                     </div>
@@ -129,16 +129,16 @@
                                         <input type="checkbox" class="form-check-input" id="check-all">
                                     </th>
                                     <th
-                                        class="border-0 px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                                        class="border-0 px-4 py-3 text-[10px] uppercase tracking-wider text-slate-700 fw-black">
                                         Waktu</th>
                                     <th
-                                        class="border-0 px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                                        class="border-0 px-4 py-3 text-[10px] uppercase tracking-wider text-slate-700 fw-black">
                                         Pengirim</th>
                                     <th
-                                        class="border-0 px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                                        class="border-0 px-4 py-3 text-[10px] uppercase tracking-wider text-slate-700 fw-black">
                                         Isi Pengaduan</th>
                                     <th
-                                        class="border-0 px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                                        class="border-0 px-4 py-3 text-[10px] uppercase tracking-wider text-slate-700 fw-black">
                                         Status</th>
                                     <th
                                         class="border-0 px-4 py-3 text-[10px] uppercase tracking-wider text-slate-500 font-bold text-end">
@@ -155,7 +155,7 @@
                                             <div class="text-[11px] text-slate-600 font-medium">
                                                 {{ $pengaduan->created_at->format('d M Y') }}
                                             </div>
-                                            <div class="text-[10px] text-slate-400">
+                                            <div class="text-[10px] text-slate-500 fw-bold">
                                                 {{ $pengaduan->created_at->format('H:i') }}
                                             </div>
                                         </td>
@@ -169,7 +169,7 @@
                                                     <div class="text-[11px] text-slate-700 font-medium">
                                                         {{ $pengaduan->nama ?? 'Anonim' }}
                                                     </div>
-                                                    <div class="text-[10px] text-slate-400">
+                                                    <div class="text-[10px] text-slate-500 fw-bold">
                                                         {{ $pengaduan->whatsapp ?? '-' }}
                                                     </div>
                                                 </div>
@@ -180,7 +180,7 @@
                                                 {{ Str::limit($pengaduan->uraian, 80) }}
                                             </div>
                                             @if($pengaduan->jenis_layanan)
-                                                <span class="badge bg-slate-100 text-slate-600 text-[9px] mt-1">
+                                                <span class="badge bg-slate-200 text-slate-800 text-[9px] mt-1 fw-bold">
                                                     {{ $pengaduan->jenis_layanan }}
                                                 </span>
                                             @endif

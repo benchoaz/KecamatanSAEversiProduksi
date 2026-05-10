@@ -11,7 +11,7 @@
             </div>
             <div class="logo-text">
                 <span class="logo-title fw-bold text-uppercase">DASHBOARD</span>
-                <span class="logo-subtitle tracking-wider">{{ strtoupper(appProfile()->full_region_name) }}</span>
+                <span class="logo-subtitle tracking-wider text-slate-600 fw-black">{{ strtoupper(appProfile()->full_region_name) }}</span>
             </div>
         </div>
         <button class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
@@ -23,7 +23,7 @@
 
     <nav class="sidebar-nav">
         <div class="nav-section">
-            <span class="nav-section-title">ADMINISTRASI & OTORITAS</span>
+            <span class="nav-section-title text-slate-500 fw-black opacity-100" style="letter-spacing: 1px;">ADMINISTRASI & OTORITAS</span>
             <ul class="nav-menu">
                 <li class="nav-item">
                     <a href="{{ route('kecamatan.dashboard') }}"
@@ -36,7 +36,7 @@
         </div>
         
         <div class="nav-section">
-            <span class="nav-section-title">PELAYANAN PUBLIK</span>
+            <span class="nav-section-title text-slate-500 fw-black opacity-100" style="letter-spacing: 1px;">PELAYANAN PUBLIK</span>
             <ul class="nav-menu">
                 <li class="nav-item">
                     <a href="{{ route('kecamatan.pelayanan.inbox') }}"
@@ -77,7 +77,7 @@
 
         @if(isset($dynamicMenus) && $dynamicMenus->count() > 0)
             <div class="nav-section">
-                <span class="nav-section-title">MODUL OTORISASI (DINAMIS)</span>
+                <span class="nav-section-title text-slate-500 fw-black opacity-100" style="letter-spacing: 1px;">MODUL OTORISASI (DINAMIS)</span>
                 <ul class="nav-menu">
                     @foreach($dynamicMenus as $menu)
                         @if($menu->subMenus->count() > 0)
@@ -118,9 +118,9 @@
         <div class="user-card border-0 shadow-sm" style="background: rgba(255,255,255,0.03);">
             <div class="user-avatar bg-brand-600 text-white"><i class="fas fa-user-tie"></i></div>
             <div class="user-info">
-                <span class="user-name text-truncate text-white">{{ auth()->user()->nama_lengkap }}</span>
+                <span class="user-name text-truncate text-slate-900 fw-black">{{ auth()->user()->nama_lengkap }}</span>
                 <span
-                    class="user-role small text-muted text-uppercase tracking-tighter">{{ optional(auth()->user()->role)->nama_role }}</span>
+                    class="user-role small text-slate-500 fw-bold text-uppercase tracking-tighter">{{ optional(auth()->user()->role)->nama_role }}</span>
             </div>
         </div>
 

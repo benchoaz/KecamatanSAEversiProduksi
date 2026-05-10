@@ -8,7 +8,7 @@
             <span class="breadcrumb-item">
                 <i class="fas fa-house-chimney text-brand-600 fs-4"></i>
             </span>
-            <span class="breadcrumb-separator mx-2 opacity-25">/</span>
+            <span class="breadcrumb-separator mx-2 opacity-50 fw-bold text-slate-400">/</span>
             <span class="breadcrumb-item fw-black text-primary-900 fs-4" style="letter-spacing: -0.02em;">@yield('breadcrumb', 'Dashboard Kontrol')</span>
         </div>
     </div>
@@ -18,7 +18,7 @@
         <div class="header-search ps-3 border-start border-primary-50 d-none d-md-flex align-items-center position-relative">
             <i class="fas fa-magnifying-glass text-tertiary position-absolute ms-3"></i>
             <input type="text" placeholder="Cari data desa..."
-                class="search-input bg-primary-50 border-0 rounded-pill px-5 py-2" style="font-size: 13px; width: 220px;">
+                class="search-input bg-primary-50 border-0 rounded-pill px-5 py-2 text-slate-700 fw-medium placeholder-slate-500" style="font-size: 13px; width: 220px;">
         </div>
 
         <!-- System Controls -->
@@ -58,7 +58,7 @@
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <span class="small fw-bold text-teal-900">Pengajuan Layanan baru</span>
-                                            <span class="text-tertiary" style="font-size: 10px;">{{ optional(optional($svc)->created_at)->diffForHumans() ?? '-' }}</span>
+                                            <span class="text-slate-500 fw-bold" style="font-size: 10px;">{{ optional(optional($svc)->created_at)->diffForHumans() ?? '-' }}</span>
                                         </div>
                                         <p class="mb-0 text-slate-500 small lh-sm"><strong>{{ optional($svc)->nama_pemohon ?? 'Unknown' }}</strong> mengajukan {{ optional($svc)->jenis_layanan ?? 'Layanan' }}</p>
                                     </div>
@@ -78,10 +78,10 @@
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <span class="small fw-bold text-primary-900">{{ $ann->title }}</span>
-                                            <span class="text-tertiary"
+                                            <span class="text-slate-500 fw-bold"
                                                 style="font-size: 10px;">{{ $ann->created_at->diffForHumans() }}</span>
                                         </div>
-                                        <p class="mb-0 text-tertiary small lh-sm">{{ Str::limit($ann->content, 80) }}</p>
+                                        <p class="mb-0 text-slate-600 small lh-sm fw-medium">{{ Str::limit($ann->content, 80) }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -90,7 +90,7 @@
                         @if(count($recentUnreadServices ?? []) == 0 && $announcements->count() == 0)
                             <div class="text-center py-5 px-4">
                                 <i class="fas fa-bell-slash fa-2x text-primary-50 mb-3 d-block"></i>
-                                <p class="text-tertiary small mb-0">Belum ada notifikasi baru untuk Anda.</p>
+                                <p class="text-slate-500 small mb-0 fw-bold">Belum ada notifikasi baru untuk Anda.</p>
                             </div>
                         @endif
                     </div>

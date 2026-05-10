@@ -9,7 +9,7 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <a href="{{ route('kecamatan.pelayanan.pengaduan') }}" class="btn btn-link text-slate-500 text-decoration-none p-0 mb-2 d-inline-block">
+                    <a href="{{ route('kecamatan.pelayanan.pengaduan') }}" class="btn btn-link text-blue-600 fw-bold text-decoration-none p-0 mb-2 d-inline-block">
                         <i class="fas fa-arrow-left me-1"></i> Kembali ke Daftar Pengaduan
                     </a>
                     <h1 class="text-slate-900 fw-bold fs-3 mb-1">
@@ -92,7 +92,7 @@
                     @endif
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-1 d-block">Nama Lengkap</label>
+                            <label class="text-[10px] text-slate-700 uppercase tracking-wider fw-black mb-1 d-block">Nama Lengkap</label>
                             <input type="text" name="nama_pemohon" class="form-control form-control-sm" value="{{ $pengaduan->nama ?? '' }}" placeholder="Belum disebutkan">
                         </div>
                         <div class="col-md-6">
@@ -111,7 +111,7 @@
                             <input type="text" name="nik" class="form-control form-control-sm" value="{{ $pengaduan->nik ?? '' }}" placeholder="Masukkan 16 digit NIK">
                         </div>
                         <div class="col-md-6">
-                            <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-1 d-block">Desa/Kelurahan</label>
+                            <label class="text-[10px] text-slate-700 uppercase tracking-wider fw-black mb-1 d-block">Desa/Kelurahan</label>
                             <select name="desa_id" class="form-select form-select-sm">
                                 <option value="">-- Pilih Desa --</option>
                                 @foreach($desas ?? [] as $desa)
@@ -140,7 +140,7 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Jenis Layanan</label>
+                        <label class="text-[10px] text-slate-700 uppercase tracking-wider fw-black">Jenis Layanan</label>
                         <p class="text-slate-700 mb-0">
                             <span class="badge bg-slate-100 text-slate-600">
                                 {{ $pengaduan->jenis_layanan ?? 'Umum' }}
@@ -148,21 +148,21 @@
                         </p>
                     </div>
                     <div class="mb-3">
-                        <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Uraian</label>
+                        <label class="text-[10px] text-slate-700 uppercase tracking-wider fw-black">Uraian</label>
                         <div class="bg-slate-50 rounded-3 p-3 mt-1">
                             <p class="text-slate-700 mb-0 whitespace-pre-line">{{ $pengaduan->uraian }}</p>
                         </div>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Waktu Pengaduan</label>
+                            <label class="text-[10px] text-slate-700 uppercase tracking-wider fw-black">Waktu Pengaduan</label>
                             <p class="text-slate-700 mb-0">
                                 <i class="fas fa-calendar me-1 text-slate-400"></i>
                                 {{ $pengaduan->created_at->format('d M Y, H:i') }}
                             </p>
                         </div>
                         <div class="col-md-6">
-                            <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Sumber</label>
+                            <label class="text-[10px] text-slate-700 uppercase tracking-wider fw-black">Sumber</label>
                             <p class="mb-0">
                                 <span class="badge bg-success text-white">
                                     <i class="fab fa-whatsapp me-1"></i> WhatsApp Bot
@@ -278,7 +278,7 @@
                         <!-- Handler Info -->
                         @if($pengaduan->handler)
                         <div class="bg-slate-50 rounded-3 p-2 mb-3">
-                            <p class="text-[10px] text-slate-400 mb-1">Ditangani oleh:</p>
+                            <p class="text-[10px] text-slate-600 mb-1 fw-bold">Ditangani oleh:</p>
                             <p class="text-[11px] text-slate-700 mb-0">
                                 {{ $pengaduan->handler->nama_lengkap }}
                                 <span class="text-slate-400">· {{ $pengaduan->handled_at?->format('d M Y H:i') }}</span>

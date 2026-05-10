@@ -7,6 +7,12 @@
         .no-caret::after {
             display: none !important;
         }
+        /* Improved Placeholder Contrast */
+        ::placeholder {
+            color: #64748b !important;
+            opacity: 1;
+            font-weight: 500;
+        }
     </style>
     <div class="container-fluid px-4 py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -76,11 +82,11 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-slate-50 border-bottom border-slate-100">
                             <tr>
-                                <th class="px-4 py-3 text-slate-500 uppercase small fw-bold">{{ $activeTab == 'umkm' ? 'UMKM / Pemilik' : 'Jasa / Penyedia' }}</th>
-                                <th class="px-4 py-3 text-slate-500 uppercase small fw-bold">Fokus & Wilayah</th>
-                                <th class="px-4 py-3 text-slate-500 uppercase small fw-bold">Kontak</th>
-                                <th class="px-4 py-3 text-slate-500 uppercase small fw-bold">Status</th>
-                                <th class="px-4 py-3 text-slate-500 uppercase small fw-bold text-end">Aksi Fasilitator</th>
+                                <th class="px-4 py-3 text-slate-800 uppercase small fw-black">{{ $activeTab == 'umkm' ? 'UMKM / Pemilik' : 'Jasa / Penyedia' }}</th>
+                                <th class="px-4 py-3 text-slate-800 uppercase small fw-black">Fokus & Wilayah</th>
+                                <th class="px-4 py-3 text-slate-800 uppercase small fw-black">Kontak</th>
+                                <th class="px-4 py-3 text-slate-800 uppercase small fw-black">Status</th>
+                                <th class="px-4 py-3 text-slate-800 uppercase small fw-black text-end">Aksi Fasilitator</th>
                             </tr>
                         </thead>
                         <tbody class="border-0">
@@ -105,7 +111,7 @@
                                                             <i class="fas fa-check-circle text-primary text-[10px]" title="Terverifikasi"></i>
                                                         @endif
                                                     </div>
-                                                    <div class="text-slate-500 text-xs">{{ $item->nama_pemilik }}</div>
+                                                    <div class="text-slate-700 text-xs fw-bold">{{ $item->nama_pemilik }}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -113,7 +119,7 @@
                                             <div class="badge bg-slate-100 text-slate-600 border border-slate-200 rounded-pill px-2 py-1 small fw-bold mb-1">
                                                 {{ $item->desa }}
                                             </div>
-                                            <div class="text-xs text-slate-500">{{ $item->jenis_usaha }}</div>
+                                            <div class="text-xs text-slate-700 fw-medium">{{ $item->jenis_usaha }}</div>
                                         </td>
                                         <td class="px-4 py-3">
                                             <a href="https://wa.me/{{ $item->no_wa }}" target="_blank" class="text-success text-decoration-none text-xs fw-bold">
@@ -196,7 +202,7 @@
                                                             <i class="fas fa-check-circle text-primary text-[10px]" title="Terverifikasi"></i>
                                                         @endif
                                                     </div>
-                                                    <div class="text-slate-500 text-xs">{{ $item->display_name }}</div>
+                                                    <div class="text-slate-700 text-xs fw-bold">{{ $item->display_name }}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -204,7 +210,7 @@
                                             <div class="badge bg-slate-100 text-slate-600 border border-slate-200 rounded-pill px-2 py-1 small fw-bold mb-1">
                                                 {{ $item->service_area }}
                                             </div>
-                                            <div class="text-xs text-slate-500">{{ $item->job_category }}</div>
+                                            <div class="text-xs text-slate-700 fw-medium">{{ $item->job_category }}</div>
                                         </td>
                                         <td class="px-4 py-3">
                                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $item->contact_phone) }}" target="_blank" class="text-success text-decoration-none text-xs fw-bold">
