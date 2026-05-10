@@ -216,8 +216,8 @@
 
                                 <!-- Upload Box Enhanced -->
                                 <div class="group">
-                                    <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Foto Tempat Usaha /
-                                        Produk</label>
+                                    <label class="block text-xs font-bold text-slate-700 mb-2 ml-1">Foto Utama Toko / Sampul Lapak <span class="text-rose-500">*</span></label>
+                                    <p class="text-[10px] text-slate-400 mb-3 ml-1">Foto ini akan tampil sebagai "Sampul" (Cover) lapak Anda di aplikasi. Gunakan foto toko Anda atau foto produk unggulan terbaik Anda.</p>
                                     <div class="relative">
                                         <input type="file" name="foto_usaha" id="foto_usaha" class="peer hidden"
                                             accept="image/*" onchange="previewImage(this)">

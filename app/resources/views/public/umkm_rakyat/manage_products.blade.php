@@ -8,11 +8,17 @@
             <p class="text-slate-500 font-medium">Tambah atau perbarui daftar produk jualan Anda.</p>
         </div>
         <button onclick="openModal()"
-            class="bg-seller-primary text-white font-black px-8 py-4 rounded-2xl shadow-lg shadow-sky-500/20 hover:bg-seller-primary/90 transition-all flex items-center justify-center gap-3">
+            class="hidden md:flex bg-seller-primary text-white font-black px-8 py-4 rounded-2xl shadow-lg shadow-sky-500/20 hover:bg-seller-primary/90 transition-all items-center justify-center gap-3">
             <i class="fas fa-plus"></i>
             <span>Tambah Produk Baru</span>
         </button>
     </div>
+
+    <!-- Floating Action Button for Mobile -->
+    <button onclick="openModal()" 
+        class="md:hidden fixed bottom-24 right-6 z-50 w-16 h-16 bg-seller-primary text-white rounded-full shadow-2xl flex items-center justify-center text-2xl animate-bounce hover:animate-none transition-all active:scale-90">
+        <i class="fas fa-plus"></i>
+    </button>
 
     @if(session('success'))
         <div
