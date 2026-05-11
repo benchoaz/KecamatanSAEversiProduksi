@@ -64,6 +64,7 @@ class AiHandler
             // WAKTU SEKARANG (Server Time)
             $now = Carbon::now('Asia/Jakarta');
             $timeNow = $now->format('H.i');
+            $dateNow = $now->translatedFormat('l, d F Y');
             
             // Tentukan Salam Berdasarkan Waktu
             $hour = (int)$now->format('H');
@@ -82,6 +83,7 @@ class AiHandler
             $systemPrompt .= "- Wilayah Anda: {$regionName}\n";
             $systemPrompt .= "- Alamat Kantor: {$officeAddress}\n";
             $systemPrompt .= "- Kontak Kantor: {$officePhone}\n";
+            $systemPrompt .= "- Hari & Tanggal Sekarang: {$dateNow}\n";
             $systemPrompt .= "- Waktu Sekarang: {$timeNow} WIB\n";
             $systemPrompt .= "- Salam Saat Ini: Selamat {$greeting} (GUNAKAN SALAM INI!)\n\n";
             
