@@ -47,7 +47,7 @@ class AiHandler
             if ($phone) {
                 $phoneClean = preg_replace('/[^0-9]/', '', $phone);
                 $memory = AiMemory::firstOrCreate(['phone_number' => $phoneClean]);
-                $userName = $memory->user_name ?? 'Belum diketahui';
+                $userName = (!empty($memory->user_name)) ? $memory->user_name : 'Belum diketahui';
                 
                 if (!empty($memory->context)) {
                     $history = json_decode($memory->context, true) ?: [];
@@ -107,10 +107,10 @@ class AiHandler
 
             $systemPrompt .= "🧠 LOGIKA UTAMA MANAJEMEN NAMA:\n";
             $systemPrompt .= "1. Nama user saat ini adalah: '{$userName}'.\n";
-            $systemPrompt .= "2. Jika Nama adalah 'Belum diketahui', Anda WAJIB menyapa dengan 'Bapak/Ibu' saja dan tanyakan namanya dengan sopan.\n";
-            $systemPrompt .= "3. Jika Nama SUDAH ADA (bukan 'Belum diketahui'), Anda WAJIB menggunakan nama tersebut (panggil 'Bapak {$userName}' atau 'Ibu {$userName}').\n";
-            $systemPrompt .= "4. DILARANG KERAS berasumsi atau menebak-nebak nama lain (seperti Dewi, dsb) jika nama sudah ada di data di atas.\n";
-            $systemPrompt .= "5. Jika user ingin mengganti nama atau menyebutkan nama baru, gunakan tag [SET_NAME:nama] di akhir jawaban untuk memperbarui memori saya.\n\n";
+            $systemPrompt .= "2. Jika Nama adalah 'Belum diketahui', Anda WAJIB bertanya: 'Mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya?' sebelum memberikan jawaban lain.\n";
+            $systemPrompt .= "3. Jika Nama SUDAH ADA (bukan 'Belum diketahui'), sapa dengan 'Bapak [Nama]' atau 'Ibu [Nama]' dan DILARANG menanyakan nama lagi.\n";
+            $systemPrompt .= "4. DILARANG KERAS berasumsi atau menebak nama jika data di atas adalah 'Belum diketahui'.\n";
+            $systemPrompt .= "5. Jika user menyebutkan namanya, berikan tag [SET_NAME:nama] di akhir jawaban Anda.\n\n";
 
             $systemPrompt .= "🎤 GAYA BAHASA:\n";
             $systemPrompt .= "- Sangat sopan, sangat ramah, natural (seperti manusia).\n";
