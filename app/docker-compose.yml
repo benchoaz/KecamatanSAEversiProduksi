@@ -3,27 +3,23 @@ services:
   # MySQL Database - Optimized with proper configuration
   # ============================================================
   db:
-    image: mysql:8.0
+    image: postgres:17-alpine
     container_name: kecamatan-db
     restart: unless-stopped
-    # ports:
-    #   - "3307:3306"
     environment:
-      MYSQL_DATABASE: dashboard_kecamatan
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-root}
-      MYSQL_USER: ${DB_USERNAME:-user}
+      POSTGRES_DB: dashboard_kecamatan
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     volumes:
-      - dbdata:/var/lib/mysql
+      - dbdata_postgres:/var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    command: >
-      --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max_connections=200 --innodb_buffer_pool_size=256M --innodb_log_file_size=64M --innodb_flush_log_at_trx_commit=2 --innodb_flush_method=O_DIRECT
+      test: ["CMD-SHELL", "pg_isready -U user -d dashboard_kecamatan"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
   # ============================================================
   # Redis - For caching and session management
@@ -84,8 +80,8 @@ services:
     image: nginx:alpine
     container_name: kecamatan-nginx
     restart: unless-stopped
-    # ports:
-    #   - "80:80"
+    ports:
+      - "8000:80"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kecamatan-dashboard.rule=Host(`kecamatanbesuk.my.id`)"
@@ -197,7 +193,7 @@ networks:
     name: kecamatan-network
 
 volumes:
-  dbdata:
+  dbdata_postgres:
   redis_data:
   n8n_data:
   waha_sessions:

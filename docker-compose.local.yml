@@ -47,13 +47,14 @@ services:
       - "traefik.http.routers.kecamatan.priority=1"
       - "traefik.http.services.kecamatan.loadbalancer.server.port=80"
       - "traefik.http.routers.kecamatan.middlewares=kecamatan-compress@file,kecamatan-headers@file,kecamatan-rate@file"
+    ports:
+      - "8000:80"
 
   app:
     environment:
-      - APP_URL=https://localhost
+      - APP_URL=http://localhost:8000
     volumes:
       - ./app:/var/www:rw
-      - /var/www/vendor
       - ./app/storage:/var/www/storage:rw
 
 networks:

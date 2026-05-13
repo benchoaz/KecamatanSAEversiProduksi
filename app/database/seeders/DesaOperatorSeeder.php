@@ -17,7 +17,7 @@ class DesaOperatorSeeder extends Seeder
     public function run(): void
     {
         // 1. Get the Operator Desa role
-        $role = Role::where('nama_role', 'Operator Desa')->first();
+        $role = Role::where('name', 'Operator Desa')->first();
 
         if (!$role) {
             $this->command->error('Role "Operator Desa" tidak ditemukan. Pastikan RoleSeeder sudah dijalankan.');

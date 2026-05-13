@@ -26,7 +26,7 @@ class FixRolesSeeder extends Seeder
             'Auditor' => 'Melihat laporan dan log aktivitas sistem tanpa hak edit (view-only).',
         ];
 
-        $hasNamaRole = Schema::hasColumn('roles', 'nama_role');
+        $hasNamaRole = Schema::hasColumn('roles', 'name');
         $hasDeskripsi = Schema::hasColumn('roles', 'deskripsi');
 
         // 1. Create/Update Target Roles
@@ -34,7 +34,7 @@ class FixRolesSeeder extends Seeder
             $data = [
                 'guard_name' => 'web'
             ];
-            if ($hasNamaRole) $data['nama_role'] = $name;
+            if ($hasNamaRole) $data['name'] = $name;
             if ($hasDeskripsi) $data['deskripsi'] = $desc;
 
             Role::updateOrCreate(

@@ -121,8 +121,18 @@
                         <div class="card-header bg-white py-3 border-bottom border-light d-flex align-items-center justify-content-between">
                             <h6 class="mb-0 fw-bold"><i class="fas fa-shield-halved me-2 text-danger"></i> Otorisasi Menu (Akses Khusus)</h6>
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-xs btn-outline-primary py-0" onclick="checkAllVisible()" style="font-size:11px;">Semua</button>
-                                <button type="button" class="btn btn-xs btn-outline-secondary py-0" onclick="uncheckAllVisible()" style="font-size:11px;">Hapus</button>
+                                <div class="dropdown">
+                                    <button class="btn btn-xs btn-outline-primary dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown" style="font-size:11px;">
+                                        Pilih Cepat
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="font-size:12px;">
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="checkAllVisible()">Centang Semua</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="uncheckAllVisible()">Hapus Semua</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="checkBySection('pelayanan')">Hanya Pelayanan</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="checkBySection('administrasi')">Hanya Administrasi</a></li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="card-body p-0">
@@ -142,41 +152,60 @@
                             <div class="tab-content p-4" id="permissionTabsContent">
                                 {{-- Dashboard Kecamatan Pane --}}
                                 <div class="tab-pane fade show active" id="kecamatan-pane" role="tabpanel" tabindex="0">
-                                    <div class="row g-3">
-                                        @foreach($menus->where('target_dashboard', 'kecamatan') as $menu)
-                                            <div class="col-12">
-                                                <div class="menu-item p-3 border rounded-3 mb-2 bg-white">
-                                                    <div class="form-check d-flex align-items-center gap-2">
-                                                        <input class="form-check-input menu-parent" type="checkbox" name="permissions[]" 
-                                                               id="p_m_{{ $menu->id }}" value="{{ $menu->permission_name }}"
-                                                               {{ in_array($menu->permission_name, $userPermissions) ? 'checked' : '' }}
-                                                               data-group="{{ $menu->id }}">
-                                                        <label class="form-check-label fw-bold cursor-pointer" for="p_m_{{ $menu->id }}">
-                                                            <i class="{{ $menu->icon }} text-muted me-2" style="width:20px;"></i> {{ $menu->name }}
-                                                        </label>
-                                                    </div>
-                                                    @if($menu->subMenus->count() > 0)
-                                                        <div class="submenu-list ms-4 mt-2 pt-2 border-top border-light row">
-                                                            @foreach($menu->subMenus as $sub)
-                                                                <div class="col-md-6 mb-1">
-                                                                    <div class="form-check">
-                                                                        <input class="form-check-input menu-child child-group-{{ $menu->id }}" type="checkbox" name="permissions[]" 
-                                                                               id="p_s_{{ $sub->id }}" value="{{ $sub->permission_name }}"
-                                                                               {{ in_array($sub->permission_name, $userPermissions) ? 'checked' : '' }}
-                                                                               data-parent="{{ $menu->id }}">
-                                                                        <label class="form-check-label small cursor-pointer" for="p_s_{{ $sub->id }}">
-                                                                            {{ $sub->name }}
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                    @endif
-                                                </div>
+                                    @php
+                                        $kecamatanMenus = $menus->where('target_dashboard', 'kecamatan');
+                                        // Grouping logical groups
+                                        $groups = [
+                                            'ADMINISTRASI & OTORITAS' => ['kecamatan-dashboard', 'kecamatan-audit', 'kecamatan-users', 'kecamatan-settings'],
+                                            'PELAYANAN PUBLIK' => ['kecamatan-inbox', 'kecamatan-pengaduan', 'kecamatan-visitor', 'kecamatan-faq', 'kecamatan-layanan', 'kecamatan-statistics', 'kecamatan-feedback', 'kecamatan-features'],
+                                            'MODUL SEKTORAL' => ['kecamatan-pemerintahan', 'kecamatan-pembangunan', 'kecamatan-kesra', 'kecamatan-trantibum', 'kecamatan-laporan', 'kecamatan-berita', 'kecamatan-umkm', 'kecamatan-announcements', 'kecamatan-geospasial'],
+                                        ];
+                                    @endphp
+
+                                    @foreach($groups as $groupName => $slugs)
+                                        <div class="mb-4">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="flex-grow-1 border-bottom border-light-subtle"></div>
+                                                <span class="mx-3 x-small fw-bold text-muted letter-spacing-1">{{ $groupName }}</span>
+                                                <div class="flex-grow-1 border-bottom border-light-subtle"></div>
                                             </div>
-                                        @endforeach
-                                    </div>
+                                            <div class="row g-3">
+                                                @foreach($kecamatanMenus->whereIn('slug', $slugs) as $menu)
+                                                    <div class="col-md-6 col-xl-4">
+                                                        <div class="menu-item p-3 border rounded-3 h-100 bg-white transition-all shadow-hover">
+                                                            <div class="form-check d-flex align-items-center gap-2">
+                                                                <input class="form-check-input menu-parent" type="checkbox" name="permissions[]" 
+                                                                       id="p_m_{{ $menu->id }}" value="{{ $menu->permission_name }}"
+                                                                       {{ in_array($menu->permission_name, $userPermissions) ? 'checked' : '' }}
+                                                                       data-group="{{ $menu->id }}"
+                                                                       data-section="{{ str_contains(strtolower($groupName), 'pelayanan') ? 'pelayanan' : 'administrasi' }}">
+                                                                <label class="form-check-label fw-bold cursor-pointer text-dark" for="p_m_{{ $menu->id }}" style="font-size:0.9rem;">
+                                                                    <i class="{{ $menu->icon }} text-primary opacity-75 me-2" style="width:18px;"></i> {{ $menu->name }}
+                                                                </label>
+                                                            </div>
+                                                            @if($menu->subMenus->count() > 0)
+                                                                <div class="submenu-list ms-4 mt-2 pt-2 border-top border-light">
+                                                                    @foreach($menu->subMenus as $sub)
+                                                                        <div class="form-check mb-1">
+                                                                            <input class="form-check-input menu-child child-group-{{ $menu->id }}" type="checkbox" name="permissions[]" 
+                                                                                   id="p_s_{{ $sub->id }}" value="{{ $sub->permission_name }}"
+                                                                                   {{ in_array($sub->permission_name, $userPermissions) ? 'checked' : '' }}
+                                                                                   data-parent="{{ $menu->id }}">
+                                                                            <label class="form-check-label x-small cursor-pointer text-muted" for="p_s_{{ $sub->id }}">
+                                                                                {{ $sub->name }}
+                                                                            </label>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
+
 
                                 {{-- Dashboard Desa Pane --}}
                                 <div class="tab-pane fade" id="desa-pane" role="tabpanel" tabindex="0">
@@ -300,6 +329,18 @@
                 activePane.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
             }
 
+            function checkBySection(section) {
+                const activePane = document.querySelector('.tab-pane.active');
+                activePane.querySelectorAll('.menu-parent[data-section="' + section + '"]').forEach(parent => {
+                    parent.checked = true;
+                    // Trigger change to check children
+                    const groupId = parent.dataset.group;
+                    document.querySelectorAll('.child-group-' + groupId).forEach(child => {
+                        child.checked = true;
+                    });
+                });
+            }
+
             function togglePassword(inputId, btnElement) {
                 const input = document.getElementById(inputId);
                 const icon = btnElement.querySelector('i');
@@ -317,11 +358,24 @@
     @endpush
 
     <style>
-        .x-small { font-size: 0.75rem; }
+        .x-small { font-size: 0.7rem; }
+        .letter-spacing-1 { letter-spacing: 1px; }
         .bg-light { background-color: #f8fafc !important; }
         .cursor-pointer { cursor: pointer; }
-        .menu-item:hover { border-color: rgba(var(--bs-primary-rgb), 0.5) !important; background: rgba(var(--bs-primary-rgb), 0.01) !important; }
-        .nav-tabs .nav-link { color: #64748b; }
-        .nav-tabs .nav-link.active { color: var(--bs-primary); border-bottom: 2px solid var(--bs-primary) !important; background: white; }
+        .transition-all { transition: all 0.2s ease-in-out; }
+        .shadow-hover:hover { 
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important; 
+            border-color: var(--bs-primary) !important;
+            transform: translateY(-2px);
+        }
+        .menu-item { border: 1px solid #edf2f7; }
+        .form-check-input:checked { background-color: var(--bs-primary); border-color: var(--bs-primary); }
+        .nav-tabs .nav-link { color: #64748b; transition: all 0.3s; border-radius: 0 !important; }
+        .nav-tabs .nav-link.active { 
+            color: var(--bs-primary); 
+            border-bottom: 3px solid var(--bs-primary) !important; 
+            background: white !important; 
+        }
+        .dropdown-item:active { background-color: var(--bs-primary); }
     </style>
 @endsection

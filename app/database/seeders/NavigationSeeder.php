@@ -37,6 +37,8 @@ class NavigationSeeder extends Seeder
         $this->createMenu('FAQ Administrasi', 'fas fa-robot', 'kecamatan-faq', 50, 'view_faq', 'kecamatan', 'kecamatan.pelayanan.faq.index');
         $this->createMenu('Daftar Layanan', 'fas fa-layer-group', 'kecamatan-layanan', 60, 'view_layanan', 'kecamatan', 'kecamatan.pelayanan.layanan.index');
         $this->createMenu('Statistik Layanan', 'fas fa-chart-line', 'kecamatan-statistics', 70, 'view_statistics', 'kecamatan', 'kecamatan.pelayanan.statistics');
+        $this->createMenu('Hasil Survei (Feedback)', 'fas fa-star-half-alt', 'kecamatan-feedback', 75, 'view_feedback', 'kecamatan', 'kecamatan.pelayanan.feedback.index');
+        $this->createMenu('Pengaturan Layanan', 'fas fa-cog', 'kecamatan-settings-pelayanan', 78, 'view_pelayanan_settings', 'kecamatan', 'kecamatan.settings.pelayanan');
         $this->createMenu('Pengumuman', 'fas fa-bullhorn', 'kecamatan-announcements', 80, 'view_announcements', 'kecamatan', 'kecamatan.announcements.index');
 
         // 4. BIDANG PENGAWASAN (WITH SUBMENUS)

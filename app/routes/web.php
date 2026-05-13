@@ -36,6 +36,26 @@ Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])
 Route::get('/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
 Route::get('/berita', [\App\Http\Controllers\PublicBeritaController::class, 'index'])->name('public.berita.index');
 Route::get('/berita/{slug}', [\App\Http\Controllers\PublicBeritaController::class, 'show'])->name('public.berita.show');
+
+// ============================================================
+// KABUPATEN GATEWAY (HUB) ROUTES
+// ============================================================
+Route::prefix('hub')->name('hub.')->group(function () {
+    Route::get('/login', [App\Http\Controllers\Hub\DashboardController::class, 'loginForm'])->name('login');
+    Route::post('/login', [App\Http\Controllers\Hub\Auth\LoginController::class, 'login'])->name('login.post');
+    Route::post('/logout', [App\Http\Controllers\Hub\Auth\LoginController::class, 'logout'])->name('logout');
+    
+    Route::middleware(['auth', 'hub.admin'])->group(function () {
+        Route::get('/districts', [App\Http\Controllers\Hub\DistrictController::class, 'index'])->name('districts.index');
+        Route::post('/districts', [App\Http\Controllers\Hub\DistrictController::class, 'store'])->name('districts.store');
+        Route::patch('/districts/{district}/toggle', [App\Http\Controllers\Hub\DistrictController::class, 'toggleStatus'])->name('districts.toggle');
+        
+        // WhatsApp & AI Hub
+        Route::get('/whatsapp', [App\Http\Controllers\Hub\WhatsAppController::class, 'index'])->name('whatsapp.index');
+        Route::post('/whatsapp/config', [App\Http\Controllers\Hub\WhatsAppController::class, 'storeConfig'])->name('whatsapp.config.store');
+    });
+});
+
 // Public Service & Economy Routes
 require __DIR__ . '/public/layanan.php';
 require __DIR__ . '/public/economy.php';

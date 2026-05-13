@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Role;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AdminUserSeeder extends Seeder
 {
@@ -12,14 +15,14 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        $roleAdmin = \App\Models\Role::where('nama_role', 'Super Admin')->first();
+        $roleAdmin = Role::where('name', 'Super Admin')->first();
 
-        \App\Models\User::updateOrCreate(
+        User::updateOrCreate(
             ['username' => 'admin'],
             [
                 'nama_lengkap' => 'Administrator Utama',
-                'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
-                'role_id' => $roleAdmin->id,
+                'password' => Hash::make('admin123'),
+                'role_id' => $roleAdmin ? $roleAdmin->id : null,
                 'status' => 'aktif',
             ]
         );

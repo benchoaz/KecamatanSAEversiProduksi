@@ -80,8 +80,8 @@ class NavigationService
                     return true;
                 }));
 
-                // Hide parent menu if all its submenus are filtered out
-                return $menu->subMenus->count() > 0 || !$menu->permission_name;
+                // Standalone menus (with permission) or folders with active submenus should stay
+                return $menu->permission_name || $menu->subMenus->count() > 0;
             });
     }
 

@@ -71,5 +71,6 @@ class Kernel extends HttpKernel
         'module.role' => \App\Http\Middleware\ModuleRoleMiddleware::class,
         'https' => \App\Http\Middleware\ForceHttps::class,
         'permission' => \App\Http\Middleware\CheckPermission::class,
+        'hub.admin' => \App\Http\Middleware\Hub\HubAdminMiddleware::class,
     ];
 }

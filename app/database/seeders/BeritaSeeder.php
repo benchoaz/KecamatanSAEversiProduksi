@@ -15,7 +15,7 @@ class BeritaSeeder extends Seeder
     public function run(): void
     {
         $admin = User::whereHas('role', function ($q) {
-            $q->where('nama_role', 'Operator Kecamatan')->orWhere('nama_role', 'Super Admin');
+            $q->where('name', 'Operator Kecamatan')->orWhere('name', 'Super Admin');
         })->first();
 
         if (!$admin) {

@@ -87,6 +87,10 @@ Route::prefix('whatsapp')->middleware(['api.token', 'throttle:60,1'])->group(fun
     Route::get('/health', [WhatsappController::class, 'health'])
         ->withoutMiddleware(['api.token'])
         ->name('api.whatsapp.health');
+
+    // Kabupaten Gateway Hub Routing
+    Route::post('/hub/route', [\App\Http\Controllers\Api\HubWhatsappController::class, 'route'])
+        ->name('api.whatsapp.hub.route');
 });
 
 // Global health check for n8n (compatibility alias)

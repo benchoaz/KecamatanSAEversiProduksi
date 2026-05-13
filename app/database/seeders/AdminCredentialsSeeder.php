@@ -18,12 +18,12 @@ class AdminCredentialsSeeder extends Seeder
         $roleId = DB::table('roles')->where('name', 'Super Admin')->value('id');
         
         if (!$roleId) {
-            $roleId = DB::table('roles')->where('nama_role', 'Super Admin')->value('id');
+            $roleId = DB::table('roles')->where('name', 'Super Admin')->value('id');
         }
 
         if (!$roleId) {
             // Create it if missing
-            $column = \Illuminate\Support\Facades\Schema::hasColumn('roles', 'nama_role') ? 'nama_role' : 'name';
+            $column = \Illuminate\Support\Facades\Schema::hasColumn('roles', 'name') ? 'name' : 'name';
             $roleId = DB::table('roles')->insertGetId([
                 $column => 'Super Admin',
                 'guard_name' => 'web',

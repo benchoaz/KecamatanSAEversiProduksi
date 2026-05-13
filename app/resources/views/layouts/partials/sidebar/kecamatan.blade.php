@@ -25,6 +25,7 @@
         <div class="nav-section">
             <span class="nav-section-title text-slate-500 fw-black opacity-100" style="letter-spacing: 1px;">ADMINISTRASI & OTORITAS</span>
             <ul class="nav-menu">
+                @can('view_dashboard')
                 <li class="nav-item">
                     <a href="{{ route('kecamatan.dashboard') }}"
                         class="nav-link {{ request()->is('kecamatan/dashboard*') ? 'active' : '' }}">
@@ -32,12 +33,14 @@
                         <span class="nav-text">Beranda Pusat</span>
                     </a>
                 </li>
+                @endcan
             </ul>
         </div>
         
         <div class="nav-section">
             <span class="nav-section-title text-slate-500 fw-black opacity-100" style="letter-spacing: 1px;">PELAYANAN PUBLIK</span>
             <ul class="nav-menu">
+                @can('view_inbox')
                 <li class="nav-item">
                     <a href="{{ route('kecamatan.pelayanan.inbox') }}"
                         class="nav-link {{ request()->fullUrlIs(route('kecamatan.pelayanan.inbox')) ? 'active' : '' }}">
@@ -45,6 +48,9 @@
                         <span class="nav-text">Inbox Terpadu</span>
                     </a>
                 </li>
+                @endcan
+
+                @can('view_pengaduan')
                 <li class="nav-item">
                     <a href="{{ route('kecamatan.pelayanan.pengaduan') }}"
                         class="nav-link {{ request()->is('kecamatan/pelayanan/pengaduan*') ? 'active' : '' }}">
@@ -52,6 +58,9 @@
                         <span class="nav-text">Pengaduan Masyarakat</span>
                     </a>
                 </li>
+                @endcan
+
+                @can('view_statistics')
                 <li class="nav-item">
                     <a href="{{ route('kecamatan.pelayanan.statistics') }}"
                         class="nav-link {{ request()->is('kecamatan/pelayanan/statistics*') ? 'active' : '' }}">
@@ -59,6 +68,9 @@
                         <span class="nav-text">Statistik Layanan</span>
                     </a>
                 </li>
+                @endcan
+
+                @can('view_feedback')
                 <li class="nav-item">
                     <a href="{{ route('kecamatan.pelayanan.feedback.index') }}"
                         class="nav-link {{ request()->is('kecamatan/pelayanan/feedback*') ? 'active' : '' }}">
@@ -66,6 +78,9 @@
                         <span class="nav-text">Hasil Survei (Feedback)</span>
                     </a>
                 </li>
+                @endcan
+
+                @can('view_pelayanan_settings')
                 <li class="nav-item">
                     <a href="{{ route('kecamatan.settings.pelayanan') }}"
                         class="nav-link {{ request()->is('kecamatan/settings/pelayanan*') ? 'active' : '' }}">
@@ -73,6 +88,7 @@
                         <span class="nav-text">Pengaturan Layanan</span>
                     </a>
                 </li>
+                @endcan
             </ul>
         </div>
 

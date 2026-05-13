@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Role;
 
 class RoleSeeder extends Seeder
 {
@@ -14,31 +15,35 @@ class RoleSeeder extends Seeder
     {
         $roles = [
             [
-                'nama_role' => 'Super Admin',
+                'name' => 'Super Admin',
                 'deskripsi' => 'Akses penuh ke seluruh sistem, manajemen user, dan konfigurasi master.'
             ],
             [
-                'nama_role' => 'Operator Kecamatan',
+                'name' => 'super_admin_kabupaten',
+                'deskripsi' => 'Pengendali pusat seluruh kecamatan dalam satu kabupaten.'
+            ],
+            [
+                'name' => 'Operator Kecamatan',
                 'deskripsi' => 'Pengelola data wilayah kecamatan, monitoring desa, dan verifikasi adminstratif.'
             ],
             [
-                'nama_role' => 'Operator Desa',
+                'name' => 'Operator Desa',
                 'deskripsi' => 'Penginput data pembangunan dan administrasi tingkat desa.'
             ],
             [
-                'nama_role' => 'Verifikator',
+                'name' => 'Verifikator',
                 'deskripsi' => 'Menyetuju atau menolak pengajuan dan submission dari desa.'
             ],
             [
-                'nama_role' => 'Auditor',
+                'name' => 'Auditor',
                 'deskripsi' => 'Melihat laporan dan log aktivitas sistem tanpa hak edit (view-only).'
             ],
         ];
 
         foreach ($roles as $role) {
-            \App\Models\Role::updateOrCreate(
-                ['nama_role' => $role['nama_role']],
-                ['deskripsi' => $role['deskripsi']]
+            Role::updateOrCreate(
+                ['name' => $role['name']],
+                ['guard_name' => 'web']
             );
         }
     }

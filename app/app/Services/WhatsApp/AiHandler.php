@@ -101,16 +101,16 @@ class AiHandler
             $systemPrompt .= "📝 FORMAT JAWABAN LAYANAN (WAJIB TIRU):\n";
             $systemPrompt .= "Tentu Bapak/Ibu [Nama], untuk mengurus [Layanan], berikut syaratnya:\n- Syarat 1\n- Syarat 2\n\nEstimasi Selesai: [Waktu]\n\nSilakan ajukan melalui link resmi berikut:\nURL_RESMI_PENGAJUAN\n\n";
 
-            $systemPrompt .= "IDENTITAS PENGGUNA SAAT INI (WAJIB DILIHAT):\n";
-            $systemPrompt .= "- Nama: {$userName}\n";
-            $systemPrompt .= "- Nomor WA: {$phone}\n\n";
-
-            $systemPrompt .= "🧠 LOGIKA UTAMA MANAJEMEN NAMA:\n";
-            $systemPrompt .= "1. Nama user saat ini adalah: '{$userName}'.\n";
-            $systemPrompt .= "2. Jika Nama adalah 'Belum diketahui', Anda WAJIB bertanya: 'Mohon izin, saya sedang berbicara dengan Bapak/Ibu siapa ya?' sebelum memberikan jawaban lain.\n";
-            $systemPrompt .= "3. Jika Nama SUDAH ADA (bukan 'Belum diketahui'), sapa dengan 'Bapak [Nama]' atau 'Ibu [Nama]' dan DILARANG menanyakan nama lagi.\n";
-            $systemPrompt .= "4. DILARANG KERAS berasumsi atau menebak nama jika data di atas adalah 'Belum diketahui'.\n";
-            $systemPrompt .= "5. Jika user menyebutkan namanya, berikan tag [SET_NAME:nama] di akhir jawaban Anda.\n\n";
+            $systemPrompt .= "👤 PROFIL PENGGUNA (DATA SISTEM - PRIORITAS TINGGI):\n";
+            $systemPrompt .= ">>> NAMA TERDAFTAR : '{$userName}'\n";
+            $systemPrompt .= ">>> ID KONTAK (WA) : '{$phone}'\n\n";
+            
+            $systemPrompt .= "🧠 LOGIKA MANAJEMEN IDENTITAS:\n";
+            $systemPrompt .= "1. Nama resmi user adalah '{$userName}'. JANGAN PERNAH memanggil dengan angka ID/Nomor WA.\n";
+            $systemPrompt .= "2. Jika Nama = 'Belum diketahui', sapalah dengan 'Bapak/Ibu' secara umum. DILARANG bertanya 'Ini dengan siapa?' atau 'Boleh tahu namanya?' kecuali user yang memulai topik perkenalan.\n";
+            $systemPrompt .= "3. Jika User menyebutkan namanya secara sukarela (Contoh: 'Halo, saya Budi'), Anda WAJIB memberikan tag [SET_NAME:Budi] di akhir jawaban Anda.\n";
+            $systemPrompt .= "4. ⚠️ PERINGATAN KERAS: Angka panjang (NIK/No.HP) BUKAN nama. Jangan pernah menganggap angka sebagai identitas panggilan.\n";
+            $systemPrompt .= "5. Jika Nama SUDAH ADA di data sistem, sapalah dengan 'Bapak [Nama]' atau 'Ibu [Nama]' secara ramah dan akrab.\n\n";
 
             $systemPrompt .= "🎤 GAYA BAHASA:\n";
             $systemPrompt .= "- Sangat sopan, sangat ramah, natural (seperti manusia).\n";
@@ -155,7 +155,8 @@ class AiHandler
             // Post-Processing: Deteksi Nama
             if (preg_match('/\[SET_NAME:(.*?)\]/', $reply, $matches)) {
                 $detectedName = trim($matches[1]);
-                if ($memory && !empty($detectedName)) {
+                // Jaring Pengaman: Jika nama hanya berisi angka, abaikan (mungkin AI salah tangkap NIK/HP)
+                if ($memory && !empty($detectedName) && !is_numeric($detectedName)) {
                     $memory->user_name = $detectedName;
                     $userName = $detectedName;
                     $memory->save();
