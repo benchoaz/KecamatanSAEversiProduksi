@@ -14,12 +14,6 @@
     </div>
 
     <div class="header-right">
-        <!-- Search -->
-        <div class="header-search ps-3 border-start border-primary-50 d-none d-md-flex align-items-center position-relative">
-            <i class="fas fa-magnifying-glass text-tertiary position-absolute ms-3"></i>
-            <input type="text" placeholder="Cari data desa..."
-                class="search-input bg-primary-50 border-0 rounded-pill px-5 py-2 text-slate-700 fw-medium placeholder-slate-500" style="font-size: 13px; width: 220px;">
-        </div>
 
         <!-- System Controls -->
         <div class="d-flex align-items-center gap-2 ps-3 border-start border-primary-50">

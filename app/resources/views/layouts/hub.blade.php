@@ -24,62 +24,97 @@
     <link rel="stylesheet" href="{{ asset('css/dashboard-premium.css') }}">
     
     <style>
-        /* Custom Styling for Hub Gateway */
+        /* Minimalist Dashboard Styling (Focus Mode) */
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #000000;
+            --text-muted: #555555;
+            --border-color: #dddddd;
+            --accent-color: #000000;
+        }
+
         body {
-            background-color: #ffffff !important;
-            color: #000000 !important;
+            background-color: var(--bg-color) !important;
+            color: var(--text-main) !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
         }
-        .main-content, .page-content, .container-fluid {
-            background-color: #ffffff !important;
-        }
-        .card {
-            background-color: #ffffff !important;
-            border: 1px solid #e2e8f0 !important;
-            box-shadow: none !important; /* Remove shadows for cleaner look */
-            color: #000000 !important;
-        }
-        h1, h2, h3, h4, h5, h6, p, span, div, td, th {
-            color: #000000 !important;
-        }
-        .text-muted, .text-gray-800, .text-gray-600 {
-            color: #334155 !important; /* Slightly softer black for secondary text */
-        }
+
         .sidebar {
-            background-color: #ffffff !important;
-            border-right: 1px solid #e2e8f0 !important;
-            color: #000000 !important;
+            background-color: var(--bg-color) !important;
+            border-right: 1px solid var(--border-color) !important;
+            width: 250px;
         }
+
         .sidebar .nav-link {
-            color: #475569 !important;
+            color: var(--text-main) !important;
+            border-bottom: 1px solid transparent;
+            border-radius: 0 !important;
+            padding: 12px 20px !important;
         }
+
         .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            color: #000000 !important;
-            background: #f1f5f9 !important;
-            border-radius: 12px;
+            background-color: #f0f0f0 !important;
+            font-weight: bold;
         }
-        .sidebar .nav-icon i {
-            color: #64748b !important;
+
+        .main-content {
+            background-color: var(--bg-color) !important;
         }
-        .sidebar .nav-link.active .nav-icon i {
-            color: #2563eb !important;
+
+        .card {
+            border: 1px solid var(--border-color) !important;
+            border-radius: 4px !important;
+            box-shadow: none !important;
+            background: #fff !important;
         }
-        .logo-title {
-            color: #000000 !important;
-            font-weight: 800 !important;
-            letter-spacing: 1px;
+
+        .card-header {
+            background-color: #fafafa !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            font-weight: bold;
+            color: #000 !important;
         }
-        .logo-subtitle {
-            color: #64748b !important;
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #000 !important;
+            font-weight: 700 !important;
         }
-        .user-card {
-            background-color: #f8fafc !important;
-            border: 1px solid #e2e8f0 !important;
+
+        .table {
+            color: #000 !important;
         }
-        .user-name {
-            color: #000000 !important;
+
+        .table thead th {
+            background-color: #f5f5f5 !important;
+            color: #000 !important;
+            border-bottom: 2px solid var(--border-color) !important;
+            text-transform: none !important;
+            letter-spacing: 0 !important;
         }
-        .user-role {
-            color: #64748b !important;
+
+        .badge {
+            border: 1px solid #000;
+            background: transparent !important;
+            color: #000 !important;
+            border-radius: 2px !important;
+        }
+
+        .btn-primary {
+            background-color: #000 !important;
+            border-color: #000 !important;
+            color: #fff !important;
+            border-radius: 4px !important;
+        }
+
+        .btn-outline-primary {
+            color: #000 !important;
+            border-color: #000 !important;
+        }
+
+        .form-control {
+            border-radius: 2px !important;
+            border: 1px solid var(--border-color) !important;
         }
     </style>
 </head>

@@ -53,6 +53,14 @@ Route::prefix('hub')->name('hub.')->group(function () {
         // WhatsApp & AI Hub
         Route::get('/whatsapp', [App\Http\Controllers\Hub\WhatsAppController::class, 'index'])->name('whatsapp.index');
         Route::post('/whatsapp/config', [App\Http\Controllers\Hub\WhatsAppController::class, 'storeConfig'])->name('whatsapp.config.store');
+        
+        // External API Settings
+        Route::get('/api-settings', [App\Http\Controllers\Hub\ExternalApiController::class, 'index'])->name('api.index');
+        Route::post('/api-settings', [App\Http\Controllers\Hub\ExternalApiController::class, 'store'])->name('api.store');
+        Route::patch('/api-settings/{id}/toggle', [App\Http\Controllers\Hub\ExternalApiController::class, 'toggleStatus'])->name('api.toggle');
+
+        // Workflow (n8n)
+        Route::get('/workflow', [App\Http\Controllers\Hub\WorkflowController::class, 'index'])->name('workflow.index');
     });
 });
 
