@@ -1,0 +1,1 @@
+# SAE AI (Python)\nService kecerdasan buatan untuk OCR dokumen dan AI chatbot.\n\n## Kapan digunakan?\n- Saat fitur baca KTP/SK otomatis dibutuhkan\n- Saat chatbot perlu 'berpikir' lebih pintar\n\n## Status: PLANNED (belum aktif)

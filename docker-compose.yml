@@ -167,6 +167,44 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  # ============================================================
+  # [FUTURE] SAE Engine - Golang High Performance Service
+  # Aktifkan saat notifikasi realtime mulai lambat.
+  # Uncomment blok di bawah ini untuk mengaktifkan.
+  # ============================================================
+  # sae-engine:
+  #   build:
+  #     context: ./apps/sae-engine
+  #     dockerfile: Dockerfile
+  #   container_name: sae-engine
+  #   restart: unless-stopped
+  #   environment:
+  #     - REDIS_URL=redis://redis:6379
+  #     - APP_URL=http://app
+  #   networks:
+  #     - kecamatan-network
+  #   depends_on:
+  #     - redis
+
+  # ============================================================
+  # [FUTURE] SAE AI - Python Intelligence Service
+  # Aktifkan saat fitur OCR dan AI Chatbot dibutuhkan.
+  # Uncomment blok di bawah ini untuk mengaktifkan.
+  # ============================================================
+  # sae-ai:
+  #   build:
+  #     context: ./apps/sae-ai
+  #     dockerfile: Dockerfile
+  #   container_name: sae-ai
+  #   restart: unless-stopped
+  #   environment:
+  #     - REDIS_URL=redis://redis:6379
+  #     - MODEL_PATH=/models
+  #   networks:
+  #     - kecamatan-network
+  #   depends_on:
+  #     - redis
+
 networks:
   kecamatan-network:
     name: kecamatan-network

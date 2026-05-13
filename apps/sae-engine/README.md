@@ -1,0 +1,1 @@
+# SAE Engine (Golang)\nService high-performance untuk notifikasi realtime dan message routing.\n\n## Kapan digunakan?\n- Saat notifikasi ke 24 kecamatan mulai terasa lambat\n- Saat queue pesan WhatsApp menumpuk\n\n## Status: PLANNED (belum aktif)
