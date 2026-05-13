@@ -46,6 +46,8 @@ Route::prefix('hub')->name('hub.')->group(function () {
     Route::post('/logout', [App\Http\Controllers\Hub\Auth\LoginController::class, 'logout'])->name('logout');
     
     Route::middleware(['auth', 'hub.admin'])->group(function () {
+        // Dashboard Utama
+        Route::get('/', [App\Http\Controllers\Hub\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/districts', [App\Http\Controllers\Hub\DistrictController::class, 'index'])->name('districts.index');
         Route::post('/districts', [App\Http\Controllers\Hub\DistrictController::class, 'store'])->name('districts.store');
         Route::patch('/districts/{district}/toggle', [App\Http\Controllers\Hub\DistrictController::class, 'toggleStatus'])->name('districts.toggle');

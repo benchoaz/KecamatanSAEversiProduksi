@@ -11,6 +11,13 @@
     <div class="sidebar-nav mt-3">
         <div class="nav-section-title text-uppercase mb-3 px-4">Menu Utama</div>
         
+        <a href="{{ route('hub.dashboard') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('hub.dashboard') ? 'active' : '' }}">
+            <div class="nav-icon me-3">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <span class="nav-text">Overview</span>
+        </a>
+
         <a href="{{ route('hub.districts.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('hub.districts.*') ? 'active' : '' }}">
             <div class="nav-icon me-3">
                 <i class="fas fa-server"></i>
