@@ -7,10 +7,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>HUB GATEWAY - KABUPATEN PROBOLINGGO</title>
     
-    <!-- Fonts - Poppins -->
+    <!-- Fonts - Inter (Elegant SaaS) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -18,121 +18,129 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Styles -->
+    <!-- Base Styles Re-adjustment -->
     <link rel="stylesheet" href="{{ asset('css/min/dashboard.min.css?v=2.1') }}">
     <link rel="stylesheet" href="{{ asset('css/layout-fix.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/dashboard-premium.css') }}">
     
     <style>
-        /* Minimalist Dashboard Styling (Focus Mode) */
+        /* ELEGANT LIGHT UI (Reference: Professional SaaS) */
         :root {
-            --bg-color: #ffffff;
-            --text-main: #000000;
-            --text-muted: #555555;
-            --border-color: #dddddd;
-            --accent-color: #000000;
+            --bg-body: #f9fafb;
+            --bg-sidebar: #ffffff;
+            --primary: #2563eb;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #f1f5f9;
         }
 
         body {
-            background-color: var(--bg-color) !important;
+            font-family: 'Inter', sans-serif !important;
+            background-color: var(--bg-body) !important;
             color: var(--text-main) !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            letter-spacing: -0.01em;
         }
 
+        h1, h2, h3, h4, h5, h6, .fw-bold {
+            font-family: 'Inter', sans-serif !important;
+            color: var(--text-main) !important;
+            letter-spacing: -0.02em !important;
+        }
+
+        /* Sidebar: High-End White Look */
         .sidebar {
-            background-color: var(--bg-color) !important;
-            border-right: 1px solid var(--border-color) !important;
-            width: 250px;
+            background-color: var(--bg-sidebar) !important;
+            border-right: 1px solid #e5e7eb !important;
+            box-shadow: none !important;
         }
 
         .sidebar .nav-link {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            font-size: 14px;
+            border-radius: 8px;
+            margin: 4px 12px;
+            padding: 10px 16px !important;
+            transition: all 0.2s;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #f3f4f6 !important;
             color: var(--text-main) !important;
-            border-bottom: 1px solid transparent;
-            border-radius: 0 !important;
-            padding: 12px 20px !important;
         }
 
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            background-color: #f0f0f0 !important;
-            font-weight: bold;
+        .sidebar .nav-link.active {
+            background-color: #eff6ff !important;
+            color: var(--primary) !important;
+            font-weight: 600;
         }
 
-        .main-content {
-            background-color: var(--bg-color) !important;
+        .sidebar .nav-icon i {
+            color: #9ca3af !important;
         }
 
+        .sidebar .nav-link.active .nav-icon i {
+            color: var(--primary) !important;
+        }
+
+        /* Card Refinement */
         .card {
-            border: 1px solid var(--border-color) !important;
-            border-radius: 4px !important;
-            box-shadow: none !important;
-            background: #fff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 12px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
+            background-color: #fff !important;
         }
 
         .card-header {
-            background-color: #fafafa !important;
-            border-bottom: 1px solid var(--border-color) !important;
-            font-weight: bold;
-            color: #000 !important;
+            background-color: #fff !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            font-weight: 600;
+            padding: 1.25rem !important;
         }
 
-        h1, h2, h3, h4, h5, h6 {
-            color: #000 !important;
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
+            border-radius: 8px !important;
+            font-weight: 600;
+            padding: 8px 20px !important;
+        }
+
+        .nav-section-title {
+            color: #9ca3af !important;
             font-weight: 700 !important;
-        }
-
-        .table {
-            color: #000 !important;
+            font-size: 11px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            padding-left: 28px !important;
+            margin-top: 20px !important;
+            margin-bottom: 10px !important;
         }
 
         .table thead th {
-            background-color: #f5f5f5 !important;
-            color: #000 !important;
-            border-bottom: 2px solid var(--border-color) !important;
-            text-transform: none !important;
-            letter-spacing: 0 !important;
-        }
-
-        .badge {
-            border: 1px solid #000;
-            background: transparent !important;
-            color: #000 !important;
-            border-radius: 2px !important;
-        }
-
-        .btn-primary {
-            background-color: #000 !important;
-            border-color: #000 !important;
-            color: #fff !important;
-            border-radius: 4px !important;
-        }
-
-        .btn-outline-primary {
-            color: #000 !important;
-            border-color: #000 !important;
-        }
-
-        .form-control {
-            border-radius: 2px !important;
-            border: 1px solid var(--border-color) !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            color: #6b7280 !important;
+            background-color: #f9fafb !important;
+            border-bottom: 1px solid #e5e7eb !important;
         }
     </style>
 </head>
 
 <body>
     <div class="app-container">
-        <!-- Sidebar Khusus Kabupaten -->
         @include('layouts.partials.sidebar.hub')
 
-        <!-- Main Content -->
         <main class="main-content">
-            <!-- Header -->
             @include('layouts.partials.header')
 
-            <!-- Page Content -->
             <div class="page-content py-4 px-4">
                 @if(session('success'))
-                    <div class="alert alert-success shadow-sm rounded-4">
+                    <div class="alert alert-success border-0 shadow-sm rounded-4" style="background-color: #f0fdf4; color: #166534;">
                         <i class="fas fa-check-circle me-2"></i>
                         {{ session('success') }}
                     </div>
@@ -143,7 +151,6 @@
         </main>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/dashboard.js?v=2.1') }}"></script>
     @stack('scripts')

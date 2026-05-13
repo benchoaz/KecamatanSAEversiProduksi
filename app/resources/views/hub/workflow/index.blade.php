@@ -2,77 +2,90 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row mb-5">
-        <div class="col-12">
-            <h1 class="h2 mb-2">Otomasi & Alur Kerja (n8n)</h1>
-            <p class="text-muted" style="font-size: 16px;">Kelola integrasi otomatis antar aplikasi dan layanan pihak ketiga.</p>
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="h3 mb-1" style="font-weight: 700;">Workflows & Automation</h1>
+            <p class="text-muted mb-0">Powered by n8n. Manage cross-district automated tasks.</p>
         </div>
     </div>
 
     <div class="row">
-        <!-- n8n Control Panel -->
+        <!-- n8n Engine Status -->
         <div class="col-lg-6">
-            <div class="card mb-4">
-                <div class="card-header py-3">
-                    Status Server Otomasi
+            <div class="card h-100">
+                <div class="card-header border-0 pb-0">
+                    <h6 class="text-muted small fw-bold text-uppercase mb-0">Automation Engine</h6>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="flex-shrink-0">
-                            <div class="border p-3 text-center" style="width: 80px;">
-                                <i class="fas fa-robot fa-2x"></i>
-                            </div>
+                    <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
+                        <div class="flex-shrink-0 bg-primary-light text-primary rounded-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-robot fa-2x"></i>
                         </div>
                         <div class="ms-4">
-                            <div class="fw-bold fs-5">n8n Engine</div>
-                            <div class="text-muted small">Versi: Centralized Hub Instance</div>
-                            <div class="mt-2">
+                            <div class="fw-bold fs-5">n8n Central Instance</div>
+                            <div class="mt-1">
                                 @if($is_online)
-                                    <span class="fw-bold" style="color: #000;">● TERHUBUNG (ONLINE)</span>
+                                    <span class="badge-status-active">online</span>
                                 @else
-                                    <span style="color: #888;">○ TERPUTUS (OFFLINE)</span>
+                                    <span class="badge bg-light text-muted border-0 rounded-pill px-3 py-1" style="font-size: 11px;">offline</span>
                                 @endif
                             </div>
                         </div>
                     </div>
 
-                    <div class="border-top pt-4">
-                        <p class="small text-muted mb-3">Gunakan tombol di bawah ini untuk membuka Editor Alur Kerja. Pastikan Bapak sudah masuk ke VPN (Tailscale) jika mengakses dari luar jaringan lokal.</p>
-                        <a href="{{ $n8n_url }}" target="_blank" class="btn btn-dark w-100 p-3 fw-bold">
-                            BUKA EDITOR n8n <i class="fas fa-external-link-alt ms-2"></i>
+                    <div class="pt-2">
+                        <p class="text-muted small mb-4">The n8n editor allows you to create complex automations between 24 district databases and 3rd party services like WhatsApp, Google Drive, or Email.</p>
+                        <a href="{{ $n8n_url }}" target="_blank" class="btn btn-primary w-100 p-3">
+                            <i class="fas fa-external-link-alt me-2"></i> Open n8n Editor
                         </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Documentation/Help -->
+        <!-- Examples/Templates -->
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header py-3">
-                    Contoh Alur Kerja (Workflows)
+            <div class="card h-100">
+                <div class="card-header">
+                    Active Automation Use-Cases
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
-                        <div class="list-group-item p-4">
-                            <div class="fw-bold">1. Broadcast Notifikasi WA</div>
-                            <p class="text-muted small mb-0">Otomatis mengirim pesan WhatsApp ke warga saat berkas layanan selesai diproses di kecamatan.</p>
+                        <div class="list-group-item p-4 border-0 border-bottom">
+                            <div class="d-flex align-items-start">
+                                <div class="bg-success-light text-success rounded-circle d-flex align-items-center justify-content-center p-2 me-3" style="width: 32px; height: 32px;">
+                                    <i class="fab fa-whatsapp small"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" style="font-size: 15px;">WhatsApp Broadcast</div>
+                                    <p class="text-muted small mb-0">Notify residents automatically when their public service request status changes.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="list-group-item p-4">
-                            <div class="fw-bold">2. Sinkronisasi Data PMD</div>
-                            <p class="text-muted small mb-0">Menarik data perangkat desa terbaru dari 24 kecamatan ke database pusat Kabupaten setiap jam 12 malam.</p>
+                        <div class="list-group-item p-4 border-0 border-bottom">
+                            <div class="d-flex align-items-start">
+                                <div class="bg-primary-light text-primary rounded-circle d-flex align-items-center justify-content-center p-2 me-3" style="width: 32px; height: 32px;">
+                                    <i class="fas fa-database small"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" style="font-size: 15px;">Data Synchronization</div>
+                                    <p class="text-muted small mb-0">Aggregate UMKM and Village Personnel data from 24 districts every midnight.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="list-group-item p-4">
-                            <div class="fw-bold">3. Backup Database Global</div>
-                            <p class="text-muted small mb-0">Melakukan backup terenkripsi ke Google Drive/Cloud storage untuk seluruh database kecamatan.</p>
+                        <div class="list-group-item p-4 border-0">
+                            <div class="d-flex align-items-start">
+                                <div class="bg-info-light text-info rounded-circle d-flex align-items-center justify-content-center p-2 me-3" style="width: 32px; height: 32px;">
+                                    <i class="fas fa-cloud-upload-alt small"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" style="font-size: 15px;">Cloud Backups</div>
+                                    <p class="text-muted small mb-0">Schedule automated off-site backups for the entire Hub infrastructure.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="mt-4 p-4 border" style="background-color: #fafafa;">
-                <h6 class="fw-bold"><i class="fas fa-shield-alt me-2"></i> Info Keamanan</h6>
-                <p class="small text-muted mb-0">Setiap alur kerja menggunakan <strong>API Key</strong> yang dibuat di menu "Aplikasi Eksternal" untuk menjamin keamanan akses data antar dinas.</p>
             </div>
         </div>
     </div>

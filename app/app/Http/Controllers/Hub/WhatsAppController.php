@@ -14,7 +14,18 @@ class WhatsAppController extends Controller
     public function index()
     {
         $configs = HubAiConfig::orderBy('key')->get();
-        return view('hub.whatsapp.index', compact('configs'));
+        
+        // Check WAHA Status
+        $waha_url = config('services.waha.url', 'http://localhost:3000');
+        $is_online = false;
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(1)->get($waha_url . '/health');
+            $is_online = $response->successful();
+        } catch (\Exception $e) {
+            $is_online = false;
+        }
+
+        return view('hub.whatsapp.index', compact('configs', 'is_online'));
     }
 
     /**

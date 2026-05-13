@@ -1,57 +1,66 @@
 <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header py-4 px-4 border-bottom">
-        <div class="logo-text">
-            <div class="logo-title fs-5" style="color: #000; font-weight: 800;">PROBOLINGGO</div>
-            <div class="logo-subtitle text-xs text-muted" style="font-size: 10px; letter-spacing: 2px;">GATEWAY HUB</div>
+    <div class="sidebar-header py-4 px-4">
+        <div class="logo-wrapper d-flex align-items-center">
+            <div class="logo-text">
+                <div class="logo-title fs-5 fw-bold" style="color: var(--primary); letter-spacing: -1px;">PROBOLINGGO</div>
+                <div class="logo-subtitle text-muted" style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Gateway Hub</div>
+            </div>
         </div>
     </div>
 
     <div class="sidebar-nav mt-3">
-        <div class="nav-section-title text-uppercase mb-2 px-4" style="font-size: 10px; color: #888; font-weight: bold;">Menu Utama</div>
+        <div class="nav-section-title text-uppercase mb-3 px-4">Menu Utama</div>
         
         <a href="{{ route('hub.districts.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('hub.districts.*') ? 'active' : '' }}">
-            <i class="fas fa-city me-3" style="width: 20px;"></i>
-            <span>Pusat Kendali</span>
+            <div class="nav-icon me-3">
+                <i class="fas fa-server"></i>
+            </div>
+            <span class="nav-text">Control Center</span>
         </a>
 
-        <a href="#" class="nav-link d-flex align-items-center" style="opacity: 0.5;">
-            <i class="fas fa-inbox me-3" style="width: 20px;"></i>
-            <span>Inbox Terpadu</span>
+        <a href="#" class="nav-link d-flex align-items-center opacity-50">
+            <div class="nav-icon me-3">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <span class="nav-text">Inbox Terpadu</span>
         </a>
 
-        <a href="#" class="nav-link d-flex align-items-center" style="opacity: 0.5;">
-            <i class="fas fa-chart-pie me-3" style="width: 20px;"></i>
-            <span>Statistik Global</span>
-        </a>
-
-        <div class="nav-section-title text-uppercase mb-2 px-4 mt-4" style="font-size: 10px; color: #888; font-weight: bold;">Integrasi</div>
+        <div class="nav-section-title text-uppercase mb-3 px-4 mt-4">Sistem & Integrasi</div>
 
         <a href="{{ route('hub.whatsapp.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('hub.whatsapp.*') ? 'active' : '' }}">
-            <i class="fab fa-whatsapp me-3" style="width: 20px;"></i>
-            <span>WhatsApp Hub</span>
+            <div class="nav-icon me-3">
+                <i class="fab fa-whatsapp"></i>
+            </div>
+            <span class="nav-text">WhatsApp Hub</span>
         </a>
 
         <a href="{{ route('hub.api.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('hub.api.*') ? 'active' : '' }}">
-            <i class="fas fa-link me-3" style="width: 20px;"></i>
-            <span>Aplikasi Eksternal</span>
+            <div class="nav-icon me-3">
+                <i class="fas fa-link"></i>
+            </div>
+            <span class="nav-text">Aplikasi Eksternal</span>
         </a>
 
         <a href="{{ route('hub.workflow.index') }}" class="nav-link d-flex align-items-center {{ request()->routeIs('hub.workflow.*') ? 'active' : '' }}">
-            <i class="fas fa-project-diagram me-3" style="width: 20px;"></i>
-            <span>Workflow (n8n)</span>
+            <div class="nav-icon me-3">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <span class="nav-text">Workflow (n8n)</span>
         </a>
     </div>
 
-    <div class="sidebar-footer p-4 border-top mt-auto">
-        <div class="user-info mb-3">
-            <div class="user-name fw-bold" style="font-size: 13px;">{{ auth()->user()->nama_lengkap }}</div>
-            <div class="user-role text-muted" style="font-size: 11px;">Super Admin Kabupaten</div>
+    <div class="sidebar-footer p-4 mt-auto">
+        <div class="user-card d-flex align-items-center bg-light p-2 rounded-3">
+            <div class="avatar-circle me-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%; font-size: 12px; font-weight: bold;">
+                {{ strtoupper(substr(auth()->user()->nama_lengkap, 0, 2)) }}
+            </div>
+            <div class="user-details overflow-hidden">
+                <div class="user-name fw-bold text-truncate" style="font-size: 12px;">{{ auth()->user()->nama_lengkap }}</div>
+            </div>
         </div>
-        <form action="{{ route('hub.logout') }}" method="POST">
+        <form action="{{ route('hub.logout') }}" method="POST" class="mt-3">
             @csrf
-            <button type="submit" class="btn btn-outline-dark btn-sm w-100" style="font-size: 11px;">
-                Log Out
-            </button>
+            <button type="submit" class="btn btn-outline-dark btn-sm w-100 rounded-3" style="font-size: 11px; font-weight: 600;">Keluar</button>
         </form>
     </div>
 </aside>
