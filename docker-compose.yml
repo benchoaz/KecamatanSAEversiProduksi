@@ -79,6 +79,8 @@ services:
     image: nginx:alpine
     container_name: kecamatan-nginx
     restart: unless-stopped
+    ports:
+      - "8000:80"    # Akses lokal: localhost:8000
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kecamatan.rule=Host(`kecamatanbesuk.web.id`)"
