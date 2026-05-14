@@ -16,7 +16,7 @@ class HubDistrictSeeder extends Seeder
             [
                 'name' => 'Kecamatan Besuk',
                 'slug' => 'besuk',
-                'db_name' => 'dashboard_kecamatan',
+                'db_name' => 'dashboard_besuk',
                 'is_active' => true,
             ],
             [
