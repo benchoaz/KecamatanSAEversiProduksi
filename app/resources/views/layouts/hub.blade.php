@@ -28,56 +28,52 @@
             --bg-body: #f9fafb;
             --bg-sidebar: #ffffff;
             --primary: #2563eb;
-            --text-main: #111827;
-            --text-muted: #6b7280;
-            --border-color: #f1f5f9;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
         }
 
-        body {
+        body, .app-container, .main-content {
             font-family: 'Inter', sans-serif !important;
             background-color: var(--bg-body) !important;
             color: var(--text-main) !important;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            letter-spacing: -0.01em;
-        }
-
-        h1, h2, h3, h4, h5, h6, .fw-bold {
-            font-family: 'Inter', sans-serif !important;
-            color: var(--text-main) !important;
-            letter-spacing: -0.02em !important;
+            background: var(--bg-body) !important;
         }
 
         /* Sidebar: High-End White Look */
         .sidebar {
             background-color: var(--bg-sidebar) !important;
-            border-right: 1px solid #e5e7eb !important;
+            background: #ffffff !important;
+            border-right: 1px solid var(--border-color) !important;
             box-shadow: none !important;
+            color: var(--text-main) !important;
         }
 
         .sidebar .nav-link {
             color: var(--text-muted) !important;
-            font-weight: 500;
-            font-size: 14px;
-            border-radius: 8px;
-            margin: 4px 12px;
-            padding: 10px 16px !important;
-            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 12px;
+            margin: 4px 16px;
+            padding: 12px 16px !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sidebar .nav-link:hover {
-            background-color: #f3f4f6 !important;
+            background-color: #f1f5f9 !important;
             color: var(--text-main) !important;
+            transform: translateX(4px);
         }
 
         .sidebar .nav-link.active {
             background-color: #eff6ff !important;
             color: var(--primary) !important;
-            font-weight: 600;
+            box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.1);
         }
 
         .sidebar .nav-icon i {
-            color: #9ca3af !important;
+            color: #94a3b8 !important;
+            font-size: 16px;
         }
 
         .sidebar .nav-link.active .nav-icon i {
@@ -86,47 +82,59 @@
 
         /* Card Refinement */
         .card {
-            border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
-            background-color: #fff !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 4px 20px -10px rgba(0,0,0,0.05) !important;
+            background-color: #ffffff !important;
+            overflow: hidden;
         }
 
         .card-header {
-            background-color: #fff !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            font-weight: 600;
-            padding: 1.25rem !important;
+            background-color: #ffffff !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            font-weight: 800;
+            padding: 1.5rem !important;
+            color: var(--text-main) !important;
         }
 
-        /* Buttons */
-        .btn-primary {
-            background-color: var(--primary) !important;
-            border-color: var(--primary) !important;
-            border-radius: 8px !important;
-            font-weight: 600;
-            padding: 8px 20px !important;
+        /* Header / Navbar */
+        .header {
+            background-color: rgba(255, 255, 255, 0.8) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color) !important;
         }
 
         .nav-section-title {
-            color: #9ca3af !important;
-            font-weight: 700 !important;
-            font-size: 11px !important;
+            color: #94a3b8 !important;
+            font-weight: 800 !important;
+            font-size: 10px !important;
             text-transform: uppercase !important;
-            letter-spacing: 0.05em !important;
-            padding-left: 28px !important;
-            margin-top: 20px !important;
-            margin-bottom: 10px !important;
+            letter-spacing: 0.1em !important;
+            padding-left: 32px !important;
+            margin-top: 24px !important;
+            margin-bottom: 8px !important;
         }
 
-        .table thead th {
-            font-size: 11px !important;
-            font-weight: 700 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.05em !important;
-            color: #6b7280 !important;
-            background-color: #f9fafb !important;
-            border-bottom: 1px solid #e5e7eb !important;
+        /* Inputs & Forms */
+        .form-control {
+            background-color: #ffffff !important;
+            border: 1.5px solid var(--border-color) !important;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+            font-size: 14px !important;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+        }
+
+        /* Modal / Overlay */
+        .modal-content {
+            border-radius: 24px !important;
+            border: none !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
         }
     </style>
 </head>
@@ -151,8 +159,16 @@
         </main>
     </div>
 
+    <style>
+        .modal-backdrop {
+            background-color: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(8px);
+        }
+    </style>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/dashboard.js?v=2.1') }}"></script>
+    @stack('modals')
     @stack('scripts')
 </body>
 </html>

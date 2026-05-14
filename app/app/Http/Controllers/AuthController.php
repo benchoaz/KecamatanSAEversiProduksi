@@ -67,8 +67,9 @@ class AuthController extends Controller
     {
         Auth::logout();
 
+        // Bersihkan session secara total (agresif untuk Redis)
+        $request->session()->flush();
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/')->with('logout_success', true);

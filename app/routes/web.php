@@ -44,18 +44,21 @@ Route::prefix('hub')->name('hub.')->group(function () {
     Route::get('/login', [App\Http\Controllers\Hub\DashboardController::class, 'loginForm'])->name('login');
     Route::post('/login', [App\Http\Controllers\Hub\Auth\LoginController::class, 'login'])->name('login.post');
     Route::post('/logout', [App\Http\Controllers\Hub\Auth\LoginController::class, 'logout'])->name('logout');
-    
+    // Fallback GET logout — cegah 405 jika user akses via URL langsung
+    Route::get('/logout', [App\Http\Controllers\Hub\Auth\LoginController::class, 'logout'])->name('logout.get');
+
     Route::middleware(['auth', 'hub.admin'])->group(function () {
         // Dashboard Utama
         Route::get('/', [App\Http\Controllers\Hub\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/districts', [App\Http\Controllers\Hub\DistrictController::class, 'index'])->name('districts.index');
         Route::post('/districts', [App\Http\Controllers\Hub\DistrictController::class, 'store'])->name('districts.store');
         Route::patch('/districts/{district}/toggle', [App\Http\Controllers\Hub\DistrictController::class, 'toggleStatus'])->name('districts.toggle');
-        
+
         // WhatsApp & AI Hub
         Route::get('/whatsapp', [App\Http\Controllers\Hub\WhatsAppController::class, 'index'])->name('whatsapp.index');
         Route::post('/whatsapp/config', [App\Http\Controllers\Hub\WhatsAppController::class, 'storeConfig'])->name('whatsapp.config.store');
-        
+        Route::patch('/whatsapp/district/{district}', [App\Http\Controllers\Hub\WhatsAppController::class, 'updateDistrictConfig'])->name('whatsapp.district.update');
+
         // External API Settings
         Route::get('/api-settings', [App\Http\Controllers\Hub\ExternalApiController::class, 'index'])->name('api.index');
         Route::post('/api-settings', [App\Http\Controllers\Hub\ExternalApiController::class, 'store'])->name('api.store');
@@ -65,6 +68,7 @@ Route::prefix('hub')->name('hub.')->group(function () {
         Route::get('/workflow', [App\Http\Controllers\Hub\WorkflowController::class, 'index'])->name('workflow.index');
     });
 });
+
 
 // Public Service & Economy Routes
 require __DIR__ . '/public/layanan.php';
