@@ -7,10 +7,15 @@ use App\Models\WhatsappSession;
 class StateHandler
 {
     protected IntentHandler $intentHandler;
+
     protected ComplaintHandler $complaintHandler;
+
     protected OwnerHandler $ownerHandler;
+
     protected StatusHandler $statusHandler;
+
     protected SyaratHandler $syaratHandler;
+
     protected UmkmHandler $umkmHandler;
 
     protected JasaHandler $jasaHandler;
@@ -54,13 +59,14 @@ class StateHandler
             preg_match('/^[0-9]{6}$/', $messageLower)
         ) {
             \Log::info('StateHandler Keyword Override Triggered', ['message' => $message]);
-            
+
             // If it's a numeric override for "Back" (0) or "KEMBALI", ensure we go to menu
             if ($messageLower === '0' || $messageLower === 'kembali') {
                 $message = 'menu';
             }
 
             $session->clear();
+
             return $this->intentHandler->handle($session->phone, $message);
         }
 
@@ -94,10 +100,10 @@ class StateHandler
             return [
                 'success' => true,
                 'intent' => 'status',
-                'reply' => "🏛️ *CEK STATUS BERKAS*\n\n" .
-                    "Silakan masukkan **PIN Lacak** (6 angka) untuk melihat perkembangan berkas Anda.\n\n" .
-                    "💡 *Tips:* Jika Anda lupa PIN, silakan ketik **LUPA**.\n\n" .
-                    "Ketik **MENU** atau **0** untuk kembali.",
+                'reply' => "🏛️ *CEK STATUS BERKAS*\n\n".
+                    "Silakan masukkan **PIN Lacak** (6 angka) untuk melihat perkembangan berkas Anda.\n\n".
+                    "💡 *Tips:* Jika Anda lupa PIN, silakan ketik **LUPA**.\n\n".
+                    'Ketik **MENU** atau **0** untuk kembali.',
                 'state_update' => 'WAITING_STATUS_PIN',
             ];
         }
@@ -109,6 +115,7 @@ class StateHandler
 
         if ($this->isSelection($message, '3') || $message === 'menu' || $message === 'kembali' || $message === '0') {
             $session->clear();
+
             return $this->intentHandler->handle($session->phone, 'menu');
         }
 
@@ -120,7 +127,7 @@ class StateHandler
             return $this->statusHandler->handleForgotPin($session->phone);
         }
 
-        // Jika tidak ada yang cocok, jangan langsung bilang tidak valid. 
+        // Jika tidak ada yang cocok, jangan langsung bilang tidak valid.
         // Berikan ke IntentHandler untuk dicek apakah ini pertanyaan AI atau Keyword lain.
         return $this->intentHandler->handle($session->phone, $message);
     }
@@ -136,10 +143,10 @@ class StateHandler
             return [
                 'success' => true,
                 'intent' => 'umkm_link',
-                'reply' => "🛒 *Etalase Produk UMKM*\n\n" .
-                    "Temukan produk unggulan karya warga sekitar:\n" .
-                    "{$baseUrl}/ekonomi?tab=produk\n\n" .
-                    "Ketik *MENU* untuk kembali.",
+                'reply' => "🛒 *Etalase Produk UMKM*\n\n".
+                    "Temukan produk unggulan karya warga sekitar:\n".
+                    "{$baseUrl}/ekonomi?tab=produk\n\n".
+                    'Ketik *MENU* untuk kembali.',
                 'state_update' => null,
             ];
         }
@@ -148,20 +155,21 @@ class StateHandler
             return [
                 'success' => true,
                 'intent' => 'jasa_link',
-                'reply' => "🔧 *Direktori Jasa & Tenaga Ahli*\n\n" .
-                    "Temukan tukang, tenaga harian, dan penyedia jasa:\n" .
-                    "{$baseUrl}/ekonomi?tab=jasa\n\n" .
-                    "Ketik *MENU* untuk kembali.",
+                'reply' => "🔧 *Direktori Jasa & Tenaga Ahli*\n\n".
+                    "Temukan tukang, tenaga harian, dan penyedia jasa:\n".
+                    "{$baseUrl}/ekonomi?tab=jasa\n\n".
+                    'Ketik *MENU* untuk kembali.',
                 'state_update' => null,
             ];
         }
 
         if ($this->isSelection($message, '3') || $message === 'menu' || $message === 'kembali') {
             $session->clear();
+
             return $this->intentHandler->handle($session->phone, 'menu');
         }
 
-        // Jika tidak ada yang cocok, jangan langsung bilang tidak valid. 
+        // Jika tidak ada yang cocok, jangan langsung bilang tidak valid.
         // Berikan ke IntentHandler untuk dicek apakah ini pertanyaan AI atau Keyword lain.
         return $this->intentHandler->handle($session->phone, $message);
     }
@@ -174,8 +182,9 @@ class StateHandler
         $message = trim($message);
 
         // Pure numeric match
-        if ($message === $number)
+        if ($message === $number) {
             return true;
+        }
 
         // Emoji match mapping
         $emojis = [

@@ -12,17 +12,23 @@ class AparaturDesa extends Model
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $table = 'aparatur_desa';
+
     protected $guarded = [];
 
     // Status Jabatan Constants
     const STATUS_AKTIF = 'Aktif';
+
     const STATUS_PJ = 'Pj';
+
     const STATUS_BERAKHIR = 'Berakhir';
+
     const STATUS_BERHENTI = 'Berhenti';
 
     // Status Verifikasi Constants
     const VERIFIKASI_BELUM = 'Belum Diverifikasi';
+
     const VERIFIKASI_SUDAH = 'Terverifikasi';
+
     const VERIFIKASI_REVISI = 'Perlu Perbaikan';
 
     protected $casts = [

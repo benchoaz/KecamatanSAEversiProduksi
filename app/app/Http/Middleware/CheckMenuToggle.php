@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Menu;
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\Menu;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckMenuToggle
@@ -18,15 +18,15 @@ class CheckMenuToggle
     {
         $menu = Menu::where('kode_menu', $kodeMenu)->first();
 
-        if ($menu && !$menu->is_active) {
+        if ($menu && ! $menu->is_active) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Fitur ' . $menu->nama_menu . ' sedang dinonaktifkan oleh Kecamatan.'
+                    'message' => 'Fitur '.$menu->nama_menu.' sedang dinonaktifkan oleh Kecamatan.',
                 ], 403);
             }
 
-            return redirect()->route('dashboard')->with('error', 'Fitur ' . $menu->nama_menu . ' sedang dinonaktifkan oleh Kecamatan.');
+            return redirect()->route('dashboard')->with('error', 'Fitur '.$menu->nama_menu.' sedang dinonaktifkan oleh Kecamatan.');
         }
 
         return $next($request);

@@ -10,6 +10,7 @@ class MasterKegiatan extends Model
     use HasFactory;
 
     protected $table = 'master_kegiatan';
+
     protected $guarded = ['id'];
 
     protected $casts = [

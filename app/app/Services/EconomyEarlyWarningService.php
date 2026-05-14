@@ -3,16 +3,14 @@
 namespace App\Services;
 
 use App\Models\PembangunanDesa;
-use App\Models\Umkm;
-
-use App\Models\UsulanMusrenbang;
 use App\Models\Submission;
+use App\Models\Umkm;
+use App\Models\UsulanMusrenbang;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Early Warning System (EWS) untuk Ekonomi & Pembangunan
- * 
+ *
  * Mendeteksi anomali dan mengirim notifikasi untuk:
  * - Pembangunan: Serapan anggaran, progress fisik, SPJ
  * - Ekonomi: UMKM tidak aktif, lowongan expired
@@ -48,6 +46,7 @@ class EconomyEarlyWarningService
             ->filter(function ($project) {
                 $lastUpdate = $project->updated_at;
                 $daysSinceUpdate = now()->diffInDays($lastUpdate);
+
                 return $daysSinceUpdate > 30 && $project->progress_fisik < 100;
             });
 
@@ -57,13 +56,13 @@ class EconomyEarlyWarningService
                 'type' => 'progress_stagnant',
                 'title' => 'Proyek Progress Mandek',
                 'message' => "{$stagnantProjects->count()} proyek tidak mengalami kemajuan >30 hari",
-                'data' => $stagnantProjects->map(fn($p) => [
+                'data' => $stagnantProjects->map(fn ($p) => [
                     'id' => $p->id,
                     'nama' => $p->nama_kegatan,
                     'desa' => $p->desa->nama_desa ?? 'N/A',
                     'progress' => $p->progress_fisik,
-                    'hari_tanpa_update' => now()->diffInDays($p->updated_at)
-                ])
+                    'hari_tanpa_update' => now()->diffInDays($p->updated_at),
+                ]),
             ];
         }
 
@@ -78,12 +77,12 @@ class EconomyEarlyWarningService
                 'type' => 'finance_anomaly',
                 'title' => 'Anomali Keuangan',
                 'message' => "{$financialAnomalies->count()} proyek: keuangan mendahului fisik",
-                'data' => $financialAnomalies->map(fn($p) => [
+                'data' => $financialAnomalies->map(fn ($p) => [
                     'id' => $p->id,
                     'nama' => $p->nama_kegatan,
                     'progress_fisik' => $p->progress_fisik,
-                    'progress_keuangan' => $p->progress_keuangan
-                ])
+                    'progress_keuangan' => $p->progress_keuangan,
+                ]),
             ];
         }
 
@@ -107,8 +106,8 @@ class EconomyEarlyWarningService
                         'id' => $project->id,
                         'nama' => $project->nama_kegatan,
                         'expected' => round($expectedProgress, 1),
-                        'actual' => $project->progress_keuangan
-                    ]
+                        'actual' => $project->progress_keuangan,
+                    ],
                 ];
             }
         }
@@ -129,7 +128,7 @@ class EconomyEarlyWarningService
                 'type' => 'spj_incomplete',
                 'title' => 'SPJ Belum Lengkap',
                 'message' => "{$incompleteSpj->count()} proyek selesai >7 hari belum ada SPJ",
-                'data' => $incompleteSpj
+                'data' => $incompleteSpj,
             ];
         }
 
@@ -152,16 +151,14 @@ class EconomyEarlyWarningService
                 'level' => 'info',
                 'type' => 'umkm_inactive_high',
                 'title' => 'UMKM Tidak Aktif Tinggi',
-                'message' => round(($nonaktifUmkm / $totalUmkm) * 100, 1) . "% UMKM tidak aktif",
+                'message' => round(($nonaktifUmkm / $totalUmkm) * 100, 1).'% UMKM tidak aktif',
                 'data' => [
                     'total' => $totalUmkm,
                     'nonaktif' => $nonaktifUmkm,
-                    'persentase' => round(($nonaktifUmkm / $totalUmkm) * 100, 1)
-                ]
+                    'persentase' => round(($nonaktifUmkm / $totalUmkm) * 100, 1),
+                ],
             ];
         }
-
-
 
         // 3. UMKM pending verification (>14 hari)
         $pendingUmkm = Umkm::where('status', 'pending')
@@ -174,11 +171,11 @@ class EconomyEarlyWarningService
                 'type' => 'umkm_pending_long',
                 'title' => 'UMKM Menunggu Verifikasi',
                 'message' => "{$pendingUmkm->count()} UMKM pending >14 hari",
-                'data' => $pendingUmkm->map(fn($u) => [
+                'data' => $pendingUmkm->map(fn ($u) => [
                     'id' => $u->id,
                     'nama_usaha' => $u->nama_usaha,
-                    'hari_pending' => now()->diffInDays($u->created_at)
-                ])
+                    'hari_pending' => now()->diffInDays($u->created_at),
+                ]),
             ];
         }
 
@@ -204,12 +201,12 @@ class EconomyEarlyWarningService
                 'type' => 'musrenbang_unverified',
                 'title' => 'Usulan Musrenbang Belum Diverifikasi',
                 'message' => "{$unverified->count()} usulan dari tahun lalu belum diverifikasi",
-                'data' => $unverified->map(fn($m) => [
+                'data' => $unverified->map(fn ($m) => [
                     'id' => $m->id,
                     'nama_usulan' => $m->nama_usulan,
                     'tahun' => $m->tahun,
-                    'hari_menunggu' => now()->diffInDays($m->created_at)
-                ])
+                    'hari_menunggu' => now()->diffInDays($m->created_at),
+                ]),
             ];
         }
 
@@ -242,8 +239,8 @@ class EconomyEarlyWarningService
                 'level' => 'warning',
                 'type' => 'report_missing',
                 'title' => 'Laporan Bulan Lalu Belum Ada',
-                'message' => "{$missingReports->count()} desa belum submit laporan bulan " . $lastMonth->format('F Y'),
-                'data' => $missingReports
+                'message' => "{$missingReports->count()} desa belum submit laporan bulan ".$lastMonth->format('F Y'),
+                'data' => $missingReports,
             ];
         }
 
@@ -277,7 +274,7 @@ class EconomyEarlyWarningService
             'critical' => $critical,
             'warning' => $warning,
             'info' => $info,
-            'has_alerts' => ($critical + $warning + $info) > 0
+            'has_alerts' => ($critical + $warning + $info) > 0,
         ];
     }
 }

@@ -14,6 +14,7 @@ class DistrictController extends Controller
     public function index()
     {
         $districts = HubDistrict::orderBy('name')->get();
+
         return view('hub.districts.index', compact('districts'));
     }
 
@@ -38,7 +39,8 @@ class DistrictController extends Controller
      */
     public function toggleStatus(HubDistrict $district)
     {
-        $district->update(['is_active' => !$district->is_active]);
+        $district->update(['is_active' => ! $district->is_active]);
+
         return redirect()->back()->with('success', 'Status kecamatan berhasil diubah!');
     }
 }

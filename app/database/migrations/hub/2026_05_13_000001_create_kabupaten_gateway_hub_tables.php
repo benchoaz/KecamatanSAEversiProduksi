@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('domain')->nullable()->unique();
-            
+
             // Database Connection Info
             $table->string('db_connection_name')->default('pgsql');
             $table->string('db_host')->nullable();
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('db_name')->nullable();
             $table->string('db_user')->nullable();
             $table->text('db_pass')->nullable(); // Encrypted
-            
+
             $table->boolean('is_active')->default(true);
             $table->json('settings')->nullable();
             $table->timestamps();
@@ -40,7 +40,7 @@ return new class extends Migration
             $table->json('context_data')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
+
             $table->unique(['phone_number', 'hub_district_id']);
         });
 

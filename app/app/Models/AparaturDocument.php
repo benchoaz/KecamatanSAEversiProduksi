@@ -11,6 +11,7 @@ class AparaturDocument extends Model
     use HasFactory, HasUuids;
 
     protected $table = 'aparatur_documents';
+
     protected $guarded = [];
 
     public function aparatur()

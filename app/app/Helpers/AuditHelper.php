@@ -4,7 +4,6 @@ namespace App\Helpers;
 
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Auth;
 
 class AuditHelper
 {

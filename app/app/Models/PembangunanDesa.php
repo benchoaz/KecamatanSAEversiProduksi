@@ -10,6 +10,7 @@ class PembangunanDesa extends Model
     use HasFactory;
 
     protected $table = 'pembangunan_desa';
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -25,7 +26,7 @@ class PembangunanDesa extends Model
         // Auto-generate SPJ requirements when activity is created
         static::created(function ($model) {
             if ($model->master_kegiatan_id) {
-                $engine = new \App\Services\SpjRuleEngine();
+                $engine = new \App\Services\SpjRuleEngine;
                 // We use the master record as basis for rules
                 $recommendedDocs = $engine->getRecommendedDocuments($model->masterKegiatan, [
                     // Pass current transaction data for rule matching

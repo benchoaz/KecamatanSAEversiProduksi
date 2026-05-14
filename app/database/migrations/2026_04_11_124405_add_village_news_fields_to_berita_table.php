@@ -38,7 +38,7 @@ return new class extends Migration
                 'external_source',
                 'external_id',
                 'clickbait_headline',
-                'priority_level'
+                'priority_level',
             ]);
         });
     }

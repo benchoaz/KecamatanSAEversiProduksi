@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\MasterLayanan;
 use App\Models\PelayananFaq;
-use Illuminate\Support\Str;
+use Illuminate\Console\Command;
 
 class SyncServiceToFaq extends Command
 {
@@ -40,22 +39,22 @@ class SyncServiceToFaq extends Command
         $syncCount = 0;
 
         foreach ($services as $service) {
-            $question = "Bagaimana cara mengurus " . $service->nama_layanan . "?";
-            
+            $question = 'Bagaimana cara mengurus '.$service->nama_layanan.'?';
+
             // Clean HTML from deskripsi_syarat if needed, but keep some formatting for AI
             $requirements = strip_tags($service->deskripsi_syarat);
-            
-            $answer = "Untuk mengurus **" . $service->nama_layanan . "**, berikut adalah persyaratannya:\n\n" . 
-                      $service->deskripsi_syarat . "\n\n" .
-                      "**Estimasi Waktu:** " . ($service->estimasi_waktu ?? 'Sesuai antrean') . ".\n\n" .
-                      "Silakan ajukan melalui portal website atau datang langsung ke kantor dengan membawa berkas asli.";
+
+            $answer = 'Untuk mengurus **'.$service->nama_layanan."**, berikut adalah persyaratannya:\n\n".
+                      $service->deskripsi_syarat."\n\n".
+                      '**Estimasi Waktu:** '.($service->estimasi_waktu ?? 'Sesuai antrean').".\n\n".
+                      'Silakan ajukan melalui portal website atau datang langsung ke kantor dengan membawa berkas asli.';
 
             PelayananFaq::updateOrCreate(
                 ['question' => $question],
                 [
                     'category' => 'Adminduk',
                     'module' => PelayananFaq::MODULE_PELAYANAN,
-                    'keywords' => $service->nama_layanan . ', syarat, cara, berkas, ' . $service->slug,
+                    'keywords' => $service->nama_layanan.', syarat, cara, berkas, '.$service->slug,
                     'answer' => $answer,
                     'priority' => 10,
                     'is_active' => true,
@@ -73,25 +72,25 @@ class SyncServiceToFaq extends Command
                 'question' => 'Kapan jam operasional kantor pelayanan?',
                 'answer' => 'Kantor pelayanan kami buka setiap hari kerja:\n- **Senin s/d Kamis**: 08:00 - 15:30 WIB\n- **Jumat**: 08:00 - 11:30 WIB\n- **Sabtu & Minggu**: Libur.',
                 'keywords' => 'jam buka, jam kerja, operasional, tutup, buka',
-                'category' => 'Umum'
+                'category' => 'Umum',
             ],
             [
                 'question' => 'Berapa biaya pengurusan administrasi di sini?',
                 'answer' => 'Seluruh pengurusan administrasi kependudukan dan layanan publik di kantor kami adalah **GRATIS (Rp 0,-)**. Jika ada oknum yang meminta biaya, silakan laporkan melalui menu Pengaduan.',
                 'keywords' => 'biaya, bayar, gratis, pungli, harga',
-                'category' => 'Umum'
+                'category' => 'Umum',
             ],
             [
                 'question' => 'Bagaimana jika berkas permohonan saya ditolak?',
                 'answer' => 'Jika berkas Anda ditolak, silakan periksa alasan penolakan pada detail riwayat permohonan Anda. Biasanya disebabkan oleh dokumen yang tidak lengkap atau foto berkas yang tidak jelas (blur). Anda dapat mengunggah ulang berkas yang benar tanpa harus membuat permohonan baru dari awal.',
                 'keywords' => 'tolak, gagal, berkas salah, revisi, perbaiki',
-                'category' => 'Umum'
+                'category' => 'Umum',
             ],
             [
                 'question' => 'Apakah saya bisa mengurus surat untuk orang lain?',
                 'answer' => 'Secara umum, pengurusan administrasi harus dilakukan oleh yang bersangkutan. Namun, untuk anggota keluarga dalam satu Kartu Keluarga (KK), dapat diwakilkan oleh kepala keluarga atau anggota keluarga dewasa lainnya dengan menunjukkan identitas asli.',
                 'keywords' => 'wakil, titip, orang lain, keluarga, kuasa',
-                'category' => 'Umum'
+                'category' => 'Umum',
             ],
         ];
 

@@ -15,12 +15,12 @@ class UmkmVerification extends Model
         'umkm_id',
         'kode_verifikasi',
         'expired_at',
-        'is_verified'
+        'is_verified',
     ];
 
     protected $casts = [
         'expired_at' => 'datetime',
-        'is_verified' => 'boolean'
+        'is_verified' => 'boolean',
     ];
 
     public function umkm()

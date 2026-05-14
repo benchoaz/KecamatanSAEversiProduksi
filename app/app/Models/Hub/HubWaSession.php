@@ -2,8 +2,8 @@
 
 namespace App\Models\Hub;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class HubWaSession extends Model
@@ -17,7 +17,7 @@ class HubWaSession extends Model
         'hub_district_id',
         'last_interaction_at',
         'context_data',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
@@ -37,6 +37,7 @@ class HubWaSession extends Model
     }
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     public function district()

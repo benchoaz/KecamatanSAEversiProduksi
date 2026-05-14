@@ -17,7 +17,7 @@ return new class extends Migration
             // Index for tracking code with status
             $table->index(['tracking_code', 'status'], 'idx_ps_tracking_status');
             // Index for WhatsApp suffix
-            if (!Schema::hasColumn('public_services', 'whatsapp_suffix')) {
+            if (! Schema::hasColumn('public_services', 'whatsapp_suffix')) {
                 $table->string('whatsapp_suffix', 10)->nullable()->index();
             }
         });

@@ -10,6 +10,7 @@ class DokumenDesa extends Model
     use HasFactory;
 
     protected $table = 'dokumen_desa';
+
     protected $guarded = ['id'];
 
     protected $casts = [

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Desa;
 
+use App\Helpers\AuditHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Helpers\AuditHelper;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller

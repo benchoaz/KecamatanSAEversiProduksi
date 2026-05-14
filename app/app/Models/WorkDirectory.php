@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WorkDirectory extends Model
 {
-    use HasFactory, \App\Traits\OperationalStatus;
+    use \App\Traits\OperationalStatus, HasFactory;
 
     protected $table = 'work_directory';
 
@@ -51,11 +51,11 @@ class WorkDirectory extends Model
     {
         parent::boot();
         static::creating(function ($model) {
-            if (!$model->manage_token) {
+            if (! $model->manage_token) {
                 $model->manage_token = \Illuminate\Support\Str::random(40);
             }
-            if (!$model->slug) {
-                $model->slug = \Illuminate\Support\Str::slug($model->job_title) . '-' . \Illuminate\Support\Str::random(5);
+            if (! $model->slug) {
+                $model->slug = \Illuminate\Support\Str::slug($model->job_title).'-'.\Illuminate\Support\Str::random(5);
             }
         });
     }
@@ -95,7 +95,7 @@ class WorkDirectory extends Model
             'Kue Keliling',
 
             // Lainnya
-            'Lainnya'
+            'Lainnya',
         ];
     }
 
@@ -166,9 +166,9 @@ class WorkDirectory extends Model
 
         // Normalize to 62 format
         if (substr($phone, 0, 1) === '0') {
-            $phone = '62' . substr($phone, 1);
+            $phone = '62'.substr($phone, 1);
         } elseif (substr($phone, 0, 2) !== '62') {
-            $phone = '62' . $phone;
+            $phone = '62'.$phone;
         }
 
         return "https://wa.me/{$phone}";

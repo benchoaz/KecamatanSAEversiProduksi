@@ -10,6 +10,7 @@ class MasterSubBidang extends Model
     use HasFactory;
 
     protected $table = 'master_sub_bidang';
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -44,6 +45,6 @@ class MasterSubBidang extends Model
 
     public function getFullKodeAttribute()
     {
-        return $this->bidang->kode_bidang . '.' . $this->kode_sub_bidang;
+        return $this->bidang->kode_bidang.'.'.$this->kode_sub_bidang;
     }
 }

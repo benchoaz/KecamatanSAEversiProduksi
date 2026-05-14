@@ -27,6 +27,7 @@ class UmkmResource extends Resource
         if ($user && $user->isOperatorDesa()) {
             // Operator Desa only sees UMKM from their village
             $namaDesa = $user->desa->nama_desa ?? '';
+
             return $query->where('desa', $namaDesa);
         }
 
@@ -109,12 +110,12 @@ class UmkmResource extends Resource
                 Tables\Columns\TextColumn::make('nama_usaha')
                     ->searchable()
                     ->sortable()
-                    ->description(fn(Umkm $record) => $record->jenis_usaha),
+                    ->description(fn (Umkm $record) => $record->jenis_usaha),
                 Tables\Columns\TextColumn::make('nama_pemilik')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('no_wa')
                     ->label('WhatsApp')
-                    ->url(fn(Umkm $record) => "https://wa.me/" . preg_replace('/[^0-9]/', '', $record->no_wa), true),
+                    ->url(fn (Umkm $record) => 'https://wa.me/'.preg_replace('/[^0-9]/', '', $record->no_wa), true),
                 Tables\Columns\TextColumn::make('desa')
                     ->badge()
                     ->color('gray')
@@ -128,7 +129,7 @@ class UmkmResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('source')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'admin' => 'info',
                         'self-service' => 'success',
                     }),
@@ -147,7 +148,7 @@ class UmkmResource extends Resource
                     ->label('Suspend')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->hidden(fn(Umkm $record) => $record->status === 'suspended')
+                    ->hidden(fn (Umkm $record) => $record->status === 'suspended')
                     ->requiresConfirmation()
                     ->modalHeading('Suspend UMKM?')
                     ->modalDescription('Toko ini akan disembunyikan dari katalog publik.')
@@ -157,35 +158,35 @@ class UmkmResource extends Resource
                             'umkm_id' => $record->id,
                             'action' => 'suspend',
                             'actor' => 'admin',
-                            'notes' => 'Suspended by admin due to violation'
+                            'notes' => 'Suspended by admin due to violation',
                         ]);
                     }),
                 Tables\Actions\Action::make('reactivate')
                     ->label('Aktifkan')
                     ->icon('heroicon-o-arrow-path')
                     ->color('success')
-                    ->visible(fn(Umkm $record) => $record->status === 'suspended')
+                    ->visible(fn (Umkm $record) => $record->status === 'suspended')
                     ->action(function (Umkm $record) {
                         $record->update(['status' => 'aktif']);
                         \App\Models\UmkmAdminLog::create([
                             'umkm_id' => $record->id,
                             'action' => 'reactivate',
                             'actor' => 'admin',
-                            'notes' => 'Reactivated by admin'
+                            'notes' => 'Reactivated by admin',
                         ]);
                     }),
                 Tables\Actions\Action::make('verify')
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
-                    ->hidden(fn(Umkm $record) => in_array($record->status, ['aktif', 'suspended']))
+                    ->hidden(fn (Umkm $record) => in_array($record->status, ['aktif', 'suspended']))
                     ->action(function (Umkm $record) {
                         $record->update(['status' => 'aktif']);
                         \App\Models\UmkmAdminLog::create([
                             'umkm_id' => $record->id,
                             'action' => 'verify',
                             'actor' => 'admin',
-                            'notes' => 'Verified by admin via dashboard'
+                            'notes' => 'Verified by admin via dashboard',
                         ]);
                     }),
                 Tables\Actions\EditAction::make(),

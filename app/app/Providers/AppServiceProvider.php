@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Cache;
 use App\Services\ModuleSettingsService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,8 +33,8 @@ class AppServiceProvider extends ServiceProvider
                 $jsonContent = $profile->google_drive_json ?? null;
                 $folderId = $profile->google_drive_folder_id ?? $config['folderId'] ?? '/';
 
-                $client = new \Google\Client();
-                
+                $client = new \Google\Client;
+
                 if ($jsonContent) {
                     $authData = json_decode($jsonContent, true);
                     if ($authData && isset($authData['type']) && $authData['type'] === 'service_account') {
@@ -44,17 +44,17 @@ class AppServiceProvider extends ServiceProvider
 
                 $client->addScope(\Google\Service\Drive::DRIVE);
                 $service = new \Google\Service\Drive($client);
-                
+
                 $options = [
                     'supportsAllDrives' => true,
                     'includeItemsFromAllDrives' => true,
                 ];
 
                 // Automatically detect TeamDrive/SharedDrive ID if possible
-                if ($folderId !== '/' && !empty($folderId)) {
+                if ($folderId !== '/' && ! empty($folderId)) {
                     try {
                         $file = $service->files->get($folderId, ['fields' => 'driveId', 'supportsAllDrives' => true]);
-                        if (!empty($file->driveId)) {
+                        if (! empty($file->driveId)) {
                             $options['teamDriveId'] = $file->driveId;
                         }
                     } catch (\Exception $e) {
@@ -71,7 +71,7 @@ class AppServiceProvider extends ServiceProvider
             // Silence driver errors if config is missing
         }
 
-        if (str_contains(config('app.url'), 'https://') && !request()->is('api/*')) {
+        if (str_contains(config('app.url'), 'https://') && ! request()->is('api/*')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
         \App\Models\Menu::observe(\App\Observers\MenuObserver::class);
@@ -89,9 +89,9 @@ class AppServiceProvider extends ServiceProvider
         // Desa Module Composer - With Caching
         view()->composer(['desa.*', 'layouts.desa'], function ($view) {
             if (auth()->check() && auth()->user()->desa_id) {
-                $cacheKey = 'desa_announcements_' . auth()->user()->desa_id;
+                $cacheKey = 'desa_announcements_'.auth()->user()->desa_id;
                 $service = app(\App\Services\AnnouncementService::class);
-                $view->with('internalAnnouncements', Cache::remember($cacheKey, 600, fn() => $service->getDesaAnnouncements(auth()->user()->desa_id)));
+                $view->with('internalAnnouncements', Cache::remember($cacheKey, 600, fn () => $service->getDesaAnnouncements(auth()->user()->desa_id)));
             }
         });
 
@@ -141,16 +141,15 @@ class AppServiceProvider extends ServiceProvider
 
         // Kecamatan General Layout Composer (for shared components) - With Caching
         view()->composer(['layouts.kecamatan', 'kecamatan.dashboard.*'], function ($view) {
-            if (auth()->check() && !auth()->user()->desa_id) {
+            if (auth()->check() && ! auth()->user()->desa_id) {
                 $service = app(\App\Services\AnnouncementService::class);
-                $view->with('internalAnnouncements', Cache::remember('kecamatan_announcements', 600, fn() => $service->getInternalAnnouncements()));
+                $view->with('internalAnnouncements', Cache::remember('kecamatan_announcements', 600, fn () => $service->getInternalAnnouncements()));
 
                 // Specific for Kecamatan: Service Submissions Notifications - Cached
                 $view->with('unreadServiceCount', Cache::remember(
                     'unread_service_count',
                     300,
-                    fn() =>
-                    \App\Models\PublicService::whereIn('status', ['Menunggu', 'Menunggu Klarifikasi'])->count()
+                    fn () => \App\Models\PublicService::whereIn('status', ['Menunggu', 'Menunggu Klarifikasi'])->count()
                 ));
                 $view->with('recentUnreadServices', \App\Models\PublicService::whereIn('status', ['Menunggu', 'Menunggu Klarifikasi'])
                     ->orderBy('created_at', 'desc')

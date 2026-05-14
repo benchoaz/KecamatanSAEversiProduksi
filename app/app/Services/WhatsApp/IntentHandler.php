@@ -7,13 +7,19 @@ use App\Models\WhatsappSession;
 class IntentHandler
 {
     protected StatusHandler $statusHandler;
+
     protected SyaratHandler $syaratHandler;
+
     protected UmkmHandler $umkmHandler;
+
     protected JasaHandler $jasaHandler;
 
     protected ComplaintHandler $complaintHandler;
+
     protected OwnerHandler $ownerHandler;
+
     protected \App\Services\FaqSearchService $faqSearchService;
+
     protected AiHandler $aiHandler;
 
     public function __construct(
@@ -43,7 +49,7 @@ class IntentHandler
     {
         $messageLower = strtolower(trim($message));
         $phone = $this->normalizePhone($phone);
-        
+
         $session = WhatsappSession::where('phone', $phone)->first();
         $state = $session ? $session->state : null;
 
@@ -51,14 +57,18 @@ class IntentHandler
         if ($this->matchesIntent($messageLower, ['menu', 'daftar menu', 'lihat menu', 'tampilkan menu', 'help', 'bantuan', '0', 'batal', 'stop', 'berhenti', 'cancel'])) {
             // If it's a cancel keyword, clear session first
             if (in_array($messageLower, ['batal', 'stop', 'berhenti', 'cancel'])) {
-                if ($session) $session->clear();
+                if ($session) {
+                    $session->clear();
+                }
+
                 return [
                     'success' => true,
                     'intent' => 'cancel',
                     'reply' => "👋 *Siaaap!* Permintaan Anda telah dibatalkan.\n\nKetik *MENU* untuk layanan lainnya. 😊",
-                    'state_update' => null
+                    'state_update' => null,
                 ];
             }
+
             return $this->getMainMenu($phone);
         }
 
@@ -67,26 +77,30 @@ class IntentHandler
         if ($this->matchesIntent($messageLower, $greetings)) {
             // Give it to AI for a warm personalized greeting if AI is active
             $aiResponse = $this->aiHandler->handle($phone, $message);
-            if ($aiResponse) return $aiResponse;
+            if ($aiResponse) {
+                return $aiResponse;
+            }
 
             // Manual warm fallback if AI is off
             return [
                 'success' => true,
                 'intent' => 'greeting',
-                'reply' => "👋 *Halo! Selamat datang di Layanan Digital " . $this->getRegionName() . "*.\n\n" .
-                    "Ada yang bisa saya bantu hari ini? Silakan ketik pertanyaan Anda (contoh: *syarat ktp*) atau ketik *MENU* untuk melihat daftar layanan lengkap kami. 😊",
+                'reply' => '👋 *Halo! Selamat datang di Layanan Digital '.$this->getRegionName()."*.\n\n".
+                    'Ada yang bisa saya bantu hari ini? Silakan ketik pertanyaan Anda (contoh: *syarat ktp*) atau ketik *MENU* untuk melihat daftar layanan lengkap kami. 😊',
                 'state_update' => null,
             ];
         }
 
         // 3. AI-PRIORITY KEYWORDS: Direct to AI for these specific topics as requested by user
         $aiPriorityKeywords = [
-            'laporan', 'mengadu', 'curhat', 'aduan', 'lapor', 
-            'umkm', 'jasa', 'masakan', 'makanan', 'ekonomi', 'produk'
+            'laporan', 'mengadu', 'curhat', 'aduan', 'lapor',
+            'umkm', 'jasa', 'masakan', 'makanan', 'ekonomi', 'produk',
         ];
         if ($this->containsIntent($messageLower, $aiPriorityKeywords)) {
             $aiResponse = $this->aiHandler->handle($phone, $message);
-            if ($aiResponse) return $aiResponse;
+            if ($aiResponse) {
+                return $aiResponse;
+            }
         }
 
         // 3. EMERGENCY DETECTOR: Handle emergency keywords (CONTAIN matching for safety)
@@ -95,7 +109,7 @@ class IntentHandler
             'ambulance', 'ambulans', 'kecelakaan', 'darurat', 'pingsan', 'sekarat', 'kritis',
             'polisi', 'maling', 'rampok', 'begal', 'bunuh', 'kriminal',
             'korupsi', 'pungli', 'penyelewengan',
-            'hamil', 'melahirkan', 'persalinan', 'kontraksi'
+            'hamil', 'melahirkan', 'persalinan', 'kontraksi',
         ];
         if ($this->containsIntent($messageLower, $emergencyKeywords)) {
             return $this->handleEmergencyResponse($messageLower);
@@ -104,6 +118,7 @@ class IntentHandler
         // 4. STATE NAVIGATION: Handle Nested Menus (HIGHER PRIORITY THAN ROOT)
         if ($state && str_starts_with($state, 'NAV_PATH:')) {
             $path = str_replace('NAV_PATH:', '', $state);
+
             return $this->handleMenuNavigation($phone, $messageLower, $path);
         }
 
@@ -136,11 +151,12 @@ class IntentHandler
         if ($state === 'MAIN_MENU') {
             $activeMenu = $this->getActiveMenuMapping();
             foreach ($activeMenu as $number => $item) {
-                if ($this->isSelection($messageLower, (string)$number)) {
+                if ($this->isSelection($messageLower, (string) $number)) {
                     // If this is a submenu, enter it
                     if (($item['action'] ?? '') === 'submenu') {
-                        return $this->enterSubmenu($phone, (string)($number - 1), $item);
+                        return $this->enterSubmenu($phone, (string) ($number - 1), $item);
                     }
+
                     // Otherwise execute the direct action
                     return $this->executeMenuAction($item['action'] ?? 'custom', $phone, $item);
                 }
@@ -157,6 +173,7 @@ class IntentHandler
         // Status check intent
         if ($this->matchesIntent($messageLower, ['status', 'cek', 'lacak'])) {
             $query = trim(str_replace(['status', 'cek', 'lacak'], '', $messageLower));
+
             return $this->statusHandler->handle($phone, $query ?: null);
         }
 
@@ -179,6 +196,7 @@ class IntentHandler
             if (empty($query) || strlen($query) < 2) {
                 return $this->getLayananLink();
             }
+
             return $this->syaratHandler->search($query);
         }
 
@@ -191,25 +209,28 @@ class IntentHandler
             if (empty($query) || strlen($query) < 2) {
                 return $this->getUmkmLink();
             }
+
             return $this->umkmHandler->search($query);
         }
 
         // JASA search intent
         if (str_starts_with($messageLower, 'jasa')) {
             $query = trim(substr($message, 4));
+
             return $this->jasaHandler->search($query);
         }
 
         // LOKER keyword
         if ($this->matchesIntent($messageLower, ['loker', 'lowongan', 'kerja'])) {
             $baseUrl = $this->getPublicUrl();
+
             return [
                 'success' => true,
                 'intent' => 'jasa_link',
-                'reply' => "🔧 *Direktori Jasa & Tenaga AhlI*\n\n" .
-                    "Temukan tukang, tenaga harian, dan penyedia jasa lokal:\n" .
-                    "{$baseUrl}/ekonomi?tab=jasa\n\n" .
-                    "Ketik *MENU* untuk kembali.",
+                'reply' => "🔧 *Direktori Jasa & Tenaga AhlI*\n\n".
+                    "Temukan tukang, tenaga harian, dan penyedia jasa lokal:\n".
+                    "{$baseUrl}/ekonomi?tab=jasa\n\n".
+                    'Ketik *MENU* untuk kembali.',
                 'state_update' => null,
             ];
         }
@@ -257,10 +278,11 @@ class IntentHandler
         }
 
         foreach ($keywords as $keyword) {
-            if ($message === $keyword || str_starts_with($message, $keyword . ' ')) {
+            if ($message === $keyword || str_starts_with($message, $keyword.' ')) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -268,15 +290,16 @@ class IntentHandler
     {
         foreach ($keywords as $keyword) {
             // Use regex to match whole words only, avoiding substring matches like 'api' in 'tapi'
-            $pattern = '/\b' . preg_quote($keyword, '/') . '\b/i';
+            $pattern = '/\b'.preg_quote($keyword, '/').'\b/i';
             if (preg_match($pattern, $message)) {
                 return true;
             }
         }
+
         return false;
     }
 
-    protected function getActiveMenuMapping(array $menuItems = null): array
+    protected function getActiveMenuMapping(?array $menuItems = null): array
     {
         if ($menuItems === null) {
             $profile = appProfile();
@@ -290,10 +313,13 @@ class IntentHandler
         $mapping = [];
         $numbering = 1;
         foreach ($menuItems as $item) {
-            if (!($item['enabled'] ?? true)) continue;
+            if (! ($item['enabled'] ?? true)) {
+                continue;
+            }
             $mapping[$numbering] = $item;
             $numbering++;
         }
+
         return $mapping;
     }
 
@@ -301,7 +327,9 @@ class IntentHandler
     {
         $profile = appProfile();
         $fullMenu = $profile->whatsapp_bot_menu;
-        if (is_string($fullMenu)) $fullMenu = json_decode($fullMenu, true);
+        if (is_string($fullMenu)) {
+            $fullMenu = json_decode($fullMenu, true);
+        }
         $fullMenu = $fullMenu ?: $this->defaultBotMenu();
 
         $indices = explode('.', $path);
@@ -319,16 +347,20 @@ class IntentHandler
 
         $activeMapping = $this->getActiveMenuMapping($currentMenu);
         foreach ($activeMapping as $number => $item) {
-            if ($this->isSelection($message, (string)$number)) {
+            if ($this->isSelection($message, (string) $number)) {
                 $action = $item['action'] ?? 'custom';
-                if ($action === 'submenu' && !empty($item['children'])) {
-                    return $this->enterSubmenu($phone, $path . '.' . ($number - 1), $item);
+                if ($action === 'submenu' && ! empty($item['children'])) {
+                    return $this->enterSubmenu($phone, $path.'.'.($number - 1), $item);
                 }
                 if ($action === 'back') {
                     $newPath = count($indices) > 1 ? implode('.', array_slice($indices, 0, -1)) : null;
-                    if ($newPath === null) return $this->getMainMenu($phone);
+                    if ($newPath === null) {
+                        return $this->getMainMenu($phone);
+                    }
+
                     return $this->handleMenuNavigation($phone, 'RE-RENDER', $newPath);
                 }
+
                 return $this->executeMenuAction($action, $phone, $item);
             }
         }
@@ -337,7 +369,7 @@ class IntentHandler
             'success' => true,
             'intent' => 'submenu_render',
             'reply' => $this->renderMenu($activeMapping, $parentLabel, $phone),
-            'state_update' => 'NAV_PATH:' . $path,
+            'state_update' => 'NAV_PATH:'.$path,
         ];
     }
 
@@ -350,7 +382,7 @@ class IntentHandler
             'success' => true,
             'intent' => 'submenu_enter',
             'reply' => $this->renderMenu($activeMapping, $item['label'] ?? 'Sub-Menu', $phone),
-            'state_update' => 'NAV_PATH:' . $newPath,
+            'state_update' => 'NAV_PATH:'.$newPath,
         ];
     }
 
@@ -361,6 +393,7 @@ class IntentHandler
                 return $this->getAdministrasiSubmenu($phone);
             case 'umkm_produk':
                 $baseUrl = $this->getPublicUrl();
+
                 return [
                     'success' => true,
                     'intent' => 'umkm_produk',
@@ -369,6 +402,7 @@ class IntentHandler
                 ];
             case 'jasa':
                 $baseUrl = $this->getPublicUrl();
+
                 return [
                     'success' => true,
                     'intent' => 'jasa',
@@ -380,7 +414,7 @@ class IntentHandler
             case 'kelola_profil':
                 return $this->ownerHandler->initiate($phone);
             case 'custom':
-                if (!empty($item['url'])) {
+                if (! empty($item['url'])) {
                     return [
                         'success' => true,
                         'intent' => 'external_link',
@@ -388,6 +422,7 @@ class IntentHandler
                         'state_update' => null,
                     ];
                 }
+
                 return $this->getMainMenu($phone);
             default:
                 return $this->getMainMenu($phone);
@@ -400,9 +435,9 @@ class IntentHandler
         $activeMapping = $this->getActiveMenuMapping();
 
         return [
-            'success'      => true,
-            'intent'       => 'menu',
-            'reply'        => $this->renderMenu($activeMapping, "KECAMATAN {$regionName}", $phone),
+            'success' => true,
+            'intent' => 'menu',
+            'reply' => $this->renderMenu($activeMapping, "KECAMATAN {$regionName}", $phone),
             'state_update' => 'MAIN_MENU',
         ];
     }
@@ -410,26 +445,28 @@ class IntentHandler
     protected function renderMenu(array $mapping, string $title, ?string $phone = null): string
     {
         $greeting = $this->getUserGreeting($phone);
-        $menu  = ($greeting ? $greeting . "\n\n" : "") . "🏛️ *LAYANAN DIGITAL " . strtoupper($title) . "*\n\n";
+        $menu = ($greeting ? $greeting."\n\n" : '').'🏛️ *LAYANAN DIGITAL '.strtoupper($title)."*\n\n";
         $menu .= "Silakan pilih layanan (Ketik angka):\n\n";
 
         foreach ($mapping as $num => $item) {
             $label = $item['label'] ?? 'Pilihan';
-            $desc  = $item['description'] ?? '';
-            $menu .= "{$num}. *{$label}*" . ($desc ? "\n   _{$desc}_" : "") . "\n\n";
+            $desc = $item['description'] ?? '';
+            $menu .= "{$num}. *{$label}*".($desc ? "\n   _{$desc}_" : '')."\n\n";
         }
 
         $menu .= "Atau ketik langsung apa yang ingin Anda tanyakan. 😊\n\n";
-        $menu .= "Ketik *MENU* untuk kembali.";
+        $menu .= 'Ketik *MENU* untuk kembali.';
+
         return $menu;
     }
 
     protected function getPublicUrl(): string
     {
         $profile = appProfile();
-        if (!empty($profile->public_url)) {
+        if (! empty($profile->public_url)) {
             return rtrim($profile->public_url, '/');
         }
+
         return rtrim(env('PUBLIC_BASE_URL', config('app.url', 'https://kecamatanbesuk.my.id')), '/');
     }
 
@@ -438,18 +475,21 @@ class IntentHandler
         return [
             ['number' => '1', 'label' => 'LAYANAN DAN BERKAS',    'description' => 'Cek Syarat dan Lacak Berkas Anda',    'action' => 'administrasi',   'enabled' => true],
             ['number' => '2', 'label' => 'BELANJA PRODUK LOKAL',  'description' => 'Etalase UMKM dan Produk Unggulan',    'action' => 'umkm_produk',    'enabled' => true],
-            ['number' => '3', 'label' => 'JASA DAN TENAGA AHLI',  'description' => 'Cari Tukang, Ojek, dan Tenaga Harian','action' => 'jasa',           'enabled' => true],
-            ['number' => '4', 'label' => 'PENGADUAN DAN ASPIRASI','description' => 'Sampaikan Laporan atau Saran Anda',   'action' => 'pengaduan',      'enabled' => true],
-            ['number' => '5', 'label' => 'DAFTARKAN TOKO ATAU JASA','description' => 'Kelola Profil Usaha dan Jasa Anda', 'action' => 'kelola_profil',  'enabled' => true],
+            ['number' => '3', 'label' => 'JASA DAN TENAGA AHLI',  'description' => 'Cari Tukang, Ojek, dan Tenaga Harian', 'action' => 'jasa',           'enabled' => true],
+            ['number' => '4', 'label' => 'PENGADUAN DAN ASPIRASI', 'description' => 'Sampaikan Laporan atau Saran Anda',   'action' => 'pengaduan',      'enabled' => true],
+            ['number' => '5', 'label' => 'DAFTARKAN TOKO ATAU JASA', 'description' => 'Kelola Profil Usaha dan Jasa Anda', 'action' => 'kelola_profil',  'enabled' => true],
         ];
     }
 
     protected function isSelection(string $message, string $number): bool
     {
         $message = trim($message);
-        if ($message === $number) return true;
-        
-        $emojis = ['1'=>'1', '2'=>'2', '3'=>'3', '4'=>'4', '5'=>'5'];
+        if ($message === $number) {
+            return true;
+        }
+
+        $emojis = ['1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5'];
+
         return isset($emojis[$number]) && isset($emojis[$message]) && $emojis[$message] === $emojis[$number];
     }
 
@@ -462,24 +502,25 @@ class IntentHandler
 
         $phone = preg_replace('/[^0-9]/', '', $phone);
         if (str_starts_with($phone, '0')) {
-            $phone = '62' . substr($phone, 1);
+            $phone = '62'.substr($phone, 1);
         }
+
         return $phone;
     }
 
     protected function getUnknownIntentMessage(): string
     {
-        return "🙏 *Mohon maaf*, saya belum mengenali pesan tersebut.\n\n" .
-            "Agar kami dapat melayani dengan baik, silakan:\n" .
-            "• Ketik *MENU* untuk melihat layanan utama\n" .
-            "• Ketik apa yang ingin Anda cari (Contoh: *syarat KK* atau *cek status*)\n\n" .
-            "Terima kasih atas pengertiannya! 😊";
+        return "🙏 *Mohon maaf*, saya belum mengenali pesan tersebut.\n\n".
+            "Agar kami dapat melayani dengan baik, silakan:\n".
+            "• Ketik *MENU* untuk melihat layanan utama\n".
+            "• Ketik apa yang ingin Anda cari (Contoh: *syarat KK* atau *cek status*)\n\n".
+            'Terima kasih atas pengertiannya! 😊';
     }
 
     protected function getUmkmLink(): array
     {
         $baseUrl = $this->getPublicUrl();
-        $umkmUrl = $baseUrl . '/ekonomi?tab=produk';
+        $umkmUrl = $baseUrl.'/ekonomi?tab=produk';
 
         return [
             'success' => true,
@@ -491,13 +532,13 @@ class IntentHandler
 
     public function getLayananLink(): array
     {
-        $baseUrl    = $this->getPublicUrl();
-        $layananUrl = $baseUrl . '/#layanan';
+        $baseUrl = $this->getPublicUrl();
+        $layananUrl = $baseUrl.'/#layanan';
 
         return [
             'success' => true,
-            'intent'  => 'syarat_link',
-            'reply'   => "🏛️ *LAYANAN ADMINISTRASI*\n\nAjukan Secara Online:\n👉 {$layananUrl}\n\nAtau ketik syarat yang Anda butuhkan (contoh: *syarat ktp*).\n\nKetik *MENU* untuk kembali.",
+            'intent' => 'syarat_link',
+            'reply' => "🏛️ *LAYANAN ADMINISTRASI*\n\nAjukan Secara Online:\n👉 {$layananUrl}\n\nAtau ketik syarat yang Anda butuhkan (contoh: *syarat ktp*).\n\nKetik *MENU* untuk kembali.",
             'state_update' => 'ADM_SUBMENU',
         ];
     }
@@ -505,19 +546,20 @@ class IntentHandler
     protected function getRegionName(): string
     {
         $profile = appProfile();
+
         return $profile->region_name ?? 'Kecamatan';
     }
 
     public function getAdministrasiSubmenu(?string $phone = null): array
     {
         $greeting = $this->getUserGreeting($phone);
-        $reply = ($greeting ? $greeting . "\n\n" : "") . "🏛️ *MENU ADMINISTRASI*\n\n";
+        $reply = ($greeting ? $greeting."\n\n" : '')."🏛️ *MENU ADMINISTRASI*\n\n";
         $reply .= "Silakan pilih layanan yang diinginkan:\n\n";
         $reply .= "1. *STATUS* - Lacak Berkas Anda\n";
         $reply .= "2. *SYARAT* - Syarat & Ajukan Online\n";
         $reply .= "3. *MENU* - Kembali ke Menu Utama\n\n";
         $reply .= "Ketik angka *1*, *2*, atau *3*.\n";
-        $reply .= "Atau ketik *MENU* kapan saja.";
+        $reply .= 'Atau ketik *MENU* kapan saja.';
 
         return [
             'success' => true,
@@ -545,12 +587,12 @@ class IntentHandler
             }
         }
 
-        if (!(str_contains($message, 'korupsi') || str_contains($message, 'pungli') || str_contains($message, 'penyelewengan'))) {
+        if (! (str_contains($message, 'korupsi') || str_contains($message, 'pungli') || str_contains($message, 'penyelewengan'))) {
             $reply .= "🆘 *PANGGILAN DARURAT (UMUM):*\n";
             $reply .= "☎️ Hubungi: *112* (Bebas Pulsa)\n\n";
         }
 
-        $reply .= "Ketik *MENU* untuk layanan lainnya.";
+        $reply .= 'Ketik *MENU* untuk layanan lainnya.';
 
         return [
             'success' => true,
@@ -562,15 +604,17 @@ class IntentHandler
 
     protected function getUserGreeting(?string $phone): ?string
     {
-        if (!$phone) return null;
-        
+        if (! $phone) {
+            return null;
+        }
+
         $phoneClean = preg_replace('/[^0-9]/', '', $phone);
         $memory = \App\Models\AiMemory::where('phone_number', $phoneClean)->first();
-        
-        if ($memory && !empty($memory->user_name) && $memory->user_name !== 'Belum diketahui') {
+
+        if ($memory && ! empty($memory->user_name) && $memory->user_name !== 'Belum diketahui') {
             return "Baik Pak/Bu *{$memory->user_name}*, silakan pilih menu di bawah ini:";
         }
-        
+
         return null;
     }
 }

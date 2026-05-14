@@ -3,15 +3,12 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\DesaResource\Pages;
-use App\Filament\Admin\Resources\DesaResource\RelationManagers;
 use App\Models\Desa;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DesaResource extends Resource
 {
@@ -62,7 +59,7 @@ class DesaResource extends Resource
                             ->placeholder('https://namadesa.tatadesa.com'),
                         Forms\Components\Textarea::make('alamat_kantor')
                             ->columnSpanFull(),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 
@@ -78,7 +75,7 @@ class DesaResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         Desa::STATUS_AKTIF => 'success',
                         Desa::STATUS_TIDAK_AKTIF => 'danger',
                         default => 'gray',

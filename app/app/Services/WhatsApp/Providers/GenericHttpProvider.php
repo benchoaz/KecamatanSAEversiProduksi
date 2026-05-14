@@ -18,24 +18,28 @@ use Illuminate\Support\Facades\Log;
  */
 class GenericHttpProvider implements WhatsAppProviderInterface
 {
-    protected string  $url;
-    protected array   $extraHeaders;
-    protected string  $phoneField;
-    protected string  $messageField;
-    protected array   $extraBody;
+    protected string $url;
+
+    protected array $extraHeaders;
+
+    protected string $phoneField;
+
+    protected string $messageField;
+
+    protected array $extraBody;
 
     public function __construct(
         string $url,
-        array  $extraHeaders  = [],
-        string $phoneField    = 'target',
-        string $messageField  = 'message',
-        array  $extraBody     = []
+        array $extraHeaders = [],
+        string $phoneField = 'target',
+        string $messageField = 'message',
+        array $extraBody = []
     ) {
-        $this->url           = rtrim($url, '/');
-        $this->extraHeaders  = $extraHeaders;
-        $this->phoneField    = $phoneField ?: 'target';
-        $this->messageField  = $messageField ?: 'message';
-        $this->extraBody     = $extraBody;
+        $this->url = rtrim($url, '/');
+        $this->extraHeaders = $extraHeaders;
+        $this->phoneField = $phoneField ?: 'target';
+        $this->messageField = $messageField ?: 'message';
+        $this->extraBody = $extraBody;
     }
 
     public function getName(): string
@@ -54,7 +58,7 @@ class GenericHttpProvider implements WhatsAppProviderInterface
             $phone = $this->normalizePhone($phone);
 
             $body = array_merge($this->extraBody, [
-                $this->phoneField   => $phone,
+                $this->phoneField => $phone,
                 $this->messageField => $message,
             ]);
 
@@ -67,14 +71,17 @@ class GenericHttpProvider implements WhatsAppProviderInterface
 
             if ($response->successful()) {
                 Log::info('[GenericHTTP] Message sent', ['phone' => $phone, 'url' => $this->url]);
+
                 return ['success' => true, 'message' => 'Pesan berhasil dikirim', 'data' => $response->json()];
             }
 
             Log::error('[GenericHTTP] Send failed', ['status' => $response->status(), 'body' => $response->body()]);
-            return ['success' => false, 'message' => 'HTTP ' . $response->status() . ': ' . $response->body()];
+
+            return ['success' => false, 'message' => 'HTTP '.$response->status().': '.$response->body()];
         } catch (\Exception $e) {
             Log::error('[GenericHTTP] Exception', ['error' => $e->getMessage()]);
-            return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+
+            return ['success' => false, 'message' => 'Error: '.$e->getMessage()];
         }
     }
 
@@ -98,7 +105,7 @@ class GenericHttpProvider implements WhatsAppProviderInterface
                 'message' => $alive
                     ? "Server merespons (HTTP {$response->status()})"
                     : "Server error (HTTP {$response->status()})",
-                'status'  => $alive ? 'reachable' : 'error',
+                'status' => $alive ? 'reachable' : 'error',
             ];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage(), 'status' => 'error'];
@@ -111,11 +118,12 @@ class GenericHttpProvider implements WhatsAppProviderInterface
     {
         $clean = preg_replace('/[^0-9]/', '', $phone);
         if (str_starts_with($clean, '0')) {
-            return '62' . substr($clean, 1);
+            return '62'.substr($clean, 1);
         }
-        if (!str_starts_with($clean, '62')) {
-            return '62' . $clean;
+        if (! str_starts_with($clean, '62')) {
+            return '62'.$clean;
         }
+
         return $clean;
     }
 }

@@ -9,6 +9,7 @@ use Spatie\Permission\PermissionRegistrar;
 class SyncNavPermissions extends Command
 {
     protected $signature = 'nav:sync-permissions';
+
     protected $description = 'Sync all NavMenu permission_names into Spatie permissions table';
 
     public function handle()
@@ -33,7 +34,7 @@ class SyncNavPermissions extends Command
 
         foreach ($allPerms as $permName) {
             $perm = Permission::firstOrCreate([
-                'name'       => $permName,
+                'name' => $permName,
                 'guard_name' => 'web',
             ]);
 
@@ -50,6 +51,7 @@ class SyncNavPermissions extends Command
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $this->info("Done! Created: {$created}, Already existed: {$existing}");
+
         return Command::SUCCESS;
     }
 }

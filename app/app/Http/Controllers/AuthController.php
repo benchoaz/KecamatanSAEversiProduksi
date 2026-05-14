@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -52,7 +52,7 @@ class AuthController extends Controller
         } catch (\ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
-            \Log::error('Login error: ' . $e->getMessage(), [
+            \Log::error('Login error: '.$e->getMessage(), [
                 'username' => $request->input('username'),
                 'ip' => $request->ip(),
             ]);

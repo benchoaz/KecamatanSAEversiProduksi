@@ -17,7 +17,7 @@ class UmkmOrder extends Model
         'tracking_number',
         'notes',
         'payment_status',
-        'payment_method'
+        'payment_method',
     ];
 
     public function umkm()

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Umkm;
-use App\Models\UmkmOrder;
-use App\Models\UmkmProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,10 +14,10 @@ class UmkmSellerController extends Controller
     public function dashboard(Request $request, $token)
     {
         $umkm = Umkm::where('manage_token', $token)->firstOrFail();
-        
+
         // Verify ownership via session or token (simplification for now)
         // In production, we use the Portal session
-        
+
         $metrics = [
             'total_sales' => $umkm->orders()->where('status', 'completed')->sum('total_price'),
             'new_orders' => $umkm->orders()->where('status', 'pending')->count(),
@@ -30,7 +28,7 @@ class UmkmSellerController extends Controller
         ];
 
         $recent_orders = $umkm->orders()->latest()->take(5)->get();
-        
+
         // Sales performance for chart (last 7 days)
         $sales_chart = $umkm->orders()
             ->where('status', 'completed')
@@ -50,14 +48,14 @@ class UmkmSellerController extends Controller
     {
         $umkm = Umkm::where('manage_token', $token)->firstOrFail();
         $status = $request->get('status', 'all');
-        
+
         $query = $umkm->orders();
         if ($status !== 'all') {
             $query->where('status', $status);
         }
-        
+
         $orders = $query->latest()->paginate(10);
-        
+
         return view('public.umkm_rakyat.seller.orders', compact('umkm', 'orders', 'status'));
     }
 
@@ -68,15 +66,15 @@ class UmkmSellerController extends Controller
     {
         $umkm = Umkm::where('manage_token', $token)->firstOrFail();
         $order = $umkm->orders()->findOrFail($orderId);
-        
+
         $request->validate([
             'status' => 'required|in:pending,packing,sent,completed,cancelled',
-            'tracking_number' => 'nullable|string'
+            'tracking_number' => 'nullable|string',
         ]);
 
         $order->update([
             'status' => $request->status,
-            'tracking_number' => $request->tracking_number ?? $order->tracking_number
+            'tracking_number' => $request->tracking_number ?? $order->tracking_number,
         ]);
 
         return back()->with('success', 'Status pesanan berhasil diperbarui.');
@@ -89,7 +87,7 @@ class UmkmSellerController extends Controller
     {
         $umkm = Umkm::where('manage_token', $token)->firstOrFail();
         $products = $umkm->products()->latest()->get();
-        
+
         return view('public.umkm_rakyat.seller.inventory', compact('umkm', 'products'));
     }
 
@@ -100,26 +98,30 @@ class UmkmSellerController extends Controller
     {
         $umkm = Umkm::where('manage_token', $token)->firstOrFail();
         $product = $umkm->products()->findOrFail($productId);
-        
+
         $request->validate(['stock' => 'required|integer|min:0']);
-        
+
         $product->update(['stock' => $request->stock]);
-        
+
         return response()->json(['success' => true, 'new_stock' => $product->stock]);
     }
 
     private function calculatePerformance($umkm)
     {
         $total = $umkm->orders()->count();
-        if ($total == 0) return 100;
-        
+        if ($total == 0) {
+            return 100;
+        }
+
         $completed = $umkm->orders()->where('status', 'completed')->count();
         $cancelled = $umkm->orders()->where('status', 'cancelled')->count();
-        
+
         // Simple formula: (Completed / (Total - Cancelled)) * 100
         $effectiveTotal = $total - $cancelled;
-        if ($effectiveTotal <= 0) return 100;
-        
+        if ($effectiveTotal <= 0) {
+            return 100;
+        }
+
         return round(($completed / $effectiveTotal) * 100);
     }
 }

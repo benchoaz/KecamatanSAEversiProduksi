@@ -7,8 +7,8 @@ use App\Models\MasterLayanan;
 use App\Models\ServiceNode;
 use App\Models\ServiceRequirement;
 use App\Services\ServiceTreeService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ServiceNodeController extends Controller
 {
@@ -39,27 +39,27 @@ class ServiceNodeController extends Controller
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $validated = $request->validate([
-            'master_layanan_id'  => 'required|exists:master_layanan,id',
-            'parent_id'          => 'nullable|exists:service_nodes,id',
-            'depth'              => 'required|integer|min:0',
-            'name'               => 'required|string|max:255',
-            'description'        => 'nullable|string',
-            'ikon'               => 'nullable|string|max:100',
-            'urutan'             => 'required|integer|min:0',
-            'is_leaf'            => 'nullable|boolean',
-            'is_active'          => 'nullable|boolean',
+            'master_layanan_id' => 'required|exists:master_layanan,id',
+            'parent_id' => 'nullable|exists:service_nodes,id',
+            'depth' => 'required|integer|min:0',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'ikon' => 'nullable|string|max:100',
+            'urutan' => 'required|integer|min:0',
+            'is_leaf' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
             'show_identity_form' => 'nullable|boolean',
-            'requirement_text'   => 'nullable|string',
-            'requirements'       => 'nullable|array',
-            'requirements.*'     => 'required|string|max:255',
+            'requirement_text' => 'nullable|string',
+            'requirements' => 'nullable|array',
+            'requirements.*' => 'required|string|max:255',
         ]);
 
         $masterLayananId = $request->input('master_layanan_id');
 
-        $validated['is_leaf']            = $request->boolean('is_leaf');
-        $validated['is_active']          = $request->boolean('is_active', true);
+        $validated['is_leaf'] = $request->boolean('is_leaf');
+        $validated['is_active'] = $request->boolean('is_active', true);
         $validated['show_identity_form'] = $request->boolean('show_identity_form', true);
-        $validated['parent_id']          = $validated['parent_id'] ?: null;
+        $validated['parent_id'] = $validated['parent_id'] ?: null;
 
         $node = ServiceNode::create($validated);
 
@@ -67,11 +67,11 @@ class ServiceNodeController extends Controller
         if ($validated['is_leaf'] && $request->has('requirements')) {
             foreach ($request->input('requirements') as $idx => $label) {
                 ServiceRequirement::create([
-                    'node_id'     => $node->id,
-                    'type'        => 'file_upload',
-                    'label'       => $label,
+                    'node_id' => $node->id,
+                    'type' => 'file_upload',
+                    'label' => $label,
                     'is_required' => true,
-                    'urutan'      => $idx
+                    'urutan' => $idx,
                 ]);
             }
         }
@@ -93,20 +93,20 @@ class ServiceNodeController extends Controller
     public function update(Request $request, ServiceNode $node): \Illuminate\Http\RedirectResponse
     {
         $validated = $request->validate([
-            'name'               => 'required|string|max:255',
-            'description'        => 'nullable|string',
-            'ikon'               => 'nullable|string|max:100',
-            'urutan'             => 'required|integer|min:0',
-            'is_leaf'            => 'nullable|boolean',
-            'is_active'          => 'nullable|boolean',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'ikon' => 'nullable|string|max:100',
+            'urutan' => 'required|integer|min:0',
+            'is_leaf' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
             'show_identity_form' => 'nullable|boolean',
-            'requirement_text'   => 'nullable|string',
-            'requirements'       => 'nullable|array',
-            'requirements.*'     => 'required|string|max:255',
+            'requirement_text' => 'nullable|string',
+            'requirements' => 'nullable|array',
+            'requirements.*' => 'required|string|max:255',
         ]);
 
-        $validated['is_leaf']            = $request->boolean('is_leaf');
-        $validated['is_active']          = $request->boolean('is_active', true);
+        $validated['is_leaf'] = $request->boolean('is_leaf');
+        $validated['is_active'] = $request->boolean('is_active', true);
         $validated['show_identity_form'] = $request->boolean('show_identity_form', true);
 
         $node->update($validated);
@@ -116,11 +116,11 @@ class ServiceNodeController extends Controller
             $node->requirements()->delete();
             foreach ($request->input('requirements') as $idx => $label) {
                 ServiceRequirement::create([
-                    'node_id'     => $node->id,
-                    'type'        => 'file_upload',
-                    'label'       => $label,
+                    'node_id' => $node->id,
+                    'type' => 'file_upload',
+                    'label' => $label,
                     'is_required' => true,
-                    'urutan'      => $idx
+                    'urutan' => $idx,
                 ]);
             }
         }
@@ -155,14 +155,14 @@ class ServiceNodeController extends Controller
     public function storeRequirement(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'node_id'        => 'required|exists:service_nodes,id',
-            'type'           => 'required|in:file_upload,text_info,checkbox',
-            'label'          => 'required|string|max:255',
-            'description'    => 'nullable|string',
-            'is_required'    => 'nullable|boolean',
+            'node_id' => 'required|exists:service_nodes,id',
+            'type' => 'required|in:file_upload,text_info,checkbox',
+            'label' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'is_required' => 'nullable|boolean',
             'accepted_types' => 'nullable|string|max:100',
-            'max_size_mb'    => 'nullable|integer|min:1|max:20',
-            'urutan'         => 'nullable|integer|min:0',
+            'max_size_mb' => 'nullable|integer|min:1|max:20',
+            'urutan' => 'nullable|integer|min:0',
         ]);
 
         $validated['is_required'] = $request->boolean('is_required', true);
@@ -190,6 +190,7 @@ class ServiceNodeController extends Controller
     public function destroyRequirement(int $id): JsonResponse
     {
         ServiceRequirement::findOrFail($id)->delete();
+
         return response()->json(['success' => true]);
     }
 
@@ -206,7 +207,7 @@ class ServiceNodeController extends Controller
         $node = ServiceNode::select('id', 'name', 'is_leaf', 'show_identity_form', 'requirement_text', 'parent_id')->find($nodeId);
 
         return response()->json([
-            'node'     => $node,
+            'node' => $node,
             'children' => $children,
         ]);
     }

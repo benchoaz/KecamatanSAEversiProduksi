@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Desa extends Model
 {
     protected $table = 'desa';
+
     protected $guarded = ['id']; // Allow mass assignment for now, but will protect kode_desa in controller
 
     protected $fillable = [
@@ -16,6 +16,7 @@ class Desa extends Model
     ];
 
     const STATUS_AKTIF = 'aktif';
+
     const STATUS_TIDAK_AKTIF = 'tidak_aktif';
 
     protected $casts = [

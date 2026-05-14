@@ -15,7 +15,7 @@ class UmkmAdminLog extends Model
         'umkm_id',
         'action',
         'actor',
-        'notes'
+        'notes',
     ];
 
     public function umkm()

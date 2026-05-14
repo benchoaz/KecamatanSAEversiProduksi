@@ -2,8 +2,8 @@
 
 namespace App\Models\Hub;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class HubDistrict extends Model
@@ -23,7 +23,7 @@ class HubDistrict extends Model
         'db_user',
         'db_pass',
         'is_active',
-        'settings'
+        'settings',
     ];
 
     protected $casts = [
@@ -43,6 +43,7 @@ class HubDistrict extends Model
     }
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     public function sessions()

@@ -10,6 +10,7 @@ class MasterDokumen extends Model
     use HasFactory;
 
     protected $table = 'master_dokumen_spj';
+
     protected $guarded = ['id'];
 
     protected $casts = [

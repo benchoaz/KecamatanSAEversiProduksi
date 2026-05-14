@@ -18,7 +18,7 @@ class WahaN8nController extends Controller
 
     public function index()
     {
-        $settings  = WahaN8nSetting::getSettings() ?? new WahaN8nSetting();
+        $settings = WahaN8nSetting::getSettings() ?? new WahaN8nSetting;
         $providers = WhatsAppManager::supportedProviders();
 
         return view('kecamatan.settings.waha-n8n', compact('settings', 'providers'));
@@ -27,40 +27,40 @@ class WahaN8nController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'bot_number'        => 'nullable|string|max:20',
-            'bot_enabled'       => 'nullable|boolean',
-            'public_url'        => 'nullable|string|max:500', // Relax from 'url' to allow ports/internal links
+            'bot_number' => 'nullable|string|max:20',
+            'bot_enabled' => 'nullable|boolean',
+            'public_url' => 'nullable|string|max:500', // Relax from 'url' to allow ports/internal links
             'whatsapp_bot_menu' => 'nullable|array',
-            'whatsapp_bot_menu.*.label'       => 'nullable|string|max:100',
+            'whatsapp_bot_menu.*.label' => 'nullable|string|max:100',
             'whatsapp_bot_menu.*.description' => 'nullable|string|max:255',
-            'whatsapp_bot_menu.*.action'      => 'nullable|string|max:100',
-            'whatsapp_bot_menu.*.enabled'     => 'nullable',
-            'operator_number'                 => 'nullable|string|max:20',
-            'is_operator_notification_enabled'=> 'nullable|boolean',
-            'broadcast_group_ids'             => 'nullable|string',
-            'is_weather_alert_enabled'        => 'nullable|boolean',
-            'bmkg_adm4_code'                  => 'nullable|string|max:20',
+            'whatsapp_bot_menu.*.action' => 'nullable|string|max:100',
+            'whatsapp_bot_menu.*.enabled' => 'nullable',
+            'operator_number' => 'nullable|string|max:20',
+            'is_operator_notification_enabled' => 'nullable|boolean',
+            'broadcast_group_ids' => 'nullable|string',
+            'is_weather_alert_enabled' => 'nullable|boolean',
+            'bmkg_adm4_code' => 'nullable|string|max:20',
         ]);
 
         $validated['bot_enabled'] = $request->has('bot_enabled') ? true : false;
         $validated['is_operator_notification_enabled'] = $request->has('is_operator_notification_enabled') ? true : false;
 
-        if (!empty($validated['bot_number'])) {
+        if (! empty($validated['bot_number'])) {
             $phone = preg_replace('/[^0-9]/', '', $validated['bot_number']);
             if (str_starts_with($phone, '0')) {
-                $phone = '62' . substr($phone, 1);
-            } elseif (!str_starts_with($phone, '62')) {
-                $phone = '62' . $phone;
+                $phone = '62'.substr($phone, 1);
+            } elseif (! str_starts_with($phone, '62')) {
+                $phone = '62'.$phone;
             }
             $validated['bot_number'] = $phone;
         }
 
-        if (!empty($validated['operator_number'])) {
+        if (! empty($validated['operator_number'])) {
             $phone = preg_replace('/[^0-9]/', '', $validated['operator_number']);
             if (str_starts_with($phone, '0')) {
-                $phone = '62' . substr($phone, 1);
-            } elseif (!str_starts_with($phone, '62')) {
-                $phone = '62' . $phone;
+                $phone = '62'.substr($phone, 1);
+            } elseif (! str_starts_with($phone, '62')) {
+                $phone = '62'.$phone;
             }
             $validated['operator_number'] = $phone;
         }
@@ -89,24 +89,40 @@ class WahaN8nController extends Controller
         // Save bot number, URL, and menu to AppProfile
         $profileData = [];
 
-        if (!empty($validated['bot_number'])) {
+        if (! empty($validated['bot_number'])) {
             $profileData['whatsapp_bot_number'] = $validated['bot_number'];
         }
 
         $profileData['public_url'] = $validated['public_url'] ?? null;
         $profileData['bmkg_adm4_code'] = $validated['bmkg_adm4_code'] ?? '35.13.13.2012';
-        
+
         // Save AI Settings to Profile
         if ($request->has('ai_provider')) {
             $profileData['ai_provider'] = $request->input('ai_provider');
-            if ($request->filled('google_api_key')) $profileData['google_api_key'] = $request->input('google_api_key');
-            if ($request->filled('openai_api_key')) $profileData['openai_api_key'] = $request->input('openai_api_key');
-            if ($request->filled('anthropic_api_key')) $profileData['anthropic_api_key'] = $request->input('anthropic_api_key');
-            if ($request->filled('deepseek_api_key')) $profileData['deepseek_api_key'] = $request->input('deepseek_api_key');
-            if ($request->filled('xai_api_key')) $profileData['xai_api_key'] = $request->input('xai_api_key');
-            if ($request->filled('openrouter_api_key')) $profileData['openrouter_api_key'] = $request->input('openrouter_api_key');
-            if ($request->filled('dashscope_api_key')) $profileData['dashscope_api_key'] = $request->input('dashscope_api_key');
-            if ($request->filled('zhipu_api_key')) $profileData['zhipu_api_key'] = $request->input('zhipu_api_key');
+            if ($request->filled('google_api_key')) {
+                $profileData['google_api_key'] = $request->input('google_api_key');
+            }
+            if ($request->filled('openai_api_key')) {
+                $profileData['openai_api_key'] = $request->input('openai_api_key');
+            }
+            if ($request->filled('anthropic_api_key')) {
+                $profileData['anthropic_api_key'] = $request->input('anthropic_api_key');
+            }
+            if ($request->filled('deepseek_api_key')) {
+                $profileData['deepseek_api_key'] = $request->input('deepseek_api_key');
+            }
+            if ($request->filled('xai_api_key')) {
+                $profileData['xai_api_key'] = $request->input('xai_api_key');
+            }
+            if ($request->filled('openrouter_api_key')) {
+                $profileData['openrouter_api_key'] = $request->input('openrouter_api_key');
+            }
+            if ($request->filled('dashscope_api_key')) {
+                $profileData['dashscope_api_key'] = $request->input('dashscope_api_key');
+            }
+            if ($request->filled('zhipu_api_key')) {
+                $profileData['zhipu_api_key'] = $request->input('zhipu_api_key');
+            }
             $profileData['is_ai_active'] = $request->has('is_ai_active');
             $profileData['ai_bot_name'] = $request->input('ai_bot_name');
             $profileData['ai_bot_instruction'] = $request->input('ai_bot_instruction');
@@ -115,9 +131,9 @@ class WahaN8nController extends Controller
         if ($request->has('whatsapp_bot_menu')) {
             $menuItems = $request->input('whatsapp_bot_menu', []);
             foreach ($menuItems as $i => $item) {
-                $menuItems[$i]['enabled'] = !empty($item['enabled']);
-                $menuItems[$i]['number']  = (string)($i + 1);
-                
+                $menuItems[$i]['enabled'] = ! empty($item['enabled']);
+                $menuItems[$i]['number'] = (string) ($i + 1);
+
                 // Decode children if they are sent as a JSON string
                 if (isset($item['children']) && is_string($item['children'])) {
                     $decoded = json_decode($item['children'], true);
@@ -127,13 +143,13 @@ class WahaN8nController extends Controller
             $profileData['whatsapp_bot_menu'] = $menuItems;
         }
 
-        if (!empty($profileData)) {
+        if (! empty($profileData)) {
             $profile = AppProfile::first();
             if ($profile) {
                 // Using model update instead of query update to ensure Eloquent casts are triggered
                 $profile->update($profileData);
             }
-            
+
             // Clear cache using the service to ensure consistency
             app(\App\Services\ApplicationProfileService::class)->clearCache();
         }
@@ -151,7 +167,7 @@ class WahaN8nController extends Controller
 
     public function providerSettings()
     {
-        $settings  = WahaN8nSetting::getSettings() ?? new WahaN8nSetting();
+        $settings = WahaN8nSetting::getSettings() ?? new WahaN8nSetting;
         $providers = WhatsAppManager::supportedProviders();
 
         return view('kecamatan.settings.whatsapp-provider', compact('settings', 'providers'));
@@ -160,67 +176,67 @@ class WahaN8nController extends Controller
     public function updateProvider(Request $request)
     {
         $validated = $request->validate([
-            'active_provider'            => 'required|in:waha,fonnte,ultramsg,generic_http',
+            'active_provider' => 'required|in:waha,fonnte,ultramsg,generic_http',
 
             // WAHA fields
-            'waha_api_url'               => 'nullable|url|max:255',
-            'waha_api_key'               => 'nullable|string|max:255',
-            'waha_session_name'          => 'nullable|string|max:100',
+            'waha_api_url' => 'nullable|url|max:255',
+            'waha_api_key' => 'nullable|string|max:255',
+            'waha_session_name' => 'nullable|string|max:100',
 
             // Fonnte
-            'fonnte_token'               => 'nullable|string|max:255',
-            'fonnte_device'              => 'nullable|string|max:100',
+            'fonnte_token' => 'nullable|string|max:255',
+            'fonnte_device' => 'nullable|string|max:100',
 
             // UltraMsg
-            'ultramsg_instance_id'       => 'nullable|string|max:100',
-            'ultramsg_token'             => 'nullable|string|max:255',
+            'ultramsg_instance_id' => 'nullable|string|max:100',
+            'ultramsg_token' => 'nullable|string|max:255',
 
             // Generic HTTP
-            'generic_http_url'           => 'nullable|url|max:500',
-            'generic_http_headers_raw'   => 'nullable|string',   // JSON textarea input
-            'generic_http_phone_field'   => 'nullable|string|max:100',
+            'generic_http_url' => 'nullable|url|max:500',
+            'generic_http_headers_raw' => 'nullable|string',   // JSON textarea input
+            'generic_http_phone_field' => 'nullable|string|max:100',
             'generic_http_message_field' => 'nullable|string|max:100',
-            'generic_http_extra_raw'     => 'nullable|string',   // JSON textarea input
+            'generic_http_extra_raw' => 'nullable|string',   // JSON textarea input
 
             // n8n
-            'n8n_api_url'                => 'nullable|url|max:255',
-            'n8n_api_key'                => 'nullable|string|max:255',
-            'n8n_webhook_url'            => 'nullable|url|max:255',
-            'n8n_token'                  => 'nullable|string|max:255',
+            'n8n_api_url' => 'nullable|url|max:255',
+            'n8n_api_key' => 'nullable|string|max:255',
+            'n8n_webhook_url' => 'nullable|url|max:255',
+            'n8n_token' => 'nullable|string|max:255',
             'n8n_dashboard_internal_url' => 'nullable|url|max:255',
         ]);
 
         // Parse JSON textarea fields
         $headers = [];
-        if (!empty($validated['generic_http_headers_raw'])) {
+        if (! empty($validated['generic_http_headers_raw'])) {
             $decoded = json_decode($validated['generic_http_headers_raw'], true);
             $headers = is_array($decoded) ? $decoded : [];
         }
 
         $extraBody = [];
-        if (!empty($validated['generic_http_extra_raw'])) {
+        if (! empty($validated['generic_http_extra_raw'])) {
             $decoded = json_decode($validated['generic_http_extra_raw'], true);
             $extraBody = is_array($decoded) ? $decoded : [];
         }
 
         $data = [
-            'active_provider'            => $validated['active_provider'],
-            'waha_api_url'               => $validated['waha_api_url'] ?? null,
-            'waha_api_key'               => $validated['waha_api_key'] ?? null,
-            'waha_session_name'          => $validated['waha_session_name'] ?? 'default',
-            'fonnte_token'               => $validated['fonnte_token'] ?? null,
-            'fonnte_device'              => $validated['fonnte_device'] ?? null,
-            'ultramsg_instance_id'       => $validated['ultramsg_instance_id'] ?? null,
-            'ultramsg_token'             => $validated['ultramsg_token'] ?? null,
-            'generic_http_url'           => $validated['generic_http_url'] ?? null,
-            'generic_http_headers'       => $headers,
-            'generic_http_phone_field'   => $validated['generic_http_phone_field'] ?? 'target',
+            'active_provider' => $validated['active_provider'],
+            'waha_api_url' => $validated['waha_api_url'] ?? null,
+            'waha_api_key' => $validated['waha_api_key'] ?? null,
+            'waha_session_name' => $validated['waha_session_name'] ?? 'default',
+            'fonnte_token' => $validated['fonnte_token'] ?? null,
+            'fonnte_device' => $validated['fonnte_device'] ?? null,
+            'ultramsg_instance_id' => $validated['ultramsg_instance_id'] ?? null,
+            'ultramsg_token' => $validated['ultramsg_token'] ?? null,
+            'generic_http_url' => $validated['generic_http_url'] ?? null,
+            'generic_http_headers' => $headers,
+            'generic_http_phone_field' => $validated['generic_http_phone_field'] ?? 'target',
             'generic_http_message_field' => $validated['generic_http_message_field'] ?? 'message',
-            'generic_http_extra_body'    => $extraBody,
-            'n8n_api_url'                => $validated['n8n_api_url'] ?? null,
-            'n8n_api_key'                => $validated['n8n_api_key'] ?? null,
-            'n8n_webhook_url'            => $validated['n8n_webhook_url'] ?? null,
-            'n8n_token'                  => $validated['n8n_token'] ?? null,
+            'generic_http_extra_body' => $extraBody,
+            'n8n_api_url' => $validated['n8n_api_url'] ?? null,
+            'n8n_api_key' => $validated['n8n_api_key'] ?? null,
+            'n8n_webhook_url' => $validated['n8n_webhook_url'] ?? null,
+            'n8n_token' => $validated['n8n_token'] ?? null,
             'n8n_dashboard_internal_url' => $validated['n8n_dashboard_internal_url'] ?? null,
         ];
 
@@ -250,14 +266,14 @@ class WahaN8nController extends Controller
 
         $settings = WahaN8nSetting::getSettings();
         $provider = WhatsAppManager::make($request->provider, $settings);
-        $result   = $provider->checkConnection();
+        $result = $provider->checkConnection();
 
         return response()->json([
-            'success'      => $result['success'],
-            'message'      => $result['message'],
-            'status'       => $result['status'] ?? 'unknown',
-            'provider_name'=> $provider->getName(),
-            'data'         => $result['data'] ?? null,
+            'success' => $result['success'],
+            'message' => $result['message'],
+            'status' => $result['status'] ?? 'unknown',
+            'provider_name' => $provider->getName(),
+            'data' => $result['data'] ?? null,
         ]);
     }
 
@@ -267,15 +283,15 @@ class WahaN8nController extends Controller
 
     public function downloadN8nWorkflow()
     {
-        $settings = WahaN8nSetting::getSettings() ?? new WahaN8nSetting();
+        $settings = WahaN8nSetting::getSettings() ?? new WahaN8nSetting;
         $generator = new N8nWorkflowGenerator($settings);
-        $json      = $generator->toJson();
+        $json = $generator->toJson();
 
-        $provider  = $settings->getActiveProvider();
-        $filename  = "kecamatan-whatsapp-bot-{$provider}-" . date('Ymd') . '.json';
+        $provider = $settings->getActiveProvider();
+        $filename = "kecamatan-whatsapp-bot-{$provider}-".date('Ymd').'.json';
 
         return response($json, 200, [
-            'Content-Type'        => 'application/json',
+            'Content-Type' => 'application/json',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ]);
     }
@@ -299,21 +315,21 @@ class WahaN8nController extends Controller
         if ($webhookUrl) {
             try {
                 $response = \Illuminate\Support\Facades\Http::timeout(10)->post($webhookUrl, [
-                    'type'   => 'clear_memory',
+                    'type' => 'clear_memory',
                     'action' => 'sync_context',
                     'source' => 'admin_dashboard',
                     'timestamp' => now()->toIso8601String(),
                 ]);
                 $n8nStatus = $response->successful() ? 'success' : 'failed';
             } catch (\Exception $e) {
-                $n8nStatus = 'error: ' . $e->getMessage();
+                $n8nStatus = 'error: '.$e->getMessage();
             }
         }
 
         return response()->json([
-            'success'    => true,
-            'message'    => 'Cache aplikasi berhasil dibersihkan. Memori AI telah dijadwalkan untuk sinkronisasi ulang.',
-            'n8n_status' => $n8nStatus
+            'success' => true,
+            'message' => 'Cache aplikasi berhasil dibersihkan. Memori AI telah dijadwalkan untuk sinkronisasi ulang.',
+            'n8n_status' => $n8nStatus,
         ]);
     }
 }

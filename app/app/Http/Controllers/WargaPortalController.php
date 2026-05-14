@@ -2,18 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Umkm;
-use App\Models\WorkDirectory;
-use App\Models\UmkmLocal;
-use App\Models\WahaN8nSetting;
 use App\Models\PortalLoginToken;
+use App\Models\Umkm;
+use App\Models\UmkmLocal;
+use App\Models\WorkDirectory;
 use App\Services\PortalService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-
 
 class WargaPortalController extends Controller
 {
@@ -23,6 +17,7 @@ class WargaPortalController extends Controller
     {
         $this->portalService = $portalService;
     }
+
     public function login()
     {
         return view('public.warga.login');
@@ -57,7 +52,7 @@ class WargaPortalController extends Controller
         $signature = $request->query('signature');
         $loginToken = PortalLoginToken::where('signature', $signature)->first();
 
-        if (!$loginToken || !$loginToken->isValid()) {
+        if (! $loginToken || ! $loginToken->isValid()) {
             return redirect()->route('portal_warga.login')->with('error', 'Link ini sudah pernah digunakan atau tidak valid. Silakan request link baru.');
         }
 
@@ -73,14 +68,14 @@ class WargaPortalController extends Controller
     public function dashboard(Request $request)
     {
         $phone = session('warga_phone');
-        
-        if (!$phone) {
+
+        if (! $phone) {
             return redirect()->route('portal_warga.login')->with('error', 'Sesi berakhir. Silakan login kembali.');
         }
 
         // Get matching phone numbers via service
         $basePhone = $this->portalService->normalizePhone($phone);
-        $likeClause = '%' . $basePhone . '%';
+        $likeClause = '%'.$basePhone.'%';
 
         // Fetch User's Assets
         $umkms = Umkm::where('no_wa', 'like', $likeClause)->get();
@@ -93,16 +88,17 @@ class WargaPortalController extends Controller
             $first = $group->first();
             $first->product_count = $group->count(); // Add count for UI
             $first->all_products = $group->pluck('product')->join(', ');
+
             return $first;
         })->values();
 
         // Merge structured assets and prevent duplicates
         $allAssets = collect();
-        
+
         // 1. Process UMKMs (and attach local product counts if any)
         foreach ($umkms as $item) {
             // Find corresponding local products by name
-            $matchedLocal = $consolidatedUmkmLocals->first(function($loc) use ($item) {
+            $matchedLocal = $consolidatedUmkmLocals->first(function ($loc) use ($item) {
                 return strtolower(trim($loc->name)) === strtolower(trim($item->nama_usaha));
             });
 
@@ -111,34 +107,34 @@ class WargaPortalController extends Controller
                 $item->product_count = $matchedLocal->product_count;
                 $item->all_products = $matchedLocal->all_products;
                 // Remove from local array so it isn't rendered twice
-                $consolidatedUmkmLocals = $consolidatedUmkmLocals->reject(fn($loc) => $loc->id === $matchedLocal->id);
+                $consolidatedUmkmLocals = $consolidatedUmkmLocals->reject(fn ($loc) => $loc->id === $matchedLocal->id);
             }
 
             $allAssets->push([
-                'data' => $item, 
-                'type' => 'umkm', 
+                'data' => $item,
+                'type' => 'umkm',
                 'name' => $item->nama_usaha,
-                'name_cooldown' => $item->name_updated_at && $item->name_updated_at->diffInDays(now()) < 30 ? 30 - $item->name_updated_at->diffInDays(now()) : 0
+                'name_cooldown' => $item->name_updated_at && $item->name_updated_at->diffInDays(now()) < 30 ? 30 - $item->name_updated_at->diffInDays(now()) : 0,
             ]);
         }
 
         // 2. Add remaining standalone UMKMLocals
         foreach ($consolidatedUmkmLocals as $item) {
             $allAssets->push([
-                'data' => $item, 
-                'type' => 'umkm_local', 
+                'data' => $item,
+                'type' => 'umkm_local',
                 'name' => $item->name,
-                'name_cooldown' => $item->name_updated_at && $item->name_updated_at->diffInDays(now()) < 30 ? 30 - $item->name_updated_at->diffInDays(now()) : 0
+                'name_cooldown' => $item->name_updated_at && $item->name_updated_at->diffInDays(now()) < 30 ? 30 - $item->name_updated_at->diffInDays(now()) : 0,
             ]);
         }
 
         // 3. Add Jasa
         foreach ($jasas as $item) {
             $allAssets->push([
-                'data' => $item, 
-                'type' => 'jasa', 
+                'data' => $item,
+                'type' => 'jasa',
                 'name' => $item->job_title,
-                'name_cooldown' => $item->name_updated_at && $item->name_updated_at->diffInDays(now()) < 30 ? 30 - $item->name_updated_at->diffInDays(now()) : 0
+                'name_cooldown' => $item->name_updated_at && $item->name_updated_at->diffInDays(now()) < 30 ? 30 - $item->name_updated_at->diffInDays(now()) : 0,
             ]);
         }
 
@@ -160,28 +156,31 @@ class WargaPortalController extends Controller
             'umkmLocals' => $umkmLocals,
             'services' => $services,
             'phone' => $phone,
-            'primaryUmkm' => $umkms->first()
+            'primaryUmkm' => $umkms->first(),
         ]);
     }
 
     public function bridgeJasa($id)
     {
         $phone = session('warga_phone');
-        if (!$phone) return redirect()->route('portal_warga.login');
+        if (! $phone) {
+            return redirect()->route('portal_warga.login');
+        }
 
         // Verify this $id actually belongs to the user via service normalization
         $basePhone = $this->portalService->normalizePhone($phone);
-        
+
         $jasa = WorkDirectory::findOrFail($id);
         $jasaPhone = $this->portalService->normalizePhone($jasa->contact_phone);
-        
+
         // Match checking
-        if (!str_contains($jasaPhone, $basePhone)) {
-             return redirect()->route('portal_warga.dashboard')->with('error', 'Anda tidak memiliki akses ke jasa ini.');
+        if (! str_contains($jasaPhone, $basePhone)) {
+            return redirect()->route('portal_warga.dashboard')->with('error', 'Anda tidak memiliki akses ke jasa ini.');
         }
 
         // Grant access
         session(['manage_jasa_id' => $jasa->id]);
+
         return redirect()->route('economy.manage', $jasa->id);
     }
 
@@ -189,6 +188,7 @@ class WargaPortalController extends Controller
     {
         session()->forget('warga_phone');
         session()->forget('manage_jasa_id');
+
         return redirect()->route('landing')->with('success', 'Anda telah keluar dari Dasbor Warga.');
     }
 
@@ -205,22 +205,28 @@ class WargaPortalController extends Controller
         ]);
 
         $model = null;
-        if ($request->type === 'umkm') $model = Umkm::find($request->id);
-        if ($request->type === 'jasa') $model = WorkDirectory::find($request->id);
-        if ($request->type === 'umkm_local') $model = UmkmLocal::find($request->id);
+        if ($request->type === 'umkm') {
+            $model = Umkm::find($request->id);
+        }
+        if ($request->type === 'jasa') {
+            $model = WorkDirectory::find($request->id);
+        }
+        if ($request->type === 'umkm_local') {
+            $model = UmkmLocal::find($request->id);
+        }
 
-        if (!$model) {
+        if (! $model) {
             return back()->with('error', 'Data tidak ditemukan.');
         }
 
         // Security check using service normalization
         $phone = session('warga_phone');
         $basePhone = $this->portalService->normalizePhone($phone);
-        
+
         $modelPhoneField = $request->type === 'umkm' ? 'no_wa' : ($request->type === 'jasa' ? 'contact_phone' : 'contact_wa');
         $modelPhone = $this->portalService->normalizePhone($model->$modelPhoneField);
 
-        if (!str_contains($modelPhone, $basePhone)) {
+        if (! str_contains($modelPhone, $basePhone)) {
             return back()->with('error', 'Akses ditolak.');
         }
 
@@ -229,16 +235,17 @@ class WargaPortalController extends Controller
             // Global update for all products with same phone
             UmkmLocal::where('contact_wa', $model->contact_wa)->update([
                 'is_on_holiday' => $request->is_on_holiday,
-                'operating_hours' => $request->operating_hours ?: $model->operating_hours
+                'operating_hours' => $request->operating_hours ?: $model->operating_hours,
             ]);
         } else {
             $model->update([
                 'is_on_holiday' => $request->is_on_holiday,
-                'operating_hours' => $request->operating_hours ?: $model->operating_hours
+                'operating_hours' => $request->operating_hours ?: $model->operating_hours,
             ]);
         }
 
         $statusLabel = $request->is_on_holiday ? 'diliburkan' : 'diaktifkan kembali';
+
         return back()->with('success', "Status berhasil diperbarui! Toko/Jasa Anda kini {$statusLabel}.");
     }
 
@@ -254,22 +261,28 @@ class WargaPortalController extends Controller
         ]);
 
         $model = null;
-        if ($request->type === 'umkm') $model = Umkm::find($request->id);
-        if ($request->type === 'jasa') $model = WorkDirectory::find($request->id);
-        if ($request->type === 'umkm_local') $model = UmkmLocal::find($request->id);
+        if ($request->type === 'umkm') {
+            $model = Umkm::find($request->id);
+        }
+        if ($request->type === 'jasa') {
+            $model = WorkDirectory::find($request->id);
+        }
+        if ($request->type === 'umkm_local') {
+            $model = UmkmLocal::find($request->id);
+        }
 
-        if (!$model) {
+        if (! $model) {
             return back()->with('error', 'Data tidak ditemukan.');
         }
 
         // Security check using service normalization
         $phone = session('warga_phone');
         $basePhone = $this->portalService->normalizePhone($phone);
-        
+
         $modelPhoneField = $request->type === 'umkm' ? 'no_wa' : ($request->type === 'jasa' ? 'contact_phone' : 'contact_wa');
         $modelPhone = $this->portalService->normalizePhone($model->$modelPhoneField);
 
-        if (!str_contains($modelPhone, $basePhone)) {
+        if (! str_contains($modelPhone, $basePhone)) {
             return back()->with('error', 'Akses ditolak.');
         }
 
@@ -277,6 +290,7 @@ class WargaPortalController extends Controller
         $lastUpdate = $model->name_updated_at;
         if ($lastUpdate && $lastUpdate->diffInDays(now()) < 30) {
             $daysLeft = 30 - $lastUpdate->diffInDays(now());
+
             return back()->with('error', "Nama toko/jasa hanya bisa diubah setiap 30 hari. Silakan tunggu {$daysLeft} hari lagi.");
         }
 
@@ -285,13 +299,13 @@ class WargaPortalController extends Controller
             // Global update for all products with same phone
             UmkmLocal::where('contact_wa', $model->contact_wa)->update([
                 'name' => $request->name,
-                'name_updated_at' => now()
+                'name_updated_at' => now(),
             ]);
         } else {
             $fieldName = $request->type === 'umkm' ? 'nama_usaha' : ($request->type === 'jasa' ? 'job_title' : 'name');
             $model->update([
                 $fieldName => $request->name,
-                'name_updated_at' => now()
+                'name_updated_at' => now(),
             ]);
         }
 

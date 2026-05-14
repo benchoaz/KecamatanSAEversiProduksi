@@ -4,7 +4,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LandingController;
 // use App\Http\Controllers\Public\LayananController;
 use App\Http\Controllers\PublicServiceController;
-use App\Http\Controllers\EconomyController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,7 +15,9 @@ use Illuminate\Support\Facades\Route;
 
 // Root Landing Page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
-Route::get('/test-ping', function() { return 'pong'; });
+Route::get('/test-ping', function () {
+    return 'pong';
+});
 
 // Public Visitor (Buku Tamu)
 Route::post('/public/visitor', [\App\Http\Controllers\Kecamatan\PelayananController::class, 'visitorStore'])->name('public.visitor.store');
@@ -69,18 +70,18 @@ Route::prefix('hub')->name('hub.')->group(function () {
     });
 });
 
-
 // Public Service & Economy Routes
-require __DIR__ . '/public/layanan.php';
-require __DIR__ . '/public/economy.php';
-require __DIR__ . '/public/warga.php';
+require __DIR__.'/public/layanan.php';
+require __DIR__.'/public/economy.php';
+require __DIR__.'/public/warga.php';
 
 // Route Aliases for Landing Page compatibility
 Route::get('/tracking', [PublicServiceController::class, 'trackingPage'])->name('public.tracking');
-Route::get('/lacak-berkas', function() { return redirect()->route('public.tracking'); });
+Route::get('/lacak-berkas', function () {
+    return redirect()->route('public.tracking');
+});
 Route::post('/service/submit', [PublicServiceController::class, 'submit'])->name('public.service.submit');
 Route::post('/service/feedback/{uuid}', [PublicServiceController::class, 'submitFeedback'])->name('public.service.feedback');
-
 
 // Receipt Routes
 Route::get('/receipt/{uuid}/download', [\App\Http\Controllers\ReceiptController::class, 'generateReceipt'])->name('receipt.download');
@@ -97,7 +98,7 @@ Route::middleware(['auth'])->group(function () {
         $user = auth()->user();
 
         // FAIL-SAFE: Always allow 'admin' to access Kecamatan Dashboard
-        if ($user->username === 'admin' || 
+        if ($user->username === 'admin' ||
             $user->hasRole('Super Admin') ||
             $user->hasRole('Operator Kecamatan') ||
             $user->isModuleAdmin()) {
@@ -135,4 +136,3 @@ Route::prefix('api/public/layanan')->name('api.public.layanan.')->group(function
     Route::get('/nodes/{nodeId}/children', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'getChildren'])->name('nodes');
     Route::get('/nodes/{nodeId}/requirements', [\App\Http\Controllers\Kecamatan\ServiceNodeController::class, 'getRequirements'])->name('requirements');
 });
-

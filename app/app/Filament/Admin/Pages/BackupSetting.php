@@ -20,9 +20,9 @@ class BackupSetting extends Page implements HasForms
     protected static string $view = 'filament.admin.pages.backup-setting';
 
     protected static ?string $navigationGroup = 'Konfigurasi Sistem';
-    
+
     protected static ?string $navigationLabel = 'Pengaturan Backup';
-    
+
     protected static ?string $title = 'Pengaturan Backup Google Drive';
 
     public ?array $data = [];
@@ -53,7 +53,7 @@ class BackupSetting extends Page implements HasForms
                             ->hint('Contoh format: gdrive:nama-folder/')
                             ->helperText('Pastikan remote "gdrive" sudah terhubung di VPS Anda via perintah "rclone config".')
                             ->prefixIcon('heroicon-m-folder-open'),
-                    ])
+                    ]),
             ])
             ->statePath('data');
     }

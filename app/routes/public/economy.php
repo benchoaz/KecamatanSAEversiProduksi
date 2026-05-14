@@ -25,7 +25,7 @@ Route::post('/ekonomi/daftar', [EconomyController::class, 'store'])
     ->name('economy.store');
 
 // Kelola Jasa Mandiri (Akses menggunakan Super Dasbor Warga)
-Route::get('/ekonomi/login', function() {
+Route::get('/ekonomi/login', function () {
     return redirect()->route('portal_warga.login');
 })->name('economy.login');
 Route::post('/ekonomi/login', [EconomyController::class, 'authenticate'])
@@ -61,7 +61,7 @@ Route::prefix('umkm-rakyat')->name('umkm_rakyat.')->group(function () {
     Route::get('/', [UmkmRakyatController::class, 'index'])->name('index');
     Route::get('/terdekat', [UmkmRakyatController::class, 'nearby'])->name('nearby');
     Route::get('/produk', [UmkmRakyatController::class, 'allProducts'])->name('all_products');
-    
+
     // Pendaftaran & Verifikasi Mandiri
     Route::get('/daftar', [UmkmRakyatController::class, 'create'])->name('create');
     Route::post('/daftar', [UmkmRakyatController::class, 'store'])->name('store');
@@ -69,25 +69,25 @@ Route::prefix('umkm-rakyat')->name('umkm_rakyat.')->group(function () {
     Route::post('/{id}/verifikasi', [UmkmRakyatController::class, 'processVerify'])->name('process_verify');
 
     // Login Owner (Redirect ke Super Dasbor Warga)
-    Route::get('/login', function() {
+    Route::get('/login', function () {
         return redirect()->route('portal_warga.login');
     })->name('login');
     // POST request untuk backward compatibility jika ada yg hardcode (opsional, better die/redirect)
-    Route::post('/login/request', function() {
+    Route::post('/login/request', function () {
         return redirect()->route('portal_warga.login');
     })->name('send_access');
 
     // Dasbor Pemilik UMKM (Menggunakan Token)
     Route::prefix('{token}/manage')->name('manage')->group(function () {
         Route::get('/', [UmkmRakyatController::class, 'manage']);
-        
+
         // Produk
         Route::get('/products', [UmkmRakyatController::class, 'manageProducts'])->name('.products');
         Route::post('/products', [UmkmRakyatController::class, 'storeProduct'])->name('.product.store');
         Route::put('/products/{productId}', [UmkmRakyatController::class, 'updateProduct'])->name('.product.update');
         Route::patch('/products/{productId}/toggle', [UmkmRakyatController::class, 'toggleProductAvailability'])->name('.product.toggle');
         Route::delete('/products/{productId}', [UmkmRakyatController::class, 'deleteProduct'])->name('.product.delete');
-        
+
         // Toko/Settings
         Route::get('/settings', [UmkmRakyatController::class, 'manageSettings'])->name('.settings');
         Route::post('/settings', [UmkmRakyatController::class, 'updateSettings'])->name('.settings.update');

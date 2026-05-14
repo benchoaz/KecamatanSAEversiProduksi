@@ -13,12 +13,13 @@ use Illuminate\Support\Facades\Log;
 class UltraMsgProvider implements WhatsAppProviderInterface
 {
     protected string $instanceId;
+
     protected string $token;
 
     public function __construct(string $instanceId, string $token)
     {
         $this->instanceId = $instanceId;
-        $this->token      = $token;
+        $this->token = $token;
     }
 
     public function getName(): string
@@ -39,9 +40,9 @@ class UltraMsgProvider implements WhatsAppProviderInterface
             $response = Http::timeout(30)
                 ->asForm()
                 ->post("https://api.ultramsg.com/{$this->instanceId}/messages/chat", [
-                    'token'   => $this->token,
-                    'to'      => $phone,
-                    'body'    => $message,
+                    'token' => $this->token,
+                    'to' => $phone,
+                    'body' => $message,
                     'msgtype' => 'text',
                 ]);
 
@@ -51,16 +52,20 @@ class UltraMsgProvider implements WhatsAppProviderInterface
                 $ok = isset($data['sent']) && $data['sent'] === 'true';
                 if ($ok) {
                     Log::info('[UltraMsg] Message sent', ['phone' => $phone]);
+
                     return ['success' => true, 'message' => 'Pesan berhasil dikirim', 'data' => $data];
                 }
+
                 return ['success' => false, 'message' => $data['error'] ?? 'Gagal kirim pesan'];
             }
 
             Log::error('[UltraMsg] Send failed', ['status' => $response->status(), 'body' => $response->body()]);
-            return ['success' => false, 'message' => 'HTTP ' . $response->status() . ': ' . $response->body()];
+
+            return ['success' => false, 'message' => 'HTTP '.$response->status().': '.$response->body()];
         } catch (\Exception $e) {
             Log::error('[UltraMsg] Exception', ['error' => $e->getMessage()]);
-            return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+
+            return ['success' => false, 'message' => 'Error: '.$e->getMessage()];
         }
     }
 
@@ -73,19 +78,19 @@ class UltraMsgProvider implements WhatsAppProviderInterface
                 ]);
 
             if ($response->successful()) {
-                $data   = $response->json();
+                $data = $response->json();
                 $status = $data['status']['accountStatus']['status'] ?? 'unknown';
-                $ok     = $status === 'authenticated';
+                $ok = $status === 'authenticated';
 
                 return [
                     'success' => $ok,
                     'message' => $ok ? 'UltraMsg terhubung' : "Status: {$status}",
-                    'status'  => $ok ? 'connected' : 'disconnected',
-                    'data'    => $data,
+                    'status' => $ok ? 'connected' : 'disconnected',
+                    'data' => $data,
                 ];
             }
 
-            return ['success' => false, 'message' => 'HTTP ' . $response->status(), 'status' => 'error'];
+            return ['success' => false, 'message' => 'HTTP '.$response->status(), 'status' => 'error'];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage(), 'status' => 'error'];
         }
@@ -97,11 +102,12 @@ class UltraMsgProvider implements WhatsAppProviderInterface
     {
         $clean = preg_replace('/[^0-9]/', '', $phone);
         if (str_starts_with($clean, '0')) {
-            return '+62' . substr($clean, 1);
+            return '+62'.substr($clean, 1);
         }
         if (str_starts_with($clean, '62')) {
-            return '+' . $clean;
+            return '+'.$clean;
         }
-        return '+62' . $clean;
+
+        return '+62'.$clean;
     }
 }

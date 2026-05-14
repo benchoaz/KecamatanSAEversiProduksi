@@ -14,7 +14,7 @@ class PembangunanLogbook extends Model
         'progres_fisik',
         'catatan',
         'kendala',
-        'foto_progres'
+        'foto_progres',
     ];
 
     public function pembangunan()

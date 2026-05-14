@@ -34,7 +34,7 @@ class FAQController extends Controller
             'question' => 'required|string',
             'answer' => 'required|string',
             'priority' => 'integer|min:0|max:100',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
         ]);
 
         $validated['last_updated_by'] = auth()->id();
@@ -57,7 +57,7 @@ class FAQController extends Controller
             'question' => 'required|string',
             'answer' => 'required|string',
             'priority' => 'integer|min:0|max:100',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
         ]);
 
         $validated['last_updated_by'] = auth()->id();
@@ -83,7 +83,7 @@ class FAQController extends Controller
      */
     public function toggle(PelayananFaq $faq)
     {
-        $faq->is_active = !$faq->is_active;
+        $faq->is_active = ! $faq->is_active;
         $faq->last_updated_by = auth()->id();
         $faq->save();
 

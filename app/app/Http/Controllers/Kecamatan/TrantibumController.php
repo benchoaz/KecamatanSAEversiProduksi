@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Kecamatan;
 
 use App\Http\Controllers\Controller;
+use App\Models\Submission;
 use App\Models\TrantibumKejadian;
 use App\Models\TrantibumRelawan;
-use App\Models\Submission;
 use Illuminate\Http\Request;
 
 class TrantibumController extends Controller
@@ -72,7 +72,7 @@ class TrantibumController extends Controller
     public function taganaIndex(Request $request)
     {
         $year = $request->get('year', date('Y'));
-        
+
         $reports = Submission::where('menu_id', 4) // Trantibum menu
             ->whereYear('created_at', $year)
             ->with(['desa', 'jawabanIndikator', 'aspek'])
@@ -85,7 +85,7 @@ class TrantibumController extends Controller
     {
         $report = Submission::with(['desa', 'aspek', 'buktiDukung'])->findOrFail($id);
         $layout = auth()->user()->desa_id ? 'layouts.desa' : 'layouts.kecamatan';
-        
+
         return view('kecamatan.trantibum.show', compact('report', 'layout'));
     }
 

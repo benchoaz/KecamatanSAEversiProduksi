@@ -19,7 +19,7 @@ class SyaratHandler
     public function search(string $query): array
     {
         $query = trim(strtolower($query));
-        \Log::info('SyaratHandler searching for: ' . $query);
+        \Log::info('SyaratHandler searching for: '.$query);
 
         // If empty query, show available categories
         if (empty($query)) {
@@ -46,6 +46,7 @@ class SyaratHandler
 
             // Single match
             $top = $data['results'][0];
+
             return [
                 'success' => true,
                 'intent' => 'syarat',
@@ -71,10 +72,11 @@ class SyaratHandler
         $reply = "Ditemukan beberapa topik yang relevan:\n\n";
         foreach ($results as $i => $res) {
             $num = $i + 1;
-            $reply .= "{$num}. SYARAT " . strtoupper($res['question']) . "\n";
+            $reply .= "{$num}. SYARAT ".strtoupper($res['question'])."\n";
         }
         $reply .= "\nSilakan ketik kata kunci yang lebih spesifik dari pilihan di atas.\n";
-        $reply .= "Ketik *MENU* untuk kembali.";
+        $reply .= 'Ketik *MENU* untuk kembali.';
+
         return $reply;
     }
 
@@ -86,18 +88,19 @@ class SyaratHandler
         $title = $result['question'];
         $answer = $result['answer'];
         $baseUrl = $this->getPublicUrl();
-        
+
         $reply = "✅ *{$title}*\n\n";
         $reply .= $answer;
-        
+
         $link = $this->detectServiceLink($title);
         if ($link) {
             $reply .= "\n\nAjukan Online:\n";
             $reply .= "{$baseUrl}/{$link}";
         }
-        
+
         $reply .= "\n\nKetik *SYARAT* untuk lainnya.\n";
-        $reply .= "Ketik *MENU* atau *0* untuk kembali.";
+        $reply .= 'Ketik *MENU* atau *0* untuk kembali.';
+
         return $reply;
     }
 
@@ -118,7 +121,7 @@ class SyaratHandler
         }
 
         $reply .= "\n\nKetik *SYARAT* untuk lainnya.\n";
-        $reply .= "Ketik *MENU* atau *0* untuk kembali.";
+        $reply .= 'Ketik *MENU* atau *0* untuk kembali.';
 
         return $reply;
     }
@@ -188,7 +191,7 @@ class SyaratHandler
         $reply .= "Contoh: *syarat kk*, *syarat ktp*\n\n";
         $reply .= "Ajukan Secara Online:\n";
         $reply .= "{$baseUrl}/#layanan\n\n";
-        $reply .= "Ketik *MENU* atau *0* untuk kembali.";
+        $reply .= 'Ketik *MENU* atau *0* untuk kembali.';
 
         return $reply;
     }
@@ -208,7 +211,7 @@ class SyaratHandler
         $reply .= "Lihat Semua Layanan:\n";
         $reply .= "{$baseUrl}/#layanan\n\n";
         $reply .= "Ketik *SYARAT* untuk daftar lengkap.\n";
-        $reply .= "Ketik *MENU* atau *0* untuk kembali.";
+        $reply .= 'Ketik *MENU* atau *0* untuk kembali.';
 
         return $reply;
     }
@@ -216,9 +219,10 @@ class SyaratHandler
     protected function getPublicUrl(): string
     {
         $profile = \App\Models\AppProfile::first();
-        if ($profile && !empty($profile->public_url)) {
+        if ($profile && ! empty($profile->public_url)) {
             return rtrim($profile->public_url, '/');
         }
+
         return rtrim(env('PUBLIC_BASE_URL', config('app.url')), '/');
     }
 }

@@ -10,6 +10,7 @@ class MasterSsh extends Model
     use HasFactory;
 
     protected $table = 'master_ssh';
+
     protected $guarded = ['id'];
 
     protected $casts = [

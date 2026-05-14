@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -31,7 +32,7 @@ return new class extends Migration {
                 'result_file_path',
                 'ready_at',
                 'pickup_person',
-                'pickup_notes'
+                'pickup_notes',
             ]);
         });
     }

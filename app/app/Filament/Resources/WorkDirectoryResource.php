@@ -17,9 +17,12 @@ class WorkDirectoryResource extends Resource
     public static function canViewAny(): bool
     {
         $user = auth()->user();
-        if (!$user) return false;
+        if (! $user) {
+            return false;
+        }
 
         $role = $user->role->nama_role ?? '';
+
         return in_array($role, ['Super Admin', 'Operator Kecamatan', 'umkm_admin']);
     }
 
@@ -183,7 +186,7 @@ class WorkDirectoryResource extends Resource
                         'danger' => 'inactive',
                         'warning' => 'suspended',
                     ])
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'active' => 'Aktif',
                         'inactive' => 'Tidak Aktif',
                         'suspended' => 'Suspended',
@@ -216,17 +219,17 @@ class WorkDirectoryResource extends Resource
                     ->label('Suspend')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->hidden(fn(WorkDirectory $record) => $record->status === 'suspended')
+                    ->hidden(fn (WorkDirectory $record) => $record->status === 'suspended')
                     ->requiresConfirmation()
                     ->modalHeading('Suspend Jasa?')
                     ->modalDescription('Iklan jasa ini akan disembunyikan dari katalog publik.')
-                    ->action(fn(WorkDirectory $record) => $record->update(['status' => 'suspended'])),
+                    ->action(fn (WorkDirectory $record) => $record->update(['status' => 'suspended'])),
                 Tables\Actions\Action::make('reactivate')
                     ->label('Aktifkan')
                     ->icon('heroicon-o-arrow-path')
                     ->color('success')
-                    ->visible(fn(WorkDirectory $record) => $record->status === 'suspended')
-                    ->action(fn(WorkDirectory $record) => $record->update(['status' => 'active'])),
+                    ->visible(fn (WorkDirectory $record) => $record->status === 'suspended')
+                    ->action(fn (WorkDirectory $record) => $record->update(['status' => 'active'])),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

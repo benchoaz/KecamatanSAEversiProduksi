@@ -35,12 +35,14 @@ class GatewayRouterService
                 [
                     'hub_district_id' => $districtId,
                     'last_interaction_at' => now(),
-                    'is_active' => true
+                    'is_active' => true,
                 ]
             );
+
             return true;
         } catch (\Exception $e) {
-            Log::error("GatewayRouter: Failed to set phone district: " . $e->getMessage());
+            Log::error('GatewayRouter: Failed to set phone district: '.$e->getMessage());
+
             return false;
         }
     }

@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Services\WeatherService;
 use App\Models\WahaN8nSetting;
+use App\Services\WeatherService;
 use App\Services\WhatsApp\WhatsAppManager;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
 class CheckWeatherAlerts extends Command
@@ -31,31 +31,35 @@ class CheckWeatherAlerts extends Command
     {
         $settings = WahaN8nSetting::first();
 
-        if (!$settings || !$settings->is_weather_alert_enabled) {
+        if (! $settings || ! $settings->is_weather_alert_enabled) {
             $this->info('Weather alerts are disabled.');
+
             return 0;
         }
 
         $groupRaw = $settings->broadcast_group_ids;
         if (empty($groupRaw)) {
             $this->warn('No broadcast groups configured.');
+
             return 0;
         }
 
         // Parse group IDs (comma separated)
         $groups = array_map('trim', explode(',', $groupRaw));
-        $groups = array_filter($groups, fn($id) => str_contains($id, '@g.us'));
+        $groups = array_filter($groups, fn ($id) => str_contains($id, '@g.us'));
 
         if (empty($groups)) {
             $this->warn('No valid WhatsApp group IDs found (@g.us).');
+
             return 0;
         }
 
         $this->info('Checking BMKG for alerts...');
         $result = $weatherService->checkBmkgAlerts();
 
-        if (!$result['success'] || empty($result['alerts'])) {
+        if (! $result['success'] || empty($result['alerts'])) {
             $this->info('No matching alerts found.');
+
             return 0;
         }
 
@@ -63,26 +67,27 @@ class CheckWeatherAlerts extends Command
             // Check if we already broadcasted this alert
             if ($settings->last_alert_id === $alert['id']) {
                 $this->info("Alert {$alert['id']} already broadcasted.");
+
                 continue;
             }
 
-            $this->info("Processing Alert: " . $alert['title']);
+            $this->info('Processing Alert: '.$alert['title']);
 
             $message = "⚠️ *PERINGATAN DINI CUACA EKSTREM* ⚠️\n\n";
             $message .= "*{$alert['title']}*\n\n";
-            $message .= $alert['description'] . "\n\n";
-            $message .= "📅 Waktu: " . $alert['pubDate'] . "\n";
-            $message .= "🔗 Info Detail: " . $alert['link'] . "\n\n";
-            $message .= "_Sumber: BMKG Indonesia_";
+            $message .= $alert['description']."\n\n";
+            $message .= '📅 Waktu: '.$alert['pubDate']."\n";
+            $message .= '🔗 Info Detail: '.$alert['link']."\n\n";
+            $message .= '_Sumber: BMKG Indonesia_';
 
             $whatsapp = WhatsAppManager::driver();
-            
+
             foreach ($groups as $groupId) {
                 try {
                     $this->info("Sending to group: {$groupId}");
                     $whatsapp->sendMessage($groupId, $message);
                 } catch (\Exception $e) {
-                    Log::error("Failed to send weather alert to group {$groupId}: " . $e->getMessage());
+                    Log::error("Failed to send weather alert to group {$groupId}: ".$e->getMessage());
                 }
             }
 
@@ -94,6 +99,7 @@ class CheckWeatherAlerts extends Command
         }
 
         $this->info('Weather alert check completed.');
+
         return 0;
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Desa;
 
+use App\Helpers\AuditHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Desa\DesaSubmission;
-use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -92,7 +92,8 @@ class MusdesController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menyimpan draft: ' . $e->getMessage())->withInput();
+
+            return back()->with('error', 'Gagal menyimpan draft: '.$e->getMessage())->withInput();
         }
     }
 
@@ -106,9 +107,9 @@ class MusdesController extends Controller
             ->with(['details', 'files', 'notes'])
             ->findOrFail($id);
 
-        if (!$submission->isEditable()) {
+        if (! $submission->isEditable()) {
             return redirect()->route('desa.musdes.show', $id)
-                ->with('warning', 'Data tidak dapat diedit karena status sudah ' . $submission->status_label);
+                ->with('warning', 'Data tidak dapat diedit karena status sudah '.$submission->status_label);
         }
 
         // Helper untuk ambil detail value dengan mudah di view
@@ -125,7 +126,7 @@ class MusdesController extends Controller
         $submission = DesaSubmission::where('desa_id', auth()->user()->desa_id)
             ->findOrFail($id);
 
-        if (!$submission->isEditable()) {
+        if (! $submission->isEditable()) {
             abort(403, 'Akses ditolak. Data terkunci.');
         }
 
@@ -170,11 +171,13 @@ class MusdesController extends Controller
             AuditHelper::log('update', 'desa_submissions', $submission->id, $oldValues, $submission->fresh()->toArray());
 
             DB::commit();
+
             return back()->with('success', 'Perubahan data berhasil disimpan.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal update: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal update: '.$e->getMessage());
         }
     }
 
@@ -186,7 +189,7 @@ class MusdesController extends Controller
         $submission = DesaSubmission::where('desa_id', auth()->user()->desa_id)
             ->findOrFail($id);
 
-        if (!$submission->isEditable()) {
+        if (! $submission->isEditable()) {
             abort(403);
         }
 
@@ -201,7 +204,7 @@ class MusdesController extends Controller
         // Simpan file
         $path = $file->storeAs(
             "musdes/{$submission->desa_id}/{$submission->id}",
-            "{$type}_" . time() . "." . $file->getClientOriginalExtension(),
+            "{$type}_".time().'.'.$file->getClientOriginalExtension(),
             'public'
         );
 
@@ -220,8 +223,9 @@ class MusdesController extends Controller
     public function deleteFile($id, $fileId)
     {
         $submission = DesaSubmission::where('desa_id', auth()->user()->desa_id)->findOrFail($id);
-        if (!$submission->isEditable())
+        if (! $submission->isEditable()) {
             abort(403);
+        }
 
         $file = $submission->files()->findOrFail($fileId);
 
@@ -231,6 +235,7 @@ class MusdesController extends Controller
         }
 
         $file->delete();
+
         return back()->with('success', 'File dihapus.');
     }
 
@@ -244,7 +249,7 @@ class MusdesController extends Controller
             ->with('files')
             ->findOrFail($id);
 
-        if (!$submission->isEditable()) {
+        if (! $submission->isEditable()) {
             abort(403, 'Laporan sudah dikirim atau selesai.');
         }
 
@@ -335,11 +340,13 @@ class MusdesController extends Controller
             AuditHelper::log('delete', 'desa_submissions', $id, $oldValues, null);
 
             DB::commit();
+
             return redirect()->route('desa.musdes.index')->with('success', 'Draf laporan Musdes telah dihapus.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menghapus draf: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal menghapus draf: '.$e->getMessage());
         }
     }
 
@@ -374,7 +381,7 @@ class MusdesController extends Controller
                     <li>[Keputusan 2]</li>
                 </ul>
                 <br>
-                <p style='text-align:right;'>{$desaName}, " . date('d M Y') . "</p>
+                <p style='text-align:right;'>{$desaName}, ".date('d M Y')."</p>
                 <table width='100%'>
                     <tr>
                         <td width='50%' style='text-align:center;'>Mengetahui,<br><b>Kepala Desa {$desaName}</b><br><br><br><br>( ................................. )</td>
@@ -409,7 +416,7 @@ class MusdesController extends Controller
                         </tr>
                     </thead>
                     <tbody>
-                        " . implode('', array_map(fn($i) => "<tr><td style='text-align:center;'>{$i}</td><td></td><td></td><td>" . ($i % 2 != 0 ? "{$i}. " : "&nbsp;&nbsp;&nbsp;&nbsp;{$i}. ") . "</td></tr>", range(1, max(10, $jumlahUndangan)))) . "
+                        ".implode('', array_map(fn ($i) => "<tr><td style='text-align:center;'>{$i}</td><td></td><td></td><td>".($i % 2 != 0 ? "{$i}. " : "&nbsp;&nbsp;&nbsp;&nbsp;{$i}. ").'</td></tr>', range(1, max(10, $jumlahUndangan))))."
                     </tbody>
                 </table>
                 <br><br>
@@ -423,10 +430,10 @@ class MusdesController extends Controller
         }
 
         $headers = [
-            "Content-type" => "application/vnd.ms-word",
-            "Content-Disposition" => "attachment;Filename=\"$filename\"",
-            "Pragma" => "no-cache",
-            "Expires" => "0"
+            'Content-type' => 'application/vnd.ms-word',
+            'Content-Disposition' => "attachment;Filename=\"$filename\"",
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
         ];
 
         return response($content, 200, $headers);

@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Desa;
 
 use App\Http\Controllers\Controller;
-use App\Models\PerencanaanDesa;
 use App\Models\AuditLog;
+use App\Models\PerencanaanDesa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class PerencanaanController extends Controller
 {
@@ -63,7 +62,7 @@ class PerencanaanController extends Controller
 
         DB::beginTransaction();
         try {
-            $file_path = $request->file('file_dokumen')->store('perencanaan/' . $year, 'local');
+            $file_path = $request->file('file_dokumen')->store('perencanaan/'.$year, 'local');
 
             $perencanaan = PerencanaanDesa::create([
                 'desa_id' => auth()->user()->desa_id,
@@ -89,10 +88,12 @@ class PerencanaanController extends Controller
             ]);
 
             DB::commit();
+
             return redirect()->route('desa.perencanaan.index')->with('success', 'Dokumen perencanaan berhasil disimpan sebagai draft.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal menyimpan: '.$e->getMessage());
         }
     }
 
@@ -130,10 +131,13 @@ class PerencanaanController extends Controller
 
     private function getModeByYear($year)
     {
-        if ($year <= 2025)
+        if ($year <= 2025) {
             return PerencanaanDesa::MODE_ARSIP;
-        if ($year == 2026)
+        }
+        if ($year == 2026) {
             return PerencanaanDesa::MODE_TRANSISI;
+        }
+
         return PerencanaanDesa::MODE_TERSTRUKTUR;
     }
 }

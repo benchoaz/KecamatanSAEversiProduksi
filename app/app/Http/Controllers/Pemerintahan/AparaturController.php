@@ -7,8 +7,6 @@ use App\Models\AparaturDesa;
 use App\Models\AparaturDocument;
 use App\Models\Desa;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class AparaturController extends Controller
 {
@@ -30,8 +28,8 @@ class AparaturController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('nama_lengkap', 'like', '%' . $request->search . '%')
-                    ->orWhere('nik', 'like', '%' . $request->search . '%');
+                $q->where('nama_lengkap', 'like', '%'.$request->search.'%')
+                    ->orWhere('nik', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -52,6 +50,7 @@ class AparaturController extends Controller
     public function create()
     {
         $villages = Desa::where('is_active', true)->get();
+
         return view('kecamatan.pemerintahan.aparatur.create', compact('villages'));
     }
 
@@ -74,7 +73,7 @@ class AparaturController extends Controller
 
         $aparatur = AparaturDesa::create(array_merge($validated, [
             'updated_by' => auth()->id(),
-            'status_verifikasi' => AparaturDesa::VERIFIKASI_BELUM
+            'status_verifikasi' => AparaturDesa::VERIFIKASI_BELUM,
         ]));
 
         if ($request->hasFile('dokumen_sk')) {
@@ -86,7 +85,7 @@ class AparaturController extends Controller
                 'document_type' => 'SK_PENGANGKATAN',
                 'file_path' => $path,
                 'original_filename' => $file->getClientOriginalName(),
-                'is_active' => true
+                'is_active' => true,
             ]);
         }
 
@@ -97,12 +96,14 @@ class AparaturController extends Controller
     public function show(AparaturDesa $aparatur)
     {
         $aparatur->load(['desa', 'documents', 'updater']);
+
         return view('kecamatan.pemerintahan.aparatur.show', compact('aparatur'));
     }
 
     public function edit(AparaturDesa $aparatur)
     {
         $villages = Desa::where('is_active', true)->get();
+
         return view('kecamatan.pemerintahan.aparatur.edit', compact('aparatur', 'villages'));
     }
 
@@ -111,7 +112,7 @@ class AparaturController extends Controller
         $validated = $request->validate([
             'desa_id' => 'required|exists:desa,id',
             'nama_lengkap' => 'required|string|max:150',
-            'nik' => 'required|string|size:16|unique:aparatur_desa,nik,' . $aparatur->id,
+            'nik' => 'required|string|size:16|unique:aparatur_desa,nik,'.$aparatur->id,
             'jenis_kelamin' => 'required|in:L,P',
             'jabatan' => 'required|string',
             'nomor_sk' => 'required|string|max:100',
@@ -124,7 +125,7 @@ class AparaturController extends Controller
         ]);
 
         $aparatur->update(array_merge($validated, [
-            'updated_by' => auth()->id()
+            'updated_by' => auth()->id(),
         ]));
 
         if ($request->hasFile('dokumen_sk')) {
@@ -141,7 +142,7 @@ class AparaturController extends Controller
                 'document_type' => 'SK_PENGANGKATAN',
                 'file_path' => $path,
                 'original_filename' => $file->getClientOriginalName(),
-                'is_active' => true
+                'is_active' => true,
             ]);
         }
 
@@ -152,7 +153,7 @@ class AparaturController extends Controller
     public function verify(Request $request, $id)
     {
         $request->validate([
-            'status_verifikasi' => 'required|in:' . AparaturDesa::VERIFIKASI_SUDAH . ',' . AparaturDesa::VERIFIKASI_REVISI,
+            'status_verifikasi' => 'required|in:'.AparaturDesa::VERIFIKASI_SUDAH.','.AparaturDesa::VERIFIKASI_REVISI,
             'catatan_kecamatan' => 'nullable|string',
         ]);
 
@@ -160,7 +161,7 @@ class AparaturController extends Controller
         $aparatur->update([
             'status_verifikasi' => $request->status_verifikasi,
             'catatan_kecamatan' => $request->catatan_kecamatan,
-            'updated_by' => auth()->id()
+            'updated_by' => auth()->id(),
         ]);
 
         return back()->with('success', 'Status verifikasi berhasil diperbarui.');
@@ -169,6 +170,7 @@ class AparaturController extends Controller
     public function destroy(AparaturDesa $aparatur)
     {
         $aparatur->delete();
+
         return redirect()->route('kecamatan.pemerintahan.aparatur.index')
             ->with('success', 'Data aparatur desa berhasil dihapus.');
     }

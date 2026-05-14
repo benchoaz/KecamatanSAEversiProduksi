@@ -37,8 +37,8 @@ class UmkmHandler
             return [
                 'success' => true,
                 'intent' => 'umkm',
-                'reply' => "😔 *Maaf*, tidak ditemukan UMKM dengan kata kunci \"*{$query}*\".\n\n" .
-                    "Silakan coba kata kunci lain atau ketik *MENU* atau *0* untuk kembali.",
+                'reply' => "😔 *Maaf*, tidak ditemukan UMKM dengan kata kunci \"*{$query}*\".\n\n".
+                    'Silakan coba kata kunci lain atau ketik *MENU* atau *0* untuk kembali.',
                 'state_update' => 'WAITING_UMKM_SEARCH',
             ];
         }
@@ -64,11 +64,11 @@ class UmkmHandler
         foreach ($umkms as $index => $umkm) {
             $num = $index + 1;
             $opStatus = $umkm->operational_status;
-            $statusPrefix = $opStatus['is_open'] ? "🟢" : "🔴";
-            
+            $statusPrefix = $opStatus['is_open'] ? '🟢' : '🔴';
+
             $message .= "{$num}. {$statusPrefix} *{$umkm->name}*\n";
             $message .= "   _{$opStatus['label']}_\n";
-            
+
             if ($umkm->product) {
                 $message .= "   🛍️ Produk: {$umkm->product}\n";
             }
@@ -78,13 +78,13 @@ class UmkmHandler
             }
 
             // Link to store profile on website
-            $storeUrl = $baseUrl . "/ekonomi?tab=produk&search=" . urlencode($umkm->name);
+            $storeUrl = $baseUrl.'/ekonomi?tab=produk&search='.urlencode($umkm->name);
             $message .= "   🔗 *Lihat Foto Produk:*\n   {$storeUrl}\n\n";
         }
 
         $message .= "━━━━━━━━━━━━━━━━━\n";
         $message .= "💡 *Tips:* Klik link di atas untuk melihat katalog produk lengkap.\n\n";
-        $message .= "_Ketik MENU untuk kembali._";
+        $message .= '_Ketik MENU untuk kembali._';
 
         return $message;
     }
@@ -92,9 +92,10 @@ class UmkmHandler
     protected function getPublicUrl(): string
     {
         $profile = \App\Models\AppProfile::first();
-        if ($profile && !empty($profile->public_url)) {
+        if ($profile && ! empty($profile->public_url)) {
             return rtrim($profile->public_url, '/');
         }
+
         return rtrim(env('PUBLIC_BASE_URL', config('app.url')), '/');
     }
 }

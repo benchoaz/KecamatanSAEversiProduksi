@@ -11,14 +11,12 @@ class ApiTokenMiddleware
 {
     /**
      * Handle an incoming request for API authentication.
-     * 
+     *
      * Supports both:
      * - Database-stored tokens (with abilities and expiration)
      * - Legacy env-based token (WHATSAPP_API_TOKEN)
-     * 
-     * @param Request $request
-     * @param Closure $next
-     * @param string|null $ability Required ability for this endpoint
+     *
+     * @param  string|null  $ability  Required ability for this endpoint
      */
     public function handle(Request $request, Closure $next, ?string $ability = null): Response
     {
@@ -35,12 +33,12 @@ class ApiTokenMiddleware
             \Log::warning('API access attempt with NO token provided', [
                 'ip' => $request->ip(),
                 'path' => $request->path(),
-                'headers' => collect($request->headers->all())->map(fn($h) => $h[0])->toArray()
+                'headers' => collect($request->headers->all())->map(fn ($h) => $h[0])->toArray(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized. No API token provided.'
+                'message' => 'Unauthorized. No API token provided.',
             ], 401);
         }
 
@@ -49,10 +47,10 @@ class ApiTokenMiddleware
 
         if ($apiToken) {
             // Check if token has required ability
-            if ($ability && !$apiToken->can($ability)) {
+            if ($ability && ! $apiToken->can($ability)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Forbidden. Token lacks required ability: ' . $ability
+                    'message' => 'Forbidden. Token lacks required ability: '.$ability,
                 ], 403);
             }
 
@@ -67,14 +65,14 @@ class ApiTokenMiddleware
 
         $whatsappToken = config('services.api_tokens.whatsapp');
         $dashboardToken = config('services.api_tokens.dashboard');
-        
+
         // Dynamic token from Dashboard
         $n8nSetting = \App\Models\WahaN8nSetting::getSettings();
         $dbN8nToken = $n8nSetting ? $n8nSetting->n8n_token : null;
 
-        if ((!empty($whatsappToken) && $token === $whatsappToken) || 
-            (!empty($dashboardToken) && $token === $dashboardToken) ||
-            (!empty($dbN8nToken) && $token === $dbN8nToken)) {
+        if ((! empty($whatsappToken) && $token === $whatsappToken) ||
+            (! empty($dashboardToken) && $token === $dashboardToken) ||
+            (! empty($dbN8nToken) && $token === $dbN8nToken)) {
             return $next($request);
         }
 
@@ -82,12 +80,12 @@ class ApiTokenMiddleware
         \Log::warning('Unauthorized API access attempt with INVALID token', [
             'ip' => $request->ip(),
             'path' => $request->path(),
-            'token_prefix' => substr($token, 0, 8) . '...'
+            'token_prefix' => substr($token, 0, 8).'...',
         ]);
 
         return response()->json([
             'success' => false,
-            'message' => 'Unauthorized. Invalid or revoked API token.'
+            'message' => 'Unauthorized. Invalid or revoked API token.',
         ], 401);
     }
 
@@ -100,12 +98,12 @@ class ApiTokenMiddleware
 
         $apiToken = ApiToken::where('token', $hashedToken)->first();
 
-        if (!$apiToken) {
+        if (! $apiToken) {
             return null;
         }
 
         // Check if token is valid (not revoked, not expired)
-        if (!$apiToken->isValid()) {
+        if (! $apiToken->isValid()) {
             return null;
         }
 

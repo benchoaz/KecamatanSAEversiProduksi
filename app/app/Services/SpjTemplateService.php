@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\PembangunanDokumenSpj;
 use App\Models\AppProfile;
-use Illuminate\Support\Facades\Storage;
+use App\Models\PembangunanDokumenSpj;
 use Illuminate\Support\Str;
 
 class SpjTemplateService
@@ -13,8 +12,7 @@ class SpjTemplateService
      * Menghasilkan draft dokumen SPJ dengan data yang sudah terisi.
      * Untuk saat ini, kita akan melakukan simulasi string replacement pada file teks/markdown
      * atau mengembalikan metadata untuk diproses oleh library PDF/Word nantinya.
-     * 
-     * @param PembangunanDokumenSpj $spjDoc
+     *
      * @return array
      */
     public function generateDraftMetadata(PembangunanDokumenSpj $spjDoc)
@@ -45,7 +43,7 @@ class SpjTemplateService
             'doc_name' => $masterDoc->nama_dokumen,
             'template_file' => $masterDoc->file_template,
             'injected_data' => $data,
-            'filename' => Str::slug($masterDoc->nama_dokumen . '_' . $pembangunan->nama_kegiatan) . '.pdf'
+            'filename' => Str::slug($masterDoc->nama_dokumen.'_'.$pembangunan->nama_kegiatan).'.pdf',
         ];
     }
 

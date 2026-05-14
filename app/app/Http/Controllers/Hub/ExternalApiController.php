@@ -12,6 +12,7 @@ class ExternalApiController extends Controller
     public function index()
     {
         $apps = HubExternalApp::orderBy('name')->get();
+
         return view('hub.api.index', compact('apps'));
     }
 
@@ -25,13 +26,13 @@ class ExternalApiController extends Controller
 
         HubExternalApp::create([
             'name' => $validated['name'],
-            'client_id' => 'KAB_' . strtoupper(Str::random(10)),
+            'client_id' => 'KAB_'.strtoupper(Str::random(10)),
             'client_secret' => Str::random(40),
             'base_url' => $validated['base_url'],
             'settings' => [
-                'scopes' => $validated['scopes']
+                'scopes' => $validated['scopes'],
             ],
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         return redirect()->back()->with('success', 'Aplikasi Eksternal berhasil didaftarkan!');
@@ -43,6 +44,6 @@ class ExternalApiController extends Controller
         $app->status = ($app->status == 'active') ? 'inactive' : 'active';
         $app->save();
 
-        return redirect()->back()->with('success', 'Status aplikasi ' . $app->name . ' berhasil diubah!');
+        return redirect()->back()->with('success', 'Status aplikasi '.$app->name.' berhasil diubah!');
     }
 }

@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Kecamatan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Desa;
+use App\Models\NavMenu;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\NavMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -18,8 +18,8 @@ class UserManagementController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('nama_lengkap', 'like', '%' . $request->search . '%')
-                    ->orWhere('username', 'like', '%' . $request->search . '%');
+                $q->where('nama_lengkap', 'like', '%'.$request->search.'%')
+                    ->orWhere('username', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -38,6 +38,7 @@ class UserManagementController extends Controller
         $roles = Role::all();
         $villages = Desa::active()->get();
         $menus = NavMenu::with('subMenus')->orderBy('order')->get();
+
         return view('kecamatan.users.create', compact('roles', 'villages', 'menus'));
     }
 
@@ -56,13 +57,13 @@ class UserManagementController extends Controller
 
         // Validation Logic: Operator Desa MUST have desa_id
         $isOperatorDesa = strtolower($role->nama_role) === 'operator desa' || $role->nama_role === 'operator_desa';
-        
+
         if ($isOperatorDesa && empty($request->desa_id)) {
             return back()->withErrors(['desa_id' => 'Operator Desa wajib memilih Desa.'])->withInput();
         }
 
         // Validation Logic: Kecamatan/Admin MUST NOT have desa_id
-        if (!$isOperatorDesa) {
+        if (! $isOperatorDesa) {
             $validated['desa_id'] = null;
         }
 
@@ -70,15 +71,15 @@ class UserManagementController extends Controller
         $user = User::create($validated);
 
         // Sync extra permissions - filter null/empty values first
-        $permissions = array_values(array_filter($request->input('permissions', []), fn($p) => !empty(trim($p ?? ''))));
-        
+        $permissions = array_values(array_filter($request->input('permissions', []), fn ($p) => ! empty(trim($p ?? ''))));
+
         // Auto-create permission records AND flush Spatie internal cache
         foreach ($permissions as $permName) {
             \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $permName, 'guard_name' => 'web']);
         }
         // Force Spatie to reload permissions from DB (clears its in-memory cache)
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-        
+
         $user->syncPermissions($permissions);
 
         // Clear navigation cache
@@ -112,12 +113,12 @@ class UserManagementController extends Controller
 
         // Refine rules
         $isOperatorDesa = strtolower($role->nama_role) === 'operator desa' || $role->nama_role === 'operator_desa';
-        
+
         if ($isOperatorDesa && empty($request->desa_id)) {
             return back()->withErrors(['desa_id' => 'Operator Desa wajib memilih Desa.'])->withInput();
         }
 
-        if (!$isOperatorDesa) {
+        if (! $isOperatorDesa) {
             $validated['desa_id'] = null;
         }
 
@@ -131,15 +132,15 @@ class UserManagementController extends Controller
         $user->update($validated);
 
         // Sync extra permissions - filter null/empty values first
-        $permissions = array_values(array_filter($request->input('permissions', []), fn($p) => !empty(trim($p ?? ''))));
-        
+        $permissions = array_values(array_filter($request->input('permissions', []), fn ($p) => ! empty(trim($p ?? ''))));
+
         // Auto-create permission records AND flush Spatie internal cache
         foreach ($permissions as $permName) {
             \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $permName, 'guard_name' => 'web']);
         }
         // Force Spatie to reload permissions from DB (clears its in-memory cache)
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-        
+
         $user->syncPermissions($permissions);
 
         // Clear navigation cache

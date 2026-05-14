@@ -10,6 +10,7 @@ class PersonilDesa extends Model
     use HasFactory;
 
     protected $table = 'personil_desa';
+
     protected $guarded = ['id'];
 
     protected $casts = [

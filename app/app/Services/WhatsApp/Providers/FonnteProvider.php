@@ -12,15 +12,17 @@ use Illuminate\Support\Facades\Log;
  */
 class FonnteProvider implements WhatsAppProviderInterface
 {
-    protected const SEND_URL  = 'https://api.fonnte.com/send';
+    protected const SEND_URL = 'https://api.fonnte.com/send';
+
     protected const CHECK_URL = 'https://api.fonnte.com/device';
 
     protected string $token;
+
     protected ?string $deviceId;
 
     public function __construct(string $token, ?string $deviceId = null)
     {
-        $this->token    = $token;
+        $this->token = $token;
         $this->deviceId = $deviceId;
     }
 
@@ -40,8 +42,8 @@ class FonnteProvider implements WhatsAppProviderInterface
             $phone = $this->normalizePhone($phone);
 
             $body = [
-                'target'      => $phone,
-                'message'     => $message,
+                'target' => $phone,
+                'message' => $message,
                 'countryCode' => '62',
             ];
 
@@ -59,16 +61,20 @@ class FonnteProvider implements WhatsAppProviderInterface
                 $ok = (bool) ($data['status'] ?? false);
                 if ($ok) {
                     Log::info('[Fonnte] Message sent', ['phone' => $phone]);
+
                     return ['success' => true, 'message' => 'Pesan berhasil dikirim', 'data' => $data];
                 }
+
                 return ['success' => false, 'message' => $data['detail'] ?? 'Gagal kirim'];
             }
 
             Log::error('[Fonnte] Send failed', ['status' => $response->status(), 'body' => $response->body()]);
-            return ['success' => false, 'message' => 'HTTP ' . $response->status() . ': ' . $response->body()];
+
+            return ['success' => false, 'message' => 'HTTP '.$response->status().': '.$response->body()];
         } catch (\Exception $e) {
             Log::error('[Fonnte] Exception', ['error' => $e->getMessage()]);
-            return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+
+            return ['success' => false, 'message' => 'Error: '.$e->getMessage()];
         }
     }
 
@@ -81,16 +87,17 @@ class FonnteProvider implements WhatsAppProviderInterface
 
             if ($response->successful()) {
                 $data = $response->json();
-                $ok   = (bool) ($data['status'] ?? false);
+                $ok = (bool) ($data['status'] ?? false);
+
                 return [
                     'success' => $ok,
                     'message' => $ok ? 'Fonnte terhubung' : ($data['detail'] ?? 'Tidak terhubung'),
-                    'status'  => $ok ? 'connected' : 'error',
-                    'data'    => $data,
+                    'status' => $ok ? 'connected' : 'error',
+                    'data' => $data,
                 ];
             }
 
-            return ['success' => false, 'message' => 'HTTP ' . $response->status(), 'status' => 'error'];
+            return ['success' => false, 'message' => 'HTTP '.$response->status(), 'status' => 'error'];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage(), 'status' => 'error'];
         }
@@ -102,11 +109,12 @@ class FonnteProvider implements WhatsAppProviderInterface
     {
         $clean = preg_replace('/[^0-9]/', '', $phone);
         if (str_starts_with($clean, '0')) {
-            return '62' . substr($clean, 1);
+            return '62'.substr($clean, 1);
         }
-        if (!str_starts_with($clean, '62')) {
-            return '62' . $clean;
+        if (! str_starts_with($clean, '62')) {
+            return '62'.$clean;
         }
+
         return $clean;
     }
 }

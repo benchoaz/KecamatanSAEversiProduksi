@@ -3,15 +3,12 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\AnnouncementResource\Pages;
-use App\Filament\Admin\Resources\AnnouncementResource\RelationManagers;
 use App\Models\Announcement;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AnnouncementResource extends Resource
 {
@@ -49,7 +46,7 @@ class AnnouncementResource extends Resource
                             ->multiple()
                             ->relationship('desa', 'nama_desa')
                             ->preload()
-                            ->visible(fn(Forms\Get $get) => $get('target_type') === 'desa'),
+                            ->visible(fn (Forms\Get $get) => $get('target_type') === 'desa'),
                         Forms\Components\Select::make('priority')
                             ->options([
                                 'low' => 'Rendah',
@@ -67,7 +64,7 @@ class AnnouncementResource extends Resource
                         Forms\Components\DatePicker::make('end_date')
                             ->required()
                             ->default(now()->addDays(7)),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 
@@ -83,7 +80,7 @@ class AnnouncementResource extends Resource
                     ->badge(),
                 Tables\Columns\TextColumn::make('priority')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'urgent' => 'danger',
                         'high' => 'warning',
                         'normal' => 'success',

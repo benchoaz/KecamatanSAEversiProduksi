@@ -10,6 +10,7 @@ class LembagaDesa extends Model
     use HasFactory;
 
     protected $table = 'lembaga_desa';
+
     protected $guarded = ['id'];
 
     public function desa()

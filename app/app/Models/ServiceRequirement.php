@@ -21,19 +21,21 @@ class ServiceRequirement extends Model
     protected $casts = [
         'is_required' => 'boolean',
         'max_size_mb' => 'integer',
-        'urutan'      => 'integer',
+        'urutan' => 'integer',
     ];
 
     // Tipe yang didukung
-    public const TYPE_FILE   = 'file_upload';
-    public const TYPE_INFO   = 'text_info';
-    public const TYPE_CHECK  = 'checkbox';
+    public const TYPE_FILE = 'file_upload';
+
+    public const TYPE_INFO = 'text_info';
+
+    public const TYPE_CHECK = 'checkbox';
 
     public static function types(): array
     {
         return [
-            self::TYPE_FILE  => 'Upload File',
-            self::TYPE_INFO  => 'Informasi Teks',
+            self::TYPE_FILE => 'Upload File',
+            self::TYPE_INFO => 'Informasi Teks',
             self::TYPE_CHECK => 'Pernyataan (Checkbox)',
         ];
     }
@@ -57,7 +59,7 @@ class ServiceRequirement extends Model
     public function getFileAcceptAttribute(): string
     {
         return collect($this->accepted_types_array)
-            ->map(fn($ext) => ".$ext")
+            ->map(fn ($ext) => ".$ext")
             ->implode(',');
     }
 }

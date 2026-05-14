@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Desa;
 
-use App\Http\Controllers\Controller;
-use App\Models\Submission;
-use App\Models\Menu;
-use App\Models\Aspek;
-use App\Models\Indikator;
 use App\Helpers\AuditHelper;
+use App\Http\Controllers\Controller;
+use App\Models\Aspek;
+use App\Models\Menu;
+use App\Models\Submission;
 use Illuminate\Http\Request;
 
 class KesraController extends Controller
@@ -26,7 +25,7 @@ class KesraController extends Controller
         // Get Kesra menu
         $menu = Menu::where('kode_menu', 'kesra')->first();
 
-        if (!$menu) {
+        if (! $menu) {
             return redirect()->route('desa.dashboard')->with('error', 'Menu Kesra belum dikonfigurasi.');
         }
 
@@ -53,7 +52,7 @@ class KesraController extends Controller
 
         $menu = Menu::where('kode_menu', 'kesra')->first();
 
-        if (!$menu) {
+        if (! $menu) {
             return redirect()->route('desa.kesra.index')->with('error', 'Menu Kesra belum dikonfigurasi.');
         }
 

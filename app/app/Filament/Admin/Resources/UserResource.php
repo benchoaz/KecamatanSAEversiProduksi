@@ -3,15 +3,12 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\UserResource\Pages;
-use App\Filament\Admin\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
@@ -39,8 +36,8 @@ class UserResource extends Resource
                             ->maxLength(255),
                         Forms\Components\TextInput::make('password')
                             ->password()
-                            ->dehydrated(fn($state) => filled($state))
-                            ->required(fn(string $context): bool => $context === 'create'),
+                            ->dehydrated(fn ($state) => filled($state))
+                            ->required(fn (string $context): bool => $context === 'create'),
                         Forms\Components\Select::make('role_id')
                             ->relationship('role', 'nama_role')
                             ->required()
@@ -57,7 +54,7 @@ class UserResource extends Resource
                             ])
                             ->required()
                             ->native(false),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 
@@ -74,7 +71,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('role.nama_role')
                     ->label('Role')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'Super Admin' => 'danger',
                         'Operator Kecamatan' => 'warning',
                         'Operator Desa' => 'success',
@@ -87,7 +84,7 @@ class UserResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         User::STATUS_AKTIF => 'success',
                         User::STATUS_NONAKTIF => 'danger',
                         default => 'gray',

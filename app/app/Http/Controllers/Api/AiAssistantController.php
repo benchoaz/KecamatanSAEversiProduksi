@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Models\AiMemory;
+use App\Models\AppProfile;
 use App\Models\Berita;
+use App\Models\JobVacancy;
 use App\Models\PublicService;
 use App\Models\Umkm;
-use App\Models\JobVacancy;
-use App\Models\WorkDirectory;
-use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Models\AppProfile;
-use App\Models\AiMemory;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
-use Carbon\Carbon;
 
 class AiAssistantController extends Controller
 {
@@ -23,33 +22,33 @@ class AiAssistantController extends Controller
      */
     private function getAiContext()
     {
-        return Cache::remember('ai_context_data', 300, function() {
+        return Cache::remember('ai_context_data', 300, function () {
             // 1. Get Latest News
             $news = Berita::published()
                 ->orderBy('published_at', 'desc')
                 ->take(3)
                 ->get(['judul', 'ringkasan', 'published_at']);
-            
-            $newsText = "";
-            foreach($news as $n) {
+
+            $newsText = '';
+            foreach ($news as $n) {
                 $date = $n->published_at->format('d M Y');
                 $newsText .= "- [{$date}] {$n->judul}: {$n->ringkasan}\n";
             }
 
             // 2. Get Statistics (Aggregated from 17 Villages)
             $desas = \App\Models\Desa::all();
-            
+
             $totalPenduduk = $desas->sum('jumlah_penduduk');
             $totalLaki = $desas->sum('jumlah_laki_laki');
             $totalPerempuan = $desas->sum('jumlah_perempuan');
             $totalKK = $desas->sum('jumlah_kk');
             $villageNames = $desas->pluck('nama_desa')->join(', ');
-            
+
             $statsText = "STATISTIK WILAYAH (AGREGAT 17 DESA):\n";
             $statsText .= "- Daftar 17 Desa: {$villageNames}\n";
             $statsText .= "- Total Penduduk: {$totalPenduduk} jiwa ({$totalLaki} Laki-laki, {$totalPerempuan} Perempuan)\n";
             $statsText .= "- Total Kepala Keluarga (KK): {$totalKK}\n";
-            
+
             $serviceStats = [
                 'total_layanan' => PublicService::count(),
                 'layanan_selesai' => PublicService::where('status', PublicService::STATUS_SELESAI)->count(),
@@ -65,8 +64,8 @@ class AiAssistantController extends Controller
             $statsText .= "- Total UMKM: {$serviceStats['total_umkm']}, Loker: {$serviceStats['total_loker']}\n";
 
             return [
-                'news' => $newsText ?: "Belum ada berita terbaru.",
-                'stats' => $statsText
+                'news' => $newsText ?: 'Belum ada berita terbaru.',
+                'stats' => $statsText,
             ];
         });
     }
@@ -75,20 +74,20 @@ class AiAssistantController extends Controller
     {
         $message = $request->input('message');
         $phone = $request->input('phone');
-        
-        if (!$message) {
+
+        if (! $message) {
             return response()->json(['reply' => 'Pesan kosong.'], 400);
         }
 
         $profile = AppProfile::first();
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['reply' => 'Sistem belum dikonfigurasi.']);
         }
 
-        if (!$profile->is_ai_active) {
+        if (! $profile->is_ai_active) {
             return response()->json([
-                'reply' => "Mohon maaf, layanan asisten cerdas sedang dinonaktifkan sementara.",
-                'is_ai_active' => false
+                'reply' => 'Mohon maaf, layanan asisten cerdas sedang dinonaktifkan sementara.',
+                'is_ai_active' => false,
             ]);
         }
 
@@ -102,9 +101,9 @@ class AiAssistantController extends Controller
         }
 
         $regionName = $profile->full_region_name ?? ucwords($profile->region_name ?? 'Kecamatan SAE');
-        $botName = !empty($profile->ai_bot_name) ? $profile->ai_bot_name : 'SAE-Bot';
-        $botInstruction = !empty($profile->ai_bot_instruction) ? $profile->ai_bot_instruction : '';
-        
+        $botName = ! empty($profile->ai_bot_name) ? $profile->ai_bot_name : 'SAE-Bot';
+        $botInstruction = ! empty($profile->ai_bot_instruction) ? $profile->ai_bot_instruction : '';
+
         // WAKTU SEKARANG
         $now = Carbon::now('Asia/Jakarta');
         $timeNow = $now->format('H:i');
@@ -114,7 +113,7 @@ class AiAssistantController extends Controller
         $systemPrompt .= "- Nama Anda: '{$botName}'\n";
         $systemPrompt .= "- Wilayah Anda: {$regionName}\n";
         $systemPrompt .= "- Waktu Sekarang: {$timeNow} WIB (PENTING: Gunakan waktu ini sebagai satu-satunya acuan waktu saat ini)\n\n";
-        
+
         $systemPrompt .= "ATURAN MUTLAK:\n";
         $systemPrompt .= "- DILARANG KERAS menyebut nama 'Besuk' dengan huruf kecil. Selalu gunakan 'Besuk'.\n";
         $systemPrompt .= "- Anda adalah asisten virtual resmi yang sangat ramah, hangat, dan penuh empati dari {$regionName}.\n\n";
@@ -147,21 +146,21 @@ class AiAssistantController extends Controller
 
         $systemPrompt .= "PERINTAH KHUSUS:\n";
         $systemPrompt .= "- JANGAN PERNAH memberikan jawaban template yang kaku. Jadilah asisten yang melayani dengan tulus.\n";
-        $systemPrompt .= "- Jika warga ingin LAPOR, MENGADU, ADUAN, CURHAT, atau LAPORAN: Tunjukkan empati yang mendalam, lalu WAJIB berikan link pengaduan resmi di: " . $this->getPublicUrl() . "/#pengaduan\n";
-        $systemPrompt .= "- Jika warga mencari JASA, UMKM, INFO MASAKAN, MAKANAN, atau hal terkait EKONOMI: Arahkan ke Pusat Ekonomi {$regionName} di: " . $this->getPublicUrl() . "/ekonomi\n\n";
+        $systemPrompt .= '- Jika warga ingin LAPOR, MENGADU, ADUAN, CURHAT, atau LAPORAN: Tunjukkan empati yang mendalam, lalu WAJIB berikan link pengaduan resmi di: '.$this->getPublicUrl()."/#pengaduan\n";
+        $systemPrompt .= "- Jika warga mencari JASA, UMKM, INFO MASAKAN, MAKANAN, atau hal terkait EKONOMI: Arahkan ke Pusat Ekonomi {$regionName} di: ".$this->getPublicUrl()."/ekonomi\n\n";
 
-        if (!empty($botInstruction)) {
-            $systemPrompt .= "\nINSTRUKSI TAMBAHAN ADMIN:\n" . $botInstruction . "\n";
+        if (! empty($botInstruction)) {
+            $systemPrompt .= "\nINSTRUKSI TAMBAHAN ADMIN:\n".$botInstruction."\n";
         }
-        
+
         $context = $this->getAiContext();
-        $systemPrompt .= "\nINFORMASI TERKINI & BERITA:\n" . $context['news'] . "\n";
-        $systemPrompt .= "\n" . $context['stats'] . "\n";
+        $systemPrompt .= "\nINFORMASI TERKINI & BERITA:\n".$context['news']."\n";
+        $systemPrompt .= "\n".$context['stats']."\n";
 
         $systemPrompt .= "\nATURAN PENUTUP: Selalu akhiri dengan arahan navigasi (Ketik MENU, STATUS, dsb).\n";
 
         $provider = $profile->ai_provider ?? 'gemini';
-        $reply = "Maaf, terjadi kesalahan.";
+        $reply = 'Maaf, terjadi kesalahan.';
 
         try {
             if ($provider === 'gemini') {
@@ -174,7 +173,7 @@ class AiAssistantController extends Controller
 
             if (preg_match('/\[SET_NAME:(.*?)\]/', $reply, $matches)) {
                 $detectedName = trim($matches[1]);
-                if ($memory && !empty($detectedName)) {
+                if ($memory && ! empty($detectedName)) {
                     $memory->user_name = $detectedName;
                     $memory->save();
                 }
@@ -182,80 +181,105 @@ class AiAssistantController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error("AI Webhook Error ({$provider}): " . $e->getMessage());
-            $reply = "Mohon maaf, sistem sedang gangguan. Silakan ketik *MENU*.";
+            Log::error("AI Webhook Error ({$provider}): ".$e->getMessage());
+            $reply = 'Mohon maaf, sistem sedang gangguan. Silakan ketik *MENU*.';
         }
 
         return response()->json([
             'reply' => trim($reply),
             'is_ai_active' => true,
-            'user_name' => $userName === 'Belum diketahui' ? null : $userName
+            'user_name' => $userName === 'Belum diketahui' ? null : $userName,
         ]);
     }
 
     private function askGemini($apiKey, $systemPrompt, $message)
     {
-        if (empty($apiKey)) throw new \Exception("API Key kosong.");
+        if (empty($apiKey)) {
+            throw new \Exception('API Key kosong.');
+        }
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
         $response = Http::post($url, [
             'system_instruction' => ['parts' => [['text' => $systemPrompt]]],
-            'contents' => [['parts' => [['text' => $message]]]]
+            'contents' => [['parts' => [['text' => $message]]]],
         ]);
         if ($response->successful()) {
             $data = $response->json();
-            return $data['candidates'][0]['content']['parts'][0]['text'] ?? "Maaf, gagal proses.";
+
+            return $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Maaf, gagal proses.';
         }
-        throw new \Exception("Gemini Error: " . $response->body());
+        throw new \Exception('Gemini Error: '.$response->body());
     }
 
     private function askOpenAI($apiKey, $systemPrompt, $message)
     {
-        if (empty($apiKey)) throw new \Exception("API Key kosong.");
+        if (empty($apiKey)) {
+            throw new \Exception('API Key kosong.');
+        }
         $response = Http::withHeaders(['Authorization' => "Bearer {$apiKey}"])
             ->post('https://api.openai.com/v1/chat/completions', [
                 'model' => 'gpt-4o-mini',
                 'messages' => [
                     ['role' => 'system', 'content' => $systemPrompt],
                     ['role' => 'user', 'content' => $message],
-                ]
+                ],
             ]);
         if ($response->successful()) {
             $data = $response->json();
-            return $data['choices'][0]['message']['content'] ?? "Maaf, gagal proses.";
+
+            return $data['choices'][0]['message']['content'] ?? 'Maaf, gagal proses.';
         }
-        throw new \Exception("OpenAI Error: " . $response->body());
+        throw new \Exception('OpenAI Error: '.$response->body());
     }
 
     private function askOpenAICompatible($provider, $profile, $systemPrompt, $message)
     {
-        $apiKey = ''; $baseUrl = ''; $model = '';
-        if ($provider === 'deepseek') { $apiKey = $profile->deepseek_api_key; $baseUrl = 'https://api.deepseek.com/chat/completions'; $model = 'deepseek-chat'; }
-        elseif ($provider === 'xai') { $apiKey = $profile->xai_api_key; $baseUrl = 'https://api.x.ai/v1/chat/completions'; $model = 'grok-beta'; }
-        elseif ($provider === 'openrouter') { $apiKey = $profile->openrouter_api_key; $baseUrl = 'https://openrouter.ai/api/v1/chat/completions'; $model = 'google/gemini-flash-1.5'; }
-        elseif ($provider === 'dashscope') { $apiKey = $profile->dashscope_api_key; $baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions'; $model = 'qwen-turbo'; }
+        $apiKey = '';
+        $baseUrl = '';
+        $model = '';
+        if ($provider === 'deepseek') {
+            $apiKey = $profile->deepseek_api_key;
+            $baseUrl = 'https://api.deepseek.com/chat/completions';
+            $model = 'deepseek-chat';
+        } elseif ($provider === 'xai') {
+            $apiKey = $profile->xai_api_key;
+            $baseUrl = 'https://api.x.ai/v1/chat/completions';
+            $model = 'grok-beta';
+        } elseif ($provider === 'openrouter') {
+            $apiKey = $profile->openrouter_api_key;
+            $baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
+            $model = 'google/gemini-flash-1.5';
+        } elseif ($provider === 'dashscope') {
+            $apiKey = $profile->dashscope_api_key;
+            $baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+            $model = 'qwen-turbo';
+        }
 
-        if (empty($apiKey)) throw new \Exception("API Key kosong.");
+        if (empty($apiKey)) {
+            throw new \Exception('API Key kosong.');
+        }
         $response = Http::withHeaders(['Authorization' => "Bearer {$apiKey}"])
             ->post($baseUrl, [
                 'model' => $model,
                 'messages' => [
                     ['role' => 'system', 'content' => $systemPrompt],
                     ['role' => 'user', 'content' => $message],
-                ]
+                ],
             ]);
         if ($response->successful()) {
             $data = $response->json();
-            return $data['choices'][0]['message']['content'] ?? "Maaf, gagal proses.";
+
+            return $data['choices'][0]['message']['content'] ?? 'Maaf, gagal proses.';
         }
-        throw new \Exception("Error: " . $response->body());
+        throw new \Exception('Error: '.$response->body());
     }
 
     protected function getPublicUrl(): string
     {
         $profile = AppProfile::first();
-        if ($profile && !empty($profile->public_url)) {
+        if ($profile && ! empty($profile->public_url)) {
             return rtrim($profile->public_url, '/');
         }
+
         return rtrim(env('PUBLIC_BASE_URL', config('app.url')), '/');
     }
 }

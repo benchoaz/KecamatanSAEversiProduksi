@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Desa;
 
-use App\Http\Controllers\Controller;
-use App\Models\Submission;
-use App\Models\Menu;
-use App\Models\Aspek;
 use App\Helpers\AuditHelper;
+use App\Http\Controllers\Controller;
+use App\Models\Aspek;
+use App\Models\Menu;
+use App\Models\Submission;
 use Illuminate\Http\Request;
 
 class TrantibumController extends Controller
@@ -25,7 +25,7 @@ class TrantibumController extends Controller
         // Get Trantibum menu
         $menu = Menu::where('kode_menu', 'trantibum')->first();
 
-        if (!$menu) {
+        if (! $menu) {
             return redirect()->route('desa.dashboard')->with('error', 'Menu Trantibum belum dikonfigurasi.');
         }
 
@@ -49,7 +49,7 @@ class TrantibumController extends Controller
 
         $menu = Menu::where('kode_menu', 'trantibum')->first();
 
-        if (!$menu) {
+        if (! $menu) {
             return redirect()->route('desa.trantibum.index')->with('error', 'Menu Trantibum belum dikonfigurasi.');
         }
 
@@ -93,7 +93,6 @@ class TrantibumController extends Controller
     /**
      * Display the specified Trantibum submission
      */
-
     public function show($id)
     {
         $user = auth()->user();

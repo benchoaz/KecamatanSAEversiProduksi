@@ -50,10 +50,10 @@ class WhatsAppManager
         $settings = $settings ?? WahaN8nSetting::getSettings();
 
         return match ($type) {
-            'fonnte'       => self::buildFonnte($settings),
-            'ultramsg'     => self::buildUltraMsg($settings),
+            'fonnte' => self::buildFonnte($settings),
+            'ultramsg' => self::buildUltraMsg($settings),
             'generic_http' => self::buildGenericHttp($settings),
-            default        => self::buildWaha($settings),   // 'waha' + any unknown → WAHA
+            default => self::buildWaha($settings),   // 'waha' + any unknown → WAHA
         };
     }
 
@@ -64,8 +64,8 @@ class WhatsAppManager
     private static function buildWaha(?WahaN8nSetting $settings): WahaProvider
     {
         return new WahaProvider(
-            $settings?->waha_api_url  ?? config('services.waha.url', 'http://localhost:3000'),
-            $settings?->waha_api_key  ?? config('services.waha.api_key'),
+            $settings?->waha_api_url ?? config('services.waha.url', 'http://localhost:3000'),
+            $settings?->waha_api_key ?? config('services.waha.api_key'),
             $settings?->waha_session_name ?? config('services.waha.session', 'default'),
         );
     }
@@ -73,7 +73,7 @@ class WhatsAppManager
     private static function buildFonnte(?WahaN8nSetting $settings): FonnteProvider
     {
         return new FonnteProvider(
-            $settings?->fonnte_token  ?? '',
+            $settings?->fonnte_token ?? '',
             $settings?->fonnte_device ?? null,
         );
     }
@@ -82,22 +82,22 @@ class WhatsAppManager
     {
         return new UltraMsgProvider(
             $settings?->ultramsg_instance_id ?? '',
-            $settings?->ultramsg_token       ?? '',
+            $settings?->ultramsg_token ?? '',
         );
     }
 
     private static function buildGenericHttp(?WahaN8nSetting $settings): GenericHttpProvider
     {
         $rawHeaders = $settings?->generic_http_headers ?? [];
-        $headers    = is_array($rawHeaders) ? $rawHeaders : [];
+        $headers = is_array($rawHeaders) ? $rawHeaders : [];
 
         $rawExtra = $settings?->generic_http_extra_body ?? [];
-        $extra    = is_array($rawExtra) ? $rawExtra : [];
+        $extra = is_array($rawExtra) ? $rawExtra : [];
 
         return new GenericHttpProvider(
-            $settings?->generic_http_url          ?? '',
+            $settings?->generic_http_url ?? '',
             $headers,
-            $settings?->generic_http_phone_field   ?? 'target',
+            $settings?->generic_http_phone_field ?? 'target',
             $settings?->generic_http_message_field ?? 'message',
             $extra,
         );
@@ -113,9 +113,9 @@ class WhatsAppManager
     public static function supportedProviders(): array
     {
         return [
-            'waha'         => 'WAHA (Self-hosted)',
-            'fonnte'       => 'Fonnte',
-            'ultramsg'     => 'UltraMsg',
+            'waha' => 'WAHA (Self-hosted)',
+            'fonnte' => 'Fonnte',
+            'ultramsg' => 'UltraMsg',
             'generic_http' => 'Generic HTTP (custom)',
         ];
     }
@@ -129,7 +129,8 @@ class WhatsAppManager
             return self::driver()->sendMessage($phone, $message);
         } catch (\Exception $e) {
             Log::error('[WhatsAppManager] Unexpected error', ['error' => $e->getMessage()]);
-            return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+
+            return ['success' => false, 'message' => 'Error: '.$e->getMessage()];
         }
     }
 }

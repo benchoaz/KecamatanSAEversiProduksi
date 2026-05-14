@@ -24,17 +24,17 @@ class CheckRole
             return $next($request);
         }
 
-        if (!$user) {
+        if (! $user) {
             return redirect('login');
         }
 
         // Check if user has one of the allowed roles
-        if (!in_array($userRole, $roles)) {
+        if (! in_array($userRole, $roles)) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Unauthorized domain access.'], 403);
             }
 
-            abort(403, 'Anda tidak memiliki hak akses untuk masuk ke domain ini. (Role Anda: ' . $userRole . ')');
+            abort(403, 'Anda tidak memiliki hak akses untuk masuk ke domain ini. (Role Anda: '.$userRole.')');
         }
 
         return $next($request);

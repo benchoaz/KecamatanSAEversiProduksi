@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 class VerifikasiController extends Controller
 {
     protected $submissionService;
+
     protected $masterData;
 
     public function __construct(SubmissionService $submissionService, MasterDataService $masterData)
@@ -23,7 +24,7 @@ class VerifikasiController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        if (!$user->isSuperAdmin() && !$user->isOperatorKecamatan()) {
+        if (! $user->isSuperAdmin() && ! $user->isOperatorKecamatan()) {
             abort(403, 'Akses Terbatas: Anda tidak memiliki izin untuk modul Verifikasi.');
         }
 
@@ -39,12 +40,15 @@ class VerifikasiController extends Controller
             }
         }
 
-        if ($request->desa_id)
+        if ($request->desa_id) {
             $query->where('desa_id', $request->desa_id);
-        if ($request->menu_id)
+        }
+        if ($request->menu_id) {
             $query->where('menu_id', $request->menu_id);
-        if ($request->tahun)
+        }
+        if ($request->tahun) {
             $query->where('tahun', $request->tahun);
+        }
 
         $submissions = $query->latest()->paginate(10);
 
@@ -57,7 +61,7 @@ class VerifikasiController extends Controller
     public function show($uuid)
     {
         $user = auth()->user();
-        if (!$user->isSuperAdmin() && !$user->isOperatorKecamatan()) {
+        if (! $user->isSuperAdmin() && ! $user->isOperatorKecamatan()) {
             abort(403, 'Akses Terbatas: Anda tidak memiliki izin untuk melihat detail Verifikasi.');
         }
 
@@ -68,7 +72,7 @@ class VerifikasiController extends Controller
             'submittedBy',
             'jawabanIndikator.indikator',
             'buktiDukung',
-            'verifikasi.verifikator'
+            'verifikasi.verifikator',
         ])->where('uuid', $uuid)->firstOrFail();
 
         return view('kecamatan.verifikasi.show', compact('submission'));
@@ -78,7 +82,7 @@ class VerifikasiController extends Controller
     {
         $request->validate([
             'status' => 'required',
-            'catatan' => 'nullable|string'
+            'catatan' => 'nullable|string',
         ]);
 
         try {
@@ -91,7 +95,7 @@ class VerifikasiController extends Controller
 
             return redirect()->route('kecamatan.verifikasi.index')->with('success', 'Laporan berhasil diperbarui.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal memproses: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memproses: '.$e->getMessage());
         }
     }
 }

@@ -13,9 +13,9 @@ class PublicUmkmController extends Controller
 
         if ($request->has('q')) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->q . '%')
-                    ->orWhere('product', 'like', '%' . $request->q . '%')
-                    ->orWhere('description', 'like', '%' . $request->q . '%');
+                $q->where('name', 'like', '%'.$request->q.'%')
+                    ->orWhere('product', 'like', '%'.$request->q.'%')
+                    ->orWhere('description', 'like', '%'.$request->q.'%');
             });
         }
 
@@ -30,12 +30,12 @@ class PublicUmkmController extends Controller
 
         // WhatsApp message formatting
         $regionName = appProfile()->full_region_name;
-        $message = "Halo " . $umkm->name . ", saya tertarik dengan produk " . $umkm->product . " yang saya lihat di Website {$regionName}.";
+        $message = 'Halo '.$umkm->name.', saya tertarik dengan produk '.$umkm->product." yang saya lihat di Website {$regionName}.";
         if ($umkm->price) {
-            $message .= " Apakah stok seharga Rp " . number_format((float) $umkm->price, 0, ',', '.') . " masih tersedia?";
+            $message .= ' Apakah stok seharga Rp '.number_format((float) $umkm->price, 0, ',', '.').' masih tersedia?';
         }
 
-        $waUrl = "https://wa.me/" . preg_replace('/[^0-9]/', '', $umkm->contact_wa) . "?text=" . urlencode($message);
+        $waUrl = 'https://wa.me/'.preg_replace('/[^0-9]/', '', $umkm->contact_wa).'?text='.urlencode($message);
 
         return view('public.umkm.show', compact('umkm', 'waUrl'));
     }

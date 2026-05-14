@@ -2,10 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
 use App\Traits\Auditable;
+use Illuminate\Database\Eloquent\Model;
 
 class Announcement extends Model
 {
@@ -21,7 +19,7 @@ class Announcement extends Model
         'end_date',
         'priority',
         'is_active',
-        'created_by'
+        'created_by',
     ];
 
     protected $casts = [

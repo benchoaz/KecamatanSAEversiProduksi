@@ -51,7 +51,7 @@ class AppProfile extends Model
         // Bot Settings
         'public_url',
         'whatsapp_bot_menu',
-        
+
         // AI Settings
         'ai_provider',
         'openai_api_key',
@@ -110,6 +110,6 @@ class AppProfile extends Model
             return $name;
         }
 
-        return $level . ' ' . $name;
+        return $level.' '.$name;
     }
 }

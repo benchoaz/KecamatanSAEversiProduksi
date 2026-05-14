@@ -14,17 +14,17 @@ class ApplicationProfileService
         return Cache::rememberForever($this->cacheKey, function () {
             try {
                 return AppProfile::first() ?? new AppProfile([
-                    'app_name'      => env('APP_NAME', 'Kecamatan SAE'),
-                    'region_name'   => env('KECAMATAN_NAME', 'Kecamatan'),
-                    'region_level'  => 'kecamatan',
-                    'tagline'       => 'Solusi Administrasi Terpadu',
+                    'app_name' => env('APP_NAME', 'Kecamatan SAE'),
+                    'region_name' => env('KECAMATAN_NAME', 'Kecamatan'),
+                    'region_level' => 'kecamatan',
+                    'tagline' => 'Solusi Administrasi Terpadu',
                 ]);
             } catch (\Exception $e) {
                 return new AppProfile([
-                    'app_name'      => env('APP_NAME', 'Kecamatan SAE'),
-                    'region_name'   => env('KECAMATAN_NAME', 'Kecamatan'),
-                    'region_level'  => 'kecamatan',
-                    'tagline'       => 'Solusi Administrasi Terpadu',
+                    'app_name' => env('APP_NAME', 'Kecamatan SAE'),
+                    'region_name' => env('KECAMATAN_NAME', 'Kecamatan'),
+                    'region_level' => 'kecamatan',
+                    'tagline' => 'Solusi Administrasi Terpadu',
                 ]);
             }
         });
@@ -53,25 +53,29 @@ class ApplicationProfileService
     public function getLogo()
     {
         $path = $this->getProfile()->logo_path;
-        return $path ? asset('storage/' . $path) : null;
+
+        return $path ? asset('storage/'.$path) : null;
     }
 
     public function getPariwisataImage()
     {
         $path = $this->getProfile()->image_pariwisata;
-        return $path ? asset('storage/' . $path) : null;
+
+        return $path ? asset('storage/'.$path) : null;
     }
 
     public function getFestivalImage()
     {
         $path = $this->getProfile()->image_festival;
-        return $path ? asset('storage/' . $path) : null;
+
+        return $path ? asset('storage/'.$path) : null;
     }
 
     public function getHeroImage()
     {
         $path = $this->getProfile()->hero_image_path;
-        return $path ? asset('storage/' . $path) : null;
+
+        return $path ? asset('storage/'.$path) : null;
     }
 
     public function getHeroImageAlt()
@@ -87,7 +91,8 @@ class ApplicationProfileService
     public function getHeroBg()
     {
         $path = $this->getProfile()->hero_bg_path;
-        return $path ? asset('storage/' . $path) : null;
+
+        return $path ? asset('storage/'.$path) : null;
     }
 
     public function getHeroBgOpacity()
@@ -105,7 +110,7 @@ class ApplicationProfileService
         return $this->getProfile()->whatsapp_bot_number;
     }
 
-    public function getWhatsappBotUrl($text = "Halo, saya butuh informasi.")
+    public function getWhatsappBotUrl($text = 'Halo, saya butuh informasi.')
     {
         $number = $this->getWhatsappBotNumber();
         if (empty($number)) {
@@ -115,7 +120,7 @@ class ApplicationProfileService
         // Clean number (remove +, spaces, dashes)
         $cleanNumber = preg_replace('/[^0-9]/', '', $number);
 
-        return "https://wa.me/{$cleanNumber}?text=" . urlencode($text);
+        return "https://wa.me/{$cleanNumber}?text=".urlencode($text);
     }
 
     public function clearCache()
@@ -146,19 +151,19 @@ class ApplicationProfileService
 
         // 3. If still localhost or empty, use APP_URL from config
         $configUrl = config('app.url');
-        if ((empty($url) || str_contains($url, 'localhost')) && !empty($configUrl) && !str_contains($configUrl, 'localhost')) {
+        if ((empty($url) || str_contains($url, 'localhost')) && ! empty($configUrl) && ! str_contains($configUrl, 'localhost')) {
             $url = $configUrl;
         }
 
         // 4. Final Fallback: Use request host if available
         if (empty($url) || str_contains($url, 'localhost')) {
             $host = request()->getHost();
-            if ($host && !str_contains($host, 'localhost') && $host !== '127.0.0.1') {
+            if ($host && ! str_contains($host, 'localhost') && $host !== '127.0.0.1') {
                 $scheme = request()->isSecure() ? 'https' : 'http';
-                $url = $scheme . '://' . $host;
+                $url = $scheme.'://'.$host;
             }
         }
-        
+
         // Absolute fallback: baca dari env agar tidak hardcode nama kecamatan
         if (empty($url) || str_contains($url, 'localhost')) {
             $url = env('PUBLIC_BASE_URL', config('app.url', ''));

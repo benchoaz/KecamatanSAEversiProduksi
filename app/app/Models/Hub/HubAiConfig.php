@@ -2,8 +2,8 @@
 
 namespace App\Models\Hub;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class HubAiConfig extends Model
@@ -16,7 +16,7 @@ class HubAiConfig extends Model
         'key',
         'value',
         'description',
-        'is_global'
+        'is_global',
     ];
 
     protected $casts = [
@@ -34,5 +34,6 @@ class HubAiConfig extends Model
     }
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 }

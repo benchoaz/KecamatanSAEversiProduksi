@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PublicService;
-use App\Models\Desa;
 use App\Models\PengunjungKecamatan;
+use App\Models\PublicService;
 use App\Models\PublicServiceAttachment;
 use App\Services\PortalService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon;
-
 use App\Traits\HasWhatsAppNotifications;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class PublicServiceController extends Controller
 {
     use HasWhatsAppNotifications;
+
     protected $portalService;
 
     public function __construct(PortalService $portalService)
     {
         $this->portalService = $portalService;
     }
+
     public function submit(Request $request)
     {
         // 1. Honeypot check (simple anti-spam)
@@ -33,7 +33,7 @@ class PublicServiceController extends Controller
         // 2. Rate Limiting (2 reports / 24h per WA number)
         // Skip rate limiting for chatbox handoff requests (source=chatbox)
         $isChatboxHandoff = $request->input('source') === 'chatbox';
-        if (!$isChatboxHandoff) {
+        if (! $isChatboxHandoff) {
             $count = PublicService::where('whatsapp', $request->whatsapp)
                 ->where('created_at', '>=', Carbon::now()->subDay())
                 ->count();
@@ -43,18 +43,18 @@ class PublicServiceController extends Controller
         }
 
         // 3. Security Keyword filtering (Soft redirection to SP4N-LAPOR)
-        $isHandoff = Str::startsWith($request->uraian, '[Diteruskan dari Bot FAQ]') || 
+        $isHandoff = Str::startsWith($request->uraian, '[Diteruskan dari Bot FAQ]') ||
                      Str::startsWith($request->uraian, '[Chatbot]') ||
                      $request->input('source') === 'chatbox';
 
-        if (!$isHandoff) {
+        if (! $isHandoff) {
             $securityKeywords = ['korupsi', 'suap', 'pencurian', 'pidana', 'dana desa'];
             foreach ($securityKeywords as $keyword) {
                 if (Str::contains(strtolower($request->uraian), $keyword)) {
                     return response()->json([
                         'type' => 'security_referral',
                         'message' => 'Informasi: Untuk laporan terkait indikasi tata kelola keuangan atau penyimpangan berat, disarankan menggunakan kanal resmi SP4N-LAPOR! demi perlindungan data Anda.',
-                        'link' => 'https://lapor.go.id'
+                        'link' => 'https://lapor.go.id',
                     ], 200);
                 }
             }
@@ -66,7 +66,7 @@ class PublicServiceController extends Controller
                     return response()->json([
                         'type' => 'siak_referral',
                         'message' => 'Informasi: Untuk layanan kependudukan (KTP, KK, Akta), silakan merujuk ke portal resmi SIAK atau layanan Dispendukcapil Kabupaten.',
-                        'link' => 'https://siakterpusat.kemendagri.go.id'
+                        'link' => 'https://siakterpusat.kemendagri.go.id',
                     ], 200);
                 }
             }
@@ -82,6 +82,7 @@ class PublicServiceController extends Controller
                         return true;
                     }
                 }
+
                 return false;
             });
 
@@ -89,8 +90,8 @@ class PublicServiceController extends Controller
                 return response()->json([
                     'type' => 'faq_match',
                     'question' => $matchingFaq->question,
-                    'message' => "Jawaban Otomatis:\n" . $matchingFaq->answer . "\n\nInformasi ini bersifat umum. Jika Anda masih ingin mengirim laporan resmi, silakan ubah sedikit deskripsi Anda atau sampaikan detail lainnya.",
-                    'answer' => $matchingFaq->answer
+                    'message' => "Jawaban Otomatis:\n".$matchingFaq->answer."\n\nInformasi ini bersifat umum. Jika Anda masih ingin mengirim laporan resmi, silakan ubah sedikit deskripsi Anda atau sampaikan detail lainnya.",
+                    'answer' => $matchingFaq->answer,
                 ], 200);
             }
         }
@@ -110,7 +111,7 @@ class PublicServiceController extends Controller
             'uraian' => 'required|string|max:1000',
             'whatsapp' => 'required|string|regex:/^[0-9+]+$/',
             'foto.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            'privacy_type' => 'nullable|in:normal,rahasia,anonim'
+            'privacy_type' => 'nullable|in:normal,rahasia,anonim',
         ]);
 
         if ($validator->fails()) {
@@ -146,7 +147,7 @@ class PublicServiceController extends Controller
             'status' => PublicService::STATUS_MENUNGGU,
             'category' => $request->input('category', PublicService::CATEGORY_PELAYANAN),
             'source' => $request->input('source', 'web_form'),
-            'privacy_type' => $request->input('privacy_type', PublicService::PRIVACY_NORMAL)
+            'privacy_type' => $request->input('privacy_type', PublicService::PRIVACY_NORMAL),
         ]);
 
         // 6b. GUEST BOOK INTEGRATION: Create record in pengunjung_kecamatan
@@ -155,15 +156,15 @@ class PublicServiceController extends Controller
                 'nama' => $request->nama_pemohon ?? 'Warga (Bot)',
                 'nik' => $request->nik,
                 'desa_asal_id' => $desaId,
-                'alamat_luar' => ($request->desa_id == '999') ? 'Luar Wilayah ' . appProfile()->full_region_name : null,
+                'alamat_luar' => ($request->desa_id == '999') ? 'Luar Wilayah '.appProfile()->full_region_name : null,
                 'no_hp' => $request->whatsapp,
                 'tujuan_bidang' => 'Pelayanan Umum', // Aligned with visitor dropdown
-                'keperluan' => '[' . $request->jenis_layanan . '] ' . $request->uraian,
+                'keperluan' => '['.$request->jenis_layanan.'] '.$request->uraian,
                 'jam_datang' => now(),
-                'status' => 'menunggu'
+                'status' => 'menunggu',
             ]);
         } catch (\Exception $e) {
-            \Log::error('Gagal mencatat buku tamu (PublicService): ' . $e->getMessage());
+            \Log::error('Gagal mencatat buku tamu (PublicService): '.$e->getMessage());
         }
 
         // 7. Handle uploads (Dynamic Multi-File)
@@ -174,22 +175,24 @@ class PublicServiceController extends Controller
             foreach ($files as $i => $file) {
                 if ($file->isValid()) {
                     $filename = $file->hashName();
-                    $path = $file->storeAs('public_services/' . $service->id, $filename, 'public');
-                    $label = $labels[$i] ?? 'Berkas ' . ($i + 1);
+                    $path = $file->storeAs('public_services/'.$service->id, $filename, 'public');
+                    $label = $labels[$i] ?? 'Berkas '.($i + 1);
 
                     PublicServiceAttachment::create([
                         'public_service_id' => $service->id,
                         'label' => $label,
                         'file_path' => $path,
                         'original_name' => $file->getClientOriginalName(),
-                        'file_type' => $file->getClientMimeType()
+                        'file_type' => $file->getClientMimeType(),
                     ]);
 
                     // Fallback for old system (Keep first 2 as file_path_1 and file_path_2 for basic compatibility)
-                    if ($i === 0)
+                    if ($i === 0) {
                         $service->update(['file_path_1' => $path]);
-                    if ($i === 1)
+                    }
+                    if ($i === 1) {
                         $service->update(['file_path_2' => $path]);
+                    }
                 }
             }
         }
@@ -198,24 +201,24 @@ class PublicServiceController extends Controller
         try {
             // Send to reporter
             $this->portalService->sendComplaintConfirmation($service);
-            
+
             // Send to operator (newly added for Pengaduan)
             $this->sendToOperator($service);
         } catch (\Exception $e) {
-            \Log::warning('WA notification gagal (non-fatal): ' . $e->getMessage());
+            \Log::warning('WA notification gagal (non-fatal): '.$e->getMessage());
         }
 
         return response()->json([
-            'message' => 'Terima kasih. Laporan Anda telah kami terima dengan PIN Lacak: ' . $service->tracking_code . '. Status awal: "Menunggu Klarifikasi".',
+            'message' => 'Terima kasih. Laporan Anda telah kami terima dengan PIN Lacak: '.$service->tracking_code.'. Status awal: "Menunggu Klarifikasi".',
             'uuid' => $service->uuid,
             'tracking_code' => $service->tracking_code,
             'receipt_url' => route('receipt.download', $service->uuid),
-            'tracking_url' => route('public.tracking') . '?q=' . $service->tracking_code
+            'tracking_url' => route('public.tracking').'?q='.$service->tracking_code,
         ]);
     }
 
-        // Deleted old __construct and faqSearch logic moved below if needed
-    
+    // Deleted old __construct and faqSearch logic moved below if needed
+
     public function faqSearch(Request $request)
     {
         // Use injected service instead of standalone
@@ -224,7 +227,7 @@ class PublicServiceController extends Controller
         $data = $faqSearchService->search($query);
 
         // Adjust for legacy frontend expectation if necessary
-        if ($data['found'] && !isset($data['multiple'])) {
+        if ($data['found'] && ! isset($data['multiple'])) {
             $data['multiple'] = false;
         }
 
@@ -239,7 +242,7 @@ class PublicServiceController extends Controller
         $masterLayanan = \App\Models\MasterLayanan::where('is_active', true)
             ->orderBy('urutan')
             ->get();
-            
+
         return view('public.layanan', compact('masterLayanan'));
     }
 
@@ -250,7 +253,7 @@ class PublicServiceController extends Controller
     {
         $request->validate([
             'identifier' => 'required|string',
-            'whatsapp' => 'nullable|string', 
+            'whatsapp' => 'nullable|string',
         ]);
 
         try {
@@ -264,7 +267,7 @@ class PublicServiceController extends Controller
             // Check for UUID format
             if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $identifier)) {
                 $query->where('uuid', $identifier);
-            } 
+            }
             // Check for PIN (6 digits)
             elseif (preg_match('/^[0-9]{6}$/', $identifier)) {
                 $query->where('tracking_code', $identifier);
@@ -272,9 +275,9 @@ class PublicServiceController extends Controller
             // Check for Phone (>= 9 digits)
             elseif (strlen($cleanInput) >= 9) {
                 $suffix = substr($cleanInput, -10);
-                $query->where(function($q) use ($suffix, $cleanInput) {
+                $query->where(function ($q) use ($suffix, $cleanInput) {
                     $q->where('whatsapp_suffix', $suffix)
-                      ->orWhere('whatsapp', 'like', "%$cleanInput%");
+                        ->orWhere('whatsapp', 'like', "%$cleanInput%");
                 });
             } else {
                 return response()->json(['found' => false, 'message' => 'Format identitas tidak dikenali.'], 400);
@@ -284,33 +287,33 @@ class PublicServiceController extends Controller
                 ->latest()
                 ->first();
 
-            if (!$service) {
+            if (! $service) {
                 return response()->json([
-                    'found' => false, 
-                    'message' => 'Berkas tidak ditemukan. Mohon periksa kembali PIN atau nomor WhatsApp Anda.'
+                    'found' => false,
+                    'message' => 'Berkas tidak ditemukan. Mohon periksa kembali PIN atau nomor WhatsApp Anda.',
                 ], 404);
             }
 
             // 2. Security Verification
             // Skip verification if searching directly by full WhatsApp number
             $isPhoneSearch = (strlen($cleanInput) >= 10 && str_contains($service->whatsapp, $cleanInput));
-            
-            if (!$isPhoneSearch && !$inputWa) {
+
+            if (! $isPhoneSearch && ! $inputWa) {
                 return response()->json([
                     'found' => false,
                     'auth_required' => true,
-                    'message' => 'Untuk keamanan, masukkan Nomor WhatsApp yang digunakan saat mendaftar.'
+                    'message' => 'Untuk keamanan, masukkan Nomor WhatsApp yang digunakan saat mendaftar.',
                 ], 403);
             }
 
             if ($inputWa) {
                 $ownerPhone = preg_replace('/[^0-9]/', '', $service->whatsapp);
                 // Match either full number or last 4 digits
-                if (!str_contains($ownerPhone, $inputWa) && !str_contains($inputWa, substr($ownerPhone, -4))) {
+                if (! str_contains($ownerPhone, $inputWa) && ! str_contains($inputWa, substr($ownerPhone, -4))) {
                     return response()->json([
                         'found' => false,
                         'auth_required' => true,
-                        'message' => 'Kombinasi data tidak cocok. Pastikan nomor WA sudah benar.'
+                        'message' => 'Kombinasi data tidak cocok. Pastikan nomor WA sudah benar.',
                     ], 403);
                 }
             }
@@ -318,10 +321,11 @@ class PublicServiceController extends Controller
             return response()->json($this->buildStatusResponse($service));
 
         } catch (\Exception $e) {
-            \Log::error("Tracking Error: " . $e->getMessage(), ['input' => $request->all()]);
+            \Log::error('Tracking Error: '.$e->getMessage(), ['input' => $request->all()]);
+
             return response()->json([
-                'found' => false, 
-                'message' => 'Gagal memuat status berkas. Silakan coba beberapa saat lagi.'
+                'found' => false,
+                'message' => 'Gagal memuat status berkas. Silakan coba beberapa saat lagi.',
             ], 500);
         }
     }
@@ -347,19 +351,19 @@ class PublicServiceController extends Controller
             'rating' => $service->rating,
             'citizen_feedback' => $service->citizen_feedback,
             'feedback_at' => $service->feedback_at ? $service->feedback_at->format('d M Y, H:i') : null,
-            'histories' => $service->histories->map(function($h) {
+            'histories' => $service->histories->map(function ($h) {
                 return [
                     'status_to' => $h->status_to_label,
                     'comment' => $h->comment,
                     'created_at' => $h->created_at->format('d M Y, H:i'),
-                    'action_type' => $h->action_type
+                    'action_type' => $h->action_type,
                 ];
             }),
         ];
 
         // Digital completion
         if ($service->completion_type === 'digital' && $service->result_file_path) {
-            $response['download_url'] = asset('storage/' . $service->result_file_path);
+            $response['download_url'] = asset('storage/'.$service->result_file_path);
         }
 
         // Physical completion
@@ -391,14 +395,14 @@ class PublicServiceController extends Controller
             'status' => 'nullable|string',
             'source' => 'nullable|string',
             'desa_id' => 'nullable|integer|exists:desa,id',
-            'nama_desa_manual' => 'nullable|string'
+            'nama_desa_manual' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -422,31 +426,31 @@ class PublicServiceController extends Controller
             \Log::info('WhatsApp message received and stored', [
                 'service_id' => $service->id,
                 'category' => $service->category,
-                'phone' => $service->whatsapp
+                'phone' => $service->whatsapp,
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'WhatsApp message successfully stored. Tracking PIN: ' . $service->tracking_code,
+                'message' => 'WhatsApp message successfully stored. Tracking PIN: '.$service->tracking_code,
                 'data' => [
                     'id' => $service->id,
                     'uuid' => $service->uuid,
                     'tracking_code' => $service->tracking_code,
                     'category' => $service->category,
-                    'status' => $service->status
-                ]
+                    'status' => $service->status,
+                ],
             ], 201);
 
         } catch (\Exception $e) {
             \Log::error('Failed to store WhatsApp message', [
                 'error' => $e->getMessage(),
-                'data' => $request->all()
+                'data' => $request->all(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to store message',
-                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
     }
@@ -476,8 +480,7 @@ class PublicServiceController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Terima kasih atas penilaian Anda! Masukan Anda sangat berarti bagi peningkatan layanan kami.'
+            'message' => 'Terima kasih atas penilaian Anda! Masukan Anda sangat berarti bagi peningkatan layanan kami.',
         ]);
     }
 }
-

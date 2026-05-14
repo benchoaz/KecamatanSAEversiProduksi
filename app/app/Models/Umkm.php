@@ -8,20 +8,26 @@ use Illuminate\Support\Str;
 
 class Umkm extends Model
 {
-    use HasFactory, \App\Traits\OperationalStatus;
+    use \App\Traits\OperationalStatus, HasFactory;
 
     protected $table = 'umkm';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     // Statuses
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_AKTIF = 'aktif';
+
     public const STATUS_NONAKTIF = 'nonaktif';
 
     // Sources
     const SOURCE_SELF = 'self-service';
+
     const SOURCE_ADMIN = 'admin';
+
     const SOURCE_WHATSAPP = 'whatsapp';
 
     protected $fillable = [
@@ -52,7 +58,7 @@ class Umkm extends Model
         'nib_number',
         'shipping_methods',
         'payment_methods',
-        'auto_reply_message'
+        'auto_reply_message',
     ];
 
     protected $casts = [
@@ -60,7 +66,7 @@ class Umkm extends Model
         'is_on_holiday' => 'boolean',
         'is_verified' => 'boolean',
         'shipping_methods' => 'array',
-        'payment_methods' => 'array'
+        'payment_methods' => 'array',
     ];
 
     protected $hidden = [
@@ -72,14 +78,14 @@ class Umkm extends Model
     {
         parent::boot();
         static::creating(function ($model) {
-            if (!$model->getKey()) {
+            if (! $model->getKey()) {
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
-            if (!$model->manage_token) {
+            if (! $model->manage_token) {
                 $model->manage_token = Str::random(40);
             }
-            if (!$model->slug) {
-                $model->slug = Str::slug($model->nama_usaha) . '-' . Str::random(5);
+            if (! $model->slug) {
+                $model->slug = Str::slug($model->nama_usaha).'-'.Str::random(5);
             }
         });
     }
@@ -151,17 +157,17 @@ class Umkm extends Model
         if ($this->nib_number && $this->nik && $this->is_verified) {
             return 'legal'; // Centang Biru
         }
-        
+
         if ($this->nik && $this->is_verified) {
             return 'warga'; // Verified Citizen
         }
-        
+
         return 'basic'; // Just registered
     }
 
     public function getVerificationLevelLabelAttribute()
     {
-        return match($this->verification_level) {
+        return match ($this->verification_level) {
             'legal' => 'Terverifikasi Legal (OSS NIB)',
             'warga' => 'Warga Terverifikasi',
             default => 'Penyedia Umum'
@@ -180,70 +186,70 @@ class Umkm extends Model
                 'slug' => 'oleh-oleh',
                 'icon' => 'fa-gift',
                 'color_class' => 'bg-amber-50 text-amber-600',
-                'keywords' => ['oleh-oleh', 'khas', 'cinderamata']
+                'keywords' => ['oleh-oleh', 'khas', 'cinderamata'],
             ],
             [
                 'name' => 'Kuliner',
                 'slug' => 'kuliner',
                 'icon' => 'fa-utensils',
                 'color_class' => 'bg-rose-50 text-rose-500',
-                'keywords' => ['makanan', 'minuman', 'bakso', 'snack', 'warung']
+                'keywords' => ['makanan', 'minuman', 'bakso', 'snack', 'warung'],
             ],
             [
                 'name' => 'Fashion',
                 'slug' => 'fashion',
                 'icon' => 'fa-tshirt',
                 'color_class' => 'bg-blue-50 text-blue-500',
-                'keywords' => ['pakaian', 'baju', 'hijab', 'konveksi', 'sepatu', 'tas']
+                'keywords' => ['pakaian', 'baju', 'hijab', 'konveksi', 'sepatu', 'tas'],
             ],
             [
                 'name' => 'Elektronik',
                 'slug' => 'elektronik',
                 'icon' => 'fa-tv',
                 'color_class' => 'bg-indigo-50 text-indigo-500',
-                'keywords' => ['hp', 'komputer', 'laptop', 'servis', 'gadget']
+                'keywords' => ['hp', 'komputer', 'laptop', 'servis', 'gadget'],
             ],
             [
                 'name' => 'Kecantikan',
                 'slug' => 'kecantikan',
                 'icon' => 'fa-magic',
                 'color_class' => 'bg-pink-50 text-pink-500',
-                'keywords' => ['skincare', 'kosmetik', 'salon', 'makeup']
+                'keywords' => ['skincare', 'kosmetik', 'salon', 'makeup'],
             ],
             [
                 'name' => 'Kesehatan',
                 'slug' => 'kesehatan',
                 'icon' => 'fa-heartbeat',
                 'color_class' => 'bg-emerald-50 text-emerald-600',
-                'keywords' => ['obat', 'jamu', 'herbal', 'pijat', 'apotek']
+                'keywords' => ['obat', 'jamu', 'herbal', 'pijat', 'apotek'],
             ],
             [
                 'name' => 'Perabotan',
                 'slug' => 'perabotan',
                 'icon' => 'fa-home',
                 'color_class' => 'bg-orange-50 text-orange-600',
-                'keywords' => ['furniture', 'rumah tangga', 'mebel', 'kasur']
+                'keywords' => ['furniture', 'rumah tangga', 'mebel', 'kasur'],
             ],
             [
                 'name' => 'Pertanian',
                 'slug' => 'pertanian',
                 'icon' => 'fa-seedling',
                 'color_class' => 'bg-green-50 text-green-600',
-                'keywords' => ['bibit', 'pupuk', 'padi', 'sayur', 'buah', 'ternak']
+                'keywords' => ['bibit', 'pupuk', 'padi', 'sayur', 'buah', 'ternak'],
             ],
             [
                 'name' => 'Jasa',
                 'slug' => 'jasa',
                 'icon' => 'fa-tools',
                 'color_class' => 'bg-cyan-50 text-cyan-600',
-                'keywords' => ['servis', 'tukang', 'jahit', 'angkut', 'laundry']
+                'keywords' => ['servis', 'tukang', 'jahit', 'angkut', 'laundry'],
             ],
             [
                 'name' => 'Lainnya',
                 'slug' => 'lainnya',
                 'icon' => 'fa-th-large',
                 'color_class' => 'bg-slate-50 text-slate-500',
-                'keywords' => []
+                'keywords' => [],
             ],
         ];
     }

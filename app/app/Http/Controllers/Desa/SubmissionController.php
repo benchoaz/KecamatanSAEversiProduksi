@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Desa;
 
+use App\Helpers\AuditHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Desa\DesaSubmission;
-use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -46,11 +46,13 @@ class SubmissionController extends Controller
             AuditHelper::log('create', 'desa_submissions', $submission->id, null, $submission->toArray());
 
             DB::commit();
+
             return redirect()->route('desa.submissions.edit', $submission->id)
                 ->with('success', 'Draft laporan berhasil dibuat.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal membuat draft: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal membuat draft: '.$e->getMessage());
         }
     }
 
@@ -59,7 +61,7 @@ class SubmissionController extends Controller
         $submission = DesaSubmission::where('desa_id', auth()->user()->desa_id)
             ->findOrFail($id);
 
-        if (!$submission->isEditable()) {
+        if (! $submission->isEditable()) {
             abort(403, 'Laporan ini sudah dikunci dan tidak dapat diedit.');
         }
 
@@ -71,7 +73,7 @@ class SubmissionController extends Controller
         $submission = DesaSubmission::where('desa_id', auth()->user()->desa_id)
             ->findOrFail($id);
 
-        if (!$submission->isEditable()) {
+        if (! $submission->isEditable()) {
             abort(403, 'Laporan tidak dapat dikirim.');
         }
 
@@ -99,7 +101,7 @@ class SubmissionController extends Controller
         $submission = DesaSubmission::where('desa_id', auth()->user()->desa_id)
             ->findOrFail($id);
 
-        if (!$submission->isEditable()) {
+        if (! $submission->isEditable()) {
             abort(403, 'Laporan tidak dapat diedit.');
         }
 
@@ -116,7 +118,7 @@ class SubmissionController extends Controller
         $submission = DesaSubmission::where('desa_id', auth()->user()->desa_id)
             ->findOrFail($id);
 
-        if (!$submission->isEditable()) {
+        if (! $submission->isEditable()) {
             abort(403, 'Laporan yang sudah dikirim tidak dapat dihapus.');
         }
 

@@ -12,25 +12,23 @@ class CheckPermission
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  $permission
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, Closure $next, string $permission): Response
     {
         // NUCLEAR BYPASS: Always allow the core 'admin' user
         $user = $request->user();
         $userRole = $user && $user->role ? $user->role->name : 'NULL';
-        
+
         // NUCLEAR BYPASS: Always allow the core 'admin' user or anyone with the super_admin_kabupaten role
         if ($user && ($user->username === 'admin' || $userRole === 'super_admin_kabupaten' || $userRole === 'Super Admin')) {
             return $next($request);
         }
 
-        if (auth()->guest() || !auth()->user()->can($permission)) {
+        if (auth()->guest() || ! auth()->user()->can($permission)) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Unauthorized access.'], 403);
             }
-            
+
             abort(403, 'Anda tidak memiliki hak akses untuk halaman ini.');
         }
 

@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\Auditable;
 
 class NewsBanner extends Model
 {
-    use HasFactory, Auditable;
+    use Auditable, HasFactory;
 
     protected $fillable = [
         'title',
@@ -16,7 +16,7 @@ class NewsBanner extends Model
         'link_url',
         'priority',
         'is_active',
-        'created_by'
+        'created_by',
     ];
 
     protected $casts = [

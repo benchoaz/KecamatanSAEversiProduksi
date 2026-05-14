@@ -22,7 +22,7 @@ class AspekObserver
     protected function clearCache(Aspek $aspek): void
     {
         Cache::forget("master.aspek.{$aspek->menu_id}");
-        // Also clear menus cache if aspect counts/relations impact it? 
+        // Also clear menus cache if aspect counts/relations impact it?
         // For now sticking to explicit dependencies. If Menu has 'with aspect', we might need to clear menu cache?
         // User pattern suggests explicit targeting.
     }

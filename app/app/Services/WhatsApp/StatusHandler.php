@@ -2,8 +2,8 @@
 
 namespace App\Services\WhatsApp;
 
-use App\Models\PublicService;
 use App\Models\AiMemory;
+use App\Models\PublicService;
 use Illuminate\Support\Facades\Cache;
 
 class StatusHandler
@@ -19,7 +19,7 @@ class StatusHandler
     public function handle($phone, ?string $query = null): array
     {
         // Normalize phone to string
-        if (!is_string($phone)) {
+        if (! is_string($phone)) {
             if (is_array($phone)) {
                 $phone = reset($phone);
             }
@@ -49,7 +49,7 @@ class StatusHandler
                 $senderPhone = $this->normalizePhone($phone);
                 $recordPhone = $this->normalizePhone($service->whatsapp);
 
-                $securityWarning = "";
+                $securityWarning = '';
                 if ($senderPhone !== $recordPhone) {
                     $securityWarning = "⚠️ _Perhatian: Anda melacak berkas yang terdaftar dengan nomor WhatsApp lain._\n\n";
                 }
@@ -57,7 +57,7 @@ class StatusHandler
                 $result = [
                     'success' => true,
                     'intent' => 'status',
-                    'reply' => $securityWarning . $this->formatSingleStatus($service),
+                    'reply' => $securityWarning.$this->formatSingleStatus($service),
                     'state_update' => 'ADM_SUBMENU',
                 ];
 
@@ -130,7 +130,7 @@ class StatusHandler
     public function handleForgotPin($phone): array
     {
         // Normalize phone to string
-        if (!is_string($phone)) {
+        if (! is_string($phone)) {
             if (is_array($phone)) {
                 $phone = reset($phone);
             }
@@ -165,7 +165,7 @@ class StatusHandler
     protected function normalizePhone($phone): string
     {
         // Handle if phone is an array or object
-        if (!is_string($phone)) {
+        if (! is_string($phone)) {
             if (is_array($phone)) {
                 $phone = reset($phone); // Get first element
             }
@@ -182,7 +182,7 @@ class StatusHandler
 
         // If starts with 0, convert to 62
         if (str_starts_with($clean, '0')) {
-            $clean = '62' . substr($clean, 1);
+            $clean = '62'.substr($clean, 1);
         }
 
         // ALIAS MAPPING UNTUK TESTING
@@ -240,7 +240,7 @@ class StatusHandler
      */
     protected function getCacheKey(string $type, string $identifier): string
     {
-        return "whatsapp_status:{$type}:" . md5($identifier);
+        return "whatsapp_status:{$type}:".md5($identifier);
     }
 
     /**
@@ -250,7 +250,7 @@ class StatusHandler
     {
         $statusLabel = $this->getStatusBadge($service->status);
         $baseUrl = $this->getPublicUrl();
-        $trackingUrl = rtrim($baseUrl, '/') . '/layanan?q=' . $service->tracking_code;
+        $trackingUrl = rtrim($baseUrl, '/').'/layanan?q='.$service->tracking_code;
 
         $msg = "📂 *INFORMASI BERKAS ANDA*\n\n";
         $msg .= "Nama: *{$service->nama_pemohon}*\n";
@@ -271,7 +271,7 @@ class StatusHandler
         }
 
         $msg .= "\n🔗 *Cek Detail Lengkap:*\n{$trackingUrl}\n\n";
-        $msg .= "_Ketik MENU untuk kembali._";
+        $msg .= '_Ketik MENU untuk kembali._';
 
         return $msg;
     }
@@ -282,24 +282,24 @@ class StatusHandler
     protected function formatMultipleStatus($services): string
     {
         $baseUrl = $this->getPublicUrl();
-        
+
         $msg = "📂 *DAFTAR BERKAS LAYANAN ANDA*\n\n";
         $msg .= "Halo! Kami menemukan *{$services->count()}* berkas yang terdaftar dengan nomor ini:\n\n";
 
         foreach ($services as $index => $service) {
             $num = $index + 1;
             $statusLabel = $this->getStatusBadge($service->status);
-            
+
             $msg .= "{$num}. *{$service->jenis_layanan}*\n";
             $msg .= "   📌 PIN: `{$service->tracking_code}`\n";
             $msg .= "   📊 Status: {$statusLabel}\n";
-            $msg .= "   📅 " . $service->created_at->format('d/m/Y') . "\n\n";
+            $msg .= '   📅 '.$service->created_at->format('d/m/Y')."\n\n";
         }
 
         $msg .= "━━━━━━━━━━━━━━━━━\n\n";
         $msg .= "💡 *Tips:* Ketik langsung **PIN Lacak** (6 angka) untuk melihat detail lengkap, atau kunjungi portal kami:\n";
-        $msg .= rtrim($baseUrl, '/') . "/layanan\n\n";
-        $msg .= "_Ketik MENU untuk kembali._";
+        $msg .= rtrim($baseUrl, '/')."/layanan\n\n";
+        $msg .= '_Ketik MENU untuk kembali._';
 
         return $msg;
     }
@@ -307,9 +307,10 @@ class StatusHandler
     protected function getPublicUrl(): string
     {
         $profile = \App\Models\AppProfile::first();
-        if ($profile && !empty($profile->public_url)) {
+        if ($profile && ! empty($profile->public_url)) {
             return rtrim($profile->public_url, '/');
         }
+
         return rtrim(env('PUBLIC_BASE_URL', config('app.url')), '/');
     }
 
@@ -323,7 +324,7 @@ class StatusHandler
             'diproses' => '⚙️ Sedang Dikerjakan',
             'selesai' => '✅ Selesai & Siap Diambil',
             'ditolak' => '❌ Perlu Perbaikan / Ditolak',
-            default => '📋 ' . ucfirst($status),
+            default => '📋 '.ucfirst($status),
         };
     }
 
@@ -333,17 +334,17 @@ class StatusHandler
     protected function formatNotFound(string $phone): string
     {
         $baseUrl = $this->getPublicUrl();
-        $trackingUrl = rtrim($baseUrl, '/') . '/layanan';
+        $trackingUrl = rtrim($baseUrl, '/').'/layanan';
 
-        return "❌ *Berkas Tidak Ditemukan*\n\n" .
-            "Kami tidak menemukan berkas layanan yang terdaftar dengan nomor *{$phone}*.\n\n" .
-            "🔗 *Cek Langsung di Website:*\n" .
-            "{$trackingUrl}\n\n" .
-            "💡 *Saran Aktif:*\n" .
-            "- Ketik langsung **PIN Lacak** (6 angka) jika ada.\n" .
-            "- Ketik **MENU** untuk melihat opsi lain.\n\n" .
-            "━━━━━━━━━━━━━━━━━\n" .
-            "Butuh bantuan? Silakan hubungi petugas kecamatan.";
+        return "❌ *Berkas Tidak Ditemukan*\n\n".
+            "Kami tidak menemukan berkas layanan yang terdaftar dengan nomor *{$phone}*.\n\n".
+            "🔗 *Cek Langsung di Website:*\n".
+            "{$trackingUrl}\n\n".
+            "💡 *Saran Aktif:*\n".
+            "- Ketik langsung **PIN Lacak** (6 angka) jika ada.\n".
+            "- Ketik **MENU** untuk melihat opsi lain.\n\n".
+            "━━━━━━━━━━━━━━━━━\n".
+            'Butuh bantuan? Silakan hubungi petugas kecamatan.';
     }
 
     /**
@@ -351,13 +352,13 @@ class StatusHandler
      */
     protected function formatNoServicesForForgotPin(string $phone): string
     {
-        return "⚠️ *Nomor Tidak Terdaftar*\n\n" .
-            "Maaf, nomor *{$phone}* belum terdaftar memiliki layanan aktif di sistem kami.\n\n" .
-            "💡 *Langkah Selanjutnya:*\n" .
-            "- Silakan ajukan layanan baru di website.\n" .
-            "- Atau hubungi petugas jika ini adalah kesalahan.\n\n" .
-            "━━━━━━━━━━━━━━━━━\n" .
-            "Ketik *MENU* untuk kembali";
+        return "⚠️ *Nomor Tidak Terdaftar*\n\n".
+            "Maaf, nomor *{$phone}* belum terdaftar memiliki layanan aktif di sistem kami.\n\n".
+            "💡 *Langkah Selanjutnya:*\n".
+            "- Silakan ajukan layanan baru di website.\n".
+            "- Atau hubungi petugas jika ini adalah kesalahan.\n\n".
+            "━━━━━━━━━━━━━━━━━\n".
+            'Ketik *MENU* untuk kembali';
     }
 
     /**
@@ -376,8 +377,8 @@ class StatusHandler
         }
 
         $reply .= "━━━━━━━━━━━━━━━━━\n";
-        $reply .= "💡 *Tips:* Ketik PIN di atas untuk melihat detail lengkap.\n\n" .
-            "Ketik *MENU* untuk kembali.";
+        $reply .= "💡 *Tips:* Ketik PIN di atas untuk melihat detail lengkap.\n\n".
+            'Ketik *MENU* untuk kembali.';
 
         return $reply;
     }
@@ -387,11 +388,13 @@ class StatusHandler
      */
     protected function updateAiMemory(string $phone, string $name): void
     {
-        if (empty($phone) || empty($name)) return;
-        
+        if (empty($phone) || empty($name)) {
+            return;
+        }
+
         $phoneClean = preg_replace('/[^0-9]/', '', $phone);
         $memory = AiMemory::firstOrCreate(['phone_number' => $phoneClean]);
-        
+
         // Only update if currently unknown or if the name is significantly different
         if (empty($memory->user_name) || $memory->user_name === 'Belum diketahui') {
             $memory->user_name = $name;

@@ -1,25 +1,25 @@
 <?php
 
+use App\Http\Controllers\ApplicationProfileController;
+use App\Http\Controllers\Kecamatan\AnnouncementController;
+use App\Http\Controllers\Kecamatan\BeritaController;
 use App\Http\Controllers\Kecamatan\DashboardController;
 use App\Http\Controllers\Kecamatan\EkbangController;
 use App\Http\Controllers\Kecamatan\KesraController;
-use App\Http\Controllers\Kecamatan\PemerintahanController;
-use App\Http\Controllers\Kecamatan\TrantibumController;
-use App\Http\Controllers\Kecamatan\VerifikasiController;
 use App\Http\Controllers\Kecamatan\LaporanController;
-use App\Http\Controllers\Kecamatan\UserManagementController;
-// Removed RoleManagementController
-use App\Http\Controllers\Kecamatan\PembangunanController;
-use App\Http\Controllers\Kecamatan\ReferenceDataController;
-use App\Http\Controllers\Master\DesaMasterController;
-use App\Http\Controllers\ApplicationProfileController;
-use App\Http\Controllers\Kecamatan\WahaN8nController;
-use App\Http\Controllers\Kecamatan\PelayananController;
-use App\Http\Controllers\Kecamatan\AnnouncementController;
 use App\Http\Controllers\Kecamatan\LayananPublikController;
-use App\Http\Controllers\Kecamatan\BeritaController;
-use App\Http\Controllers\Kecamatan\ServiceNodeController;
+// Removed RoleManagementController
 use App\Http\Controllers\Kecamatan\NewsBannerController;
+use App\Http\Controllers\Kecamatan\PelayananController;
+use App\Http\Controllers\Kecamatan\PembangunanController;
+use App\Http\Controllers\Kecamatan\PemerintahanController;
+use App\Http\Controllers\Kecamatan\ReferenceDataController;
+use App\Http\Controllers\Kecamatan\ServiceNodeController;
+use App\Http\Controllers\Kecamatan\TrantibumController;
+use App\Http\Controllers\Kecamatan\UserManagementController;
+use App\Http\Controllers\Kecamatan\VerifikasiController;
+use App\Http\Controllers\Kecamatan\WahaN8nController;
+use App\Http\Controllers\Master\DesaMasterController;
 use App\Http\Controllers\Pemerintahan\AparaturController; // Keep for now or move
 use Illuminate\Support\Facades\Route;
 
@@ -74,7 +74,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
             Route::post('/requirements', [ServiceNodeController::class, 'storeRequirement'])->name('requirements.store');
         });
 
-        // Pelayanan Detail & Status Update: Catch-all ID routes moved to end 
+        // Pelayanan Detail & Status Update: Catch-all ID routes moved to end
         // to avoid hijacking static prefixes like /visitor, /faq, /layanan
         Route::get('/{id}', [PelayananController::class, 'show'])->name('show');
         Route::put('/{id}', [PelayananController::class, 'updateStatus'])->name('update-status');
@@ -118,8 +118,6 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
         Route::post('/{id}/hard-delete', [LayananPublikController::class, 'jasaHardDelete'])->name('hard-delete');
     });
 
-
-
     // Restrict other routes to Super Admin & Operator only
     Route::middleware(['role:Operator Kecamatan,Super Admin'])->group(function () {
         // Verification & Approval
@@ -144,7 +142,6 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
         Route::middleware(['permission:view_seksi_pemerintahan'])->prefix('pemerintahan')->name('pemerintahan.')->group(function () {
             Route::get('/', [PemerintahanController::class, 'index'])->name('index');
             Route::get('/export-audit', [PemerintahanController::class, 'exportAudit'])->name('export');
-
 
             // Administrative Governance Modules (Detailed Monitoring)
             Route::prefix('detail')->name('detail.')->group(function () {
@@ -171,7 +168,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
                 Route::get('/dokumen', [PemerintahanController::class, 'dokumenIndex'])->name('dokumen.index');
                 Route::post('/dokumen', [PemerintahanController::class, 'dokumenStore'])->name('dokumen.store');
                 Route::get('/peraturan', [PemerintahanController::class, 'peraturanIndex'])->name('peraturan.index');
-                
+
                 // Rekapitulasi Siltap 17 Desa
                 Route::get('/rekap-siltap', [PemerintahanController::class, 'rekapSiltapIndex'])->name('rekap-siltap.index');
                 Route::post('/rekap-siltap/{id}/update-pagu', [PemerintahanController::class, 'updatePagu'])->name('rekap-siltap.update-pagu');
@@ -216,18 +213,17 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
             Route::post('/', [\App\Http\Controllers\Kecamatan\BackupController::class, 'update'])->name('update');
         });
 
-
         // WAHA & n8n Management - Bot Number
         Route::prefix('settings/waha-n8n')->name('settings.waha-n8n.')->group(function () {
-            Route::get('/',                      [WahaN8nController::class, 'index'])->name('index');
-            Route::put('/',                      [WahaN8nController::class, 'update'])->name('update');
+            Route::get('/', [WahaN8nController::class, 'index'])->name('index');
+            Route::put('/', [WahaN8nController::class, 'update'])->name('update');
 
             // Multi-provider WhatsApp settings
-            Route::get('/provider',              [WahaN8nController::class, 'providerSettings'])->name('provider');
-            Route::put('/provider',              [WahaN8nController::class, 'updateProvider'])->name('provider.update');
-            Route::post('/provider/test',        [WahaN8nController::class, 'testProvider'])->name('provider.test');
-            Route::post('/sync-memory',         [WahaN8nController::class, 'syncMemory'])->name('sync-memory');
-            Route::get('/workflow/download',     [WahaN8nController::class, 'downloadN8nWorkflow'])->name('workflow.download');
+            Route::get('/provider', [WahaN8nController::class, 'providerSettings'])->name('provider');
+            Route::put('/provider', [WahaN8nController::class, 'updateProvider'])->name('provider.update');
+            Route::post('/provider/test', [WahaN8nController::class, 'testProvider'])->name('provider.test');
+            Route::post('/sync-memory', [WahaN8nController::class, 'syncMemory'])->name('sync-memory');
+            Route::get('/workflow/download', [WahaN8nController::class, 'downloadN8nWorkflow'])->name('workflow.download');
         });
 
         // Ekbang (Monitoring Side) (Akses: Seksi Ekbang & Pembangunan)

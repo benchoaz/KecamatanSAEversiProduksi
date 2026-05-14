@@ -15,9 +15,9 @@ class ModuleSettingsService
     /**
      * Get a setting value by module and key
      *
-     * @param string $module Module name (trantibum, umkm, loker, pelayanan)
-     * @param string $key Setting key
-     * @param mixed $default Default value if not found
+     * @param  string  $module  Module name (trantibum, umkm, loker, pelayanan)
+     * @param  string  $key  Setting key
+     * @param  mixed  $default  Default value if not found
      * @return mixed
      */
     public function get(string $module, string $key, $default = null)
@@ -32,12 +32,11 @@ class ModuleSettingsService
     /**
      * Set a setting value
      *
-     * @param string $module Module name
-     * @param string $key Setting key
-     * @param mixed $value Setting value
-     * @param string $type Value type (string, boolean, json, integer)
-     * @param string|null $description Optional description
-     * @return ModuleSetting
+     * @param  string  $module  Module name
+     * @param  string  $key  Setting key
+     * @param  mixed  $value  Setting value
+     * @param  string  $type  Value type (string, boolean, json, integer)
+     * @param  string|null  $description  Optional description
      */
     public function set(string $module, string $key, $value, string $type = 'string', ?string $description = null): ModuleSetting
     {
@@ -52,8 +51,7 @@ class ModuleSettingsService
     /**
      * Get all settings for a module
      *
-     * @param string $module Module name
-     * @return array
+     * @param  string  $module  Module name
      */
     public function all(string $module): array
     {
@@ -72,9 +70,8 @@ class ModuleSettingsService
     /**
      * Check if a setting exists
      *
-     * @param string $module Module name
-     * @param string $key Setting key
-     * @return bool
+     * @param  string  $module  Module name
+     * @param  string  $key  Setting key
      */
     public function has(string $module, string $key): bool
     {
@@ -86,9 +83,8 @@ class ModuleSettingsService
     /**
      * Delete a setting
      *
-     * @param string $module Module name
-     * @param string $key Setting key
-     * @return bool
+     * @param  string  $module  Module name
+     * @param  string  $key  Setting key
      */
     public function delete(string $module, string $key): bool
     {
@@ -104,8 +100,8 @@ class ModuleSettingsService
     /**
      * Clear cache for a specific setting
      *
-     * @param string $module Module name
-     * @param string $key Setting key
+     * @param  string  $module  Module name
+     * @param  string  $key  Setting key
      */
     public function clearCache(string $module, string $key): void
     {
@@ -116,7 +112,7 @@ class ModuleSettingsService
     /**
      * Clear all cache for a module
      *
-     * @param string $module Module name
+     * @param  string  $module  Module name
      */
     public function clearModuleCache(string $module): void
     {
@@ -134,7 +130,7 @@ class ModuleSettingsService
      * Get module announcements (helper for view composers)
      * Uses target_type field to filter announcements for specific modules
      *
-     * @param string $module Module name
+     * @param  string  $module  Module name
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getModuleAnnouncements(string $module)
@@ -160,8 +156,6 @@ class ModuleSettingsService
 
     /**
      * Get Trantibum statistics for dashboard
-     *
-     * @return array
      */
     public function getTrantibumStats(): array
     {
@@ -177,8 +171,6 @@ class ModuleSettingsService
 
     /**
      * Get UMKM statistics for dashboard
-     *
-     * @return array
      */
     public function getUmkmStats(): array
     {
@@ -199,8 +191,6 @@ class ModuleSettingsService
 
     /**
      * Get Loker statistics for dashboard
-     *
-     * @return array
      */
     public function getLokerStats(): array
     {

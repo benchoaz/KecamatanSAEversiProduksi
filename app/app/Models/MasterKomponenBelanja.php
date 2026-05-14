@@ -10,6 +10,7 @@ class MasterKomponenBelanja extends Model
     use HasFactory;
 
     protected $table = 'master_komponen_belanja';
+
     protected $guarded = ['id'];
 
     protected $casts = [

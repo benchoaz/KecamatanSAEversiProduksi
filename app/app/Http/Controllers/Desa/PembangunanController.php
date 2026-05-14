@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Desa;
 
+use App\Helpers\AuditHelper;
 use App\Http\Controllers\Controller;
 use App\Models\PembangunanDesa;
-use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class PembangunanController extends Controller
 {
@@ -165,8 +164,8 @@ class PembangunanController extends Controller
             // Check both tables, or we can use a prefix/logic if they share IDs.
             // Better to check pembangunan_desa first.
             $activity = PembangunanDesa::where('desa_id', $desa_id)->find($id);
-            if (!$activity) {
-                // Check blt_desa - this is a bit tricky if IDs overlap, 
+            if (! $activity) {
+                // Check blt_desa - this is a bit tricky if IDs overlap,
                 // but for this demo/SAE we'll assume they are distinct or use a better strategy.
                 // Actually, let's just use pembangunan_desa for now as per the user's focus on building the engine.
                 $activity = \App\Models\BltDesa::where('desa_id', $desa_id)->find($id);
@@ -191,9 +190,10 @@ class PembangunanController extends Controller
             ->latest()
             ->get()
             ->map(function ($item) {
-                $item->nama_kegiatan = "Penyaluran BLT Tahun " . $item->tahun_anggaran;
-                $item->jenis_kegiatan = "Penyaluran BLT";
+                $item->nama_kegiatan = 'Penyaluran BLT Tahun '.$item->tahun_anggaran;
+                $item->jenis_kegiatan = 'Penyaluran BLT';
                 $item->pagu_anggaran = $item->total_dana_tersalurkan; // or relevant field
+
                 return $item;
             });
 
@@ -239,32 +239,37 @@ class PembangunanController extends Controller
         $data = $validated;
 
         if ($request->hasFile('rab_file')) {
-            if ($item->rab_file)
+            if ($item->rab_file) {
                 Storage::disk('public')->delete($item->rab_file);
+            }
             $data['rab_file'] = $request->file('rab_file')->store('pembangunan/rab', 'public');
         }
 
         if ($request->hasFile('gambar_rencana_file')) {
-            if ($item->gambar_rencana_file)
+            if ($item->gambar_rencana_file) {
                 Storage::disk('public')->delete($item->gambar_rencana_file);
+            }
             $data['gambar_rencana_file'] = $request->file('gambar_rencana_file')->store('pembangunan/desain', 'public');
         }
 
         if ($request->hasFile('foto_sebelum_file')) {
-            if ($item->foto_sebelum_file)
+            if ($item->foto_sebelum_file) {
                 Storage::disk('public')->delete($item->foto_sebelum_file);
+            }
             $data['foto_sebelum_file'] = $request->file('foto_sebelum_file')->store('pembangunan/foto', 'public');
         }
 
         if ($request->hasFile('foto_progres_file')) {
-            if ($item->foto_progres_file)
+            if ($item->foto_progres_file) {
                 Storage::disk('public')->delete($item->foto_progres_file);
+            }
             $data['foto_progres_file'] = $request->file('foto_progres_file')->store('pembangunan/foto', 'public');
         }
 
         if ($request->hasFile('foto_selesai_file')) {
-            if ($item->foto_selesai_file)
+            if ($item->foto_selesai_file) {
                 Storage::disk('public')->delete($item->foto_selesai_file);
+            }
             $data['foto_selesai_file'] = $request->file('foto_selesai_file')->store('pembangunan/foto', 'public');
         }
 
@@ -283,7 +288,7 @@ class PembangunanController extends Controller
             ->with([
                 'logbooks' => function ($query) {
                     $query->latest();
-                }
+                },
             ])
             ->findOrFail($id);
 
@@ -323,7 +328,7 @@ class PembangunanController extends Controller
         return response()->json([
             'status' => 'success',
             'documents' => $docs,
-            'message' => 'Sistem menemukan ' . count($docs) . ' dokumen yang disarankan.'
+            'message' => 'Sistem menemukan '.count($docs).' dokumen yang disarankan.',
         ]);
     }
 
@@ -333,31 +338,42 @@ class PembangunanController extends Controller
         $nilai = $request->input('nilai', 0);
 
         $komponen = \App\Models\MasterKomponenBelanja::find($komponenId);
-        if (!$komponen)
+        if (! $komponen) {
             return response()->json(['status' => 'error', 'message' => 'Komponen tidak ditemukan'], 404);
+        }
 
         $estimation = $assistant->getTaxEstimation($komponen, $nilai);
 
         return response()->json([
             'status' => 'success',
-            'estimation' => $estimation
+            'estimation' => $estimation,
         ]);
     }
 
     public function destroy($id)
     {
         $item = PembangunanDesa::where('desa_id', auth()->user()->desa_id)->findOrFail($id);
-        
+
         if ($item->status_laporan !== 'Draft' && $item->status_laporan !== 'Dikembalikan') {
             return back()->with('error', 'Laporan yang sudah dikirim tidak dapat dihapus.');
         }
 
         // Delete files
-        if ($item->rab_file) Storage::disk('public')->delete($item->rab_file);
-        if ($item->gambar_rencana_file) Storage::disk('public')->delete($item->gambar_rencana_file);
-        if ($item->foto_sebelum_file) Storage::disk('public')->delete($item->foto_sebelum_file);
-        if ($item->foto_progres_file) Storage::disk('public')->delete($item->foto_progres_file);
-        if ($item->foto_selesai_file) Storage::disk('public')->delete($item->foto_selesai_file);
+        if ($item->rab_file) {
+            Storage::disk('public')->delete($item->rab_file);
+        }
+        if ($item->gambar_rencana_file) {
+            Storage::disk('public')->delete($item->gambar_rencana_file);
+        }
+        if ($item->foto_sebelum_file) {
+            Storage::disk('public')->delete($item->foto_sebelum_file);
+        }
+        if ($item->foto_progres_file) {
+            Storage::disk('public')->delete($item->foto_progres_file);
+        }
+        if ($item->foto_selesai_file) {
+            Storage::disk('public')->delete($item->foto_selesai_file);
+        }
 
         $oldValues = $item->toArray();
         $item->delete();

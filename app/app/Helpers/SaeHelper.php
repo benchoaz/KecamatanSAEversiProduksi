@@ -6,9 +6,9 @@ class SaeHelper
 {
     /**
      * Determine required documents based on activity type and components.
-     * 
-     * @param string $jenis
-     * @param array|null $components
+     *
+     * @param  string  $jenis
+     * @param  array|null  $components
      * @return array
      */
     public static function getChecklist($jenis, $components = [])
@@ -21,7 +21,7 @@ class SaeHelper
             $checklist[] = [
                 'title' => 'Tanda Terima Honor Narasumber/Upah',
                 'description' => 'Bukti penyerahan uang honorarium atau upah kerja.',
-                'template' => 'tanda-terima-honor'
+                'template' => 'tanda-terima-honor',
             ];
         }
 
@@ -29,7 +29,7 @@ class SaeHelper
             $checklist[] = [
                 'title' => 'Tanda Terima Uang Saku Peserta',
                 'description' => 'Daftar penerimaan uang saku per orang.',
-                'template' => 'tanda-terima-saku'
+                'template' => 'tanda-terima-saku',
             ];
         }
 
@@ -37,7 +37,7 @@ class SaeHelper
             $checklist[] = [
                 'title' => 'Kwitansi Konsumsi (Makan/Minum)',
                 'description' => 'Nota atau kwitansi dari penyedia katering/toko.',
-                'template' => 'kwitansi-umum'
+                'template' => 'kwitansi-umum',
             ];
         }
 
@@ -45,7 +45,7 @@ class SaeHelper
             $checklist[] = [
                 'title' => 'Kwitansi Alat Tulis Kantor (ATK)',
                 'description' => 'Nota pembelian alat tulis atau kelengkapan kantor.',
-                'template' => 'kwitansi-umum'
+                'template' => 'kwitansi-umum',
             ];
         }
 
@@ -53,7 +53,7 @@ class SaeHelper
             $checklist[] = [
                 'title' => 'Kwitansi Spanduk / Banner',
                 'description' => 'Bukti pembayaran percetakan atribut kegiatan.',
-                'template' => 'kwitansi-umum'
+                'template' => 'kwitansi-umum',
             ];
         }
 
@@ -61,7 +61,7 @@ class SaeHelper
             $checklist[] = [
                 'title' => 'Nota/Kwitansi Pembelian Material',
                 'description' => 'Bukti belanja bahan bangunan atau material fisik.',
-                'template' => 'kwitansi-umum'
+                'template' => 'kwitansi-umum',
             ];
         }
 
@@ -70,12 +70,12 @@ class SaeHelper
             $checklist[] = [
                 'title' => 'Berita Acara Hasil Musyawarah Desa',
                 'description' => 'Dokumen resmi kesepakatan hasil musyawarah.',
-                'template' => 'berita-acara-musdes'
+                'template' => 'berita-acara-musdes',
             ];
             $checklist[] = [
                 'title' => 'Notulen Rapat',
                 'description' => 'Catatan jalannya diskusi dan interaksi rapat.',
-                'template' => 'notulen'
+                'template' => 'notulen',
             ];
         }
 
@@ -83,12 +83,12 @@ class SaeHelper
             $checklist[] = [
                 'title' => 'Daftar Penerima Manfaat (KPM)',
                 'description' => 'Data detail warga penerima bantuan BLT.',
-                'template' => 'daftar-penerima-blt'
+                'template' => 'daftar-penerima-blt',
             ];
             $checklist[] = [
                 'title' => 'Tanda Terima Dana BLT',
                 'description' => 'Bukti penyerahan uang tunai kepada warga.',
-                'template' => 'tanda-terima-blt'
+                'template' => 'tanda-terima-blt',
             ];
         }
 
@@ -97,14 +97,14 @@ class SaeHelper
             $checklist[] = [
                 'title' => 'Daftar Hadir Peserta/Undangan',
                 'description' => 'Absensi kehadiran orang yang terlibat.',
-                'template' => 'daftar-hadir'
+                'template' => 'daftar-hadir',
             ];
         }
 
         $checklist[] = [
             'title' => 'Dokumentasi Foto Kegiatan',
             'description' => 'Foto proses pelaksanaan (Awal, Tengah, Akhir).',
-            'template' => null // Usually just upload slot
+            'template' => null, // Usually just upload slot
         ];
 
         return $checklist;

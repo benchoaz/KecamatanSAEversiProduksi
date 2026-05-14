@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Desa;
 
 use App\Http\Controllers\Controller;
-use App\Models\PersonilDesa;
-use App\Models\LembagaDesa;
 use App\Models\DokumenDesa;
+use App\Models\LembagaDesa;
+use App\Models\PersonilDesa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -26,11 +26,11 @@ class FileController extends Controller
         $type = $request->query('type', 'sk'); // Default to sk
         $filePath = ($type === 'foto') ? $personil->foto : $personil->file_sk;
 
-        if (!$filePath || !Storage::disk('local')->exists($filePath)) {
+        if (! $filePath || ! Storage::disk('local')->exists($filePath)) {
             abort(404, 'File not found.');
         }
 
-        return response()->file(storage_path('app/' . $filePath));
+        return response()->file(storage_path('app/'.$filePath));
     }
 
     /**
@@ -44,11 +44,11 @@ class FileController extends Controller
             abort(403, 'Unauthorized access to this file.');
         }
 
-        if (!$lembaga->file_sk || !Storage::disk('local')->exists($lembaga->file_sk)) {
+        if (! $lembaga->file_sk || ! Storage::disk('local')->exists($lembaga->file_sk)) {
             abort(404, 'File not found.');
         }
 
-        return response()->file(storage_path('app/' . $lembaga->file_sk));
+        return response()->file(storage_path('app/'.$lembaga->file_sk));
     }
 
     /**
@@ -62,10 +62,10 @@ class FileController extends Controller
             abort(403, 'Unauthorized access to this file.');
         }
 
-        if (!$dokumen->file_path || !Storage::disk('local')->exists($dokumen->file_path)) {
+        if (! $dokumen->file_path || ! Storage::disk('local')->exists($dokumen->file_path)) {
             abort(404, 'File not found.');
         }
 
-        return response()->file(storage_path('app/' . $dokumen->file_path));
+        return response()->file(storage_path('app/'.$dokumen->file_path));
     }
 }

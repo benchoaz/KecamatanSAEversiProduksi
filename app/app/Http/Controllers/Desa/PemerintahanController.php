@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Desa;
 
+use App\Helpers\AuditHelper;
 use App\Http\Controllers\Controller;
 use App\Models\DokumenDesa;
 use App\Models\InventarisDesa;
@@ -11,7 +12,6 @@ use App\Models\PersonilDesa;
 use App\Models\Submission;
 use App\Repositories\Interfaces\SubmissionRepositoryInterface;
 use App\Services\MasterDataService;
-use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpZip\ZipFile;
@@ -19,6 +19,7 @@ use PhpZip\ZipFile;
 class PemerintahanController extends Controller
 {
     protected $submissionRepo;
+
     protected $masterData;
 
     public function __construct(
@@ -69,7 +70,7 @@ class PemerintahanController extends Controller
         return view('kecamatan.pemerintahan.personil.index', [
             'personils' => $personils,
             'desa_id' => $desa_id,
-            'store_route' => route('desa.pemerintahan.detail.personil.store') // Garis bawah: Link domain desa tidak melompat
+            'store_route' => route('desa.pemerintahan.detail.personil.store'), // Garis bawah: Link domain desa tidak melompat
         ]);
     }
 
@@ -86,7 +87,7 @@ class PemerintahanController extends Controller
             'desa_id' => $desa_id,
             'title' => 'Struktur BPD',
             'kategori' => 'bpd',
-            'store_route' => route('desa.pemerintahan.detail.personil.store')
+            'store_route' => route('desa.pemerintahan.detail.personil.store'),
         ]);
     }
 
@@ -111,6 +112,7 @@ class PemerintahanController extends Controller
 
         $personil = PersonilDesa::create($validated);
         AuditHelper::log('create', 'personil_desa', $personil->id, null, $personil->toArray());
+
         return back()->with('success', 'Data personil berhasil ditambahkan.');
     }
 
@@ -160,6 +162,7 @@ class PemerintahanController extends Controller
     {
         $perencanaan = PerencanaanDesa::with(['usulan', 'desa'])->findOrFail($id);
         abort_unless($perencanaan->desa_id === auth()->user()->desa_id, 403);
+
         return view('kecamatan.pemerintahan.perencanaan.show', compact('perencanaan'));
     }
 
@@ -187,7 +190,7 @@ class PemerintahanController extends Controller
                 'tahun' => $validated['tahun'],
                 'tanggal_kegiatan' => $validated['tanggal_kegiatan'],
                 'lokasi' => $validated['lokasi'],
-                'status_administrasi' => 'lengkap'
+                'status_administrasi' => 'lengkap',
             ]);
 
             if ($request->hasFile('file_ba')) {
@@ -207,10 +210,12 @@ class PemerintahanController extends Controller
 
             DB::commit();
             AuditHelper::log('create', 'perencanaan_desa', $perencanaan->id, null, $perencanaan->toArray());
+
             return back()->with('success', 'Data Musrenbang & Usulan berhasil disimpan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal menyimpan: '.$e->getMessage());
         }
     }
 
@@ -254,6 +259,7 @@ class PemerintahanController extends Controller
 
         $dokumen = DokumenDesa::create($validated);
         AuditHelper::log('create', 'dokumen_desa', $dokumen->id, null, $dokumen->toArray());
+
         return back()->with('success', 'Dokumen berhasil diarsipkan.');
     }
 
@@ -287,6 +293,7 @@ class PemerintahanController extends Controller
 
         $lembaga = LembagaDesa::create($validated);
         AuditHelper::log('create', 'lembaga_desa', $lembaga->id, null, $lembaga->toArray());
+
         return back()->with('success', 'Data lembaga berhasil ditambahkan.');
     }
 
@@ -295,46 +302,46 @@ class PemerintahanController extends Controller
         $desa = auth()->user()->desa;
         abort_unless($desa, 404);
 
-        $zipFile = new ZipFile();
-        $zipName = "Paket_Audit_" . str_replace(' ', '_', $desa->nama_desa) . "_" . date('Ymd') . ".zip";
+        $zipFile = new ZipFile;
+        $zipName = 'Paket_Audit_'.str_replace(' ', '_', $desa->nama_desa).'_'.date('Ymd').'.zip';
 
         $personils = PersonilDesa::where('desa_id', $desa->id)->whereNotNull('file_sk')->get();
         foreach ($personils as $p) {
-            $fullPath = storage_path('app/local/' . $p->file_sk);
+            $fullPath = storage_path('app/local/'.$p->file_sk);
             if (file_exists($fullPath)) {
-                $zipFile->addFile($fullPath, "A_B_Struktur_Organisasi/" . basename($p->file_sk));
+                $zipFile->addFile($fullPath, 'A_B_Struktur_Organisasi/'.basename($p->file_sk));
             }
         }
 
         $lembagas = LembagaDesa::where('desa_id', $desa->id)->whereNotNull('file_sk')->get();
         foreach ($lembagas as $l) {
-            $fullPath = storage_path('app/local/' . $l->file_sk);
+            $fullPath = storage_path('app/local/'.$l->file_sk);
             if (file_exists($fullPath)) {
-                $zipFile->addFile($fullPath, "C_Lembaga_Desa/" . basename($l->file_sk));
+                $zipFile->addFile($fullPath, 'C_Lembaga_Desa/'.basename($l->file_sk));
             }
         }
 
         $dokumens = DokumenDesa::where('desa_id', $desa->id)->get();
         foreach ($dokumens as $d) {
-            $fullPath = storage_path('app/local/' . $d->file_path);
+            $fullPath = storage_path('app/local/'.$d->file_path);
             if (file_exists($fullPath)) {
-                $folder = in_array($d->tipe_dokumen, ['LKPJ', 'LPPD']) ? "E_Laporan_Tahunan/" : "G_Dokumen_Inti/";
-                $zipFile->addFile($fullPath, $folder . basename($d->file_path));
+                $folder = in_array($d->tipe_dokumen, ['LKPJ', 'LPPD']) ? 'E_Laporan_Tahunan/' : 'G_Dokumen_Inti/';
+                $zipFile->addFile($fullPath, $folder.basename($d->file_path));
             }
         }
 
         $perencanaans = PerencanaanDesa::where('desa_id', $desa->id)->whereNotNull('file_ba')->get();
         foreach ($perencanaans as $pr) {
-            $fullPath = storage_path('app/local/' . $pr->file_ba);
+            $fullPath = storage_path('app/local/'.$pr->file_ba);
             if (file_exists($fullPath)) {
-                $zipFile->addFile($fullPath, "D_Perencanaan/" . basename($pr->file_ba));
+                $zipFile->addFile($fullPath, 'D_Perencanaan/'.basename($pr->file_ba));
             }
         }
 
-        $zipFile->saveAsFile(storage_path('app/temp/' . $zipName));
+        $zipFile->saveAsFile(storage_path('app/temp/'.$zipName));
         $zipFile->close();
 
-        return response()->download(storage_path('app/temp/' . $zipName))->deleteFileAfterSend(true);
+        return response()->download(storage_path('app/temp/'.$zipName))->deleteFileAfterSend(true);
     }
 
     protected function calculateHealth($desa_id)
@@ -355,18 +362,21 @@ class PemerintahanController extends Controller
             'summary' => [
                 'has_kades' => $hasKades,
                 'has_sekdes' => $hasSekdes,
-                'last_asset' => $lastAssetUpdate ? $lastAssetUpdate->updated_at->format('d/m/Y') : '-'
-            ]
+                'last_asset' => $lastAssetUpdate ? $lastAssetUpdate->updated_at->format('d/m/Y') : '-',
+            ],
         ];
     }
 
     private function getCurrentPhase()
     {
         $month = (int) date('n');
-        if ($month >= 1 && $month <= 6)
+        if ($month >= 1 && $month <= 6) {
             return 'musdes';
-        if ($month >= 7 && $month <= 9)
+        }
+        if ($month >= 7 && $month <= 9) {
             return 'rkp';
+        }
+
         return 'apbdes';
     }
 }

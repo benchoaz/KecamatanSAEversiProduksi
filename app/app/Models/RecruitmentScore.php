@@ -24,10 +24,10 @@ class RecruitmentScore extends Model
     ];
 
     protected $casts = [
-        'nilai_tertulis'  => 'float',
+        'nilai_tertulis' => 'float',
         'nilai_wawancara' => 'float',
-        'nilai_total'     => 'float',
-        'scored_at'       => 'datetime',
+        'nilai_total' => 'float',
+        'scored_at' => 'datetime',
     ];
 
     /**

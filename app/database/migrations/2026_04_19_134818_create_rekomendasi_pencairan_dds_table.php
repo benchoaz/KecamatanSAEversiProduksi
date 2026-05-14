@@ -16,13 +16,13 @@ return new class extends Migration
             $table->foreignId('desa_id')->constrained('desa')->onDelete('cascade');
             $table->integer('tahap_pencairan')->comment('1, 2, atau 3');
             $table->enum('status_akhir', [
-                'VALID', 
-                'TIDAK VALID', 
-                'BELUM ADA', 
-                'TUNDA', 
-                'TIDAK LAYAK', 
-                'PERBAIKAN', 
-                'LAYAK CAIR'
+                'VALID',
+                'TIDAK VALID',
+                'BELUM ADA',
+                'TUNDA',
+                'TIDAK LAYAK',
+                'PERBAIKAN',
+                'LAYAK CAIR',
             ])->default('BELUM ADA');
             $table->text('catatan_revisi')->nullable();
             $table->string('pdf_rekomendasi_camat')->nullable();

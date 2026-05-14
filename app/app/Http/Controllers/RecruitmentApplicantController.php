@@ -2,27 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\RecruitmentService;
 use App\Repositories\Interfaces\RecruitmentRepositoryInterface;
-use Illuminate\Http\Request;
+use App\Services\RecruitmentService;
 use Exception;
+use Illuminate\Http\Request;
 
 class RecruitmentApplicantController extends Controller
 {
     protected $recruitmentService;
+
     protected $recruitmentRepo;
 
     public function __construct(RecruitmentService $recruitmentService, RecruitmentRepositoryInterface $recruitmentRepo)
     {
         $this->recruitmentService = $recruitmentService;
-        $this->recruitmentRepo    = $recruitmentRepo;
+        $this->recruitmentRepo = $recruitmentRepo;
     }
 
     /** Daftar pendaftar untuk vacancy tertentu (Desa/Panitia) */
     public function index(int $vacancyId)
     {
-        $vacancy    = $this->recruitmentRepo->findVacancyById($vacancyId);
+        $vacancy = $this->recruitmentRepo->findVacancyById($vacancyId);
         $applicants = $vacancy->applicants()->with('score')->orderByDesc('score_total')->get();
+
         return view('recruitment.desa.applicant.index', compact('vacancy', 'applicants'));
     }
 
@@ -31,11 +33,12 @@ class RecruitmentApplicantController extends Controller
     {
         $request->validate([
             'status' => 'required|in:verified,rejected,exam_qualified',
-            'notes'  => 'nullable|string',
+            'notes' => 'nullable|string',
         ]);
 
         try {
             $this->recruitmentService->verifyApplicant($id, $request->status, auth()->id());
+
             return back()->with('success', 'Status pendaftar berhasil diperbarui.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
@@ -49,15 +52,15 @@ class RecruitmentApplicantController extends Controller
         $isBuktiRequired = $applicant->score?->bukti_ujian_path ? 'nullable' : 'required';
 
         $request->validate([
-            'nilai_tertulis'   => 'required|numeric|min:0|max:100',
-            'nilai_wawancara'  => 'required|numeric|min:0|max:100',
-            'catatan'          => 'nullable|string',
+            'nilai_tertulis' => 'required|numeric|min:0|max:100',
+            'nilai_wawancara' => 'required|numeric|min:0|max:100',
+            'catatan' => 'nullable|string',
             'bukti_ujian_file' => "$isBuktiRequired|file|mimes:pdf|max:5120",
         ]);
 
         try {
             $buktiPath = $applicant->score?->bukti_ujian_path;
-            
+
             if ($request->hasFile('bukti_ujian_file')) {
                 $buktiPath = $request->file('bukti_ujian_file')->store('recruitment/bukti_ujian', 'public');
             }
@@ -70,6 +73,7 @@ class RecruitmentApplicantController extends Controller
                 $request->catatan,
                 $buktiPath
             );
+
             return back()->with('success', 'Nilai dan bukti ujian berhasil disimpan.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
@@ -86,6 +90,7 @@ class RecruitmentApplicantController extends Controller
                 ->where('id', '!=', $applicantId)
                 ->where('status', 'verified')
                 ->update(['status' => 'not_selected']);
+
             return back()->with('success', 'Pendaftar berhasil ditetapkan sebagai terpilih.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);

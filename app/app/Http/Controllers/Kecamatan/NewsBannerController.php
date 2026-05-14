@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Kecamatan;
 
 use App\Http\Controllers\Controller;
-use App\Models\NewsBanner;
 use App\Models\AuditLog;
+use App\Models\NewsBanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -30,7 +30,7 @@ class NewsBannerController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'link_url' => 'nullable|url',
             'priority' => 'integer|min:0',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
         ]);
 
         if ($request->hasFile('image')) {
@@ -52,6 +52,7 @@ class NewsBannerController extends Controller
     public function edit($id)
     {
         $banner = NewsBanner::findOrFail($id);
+
         return view('kecamatan.berita.banners.edit', compact('banner'));
     }
 
@@ -88,11 +89,11 @@ class NewsBannerController extends Controller
     public function destroy($id)
     {
         $banner = NewsBanner::findOrFail($id);
-        
+
         if ($banner->image_path) {
             Storage::disk('public')->delete($banner->image_path);
         }
-        
+
         $banner->delete();
 
         $this->logAudit('delete', $banner);
@@ -104,7 +105,7 @@ class NewsBannerController extends Controller
     public function toggleStatus($id)
     {
         $banner = NewsBanner::findOrFail($id);
-        $banner->update(['is_active' => !$banner->is_active]);
+        $banner->update(['is_active' => ! $banner->is_active]);
 
         $this->logAudit('toggle_status', $banner);
 
@@ -118,12 +119,12 @@ class NewsBannerController extends Controller
             'action' => $action,
             'model_type' => get_class($model),
             'model_id' => $model->id,
-            'details' => "Aksi $action pada modul Banner Berita: " . $model->title,
+            'details' => "Aksi $action pada modul Banner Berita: ".$model->title,
             'old_values' => $oldValues,
             'new_values' => $model->getAttributes(),
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
-            'domain' => 'kecamatan'
+            'domain' => 'kecamatan',
         ]);
     }
 }

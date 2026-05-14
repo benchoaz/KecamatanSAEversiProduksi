@@ -10,6 +10,7 @@ class MasterBidang extends Model
     use HasFactory;
 
     protected $table = 'master_bidang';
+
     protected $guarded = ['id'];
 
     protected $casts = [

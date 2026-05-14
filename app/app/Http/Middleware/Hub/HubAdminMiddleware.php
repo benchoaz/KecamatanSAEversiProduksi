@@ -22,6 +22,7 @@ class HubAdminMiddleware
         }
 
         Auth::logout();
+
         return redirect()->route('hub.login')->with('error', 'Akses ditolak. Area khusus Super Admin Kabupaten.');
     }
 }

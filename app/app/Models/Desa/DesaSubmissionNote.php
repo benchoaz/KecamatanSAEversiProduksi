@@ -10,6 +10,7 @@ class DesaSubmissionNote extends Model
     use HasFactory;
 
     protected $table = 'desa_submission_notes';
+
     protected $guarded = ['id'];
 
     public function submission()

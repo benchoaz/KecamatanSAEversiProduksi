@@ -3,36 +3,37 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Desa;
+use App\Models\MasterLayanan;
 use App\Models\PublicService;
 use App\Models\PublicServiceAttachment;
-use App\Models\MasterLayanan;
 use App\Models\ServiceNode;
-use App\Models\Desa;
+use App\Traits\HasWhatsAppNotifications;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
-use App\Traits\HasWhatsAppNotifications;
+use Illuminate\Support\Str;
 
 class LayananController extends Controller
 {
     use HasWhatsAppNotifications;
+
     /**
      * Show dynamic layanan page (besluit tree or legacy fallback)
      */
     public function showLayanan(string $slug)
     {
         // Cari berdasarkan slug ATAU nama layanan (backward compatible)
-        $layanan = MasterLayanan::where(function($q) use ($slug) {
+        $layanan = MasterLayanan::where(function ($q) use ($slug) {
             $q->where('slug', $slug)
-              ->orWhere('nama_layanan', $slug);
+                ->orWhere('nama_layanan', $slug);
         })
-        ->where('is_active', true)
-        ->first();
+            ->where('is_active', true)
+            ->first();
 
-        if (!$layanan) abort(404);
+        if (! $layanan) {
+            abort(404);
+        }
 
         $desas = Desa::orderBy('nama_desa')->get();
 
@@ -46,27 +47,27 @@ class LayananController extends Controller
         }
 
         // Bangun requirements dari attachment_requirements (berlaku untuk semua mode)
-        $masterRequirements = !empty($layanan->attachment_requirements)
-            ? collect($layanan->attachment_requirements)->values()->map(fn($r, $i) => [
-                'id'             => 999000 + $i,
-                'label'          => (string) $r,
-                'type'           => 'file_upload',
-                'is_required'    => true,
-                'description'    => null,
+        $masterRequirements = ! empty($layanan->attachment_requirements)
+            ? collect($layanan->attachment_requirements)->values()->map(fn ($r, $i) => [
+                'id' => 999000 + $i,
+                'label' => (string) $r,
+                'type' => 'file_upload',
+                'is_required' => true,
+                'description' => null,
                 'accepted_types' => 'jpg,png,pdf',
-                'max_size_mb'    => 5
+                'max_size_mb' => 5,
             ])->values()->all()
             : [];
 
         return view('public.service_navigator', [
-            'layanan'              => $layanan,
-            'rootNodes'            => $nodes ?? [],
-            'desas'                => $desas,
-            'directSubmission'     => !$layanan->has_nodes,
+            'layanan' => $layanan,
+            'rootNodes' => $nodes ?? [],
+            'desas' => $desas,
+            'directSubmission' => ! $layanan->has_nodes,
             // Untuk layanan tanpa node: tampilkan langsung
             // Untuk layanan dengan node: requirements ditampilkan sebagai "syarat umum" di bawah node
-            'requirements'         => !$layanan->has_nodes ? $masterRequirements : [],
-            'masterRequirements'   => $masterRequirements,
+            'requirements' => ! $layanan->has_nodes ? $masterRequirements : [],
+            'masterRequirements' => $masterRequirements,
         ]);
     }
 
@@ -76,10 +77,11 @@ class LayananController extends Controller
     public function showForm($type)
     {
         $validTypes = ['ktp', 'kk', 'akta', 'sktm', 'domisili', 'nikah', 'bpjs'];
-        
+
         if (in_array($type, $validTypes)) {
             $desas = Desa::orderBy('nama_desa')->get();
             $context = $this->getServiceContext($type);
+
             return view('public.apply', compact('type', 'desas', 'context'));
         }
 
@@ -125,7 +127,7 @@ class LayananController extends Controller
                     'nik' => $request->nik,
                     'whatsapp' => $request->whatsapp,
                     'desa_id' => $request->desa_id,
-                    'uraian' => $request->uraian ?? "Pengajuan online " . strtoupper($request->type),
+                    'uraian' => $request->uraian ?? 'Pengajuan online '.strtoupper($request->type),
                     'status' => PublicService::STATUS_MENUNGGU,
                     'source' => 'web_portal',
                     'is_agreed' => true,
@@ -136,18 +138,22 @@ class LayananController extends Controller
                 if ($request->hasFile('attachments')) {
                     foreach ($request->file('attachments') as $index => $file) {
                         $path = $file->store('public_services', 'public');
-                        
+
                         PublicServiceAttachment::create([
                             'public_service_id' => $service->id,
-                            'label' => $request->attachment_labels[$index] ?? 'Lampiran ' . ($index + 1),
+                            'label' => $request->attachment_labels[$index] ?? 'Lampiran '.($index + 1),
                             'file_path' => $path,
                             'original_name' => $file->getClientOriginalName(),
                             'file_type' => $file->getClientMimeType(),
                         ]);
 
                         // Backward compatibility for old columns if they exist
-                        if ($index === 0) $service->update(['file_path_1' => $path]);
-                        if ($index === 1) $service->update(['file_path_2' => $path]);
+                        if ($index === 0) {
+                            $service->update(['file_path_1' => $path]);
+                        }
+                        if ($index === 1) {
+                            $service->update(['file_path_2' => $path]);
+                        }
                     }
                 }
 
@@ -159,14 +165,15 @@ class LayananController extends Controller
                     'message' => 'Permohonan berhasil dikirim!',
                     'tracking_code' => $service->tracking_code,
                     'uuid' => $service->uuid,
-                    'redirect' => route('layanan') . '?q=' . $service->tracking_code
+                    'redirect' => route('layanan').'?q='.$service->tracking_code,
                 ]);
             });
         } catch (\Exception $e) {
-            \Log::error('Service Submission Error: ' . $e->getMessage());
+            \Log::error('Service Submission Error: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.'
+                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.',
             ], 500);
         }
     }
@@ -178,94 +185,98 @@ class LayananController extends Controller
 
         $messages = [
             'nama_pemohon.required' => 'Nama lengkap wajib diisi.',
-            'nik.required'          => 'Nomor NIK wajib diisi.',
-            'nik.size'              => 'Nomor NIK harus 16 digit.',
-            'nik.regex'             => 'Nomor NIK harus berupa angka.',
-            'whatsapp.required'     => 'Nomor WhatsApp wajib diisi.',
-            'whatsapp.min'          => 'Nomor WhatsApp minimal 9 digit.',
-            'no_kk.size'            => 'Nomor KK harus 16 digit.',
-            'no_kk.regex'           => 'Nomor KK harus berupa angka.',
-            'desa_id.required'      => 'Silakan pilih desa domisili.',
-            'is_agreed.accepted'    => 'Anda harus menyetujui pernyataan kebenaran data.',
-            'attachments.*.max'     => 'Ukuran file maksimal 10MB.',
-            'child_dob.date'        => 'Format tanggal lahir anak tidak valid.',
+            'nik.required' => 'Nomor NIK wajib diisi.',
+            'nik.size' => 'Nomor NIK harus 16 digit.',
+            'nik.regex' => 'Nomor NIK harus berupa angka.',
+            'whatsapp.required' => 'Nomor WhatsApp wajib diisi.',
+            'whatsapp.min' => 'Nomor WhatsApp minimal 9 digit.',
+            'no_kk.size' => 'Nomor KK harus 16 digit.',
+            'no_kk.regex' => 'Nomor KK harus berupa angka.',
+            'desa_id.required' => 'Silakan pilih desa domisili.',
+            'is_agreed.accepted' => 'Anda harus menyetujui pernyataan kebenaran data.',
+            'attachments.*.max' => 'Ukuran file maksimal 10MB.',
+            'child_dob.date' => 'Format tanggal lahir anak tidak valid.',
         ];
 
         $request->validate([
-            'node_id'            => 'nullable|exists:service_nodes,id',
-            'master_layanan_id'  => 'required|exists:master_layanan,id',
-            'nama_pemohon'       => $showIdentity ? 'required|string|max:255' : 'nullable|string|max:255',
-            'nik'                => $showIdentity ? 'required|string|size:16|regex:/^[0-9]+$/' : 'nullable|string|size:16|regex:/^[0-9]+$/',
-            'whatsapp'           => $showIdentity ? 'required|string|min:9|max:15|regex:/^[0-9+]+$/' : 'nullable|string|min:9|max:15|regex:/^[0-9+]+$/',
-            'desa_id'            => $showIdentity ? 'required|exists:desa,id' : 'nullable|exists:desa,id',
-            'uraian'             => 'nullable|string|max:1000',
-            'is_agreed'          => 'required|accepted',
-            'attachments.*'      => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
+            'node_id' => 'nullable|exists:service_nodes,id',
+            'master_layanan_id' => 'required|exists:master_layanan,id',
+            'nama_pemohon' => $showIdentity ? 'required|string|max:255' : 'nullable|string|max:255',
+            'nik' => $showIdentity ? 'required|string|size:16|regex:/^[0-9]+$/' : 'nullable|string|size:16|regex:/^[0-9]+$/',
+            'whatsapp' => $showIdentity ? 'required|string|min:9|max:15|regex:/^[0-9+]+$/' : 'nullable|string|min:9|max:15|regex:/^[0-9+]+$/',
+            'desa_id' => $showIdentity ? 'required|exists:desa,id' : 'nullable|exists:desa,id',
+            'uraian' => 'nullable|string|max:1000',
+            'is_agreed' => 'required|accepted',
+            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:10240',
             'attachment_req_ids' => 'nullable|array',
-            
+
             // Applicant Extra Info
-            'applicant_name'     => 'nullable|string|max:255',
-            'applicant_nik'      => 'nullable|string|size:16',
-            'no_kk'              => 'nullable|string|size:16|regex:/^[0-9]+$/',
-            
+            'applicant_name' => 'nullable|string|max:255',
+            'applicant_nik' => 'nullable|string|size:16',
+            'no_kk' => 'nullable|string|size:16|regex:/^[0-9]+$/',
+
             // Child Extra Info
-            'child_gender'       => 'nullable|string|max:20',
-            'child_pob'          => 'nullable|string|max:255',
-            'child_dob'          => 'nullable|date',
+            'child_gender' => 'nullable|string|max:20',
+            'child_pob' => 'nullable|string|max:255',
+            'child_dob' => 'nullable|date',
         ], $messages);
 
         try {
             return DB::transaction(function () use ($request) {
                 $layanan = MasterLayanan::findOrFail($request->master_layanan_id);
-                $node    = $request->node_id ? ServiceNode::find($request->node_id) : null;
+                $node = $request->node_id ? ServiceNode::find($request->node_id) : null;
 
                 if ($node && $node->master_layanan_id != $layanan->id) {
                     abort(403, 'Akses node tidak valid untuk layanan ini.');
                 }
 
                 $wa = preg_replace('/[^0-9]/', '', $request->whatsapp ?? '');
-                if (str_starts_with($wa, '0')) $wa = '62' . substr($wa, 1);
-                if (!str_starts_with($wa, '62') && !empty($wa)) $wa = '62' . $wa;
+                if (str_starts_with($wa, '0')) {
+                    $wa = '62'.substr($wa, 1);
+                }
+                if (! str_starts_with($wa, '62') && ! empty($wa)) {
+                    $wa = '62'.$wa;
+                }
 
                 $serviceData = [
-                    'uuid'          => (string) Str::uuid(),
-                    'category'      => PublicService::CATEGORY_PELAYANAN,
-                    'jenis_layanan' => $node ? $layanan->nama_layanan . ' — ' . $node->name : $layanan->nama_layanan,
-                    'nama_pemohon'  => $request->nama_pemohon,
-                    'nik'           => $request->nik,
-                    'whatsapp'      => $wa,
-                    'desa_id'       => $request->desa_id,
-                    'uraian'        => $request->uraian ?? 'Pengajuan online: ' . ($node ? $layanan->nama_layanan . ' — ' . $node->name : $layanan->nama_layanan),
-                    'status'        => PublicService::STATUS_MENUNGGU,
-                    'source'        => 'web_portal',
-                    'is_agreed'     => true,
-                    'ip_address'    => $request->ip(),
+                    'uuid' => (string) Str::uuid(),
+                    'category' => PublicService::CATEGORY_PELAYANAN,
+                    'jenis_layanan' => $node ? $layanan->nama_layanan.' — '.$node->name : $layanan->nama_layanan,
+                    'nama_pemohon' => $request->nama_pemohon,
+                    'nik' => $request->nik,
+                    'whatsapp' => $wa,
+                    'desa_id' => $request->desa_id,
+                    'uraian' => $request->uraian ?? 'Pengajuan online: '.($node ? $layanan->nama_layanan.' — '.$node->name : $layanan->nama_layanan),
+                    'status' => PublicService::STATUS_MENUNGGU,
+                    'source' => 'web_portal',
+                    'is_agreed' => true,
+                    'ip_address' => $request->ip(),
                 ];
 
                 // Build rich Uraian with extra data
-                $extraUraian = "";
+                $extraUraian = '';
 
                 if ($request->no_kk) {
-                    $extraUraian .= "\nNO. KK: " . $request->no_kk;
+                    $extraUraian .= "\nNO. KK: ".$request->no_kk;
                 }
-                
+
                 // Child Data (if birth service)
                 if ($request->child_gender || $request->child_pob || $request->child_dob) {
                     $extraUraian .= "\n\n--- DETAIL SUBJEK (ANAK) ---\n";
-                    $extraUraian .= "Jenis Kelamin: " . ($request->child_gender ?? '-') . "\n";
-                    $extraUraian .= "Tempat Lahir: " . ($request->child_pob ?? '-') . "\n";
-                    $extraUraian .= "Tanggal Lahir: " . ($request->child_dob ?? '-') . "\n";
+                    $extraUraian .= 'Jenis Kelamin: '.($request->child_gender ?? '-')."\n";
+                    $extraUraian .= 'Tempat Lahir: '.($request->child_pob ?? '-')."\n";
+                    $extraUraian .= 'Tanggal Lahir: '.($request->child_dob ?? '-')."\n";
                 }
 
                 // Applicant Data (if child is main subject)
                 if ($request->applicant_name || $request->applicant_nik) {
                     $extraUraian .= "\n\n--- DATA PEMOHON (ORANG TUA/WALI) ---\n";
-                    $extraUraian .= "Nama: " . ($request->applicant_name ?? '-') . "\n";
-                    $extraUraian .= "NIK: " . ($request->applicant_nik ?? '-') . "\n";
+                    $extraUraian .= 'Nama: '.($request->applicant_name ?? '-')."\n";
+                    $extraUraian .= 'NIK: '.($request->applicant_nik ?? '-')."\n";
                 }
 
-                if (!empty($extraUraian)) {
-                    $serviceData['uraian'] = ($serviceData['uraian'] ?? '') . $extraUraian;
+                if (! empty($extraUraian)) {
+                    $serviceData['uraian'] = ($serviceData['uraian'] ?? '').$extraUraian;
                 }
 
                 if (Schema::hasColumn('public_services', 'service_node_id')) {
@@ -279,7 +290,7 @@ class LayananController extends Controller
                     $labels = $request->input('attachment_labels', []);
 
                     $validReqIds = [];
-                    if (!empty($reqIds)) {
+                    if (! empty($reqIds)) {
                         $validReqIds = \DB::table('service_requirements')->whereIn('id', array_filter($reqIds))->pluck('id')->flip()->all();
                     }
 
@@ -289,11 +300,11 @@ class LayananController extends Controller
 
                         PublicServiceAttachment::create([
                             'public_service_id' => $service->id,
-                            'requirement_id'    => (isset($validReqIds[$reqId]) ? $reqId : null),
-                            'label'             => $labels[$idx] ?? 'Lampiran ' . ($idx + 1),
-                            'file_path'         => $path,
-                            'original_name'     => $file->getClientOriginalName(),
-                            'file_type'         => $file->getClientMimeType(),
+                            'requirement_id' => (isset($validReqIds[$reqId]) ? $reqId : null),
+                            'label' => $labels[$idx] ?? 'Lampiran '.($idx + 1),
+                            'file_path' => $path,
+                            'original_name' => $file->getClientOriginalName(),
+                            'file_type' => $file->getClientMimeType(),
                         ]);
                     }
                 }
@@ -301,15 +312,16 @@ class LayananController extends Controller
                 $this->sendWaNotification($service, 'submission');
 
                 return response()->json([
-                    'success'       => true,
+                    'success' => true,
                     'tracking_code' => $service->tracking_code,
-                    'uuid'          => $service->uuid,
-                    'redirect'      => route('layanan') . '?q=' . $service->tracking_code,
+                    'uuid' => $service->uuid,
+                    'redirect' => route('layanan').'?q='.$service->tracking_code,
                 ]);
             });
         } catch (\Exception $e) {
-            \Log::error('Node Submission Error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()], 500);
+            \Log::error('Node Submission Error: '.$e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem: '.$e->getMessage()], 500);
         }
     }
 
@@ -327,7 +339,7 @@ class LayananController extends Controller
                     'Fotokopi Kartu Keluarga (KK)',
                     'Fotokopi Akta Kelahiran',
                     'Pas Foto 3x4 (jika belum perekaman)',
-                ]
+                ],
             ],
             'kk' => [
                 'title' => 'Pembaruan Kartu Keluarga',
@@ -337,7 +349,7 @@ class LayananController extends Controller
                     'KK Asli yang lama',
                     'Surat Nikah/Akta Cerai (jika ada perubahan)',
                     'Surat Keterangan Pindah (jika pindah datang)',
-                ]
+                ],
             ],
             'akta' => [
                 'title' => 'Akta Kelahiran/Kematian',
@@ -347,7 +359,7 @@ class LayananController extends Controller
                     'Surat Keterangan Lahir/Mati dari RS/Desa',
                     'Fotokopi KK & KTP Orang Tua',
                     'Fotokopi Buku Nikah (untuk Akta Lahir)',
-                ]
+                ],
             ],
             'sktm' => [
                 'title' => 'Surat Keterangan Tidak Mampu',
@@ -357,7 +369,7 @@ class LayananController extends Controller
                     'Surat Pengantar RT/RW/Desa',
                     'Fotokopi KTP & KK',
                     'Foto Rumah (Tampak Depan)',
-                ]
+                ],
             ],
             'domisili' => [
                 'title' => 'Surat Keterangan Domisili',
@@ -366,7 +378,7 @@ class LayananController extends Controller
                 'requirements' => [
                     'Surat Pengantar Desa',
                     'Fotokopi KTP & KK',
-                ]
+                ],
             ],
             'nikah' => [
                 'title' => 'Rekomendasi Nikah (N1-N4)',
@@ -376,7 +388,7 @@ class LayananController extends Controller
                     'Fotokopi KTP & KK Calon Pengantin',
                     'Fotokopi KTP & KK Orang Tua',
                     'Pas Foto Background Biru',
-                ]
+                ],
             ],
             'bpjs' => [
                 'title' => 'Pendaftaran/Update BPJS PBI',
@@ -385,7 +397,7 @@ class LayananController extends Controller
                 'requirements' => [
                     'Fotokopi KTP & KK',
                     'Surat Keterangan Tidak Mampu (SKTM)',
-                ]
+                ],
             ],
         ];
 

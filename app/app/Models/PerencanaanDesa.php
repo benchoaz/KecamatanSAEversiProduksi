@@ -10,20 +10,29 @@ class PerencanaanDesa extends Model
     use HasFactory;
 
     protected $table = 'perencanaan_desa';
+
     protected $guarded = ['id'];
 
     const MODE_ARSIP = 'arsip';
+
     const MODE_TRANSISI = 'transisi';
+
     const MODE_TERSTRUKTUR = 'terstruktur';
 
     const TIPE_RPJMDES = 'RPJMDes';
+
     const TIPE_RKPDES = 'RKPDes';
+
     const TIPE_APBDES = 'APBDes';
 
     const STATUS_DRAFT = 'draft';
+
     const STATUS_DIKIRIM = 'dikirim';
+
     const STATUS_DIKEMBALIKAN = 'dikembalikan';
+
     const STATUS_DITERIMA = 'diterima';
+
     const STATUS_LENGKAP = 'lengkap';
 
     protected $casts = [

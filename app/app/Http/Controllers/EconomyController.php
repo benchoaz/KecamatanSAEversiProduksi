@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WorkDirectory;
-use App\Models\Umkm;
-use App\Models\UmkmLocal;
 use App\Models\Desa;
 use App\Models\PublicService;
+use App\Models\Umkm;
+use App\Models\UmkmLocal;
 use App\Models\WahaN8nSetting;
+use App\Models\WorkDirectory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class EconomyController extends Controller
 {
@@ -76,7 +73,7 @@ class EconomyController extends Controller
         // Ambil UMKM Lokal (Quick Directory)
         $localQuery = \App\Models\UmkmLocal::where('is_active', true)
             ->where('is_flagged', false); // Tambahan keamanan: jangan tampilkan yang di-flag
-            
+
         if ($request->filled('q')) {
             $search = $request->q;
             $localQuery->where(function ($q) use ($search) {
@@ -85,7 +82,7 @@ class EconomyController extends Controller
                     ->orWhere('description', 'like', "%{$search}%");
             });
         }
-        
+
         // Sorting for Local products
         match ($sort) {
             'price_low' => $localQuery->orderBy('price', 'asc'),
@@ -148,7 +145,7 @@ class EconomyController extends Controller
             'jasa' => 'Jasa / Keahlian',
             'transportasi' => 'Transportasi',
             'keliling' => 'Pedagang Keliling',
-            'harian' => 'Pekerja Harian'
+            'harian' => 'Pekerja Harian',
         ];
 
         return view('economy.create', compact('desas', 'categories', 'jobTypes'));
@@ -190,7 +187,7 @@ class EconomyController extends Controller
             'image_path' => $imagePath,
             'consent_public' => true,
             'status' => 'pending',
-            'data_source' => 'web_form'
+            'data_source' => 'web_form',
         ]);
 
         // Create Public Service entry for Inbox
@@ -203,14 +200,14 @@ class EconomyController extends Controller
             'whatsapp' => $workDir->contact_phone,
             'status' => PublicService::STATUS_MENUNGGU,
             'category' => $request->job_type == 'umkm' ? PublicService::CATEGORY_UMKM : PublicService::CATEGORY_PEKERJAAN,
-            'source' => 'web_form'
+            'source' => 'web_form',
         ]);
 
         // Send WhatsApp notification
         $this->sendWhatsAppNotification($workDir);
 
         $message = $request->job_type == 'umkm' ? 'Terima kasih. Data UMKM/Usaha Anda akan ditampilkan setelah diverifikasi.' : 'Terima kasih. Data pekerjaan/jasa Anda akan ditampilkan setelah diverifikasi.';
-        
+
         return redirect()->route('economy.index', ['tab' => 'jasa'])
             ->with('success', $message)
             ->with('new_submission_uuid', $publicService->uuid);
@@ -268,7 +265,7 @@ class EconomyController extends Controller
             'service_area' => 'nullable|string|max:255',
             'service_time' => 'nullable|string|max:100',
             'short_description' => 'nullable|string|max:500',
-            'status' => 'required|in:active,inactive,pending'
+            'status' => 'required|in:active,inactive,pending',
         ]);
 
         $workItem->update($request->all());
@@ -284,31 +281,31 @@ class EconomyController extends Controller
         try {
             $wahaSettings = WahaN8nSetting::getSettings();
 
-            if (!$wahaSettings || !$wahaSettings->isBotOperational()) {
+            if (! $wahaSettings || ! $wahaSettings->isBotOperational()) {
                 return;
             }
 
             // Normalize phone: strip leading 0, ensure starts with 62
             $phone = preg_replace('/[^0-9]/', '', $workDir->contact_phone);
             if (str_starts_with($phone, '0')) {
-                $phone = '62' . substr($phone, 1);
-            } elseif (!str_starts_with($phone, '62')) {
-                $phone = '62' . $phone;
+                $phone = '62'.substr($phone, 1);
+            } elseif (! str_starts_with($phone, '62')) {
+                $phone = '62'.$phone;
             }
 
-            $message = "✅ *Pendaftaran Berhasil!*
+            $message = '✅ *Pendaftaran Berhasil!*
 
-";
+';
             $message .= "Halo *{$workDir->display_name}*, terima kasih telah mendaftar di layanan Pekerjaan & Jasa Kecamatan.
 
 ";
             $message .= "━━━━━━━━━━━━━━━━━\n";
             $message .= "📝 *Layanan:* {$workDir->job_title}\n";
-            $message .= "📅 *Tanggal:* " . now()->format('d/m/Y H:i') . " WIB\n";
+            $message .= '📅 *Tanggal:* '.now()->format('d/m/Y H:i')." WIB\n";
             $message .= "━━━━━━━━━━━━━━━━━\n\n";
             $message .= "Untuk merubah status atau mengedit profil Jasa Anda, silakan masuk ke secara aman (tanpa PIN/Password) melalui:\n\n";
-            $message .= "🌐 *Pusat Kendali Warga*: \n" . route('portal_warga.login') . "\n\n";
-            $message .= "Ketik *MENU* untuk kembali.";
+            $message .= "🌐 *Pusat Kendali Warga*: \n".route('portal_warga.login')."\n\n";
+            $message .= 'Ketik *MENU* untuk kembali.';
 
             // Use direct WAHA sendText endpoint
             $wahaUrl = $wahaSettings->waha_api_url;
@@ -323,14 +320,14 @@ class EconomyController extends Controller
 
                 \Illuminate\Support\Facades\Http::withHeaders($headers)
                     ->timeout(8)
-                    ->post(rtrim($wahaUrl, '/') . '/api/sendText', [
+                    ->post(rtrim($wahaUrl, '/').'/api/sendText', [
                         'session' => $session,
-                        'chatId' => $phone . '@c.us',
+                        'chatId' => $phone.'@c.us',
                         'text' => $message,
                     ]);
             }
         } catch (\Exception $e) {
-            \Log::warning('WA notification gagal untuk Economia: ' . $e->getMessage());
+            \Log::warning('WA notification gagal untuk Economia: '.$e->getMessage());
         }
     }
 }

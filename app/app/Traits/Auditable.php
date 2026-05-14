@@ -25,14 +25,14 @@ trait Auditable
 
     protected static function logAction($action, $model)
     {
-        if (app()->runningInConsole() && !app()->runningUnitTests()) {
+        if (app()->runningInConsole() && ! app()->runningUnitTests()) {
             return;
         }
 
         $user = Auth::user();
 
         // Skip if no user is authenticated (unless it's a login action, handled elsewhere)
-        if (!$user) {
+        if (! $user) {
             return;
         }
 

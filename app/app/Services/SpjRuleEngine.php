@@ -10,9 +10,9 @@ class SpjRuleEngine
 {
     /**
      * Menyiapkan daftar dokumen SPJ yang disarankan berdasarkan data kegiatan.
-     * 
-     * @param array|MasterKegiatan $kegiatan
-     * @param array $selectedComponents (opsional, dari input form)
+     *
+     * @param  array|MasterKegiatan  $kegiatan
+     * @param  array  $selectedComponents  (opsional, dari input form)
      * @return \Illuminate\Support\Collection
      */
     public function getRecommendedDocuments($kegiatan, array $selectedComponents = [])
@@ -72,7 +72,7 @@ class SpjRuleEngine
      */
     private function hasHonorComponent($kegiatan, array $selectedComponents)
     {
-        if (!empty($selectedComponents)) {
+        if (! empty($selectedComponents)) {
             // Cek dari input yang dipilih di form
             return \App\Models\MasterKomponenBelanja::whereIn('id', $selectedComponents)
                 ->where('kategori', 'honor')
@@ -100,7 +100,7 @@ class SpjRuleEngine
         }
 
         // Cek label satuan di komponen belanja
-        if (!empty($selectedComponents)) {
+        if (! empty($selectedComponents)) {
             return \App\Models\MasterKomponenBelanja::whereIn('id', $selectedComponents)
                 ->whereIn('satuan', $satuanParticipants)
                 ->exists();
@@ -115,6 +115,7 @@ class SpjRuleEngine
     private function isMeetingActivity($nama)
     {
         $keywords = ['rapat', 'musyawarah', 'musdes', 'musrenbang', 'sosialisasi', 'pelatihan', 'bimtek'];
+
         return Str::contains(strtolower($nama), $keywords);
     }
 }

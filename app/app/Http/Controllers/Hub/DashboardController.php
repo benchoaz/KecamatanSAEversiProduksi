@@ -16,30 +16,30 @@ class DashboardController extends Controller
 
     public function index(DistrictConnectionService $connector)
     {
-        $districts        = HubDistrict::all();
-        $total_districts  = $districts->count();
+        $districts = HubDistrict::all();
+        $total_districts = $districts->count();
         $active_districts = $districts->where('is_active', true)->count();
 
         // Statistik dari DB lokal (data kecamatan yang sama server)
-        $total_services  = PublicService::count();
+        $total_services = PublicService::count();
         $pending_services = PublicService::where('status', 'menunggu')
-                            ->orWhere('status', 'pending')->count();
-        $done_services   = PublicService::whereIn('status', ['selesai', 'done'])->count();
+            ->orWhere('status', 'pending')->count();
+        $done_services = PublicService::whereIn('status', ['selesai', 'done'])->count();
 
         // Statistik Live dari tiap kecamatan (via koneksi dinamis)
         $district_stats = $connector->getAllStats();
 
         // Hitung agregat dari semua kecamatan yang berhasil terkoneksi
-        $global_total    = 0;
-        $global_pending  = 0;
-        $global_done     = 0;
+        $global_total = 0;
+        $global_pending = 0;
+        $global_done = 0;
         $reachable_count = 0;
 
         foreach ($district_stats as $stat) {
             if ($stat['is_reachable']) {
-                $global_total   += $stat['total_services'] ?? 0;
-                $global_pending += $stat['pending']        ?? 0;
-                $global_done    += $stat['done']           ?? 0;
+                $global_total += $stat['total_services'] ?? 0;
+                $global_pending += $stat['pending'] ?? 0;
+                $global_done += $stat['done'] ?? 0;
                 $reachable_count++;
             }
         }
@@ -47,9 +47,9 @@ class DashboardController extends Controller
         // Jika ada koneksi ke kecamatan lain, gunakan global stats
         // Jika tidak (lokal only), gunakan data DB lokal
         if ($reachable_count > 0) {
-            $total_services   = $global_total;
+            $total_services = $global_total;
             $pending_services = $global_pending;
-            $done_services    = $global_done;
+            $done_services = $global_done;
         }
 
         // Aktivitas terbaru dari DB lokal

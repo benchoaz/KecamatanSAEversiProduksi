@@ -13,7 +13,9 @@ class Loker extends Model
     protected $table = 'lokers';
 
     const STATUS_AKTIF = 'aktif';
+
     const STATUS_NONAKTIF = 'nonaktif';
+
     const STATUS_WAITING = 'menunggu_verifikasi';
 
     protected $fillable = [
@@ -52,10 +54,10 @@ class Loker extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            if (!$model->uuid) {
+            if (! $model->uuid) {
                 $model->uuid = (string) Str::uuid();
             }
-            if (!$model->manage_token) {
+            if (! $model->manage_token) {
                 $model->manage_token = Str::random(40);
             }
         });

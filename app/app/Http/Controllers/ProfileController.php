@@ -17,19 +17,19 @@ class ProfileController extends Controller
     public function edit(Request $request)
     {
         $user = Auth::user();
+
         return view('profile.edit', compact('user'));
     }
 
     /**
      * Update the user's profile.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request)
     {
         $user = Auth::user();
-        
+
         $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:255'],
             'no_hp' => ['nullable', 'string', 'max:20'],
@@ -53,7 +53,7 @@ class ProfileController extends Controller
             if ($user->foto && Storage::disk('public')->exists($user->foto)) {
                 Storage::disk('public')->delete($user->foto);
             }
-            
+
             $foto = $request->file('foto');
             $fotoPath = $foto->store('profiles', 'public');
             $data['foto'] = $fotoPath;
@@ -78,7 +78,6 @@ class ProfileController extends Controller
     /**
      * Update the user's password.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function updatePassword(Request $request)
@@ -99,7 +98,7 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         // Verify current password
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return back()
                 ->withErrors(['current_password' => 'Password lama tidak cocok dengan password Anda.'])
                 ->withInput();

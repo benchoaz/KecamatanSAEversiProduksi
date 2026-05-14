@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class WeatherService
@@ -13,7 +13,7 @@ class WeatherService
      * Bisa dikembangkan untuk dinamis berdasarkan setting profile
      */
     protected string $defaultAdm4 = '35.13.13.2012';
-    
+
     /**
      * Get weather forecast for a specific ADM4 code
      */
@@ -23,22 +23,22 @@ class WeatherService
         $adm4 = $adm4 ?: ($profile->bmkg_adm4_code ?? $this->defaultAdm4);
         $cacheKey = "weather_forecast_{$adm4}";
 
-        return Cache::remember($cacheKey, 1800, function() use ($adm4) {
+        return Cache::remember($cacheKey, 1800, function () use ($adm4) {
             try {
-                $response = Http::timeout(10)->get("https://api.bmkg.go.id/publik/prakiraan-cuaca", [
-                    'adm4' => $adm4
+                $response = Http::timeout(10)->get('https://api.bmkg.go.id/publik/prakiraan-cuaca', [
+                    'adm4' => $adm4,
                 ]);
 
                 if ($response->successful()) {
                     return $this->parseBmkgData($response->json());
                 }
-                
+
                 Log::warning("BMKG API returned error for ADM4: {$adm4}", [
                     'status' => $response->status(),
-                    'body' => $response->body()
+                    'body' => $response->body(),
                 ]);
             } catch (\Exception $e) {
-                Log::error("Failed to fetch weather from BMKG: " . $e->getMessage());
+                Log::error('Failed to fetch weather from BMKG: '.$e->getMessage());
             }
 
             return ['success' => false, 'message' => 'Gagal mengambil data cuaca'];
@@ -51,11 +51,11 @@ class WeatherService
     protected function parseBmkgData(array $data): array
     {
         $location = $data['lokasi']['kecamatan'] ?? ($data['lokasi']['nama'] ?? 'Besuk');
-        
+
         // BMKG New API: cuaca is often a nested array [[{}, {}]]
         $rawCuaca = $data['data'][0]['cuaca'] ?? [];
         $forecasts = [];
-        
+
         // Flatten the array if it's nested
         foreach ($rawCuaca as $item) {
             if (is_array($item)) {
@@ -70,7 +70,7 @@ class WeatherService
                 }
             }
         }
-        
+
         if (empty($forecasts)) {
             return ['success' => false, 'message' => 'Data ramalan tidak tersedia'];
         }
@@ -80,7 +80,7 @@ class WeatherService
             'location' => $location,
             'current' => null,
             'today_summary' => [],
-            'raw_text' => ""
+            'raw_text' => '',
         ];
 
         $now = now();
@@ -88,27 +88,31 @@ class WeatherService
 
         foreach ($forecasts as $f) {
             // BMKG uses ISO8601 or similar
-            $time = isset($f['local_datetime']) ? \Carbon\Carbon::parse($f['local_datetime']) : 
+            $time = isset($f['local_datetime']) ? \Carbon\Carbon::parse($f['local_datetime']) :
                    (isset($f['datetime']) ? \Carbon\Carbon::parse($f['datetime'])->setProperty('timezone', 'Asia/Jakarta') : null);
-            
-            if (!$time) continue;
+
+            if (! $time) {
+                continue;
+            }
 
             // Only take forecasts for today and tomorrow
-            if ($time->diffInDays($now) > 1) continue;
+            if ($time->diffInDays($now) > 1) {
+                continue;
+            }
 
             $condition = $f['weather_desc'] ?? ($f['condition_name'] ?? 'Berawan');
             $temp = $f['t'] ?? ($f['temp'] ?? '??');
             $humidity = $f['hu'] ?? '??';
-            
+
             $timeStr = $time->format('H:i');
             $dayStr = $time->isToday() ? 'Hari ini' : 'Besok';
-            
+
             $entry = "[{$dayStr} {$timeStr}] {$condition}, Suhu: {$temp}°C, Lembab: {$humidity}%";
             $formatted['today_summary'][] = $entry;
             $text .= "- {$entry}\n";
 
             // Set current if it's the closest one
-            if ($time->isPast() && (!$formatted['current'] || $time->gt($formatted['current_time']))) {
+            if ($time->isPast() && (! $formatted['current'] || $time->gt($formatted['current_time']))) {
                 $formatted['current'] = $condition;
                 $formatted['current_temp'] = $temp;
                 $formatted['current_time'] = $time;
@@ -116,6 +120,7 @@ class WeatherService
         }
 
         $formatted['raw_text'] = $text;
+
         return $formatted;
     }
 
@@ -126,24 +131,24 @@ class WeatherService
     {
         try {
             // Get the RSS feed of active alerts
-            $response = Http::timeout(10)->get("https://www.bmkg.go.id/alerts/nowcast/id");
-            
-            if (!$response->successful()) {
+            $response = Http::timeout(10)->get('https://www.bmkg.go.id/alerts/nowcast/id');
+
+            if (! $response->successful()) {
                 return ['success' => false, 'message' => 'Gagal terhubung ke server BMKG Alerts'];
             }
 
             // Simple XML parsing using SimpleXML
             $xml = simplexml_load_string($response->body());
-            if (!$xml) {
+            if (! $xml) {
                 return ['success' => false, 'message' => 'Format data BMKG tidak valid'];
             }
 
             $profile = appProfile();
             $regionName = $profile->region_name ?? 'Besuk';
-            
+
             $alerts = [];
             $targetKeywords = [$regionName, 'Probolinggo']; // Probolinggo is the Parent Regency, keep it for context
-            
+
             foreach ($xml->channel->item as $item) {
                 $description = (string) $item->description;
                 $title = (string) $item->title;
@@ -172,11 +177,12 @@ class WeatherService
 
             return [
                 'success' => true,
-                'alerts' => $alerts
+                'alerts' => $alerts,
             ];
 
         } catch (\Exception $e) {
-            Log::error("Error checking BMKG alerts: " . $e->getMessage());
+            Log::error('Error checking BMKG alerts: '.$e->getMessage());
+
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
@@ -186,6 +192,6 @@ class WeatherService
      */
     public function getRadarAlert(): string
     {
-        return "Pantauan Radar Juanda saat ini menunjukkan kondisi awan normal di wilayah Probolinggo Timur.";
+        return 'Pantauan Radar Juanda saat ini menunjukkan kondisi awan normal di wilayah Probolinggo Timur.';
     }
 }

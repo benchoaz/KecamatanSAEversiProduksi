@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Desa;
+use App\Models\PublicService;
 use App\Models\Umkm;
+use App\Models\UmkmAdminLog;
 use App\Models\UmkmProduct;
 use App\Models\UmkmVerification;
-use App\Models\UmkmAdminLog;
-use App\Models\Desa;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use App\Models\PublicService;
-use Carbon\Carbon;
 use App\Models\WahaN8nSetting;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class UmkmRakyatController extends Controller
 {
@@ -29,9 +29,9 @@ class UmkmRakyatController extends Controller
 
         if ($request->has('q')) {
             $query->where(function ($q) use ($request) {
-                $q->where('nama_usaha', 'like', '%' . $request->q . '%')
-                    ->orWhere('jenis_usaha', 'like', '%' . $request->q . '%')
-                    ->orWhere('deskripsi', 'like', '%' . $request->q . '%');
+                $q->where('nama_usaha', 'like', '%'.$request->q.'%')
+                    ->orWhere('jenis_usaha', 'like', '%'.$request->q.'%')
+                    ->orWhere('deskripsi', 'like', '%'.$request->q.'%');
             });
         }
 
@@ -45,6 +45,7 @@ class UmkmRakyatController extends Controller
     {
         $desas = Desa::orderBy('nama_desa')->get();
         $umkmCategories = Umkm::getStandardCategories();
+
         return view('public.umkm_rakyat.create', compact('desas', 'umkmCategories'));
     }
 
@@ -60,7 +61,7 @@ class UmkmRakyatController extends Controller
             'jenis_usaha' => 'required|string',
             'foto_usaha' => 'nullable|image|max:2048',
         ], [
-            'no_wa.unique' => 'Nomor WhatsApp ini sudah terdaftar sebagai UMKM. Satu nomor hanya diperbolehkan mengelola satu toko resmi.'
+            'no_wa.unique' => 'Nomor WhatsApp ini sudah terdaftar sebagai UMKM. Satu nomor hanya diperbolehkan mengelola satu toko resmi.',
         ]);
 
         $umkm = new Umkm($request->except('foto_usaha'));
@@ -80,21 +81,21 @@ class UmkmRakyatController extends Controller
             'umkm_id' => $umkm->id,
             'kode_verifikasi' => $otp,
             'expired_at' => Carbon::now()->addMinutes(15),
-            'is_verified' => false
+            'is_verified' => false,
         ]);
 
         // Create Public Service entry for Inbox
         \App\Models\PublicService::create([
             'uuid' => (string) Str::uuid(),
             'desa_id' => is_numeric($request->desa) ? $request->desa : Desa::where('nama_desa', $request->desa)->first()?->id,
-            'nama_desa_manual' => !is_numeric($request->desa) ? $request->desa : null,
+            'nama_desa_manual' => ! is_numeric($request->desa) ? $request->desa : null,
             'nama_pemohon' => $umkm->nama_pemilik,
             'jenis_layanan' => 'Pendaftaran UMKM',
             'uraian' => "Pendaftaran UMKM Baru: {$umkm->nama_usaha}. Jenis Usaha: {$umkm->jenis_usaha}. Pemilik: {$umkm->nama_pemilik}.",
             'whatsapp' => $umkm->no_wa,
             'status' => PublicService::STATUS_MENUNGGU,
             'category' => PublicService::CATEGORY_UMKM,
-            'source' => 'web_form'
+            'source' => 'web_form',
         ]);
 
         // Log action
@@ -102,7 +103,7 @@ class UmkmRakyatController extends Controller
             'umkm_id' => $umkm->id,
             'action' => 'create',
             'actor' => 'system',
-            'notes' => 'Pendaftaran mandiri via web. Masuk ke Inbox verifikasi.'
+            'notes' => 'Pendaftaran mandiri via web. Masuk ke Inbox verifikasi.',
         ]);
 
         return redirect()->route('umkm_rakyat.verify_step', $umkm->id);
@@ -113,21 +114,21 @@ class UmkmRakyatController extends Controller
         $umkm = Umkm::findOrFail($id);
         $verification = $umkm->verifications()->where('is_verified', false)->latest()->first();
 
-        if (!$verification) {
+        if (! $verification) {
             return redirect()->route('umkm_rakyat.index');
         }
 
         // WhatsApp Link generation
-        $adminWa = appProfile()->whatsapp_complaint ?? appProfile()->phone ?? "6282121212121";
-        
+        $adminWa = appProfile()->whatsapp_complaint ?? appProfile()->phone ?? '6282121212121';
+
         // Normalize admin number (remove non-digits, fix 0 to 62)
         $adminWa = preg_replace('/[^0-9]/', '', $adminWa);
         if (str_starts_with($adminWa, '0')) {
-            $adminWa = '62' . substr($adminWa, 1);
+            $adminWa = '62'.substr($adminWa, 1);
         }
 
-        $text = "VERIFIKASI UMKM " . $verification->kode_verifikasi;
-        $waUrl = "https://wa.me/{$adminWa}?text=" . urlencode($text);
+        $text = 'VERIFIKASI UMKM '.$verification->kode_verifikasi;
+        $waUrl = "https://wa.me/{$adminWa}?text=".urlencode($text);
 
         return view('public.umkm_rakyat.verify', compact('umkm', 'verification', 'waUrl'));
     }
@@ -151,19 +152,19 @@ class UmkmRakyatController extends Controller
                 'umkm_id' => $umkm->id,
                 'action' => 'verify',
                 'actor' => 'system',
-                'notes' => 'Verifikasi OTP berhasil.'
+                'notes' => 'Verifikasi OTP berhasil.',
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Verifikasi berhasil! Etalase Anda sekarang aktif.',
-                'redirect' => route('umkm_rakyat.show', $umkm->slug)
+                'redirect' => route('umkm_rakyat.show', $umkm->slug),
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Kode OTP tidak valid atau sudah kedaluwarsa.'
+            'message' => 'Kode OTP tidak valid atau sudah kedaluwarsa.',
         ], 422);
     }
 
@@ -171,7 +172,7 @@ class UmkmRakyatController extends Controller
     {
         $umkm = Umkm::where('slug', $slug)->firstOrFail();
 
-        if ($umkm->status !== 'aktif' && !request()->has('preview')) {
+        if ($umkm->status !== 'aktif' && ! request()->has('preview')) {
             abort(404);
         }
 
@@ -183,6 +184,7 @@ class UmkmRakyatController extends Controller
     public function manage($token)
     {
         $umkm = Umkm::where('manage_token', $token)->firstOrFail();
+
         return view('public.umkm_rakyat.dashboard', compact('umkm'));
     }
 
@@ -190,6 +192,7 @@ class UmkmRakyatController extends Controller
     {
         $umkm = Umkm::where('manage_token', $token)->firstOrFail();
         $products = $umkm->products()->latest()->get();
+
         return view('public.umkm_rakyat.manage_products', compact('umkm', 'products'));
     }
 
@@ -198,6 +201,7 @@ class UmkmRakyatController extends Controller
         $umkm = Umkm::where('manage_token', $token)->firstOrFail();
         $desas = Desa::orderBy('nama_desa')->get();
         $umkmCategories = Umkm::getStandardCategories();
+
         return view('public.umkm_rakyat.settings', compact('umkm', 'desas', 'umkmCategories'));
     }
 
@@ -297,8 +301,8 @@ class UmkmRakyatController extends Controller
     {
         $umkm = Umkm::where('manage_token', $token)->firstOrFail();
         $product = UmkmProduct::where('umkm_id', $umkm->id)->findOrFail($productId);
-        
-        $product->is_available = !$product->is_available;
+
+        $product->is_available = ! $product->is_available;
         $product->save();
 
         return back()->with('success', 'Status ketersediaan produk diperbarui.');
@@ -311,11 +315,12 @@ class UmkmRakyatController extends Controller
         });
 
         if ($request->has('q')) {
-            $query->where('nama_produk', 'like', '%' . $request->q . '%')
-                ->orWhere('deskripsi', 'like', '%' . $request->q . '%');
+            $query->where('nama_produk', 'like', '%'.$request->q.'%')
+                ->orWhere('deskripsi', 'like', '%'.$request->q.'%');
         }
 
         $products = $query->latest()->paginate(16);
+
         return view('public.umkm_rakyat.all_products', compact('products'));
     }
 
@@ -324,6 +329,7 @@ class UmkmRakyatController extends Controller
         // Simple placeholder for nearby logic
         // In real app, we'd use lat/lng from request
         $umkms = Umkm::where('status', Umkm::STATUS_AKTIF)->latest()->paginate(12);
+
         return view('public.umkm_rakyat.nearby', compact('umkms'));
     }
 
@@ -342,15 +348,15 @@ class UmkmRakyatController extends Controller
         $inputWa = preg_replace('/[^0-9]/', '', $request->no_wa);
 
         // Try to find UMKM by exact match or similar (handling 0 vs 62)
-        $umkm = Umkm::where('no_wa', 'like', '%' . $inputWa . '%')
-            ->orWhere('no_wa', 'like', '%' . ltrim($inputWa, '0') . '%')
+        $umkm = Umkm::where('no_wa', 'like', '%'.$inputWa.'%')
+            ->orWhere('no_wa', 'like', '%'.ltrim($inputWa, '0').'%')
             ->first();
 
         if ($umkm) {
             $waStatus = $this->sendWhatsAppMagicLink($umkm);
-            
+
             // Jika bot offline, kita arahkan langsung (HANYA untuk bypass darurat/testing)
-            if (!$waStatus['success']) {
+            if (! $waStatus['success']) {
                 return redirect($waStatus['url'])->with('warning', 'Bot WhatsApp Sedang Offline. Anda dialihkan langsung ke Dasbor melalui mode Bypass.');
             }
 
@@ -370,24 +376,24 @@ class UmkmRakyatController extends Controller
         try {
             $wahaSettings = WahaN8nSetting::getSettings();
 
-            if (!$wahaSettings || !$wahaSettings->isBotOperational()) {
+            if (! $wahaSettings || ! $wahaSettings->isBotOperational()) {
                 return ['success' => false, 'url' => $dashboardUrl];
             }
 
             // Normalize phone: strip leading 0, ensure starts with 62
             $phone = preg_replace('/[^0-9]/', '', $umkm->no_wa);
             if (str_starts_with($phone, '0')) {
-                $phone = '62' . substr($phone, 1);
-            } elseif (!str_starts_with($phone, '62')) {
-                $phone = '62' . $phone;
+                $phone = '62'.substr($phone, 1);
+            } elseif (! str_starts_with($phone, '62')) {
+                $phone = '62'.$phone;
             }
 
-            $message = "🔐 *Info Akses Dasbor UMKM*\n\n" .
-                       "Halo *{$umkm->nama_pemilik}*,\n" .
-                       "Seseorang (atau Anda sendiri) meminta akses untuk mengelola etalase toko *{$umkm->nama_usaha}* di portal Kecamatan Digital.\n\n" .
-                       "Klik tautan aman di bawah ini untuk masuk ke Dashboard langsung tanpa password:\n" .
-                       "{$dashboardUrl}\n\n" .
-                       "_PENTING: Link ini adalah akses sensitif yang mengizinkan pengeditan data produk toko Anda. JANGAN BAGIKAN link ini kepada siapa pun._";
+            $message = "🔐 *Info Akses Dasbor UMKM*\n\n".
+                       "Halo *{$umkm->nama_pemilik}*,\n".
+                       "Seseorang (atau Anda sendiri) meminta akses untuk mengelola etalase toko *{$umkm->nama_usaha}* di portal Kecamatan Digital.\n\n".
+                       "Klik tautan aman di bawah ini untuk masuk ke Dashboard langsung tanpa password:\n".
+                       "{$dashboardUrl}\n\n".
+                       '_PENTING: Link ini adalah akses sensitif yang mengizinkan pengeditan data produk toko Anda. JANGAN BAGIKAN link ini kepada siapa pun._';
 
             // Use direct WAHA sendText endpoint
             $wahaUrl = $wahaSettings->waha_api_url;
@@ -402,19 +408,21 @@ class UmkmRakyatController extends Controller
 
                 $response = Http::withHeaders($headers)
                     ->timeout(8)
-                    ->post(rtrim($wahaUrl, '/') . '/api/sendText', [
+                    ->post(rtrim($wahaUrl, '/').'/api/sendText', [
                         'session' => $session,
-                        'chatId' => $phone . '@c.us',
+                        'chatId' => $phone.'@c.us',
                         'text' => $message,
                     ]);
-                    
+
                 if ($response->successful()) {
-                     return ['success' => true, 'url' => $dashboardUrl];
+                    return ['success' => true, 'url' => $dashboardUrl];
                 }
             }
+
             return ['success' => false, 'url' => $dashboardUrl];
         } catch (\Exception $e) {
-            Log::error('WA Magic Link gagal dikirim untuk UMKM: ' . $e->getMessage());
+            Log::error('WA Magic Link gagal dikirim untuk UMKM: '.$e->getMessage());
+
             return ['success' => false, 'url' => $dashboardUrl];
         }
     }

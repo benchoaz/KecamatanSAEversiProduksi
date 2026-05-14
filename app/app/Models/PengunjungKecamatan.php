@@ -10,10 +10,13 @@ class PengunjungKecamatan extends Model
     use HasFactory;
 
     protected $table = 'pengunjung_kecamatan';
+
     protected $guarded = ['id'];
 
     const STATUS_MENUNGGU = 'menunggu';
+
     const STATUS_DILAYANI = 'dilayani';
+
     const STATUS_SELESAI = 'selesai';
 
     protected $casts = [

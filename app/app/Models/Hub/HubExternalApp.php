@@ -2,8 +2,8 @@
 
 namespace App\Models\Hub;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
 
 class HubExternalApp extends Model
 {
@@ -18,7 +18,7 @@ class HubExternalApp extends Model
         'base_url',
         'callback_url',
         'status',
-        'settings'
+        'settings',
     ];
 
     protected $casts = [

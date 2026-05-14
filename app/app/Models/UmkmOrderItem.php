@@ -11,7 +11,7 @@ class UmkmOrderItem extends Model
         'product_id',
         'quantity',
         'price',
-        'variation'
+        'variation',
     ];
 
     public function order()

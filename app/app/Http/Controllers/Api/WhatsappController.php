@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\WhatsappSession;
-use App\Models\WhatsappLog;
 use App\Models\ModuleSetting;
+use App\Models\WhatsappLog;
+use App\Models\WhatsappSession;
 use App\Services\WhatsApp\IntentHandler;
 use App\Services\WhatsApp\StateHandler;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class WhatsappController extends Controller
 {
     protected IntentHandler $intentHandler;
+
     protected StateHandler $stateHandler;
 
     public function __construct(IntentHandler $intentHandler, StateHandler $stateHandler)
@@ -34,7 +35,7 @@ class WhatsappController extends Controller
             'headers' => $request->headers->all(),
             'method' => $request->method(),
         ]);
-        
+
         // =====================================================
         // TRANSFORM WAHA WEBHOOK FORMAT
         // n8n sends: { phone: null, message: { payload: { from, body } } }
@@ -68,21 +69,21 @@ class WhatsappController extends Controller
             // Replace request data with transformed data
             $request->merge([
                 'phone' => $phone,
-                'message' => $message
+                'message' => $message,
             ]);
         }
         // Check if this is a direct WAHA webhook format (data.from and data.body)
         elseif ($request->has('data.from') && $request->has('data.body')) {
             $wahaData = $request->input('data');
             $phone = $wahaData['participant'] ?? $wahaData['author'] ?? $wahaData['from'];
-            
+
             // Handle WAHA format: 628123:1@c.us
             $phone = explode('@', $phone)[0];
             $phone = explode(':', $phone)[0];
 
             $phone = preg_replace('/[^0-9]/', '', $phone);
             if (str_starts_with($phone, '0')) {
-                $phone = '62' . substr($phone, 1);
+                $phone = '62'.substr($phone, 1);
             }
             $message = $wahaData['body'] ?? $wahaData['text'] ?? '';
 
@@ -95,7 +96,7 @@ class WhatsappController extends Controller
             // Replace request data with transformed data
             $request->merge([
                 'phone' => $phone,
-                'message' => $message
+                'message' => $message,
             ]);
         }
 
@@ -104,7 +105,7 @@ class WhatsappController extends Controller
         if (str_contains($originalPhone, 'status@broadcast') || $originalPhone === 'status') {
             return response()->json([
                 'success' => true,
-                'message' => 'Ignoring status broadcast event'
+                'message' => 'Ignoring status broadcast event',
             ]);
         }
 
@@ -140,7 +141,7 @@ class WhatsappController extends Controller
                 'phone' => $phone,
                 'state' => $session->state,
                 'is_active' => $session->isActive(),
-                'message' => $message
+                'message' => $message,
             ]);
 
             if ($session->isActive()) {
@@ -154,14 +155,14 @@ class WhatsappController extends Controller
             $replyPreview = 'NULL';
             if (isset($response['reply'])) {
                 $replyText = is_array($response['reply']) ? json_encode($response['reply']) : $response['reply'];
-                $replyPreview = is_string($replyText) ? substr($replyText, 0, 50) . '...' : 'Not a string';
+                $replyPreview = is_string($replyText) ? substr($replyText, 0, 50).'...' : 'Not a string';
             }
 
             \Log::info('Bot Handler Response', [
                 'intent' => $response['intent'] ?? 'N/A',
                 'state_update' => $response['state_update'] ?? 'N/A',
-                'duration_ms' => $duration . 'ms',
-                'reply_preview' => $replyPreview
+                'duration_ms' => $duration.'ms',
+                'reply_preview' => $replyPreview,
             ]);
 
             if (isset($response['state_update'])) {
@@ -187,11 +188,12 @@ class WhatsappController extends Controller
             );
 
             $response['chatId'] = $request->input('chatId');
+
             return response()->json($response);
 
         } catch (\Exception $e) {
-            \Log::error('Bot Handler Error: ' . $e->getMessage());
-            
+            \Log::error('Bot Handler Error: '.$e->getMessage());
+
             WhatsappLog::logInteraction(
                 $phone,
                 $message,
@@ -201,8 +203,8 @@ class WhatsappController extends Controller
             );
 
             return $this->errorResponse(
-                "🙏 *Mohon maaf*, sepertinya saya sedikit kebingungan memproses pesan tersebut.\n\n" .
-                "Silakan ketik *MENU* untuk kembali ke layanan utama kami. Terima kasih atas kesabarannya! 😊"
+                "🙏 *Mohon maaf*, sepertinya saya sedikit kebingungan memproses pesan tersebut.\n\n".
+                'Silakan ketik *MENU* untuk kembali ke layanan utama kami. Terima kasih atas kesabarannya! 😊'
             );
         }
     }

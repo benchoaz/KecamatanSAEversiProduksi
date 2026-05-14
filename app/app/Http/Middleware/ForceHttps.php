@@ -18,12 +18,12 @@ class ForceHttps
         $host = $request->header('host');
         $isInternal = str_contains($host, 'kecamatan-') || str_contains($host, 'dashboard-kecamatan');
 
-        if ((config('app.env') === 'production' || config('app.force_https', false)) 
-            && !$request->is('api/*') 
-            && !$isInternal 
-            && !$request->expectsJson()) {
-            
-            if (!$request->secure()) {
+        if ((config('app.env') === 'production' || config('app.force_https', false))
+            && ! $request->is('api/*')
+            && ! $isInternal
+            && ! $request->expectsJson()) {
+
+            if (! $request->secure()) {
                 // Redirect to HTTPS
                 return redirect()->secure($request->getRequestUri());
             }

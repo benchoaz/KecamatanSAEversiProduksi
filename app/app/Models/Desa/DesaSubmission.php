@@ -12,6 +12,7 @@ class DesaSubmission extends Model
     use HasFactory, HasUuids;
 
     protected $table = 'desa_submissions';
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -26,8 +27,11 @@ class DesaSubmission extends Model
 
     // Status Constants
     const STATUS_DRAFT = 'draft';
+
     const STATUS_SUBMITTED = 'submitted';
+
     const STATUS_RETURNED = 'returned';
+
     const STATUS_COMPLETED = 'completed';
 
     // Helpers

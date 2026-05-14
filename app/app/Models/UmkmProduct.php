@@ -25,7 +25,7 @@ class UmkmProduct extends Model
         'is_preorder',
         'discount_price',
         'discount_percentage',
-        'variations'
+        'variations',
     ];
 
     protected $casts = [
@@ -33,7 +33,7 @@ class UmkmProduct extends Model
         'is_preorder' => 'boolean',
         'harga' => 'decimal:2',
         'discount_price' => 'decimal:2',
-        'variations' => 'array'
+        'variations' => 'array',
     ];
 
     public function umkm()

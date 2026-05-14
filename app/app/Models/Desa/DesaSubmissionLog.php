@@ -10,7 +10,9 @@ class DesaSubmissionLog extends Model
     use HasFactory;
 
     protected $table = 'desa_submission_logs';
+
     protected $guarded = ['id'];
+
     public $timestamps = false;
 
     protected $casts = [

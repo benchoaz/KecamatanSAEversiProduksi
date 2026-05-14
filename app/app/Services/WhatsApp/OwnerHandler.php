@@ -2,10 +2,6 @@
 
 namespace App\Services\WhatsApp;
 
-use App\Models\WhatsappSession;
-use App\Models\UmkmLocal;
-use App\Models\Loker;
-
 class OwnerHandler
 {
     /**
@@ -14,17 +10,17 @@ class OwnerHandler
     public function initiate(string $phone): array
     {
         $baseUrl = env('PUBLIC_BASE_URL', config('app.url', 'https://babette-nonslanderous-randi.ngrok-free.dev'));
-        
+
         $kecamatan = env('KECAMATAN_NAME', 'Besuk');
 
         return [
             'success' => true,
             'intent' => 'owner_portal_link',
-            'reply' => "🌟 *Halo Warga {$kecamatan}!* 🌟\n\n" .
-                "Ingin mengubah jam buka Jasa atau mengelola produk UMKM Anda? Sekarang makin gampang lho!\n\n" .
-                "Klik tautan pribadi di bawah ini untuk akses cepat ke Dashboard Anda:\n" .
-                "🌐 {$baseUrl}/portal-warga/masuk\n\n" .
-                "Butuh bantuan lain? Ketik *MENU* kapan saja ya! 😊",
+            'reply' => "🌟 *Halo Warga {$kecamatan}!* 🌟\n\n".
+                "Ingin mengubah jam buka Jasa atau mengelola produk UMKM Anda? Sekarang makin gampang lho!\n\n".
+                "Klik tautan pribadi di bawah ini untuk akses cepat ke Dashboard Anda:\n".
+                "🌐 {$baseUrl}/portal-warga/masuk\n\n".
+                'Butuh bantuan lain? Ketik *MENU* kapan saja ya! 😊',
             'state_update' => null,
         ];
     }
@@ -39,10 +35,10 @@ class OwnerHandler
         return [
             'success' => true,
             'intent' => 'owner_lupa_pin',
-            'reply' => "📱 *Dashboard Manajemen Mandiri*\n\n" .
-                "Kelola profil toko atau jasa Anda kapan saja langsung dari HP melalui tautan di bawah ini:\n\n" .
-                "🌐 {$baseUrl}/portal-warga/masuk\n\n" .
-                "Klik tautan tersebut untuk akses tanpa repot. Ketik *MENU* untuk kembali.",
+            'reply' => "📱 *Dashboard Manajemen Mandiri*\n\n".
+                "Kelola profil toko atau jasa Anda kapan saja langsung dari HP melalui tautan di bawah ini:\n\n".
+                "🌐 {$baseUrl}/portal-warga/masuk\n\n".
+                'Klik tautan tersebut untuk akses tanpa repot. Ketik *MENU* untuk kembali.',
             'state_update' => null,
         ];
     }
@@ -64,7 +60,7 @@ class OwnerHandler
         } elseif (str_starts_with($cleanPhone, '0')) {
             $basePhone = substr($cleanPhone, 1);
         }
-        $likeClause = '%' . ltrim($basePhone, '0') . '%';
+        $likeClause = '%'.ltrim($basePhone, '0').'%';
 
         // Update all related assets
         $umkmCount = \App\Models\Umkm::where('no_wa', 'like', $likeClause)->update(['is_on_holiday' => $isHoliday]);
@@ -84,7 +80,7 @@ class OwnerHandler
 
         $reply = "✅ *BERHASIL DIUPDATE!* \n\n";
         $reply .= "Sip! Seluruh layanan atau toko Anda sekarang sudah {$newStatusLabel}.\n";
-        
+
         if ($isHoliday) {
             $reply .= "\nStatus [LIBUR] akan tampil di hasil pencarian warga agar mereka tahu Anda sedang tidak melayani.";
         } else {
@@ -109,7 +105,7 @@ class OwnerHandler
         return [
             'success' => false,
             'intent' => 'error',
-            'reply' => "Terjadi kesalahan sistem. Silakan coba lagi nanti.",
+            'reply' => 'Terjadi kesalahan sistem. Silakan coba lagi nanti.',
             'state_update' => null,
         ];
     }

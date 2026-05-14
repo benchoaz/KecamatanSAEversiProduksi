@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\ModuleSetting;
+use Illuminate\Console\Command;
 
 class GetSettingCommand extends Command
 {

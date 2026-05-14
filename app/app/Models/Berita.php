@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-use App\Traits\Auditable;
-
 class Berita extends Model
 {
-    use HasFactory, SoftDeletes, Auditable;
+    use Auditable, HasFactory, SoftDeletes;
 
     protected $table = 'berita';
 
@@ -65,8 +64,8 @@ class Berita extends Model
         }
 
         // 2. Handle relative paths (legacy or local uploads)
-        if (!Str::startsWith($thumb, ['http://', 'https://', 'data:'])) {
-            return asset('storage/' . $thumb);
+        if (! Str::startsWith($thumb, ['http://', 'https://', 'data:'])) {
+            return asset('storage/'.$thumb);
         }
 
         // 3. Robustness: Check for common placeholder patterns or broken indicators
@@ -86,17 +85,17 @@ class Berita extends Model
     private function getFallbackImage(): string
     {
         $category = strtolower($this->kategori ?? '');
-        
+
         if (Str::contains($category, 'umkm')) {
-            return "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800"; // Market/Produce
+            return 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800'; // Market/Produce
         }
-        
+
         if (Str::contains($category, 'desa')) {
-            return "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=800"; // Rural/Field
+            return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=800'; // Rural/Field
         }
 
         // Default: Professional Government/Building
-        return "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800";
+        return 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800';
     }
 
     /**
@@ -123,8 +122,8 @@ class Berita extends Model
         parent::boot();
 
         static::creating(function ($berita) {
-            if (!$berita->slug) {
-                $berita->slug = Str::slug($berita->judul) . '-' . Str::random(5);
+            if (! $berita->slug) {
+                $berita->slug = Str::slug($berita->judul).'-'.Str::random(5);
             }
         });
     }

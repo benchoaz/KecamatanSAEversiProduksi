@@ -10,6 +10,7 @@ class DesaSubmissionFile extends Model
     use HasFactory;
 
     protected $table = 'desa_submission_files';
+
     protected $guarded = ['id'];
 
     public function submission()

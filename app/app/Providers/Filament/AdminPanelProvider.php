@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -17,7 +18,6 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Filament\Navigation\NavigationItem;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -25,8 +25,8 @@ class AdminPanelProvider extends PanelProvider
     {
         try {
             $appProfile = appProfile();
-            $brandName = ($appProfile->region_level ?? 'Kecamatan') . ' ' . ($appProfile->region_name ?? 'SAE');
-            $logoUrl = $appProfile->logo_path ? asset('storage/' . $appProfile->logo_path) : null;
+            $brandName = ($appProfile->region_level ?? 'Kecamatan').' '.($appProfile->region_name ?? 'SAE');
+            $logoUrl = $appProfile->logo_path ? asset('storage/'.$appProfile->logo_path) : null;
         } catch (\Exception $e) {
             $brandName = 'Kecamatan SAE';
             $logoUrl = null;
@@ -53,7 +53,7 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->navigationItems([
                 NavigationItem::make('Beranda Dashboard')
-                    ->url(fn(): string => route('kecamatan.dashboard'))
+                    ->url(fn (): string => route('kecamatan.dashboard'))
                     ->icon('heroicon-o-home')
                     ->group('DASHBOARD UTAMA')
                     ->sort(-1),

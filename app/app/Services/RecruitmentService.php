@@ -2,19 +2,20 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\RecruitmentRepositoryInterface;
-use App\Models\RecruitmentVacancy;
+use App\Models\Desa;
 use App\Models\RecruitmentApplicant;
 use App\Models\RecruitmentCommittee;
 use App\Models\RecruitmentScore;
-use App\Models\Desa;
+use App\Models\RecruitmentVacancy;
+use App\Repositories\Interfaces\RecruitmentRepositoryInterface;
 use Exception;
-use Illuminate\Support\Facades\Storage;
 
 class RecruitmentService
 {
     protected $recruitmentRepo;
+
     protected $notificationService;
+
     protected $reportService;
 
     public function __construct(
@@ -35,13 +36,13 @@ class RecruitmentService
         $data['status'] = $data['status'] ?? 'draft';
 
         // Auto-resolve kabupaten_id via kecamatan chain
-        if (!empty($data['kecamatan_id'])) {
+        if (! empty($data['kecamatan_id'])) {
             $kecamatan = \App\Models\Kecamatan::find($data['kecamatan_id']);
             $data['kabupaten_id'] = $kecamatan?->kabupaten_id ?? null;
         }
 
         // Set klasifikasi_desa from Desa record
-        if (!isset($data['klasifikasi_desa']) && !empty($data['desa_id'])) {
+        if (! isset($data['klasifikasi_desa']) && ! empty($data['desa_id'])) {
             $desa = Desa::find($data['desa_id']);
             $data['klasifikasi_desa'] = strtolower($desa?->klasifikasi_desa ?? 'swadaya');
         }
@@ -59,7 +60,7 @@ class RecruitmentService
             try {
                 $this->notificationService->notifyVacancyToCamat($vacancy);
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::warning('Notifikasi Camat gagal: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning('Notifikasi Camat gagal: '.$e->getMessage());
             }
         }
 
@@ -69,7 +70,9 @@ class RecruitmentService
     public function updateStatus(int $id, string $status, ?string $notes = null, int $userId = 0, ?string $documentPath = null): bool
     {
         $vacancy = $this->recruitmentRepo->findVacancyById($id);
-        if (!$vacancy) throw new Exception("Lowongan tidak ditemukan.");
+        if (! $vacancy) {
+            throw new Exception('Lowongan tidak ditemukan.');
+        }
 
         $this->validateStatusTransition($vacancy->status, $status);
 
@@ -107,7 +110,7 @@ class RecruitmentService
                     try {
                         $this->reportService->generateSKPengangkatan($vacancy->id, $selected->id);
                     } catch (\Exception $e) {
-                        \Illuminate\Support\Facades\Log::warning('Generate SK gagal: ' . $e->getMessage());
+                        \Illuminate\Support\Facades\Log::warning('Generate SK gagal: '.$e->getMessage());
                     }
                 }
             }
@@ -118,20 +121,22 @@ class RecruitmentService
                     $this->reportService->generateBAKekosongan($vacancy->id);
                     $this->notificationService->notifyVacancyToCamat($vacancy);
                 } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::warning('Generate BA gagal: ' . $e->getMessage());
+                    \Illuminate\Support\Facades\Log::warning('Generate BA gagal: '.$e->getMessage());
                 }
             }
 
             if ($status === 'approved_by_bupati') {
                 try {
                     $this->notificationService->notifyApprovalKabupaten($vacancy, true, $notes);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
 
             if ($status === 'rejected_by_bupati') {
                 try {
                     $this->notificationService->notifyApprovalKabupaten($vacancy, false, $notes);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
         }
 
@@ -143,10 +148,12 @@ class RecruitmentService
     public function addCommittee(int $vacancyId, array $data, int $userId): RecruitmentCommittee
     {
         $vacancy = $this->recruitmentRepo->findVacancyById($vacancyId);
-        if (!$vacancy) throw new Exception("Lowongan tidak ditemukan.");
+        if (! $vacancy) {
+            throw new Exception('Lowongan tidak ditemukan.');
+        }
 
-        if (!in_array($vacancy->status, ['approved_by_camat', 'committee_formed', 'approved_by_bupati'])) {
-            throw new Exception("Panitia hanya dapat dibentuk setelah usulan disetujui.");
+        if (! in_array($vacancy->status, ['approved_by_camat', 'committee_formed', 'approved_by_bupati'])) {
+            throw new Exception('Panitia hanya dapat dibentuk setelah usulan disetujui.');
         }
 
         $data['recruitment_vacancy_id'] = $vacancyId;
@@ -166,8 +173,8 @@ class RecruitmentService
     {
         $vacancy = RecruitmentVacancy::findOrFail($data['recruitment_vacancy_id']);
 
-        if (!$vacancy->is_access_opened) {
-            throw new Exception("Pendaftaran belum dibuka atau sudah ditutup.");
+        if (! $vacancy->is_access_opened) {
+            throw new Exception('Pendaftaran belum dibuka atau sudah ditutup.');
         }
 
         // Cek duplikat NIK
@@ -182,7 +189,8 @@ class RecruitmentService
 
         try {
             $this->notificationService->notifyApplicantRegistered($applicant);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         return $applicant;
     }
@@ -195,7 +203,8 @@ class RecruitmentService
             $applicant = $this->recruitmentRepo->findApplicantById($id);
             try {
                 $this->notificationService->notifyApplicantVerified($applicant);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
 
         return $result;
@@ -206,29 +215,33 @@ class RecruitmentService
     public function inputScore(int $applicantId, float $nilaiTertulis, float $nilaiWawancara, int $scorerId, ?string $catatan = null, ?string $buktiUjianPath = null): RecruitmentScore
     {
         // Validasi range 0-100
-        if ($nilaiTertulis < 0 || $nilaiTertulis > 100) throw new Exception("Nilai tertulis harus antara 0-100.");
-        if ($nilaiWawancara < 0 || $nilaiWawancara > 100) throw new Exception("Nilai wawancara harus antara 0-100.");
+        if ($nilaiTertulis < 0 || $nilaiTertulis > 100) {
+            throw new Exception('Nilai tertulis harus antara 0-100.');
+        }
+        if ($nilaiWawancara < 0 || $nilaiWawancara > 100) {
+            throw new Exception('Nilai wawancara harus antara 0-100.');
+        }
 
         $nilaiTotal = RecruitmentScore::hitungNilaiTotal($nilaiTertulis, $nilaiWawancara);
 
         $score = RecruitmentScore::updateOrCreate(
             ['applicant_id' => $applicantId],
             [
-                'nilai_tertulis'   => $nilaiTertulis,
-                'nilai_wawancara'  => $nilaiWawancara,
-                'nilai_total'      => $nilaiTotal,
-                'catatan_penilai'  => $catatan,
+                'nilai_tertulis' => $nilaiTertulis,
+                'nilai_wawancara' => $nilaiWawancara,
+                'nilai_total' => $nilaiTotal,
+                'catatan_penilai' => $catatan,
                 'bukti_ujian_path' => $buktiUjianPath,
-                'scored_by'        => $scorerId,
-                'scored_at'        => now(),
+                'scored_by' => $scorerId,
+                'scored_at' => now(),
             ]
         );
 
         // Update nilai di tabel applicants juga (denormalized for quick access)
         RecruitmentApplicant::where('id', $applicantId)->update([
-            'score_written'   => $nilaiTertulis,
+            'score_written' => $nilaiTertulis,
             'score_interview' => $nilaiWawancara,
-            'score_total'     => $nilaiTotal,
+            'score_total' => $nilaiTotal,
         ]);
 
         return $score;
@@ -259,7 +272,7 @@ class RecruitmentService
         if ($currentCount >= $limits['total_maks']) {
             throw new Exception(
                 "Jumlah perangkat desa sudah mencapai batas maksimal untuk Desa {$classification} "
-                . "(Maksimal {$limits['total_maks']} perangkat sesuai Permendagri 84/2016)."
+                ."(Maksimal {$limits['total_maks']} perangkat sesuai Permendagri 84/2016)."
             );
         }
 
@@ -275,24 +288,24 @@ class RecruitmentService
         }
 
         $workflow = [
-            'draft'                => ['reported_to_camat'],
-            'reported_to_camat'    => ['approved_by_camat', 'draft'],
-            'approved_by_camat'    => ['submitted_to_bupati', 'committee_formed'],
-            'submitted_to_bupati'  => ['approved_by_bupati', 'rejected_by_bupati'],
-            'approved_by_bupati'   => ['committee_formed'],
-            'committee_formed'     => ['open_registration'],
-            'open_registration'    => ['extension_1', 'admin_verification'],
-            'extension_1'          => ['extension_2', 'admin_verification'],
-            'extension_2'          => ['admin_verification'],
-            'admin_verification'   => ['exam_process'],
-            'exam_process'         => ['ranking'],
-            'ranking'              => ['submitted_to_camat'],
-            'submitted_to_camat'   => ['camat_review'],
-            'camat_review'         => ['submitted_to_bupati', 'ranking'],
-            'sk_generated'         => ['completed'],
+            'draft' => ['reported_to_camat'],
+            'reported_to_camat' => ['approved_by_camat', 'draft'],
+            'approved_by_camat' => ['submitted_to_bupati', 'committee_formed'],
+            'submitted_to_bupati' => ['approved_by_bupati', 'rejected_by_bupati'],
+            'approved_by_bupati' => ['committee_formed'],
+            'committee_formed' => ['open_registration'],
+            'open_registration' => ['extension_1', 'admin_verification'],
+            'extension_1' => ['extension_2', 'admin_verification'],
+            'extension_2' => ['admin_verification'],
+            'admin_verification' => ['exam_process'],
+            'exam_process' => ['ranking'],
+            'ranking' => ['submitted_to_camat'],
+            'submitted_to_camat' => ['camat_review'],
+            'camat_review' => ['submitted_to_bupati', 'ranking'],
+            'sk_generated' => ['completed'],
         ];
 
-        if (isset($workflow[$current]) && !in_array($target, $workflow[$current])) {
+        if (isset($workflow[$current]) && ! in_array($target, $workflow[$current])) {
             throw new Exception("Transisi status dari '{$current}' ke '{$target}' tidak valid.");
         }
     }

@@ -2,10 +2,9 @@
 
 namespace App\Repositories;
 
-use App\Models\Submission;
 use App\Models\AuditLog;
+use App\Models\Submission;
 use App\Repositories\Interfaces\SubmissionRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -16,15 +15,15 @@ class SubmissionRepository implements SubmissionRepositoryInterface
     {
         $query = Submission::with(['desa', 'menu', 'aspek', 'submittedBy']);
 
-        if (!empty($filters['tahun'])) {
+        if (! empty($filters['tahun'])) {
             $query->where('tahun', $filters['tahun']);
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['menu_id'])) {
+        if (! empty($filters['menu_id'])) {
             $query->where('menu_id', $filters['menu_id']);
         }
 
@@ -90,6 +89,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
     public function delete(int $id): bool
     {
         $submission = $this->findById($id);
+
         return $submission->delete();
     }
 
@@ -97,7 +97,7 @@ class SubmissionRepository implements SubmissionRepositoryInterface
     {
         $query = Submission::where('desa_id', $desaId)->with(['menu', 'aspek']);
 
-        if (!empty($filters['tahun'])) {
+        if (! empty($filters['tahun'])) {
             $query->where('tahun', $filters['tahun']);
         }
 

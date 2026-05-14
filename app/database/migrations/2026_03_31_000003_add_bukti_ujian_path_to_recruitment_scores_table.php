@@ -16,12 +16,12 @@ return new class extends Migration
         // Guard: only run if the recruitment system table exists
         // This migration belongs to the perangkat desa recruitment module
         // and must not interfere with core kecamatan workflow
-        if (!Schema::hasTable('recruitment_scores')) {
+        if (! Schema::hasTable('recruitment_scores')) {
             return;
         }
 
         Schema::table('recruitment_scores', function (Blueprint $table) {
-            if (!Schema::hasColumn('recruitment_scores', 'bukti_ujian_path')) {
+            if (! Schema::hasColumn('recruitment_scores', 'bukti_ujian_path')) {
                 $table->string('bukti_ujian_path')->nullable()->after('catatan_penilai');
             }
         });

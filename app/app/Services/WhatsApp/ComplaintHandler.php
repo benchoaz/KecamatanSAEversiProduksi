@@ -2,10 +2,8 @@
 
 namespace App\Services\WhatsApp;
 
-use App\Models\WhatsappSession;
-use App\Models\PublicService;
 use App\Models\AppProfile;
-use Illuminate\Support\Str;
+use App\Models\WhatsappSession;
 
 class ComplaintHandler
 {
@@ -14,8 +12,8 @@ class ComplaintHandler
      */
     protected function getComplaintFormUrl(?string $name = null, ?string $phone = null, ?string $category = null): string
     {
-        $baseUrl = appProfile()->public_url ?? config("app.url");
-        $url = rtrim($baseUrl, '/') . '/#pengaduan';
+        $baseUrl = appProfile()->public_url ?? config('app.url');
+        $url = rtrim($baseUrl, '/').'/#pengaduan';
 
         // Add pre-filled parameters if provided
         $params = [];
@@ -29,8 +27,8 @@ class ComplaintHandler
             $params['kategori'] = urlencode($category);
         }
 
-        if (!empty($params)) {
-            $url .= '?' . http_build_query($params);
+        if (! empty($params)) {
+            $url .= '?'.http_build_query($params);
         }
 
         return $url;
@@ -47,10 +45,10 @@ class ComplaintHandler
         return [
             'success' => true,
             'intent' => 'complaint_initiate',
-            'reply' => "📢 *PENGADUAN MASYARAKAT*\n\n" .
-                "Terima kasih ingin menyampaikan aspirasi.\n\n" .
-                "Siapa nama lengkap Anda?\n" .
-                "(Ketik nama Anda, atau ketik TIDAK untuk membatalkan)",
+            'reply' => "📢 *PENGADUAN MASYARAKAT*\n\n".
+                "Terima kasih ingin menyampaikan aspirasi.\n\n".
+                "Siapa nama lengkap Anda?\n".
+                '(Ketik nama Anda, atau ketik TIDAK untuk membatalkan)',
             'state_update' => 'WAITING_COMPLAINT_NAME',
         ];
     }
@@ -66,11 +64,12 @@ class ComplaintHandler
         // Check for cancel
         if (in_array($messageLower, ['tidak', 'batal', 'cancel', 'no', 'stop', 'kembali'])) {
             $session->clear();
+
             return [
                 'success' => true,
                 'intent' => 'complaint_cancelled',
-                'reply' => "👋 *Siaaap!* Pengaduan telah dibatalkan.\n\n" .
-                    "Jika nanti Bapak/Ibu ingin menyampaikan aspirasi lagi, jangan ragu untuk menghubungi saya kembali ya. Ketik *MENU* untuk layanan lainnya. 😊",
+                'reply' => "👋 *Siaaap!* Pengaduan telah dibatalkan.\n\n".
+                    'Jika nanti Bapak/Ibu ingin menyampaikan aspirasi lagi, jangan ragu untuk menghubungi saya kembali ya. Ketik *MENU* untuk layanan lainnya. 😊',
                 'state_update' => null,
             ];
         }
@@ -80,19 +79,18 @@ class ComplaintHandler
 
         // Get user's current phone number
         $userPhone = $session->phone;
-        $userPhone = preg_replace("/[^0-9]/", "", explode("@", $userPhone)[0]);
+        $userPhone = preg_replace('/[^0-9]/', '', explode('@', $userPhone)[0]);
 
-        
         $phoneMsg = "Mohon masukkan nomor WhatsApp Anda yang aktif agar kami dapat menghubungi Anda.\n(Contoh: *08123456789*)";
-        if (strlen($userPhone) >= 9 && strlen($userPhone) <= 15 && str_starts_with($userPhone, "62")) {
+        if (strlen($userPhone) >= 9 && strlen($userPhone) <= 15 && str_starts_with($userPhone, '62')) {
             $phoneMsg = "Nomor WhatsApp yang terdeteksi: *{$userPhone}*\n\nApakah nomor ini benar? Ketik *YA* jika benar, atau ketik nomor lain jika ingin diganti.";
         }
 
         return [
-            "success" => true,
-            "intent" => "complaint_name_received",
-            "reply" => "Terima kasih *{$messageTrim}*.\n\n" . $phoneMsg,
-            "state_update" => "WAITING_COMPLAINT_WA",
+            'success' => true,
+            'intent' => 'complaint_name_received',
+            'reply' => "Terima kasih *{$messageTrim}*.\n\n".$phoneMsg,
+            'state_update' => 'WAITING_COMPLAINT_WA',
         ];
     }
 
@@ -107,11 +105,12 @@ class ComplaintHandler
         // Check for cancel
         if (in_array($messageLower, ['batal', 'cancel', 'stop', 'kembali', 'menu'])) {
             $session->clear();
+
             return [
                 'success' => true,
                 'intent' => 'complaint_cancelled',
-                'reply' => "👋 *Siaaap!* Pengaduan telah dibatalkan.\n\n" .
-                    "Ketik *MENU* untuk layanan lainnya. 😊",
+                'reply' => "👋 *Siaaap!* Pengaduan telah dibatalkan.\n\n".
+                    'Ketik *MENU* untuk layanan lainnya. 😊',
                 'state_update' => null,
             ];
         }
@@ -122,22 +121,22 @@ class ComplaintHandler
         } else {
             // User provided different WhatsApp number
             $waNumber = preg_replace('/[^0-9]/', '', $messageTrim);
-            
+
             // VALIDATION: If no numbers found, it's probably not a phone number
             if (empty($waNumber) || strlen($waNumber) < 5) {
                 return [
                     'success' => true,
                     'intent' => 'complaint_wa_invalid',
-                    'reply' => "🙏 *Mohon maaf*, sepertinya nomor yang Anda masukkan kurang tepat.\n\n" .
-                        "Bisa tolong ketikkan nomor WhatsApp Anda yang aktif? (Contoh: *08123456789*)\n\n" .
-                        "Atau ketik *BATAL* untuk membatalkan.",
+                    'reply' => "🙏 *Mohon maaf*, sepertinya nomor yang Anda masukkan kurang tepat.\n\n".
+                        "Bisa tolong ketikkan nomor WhatsApp Anda yang aktif? (Contoh: *08123456789*)\n\n".
+                        'Atau ketik *BATAL* untuk membatalkan.',
                     'state_update' => 'WAITING_COMPLAINT_WA',
                 ];
             }
 
             // Add country code if not present
-            if (!str_starts_with($waNumber, '62')) {
-                $waNumber = '62' . ltrim($waNumber, '0');
+            if (! str_starts_with($waNumber, '62')) {
+                $waNumber = '62'.ltrim($waNumber, '0');
             }
         }
 
@@ -147,12 +146,12 @@ class ComplaintHandler
         return [
             'success' => true,
             'intent' => 'complaint_wa_received',
-            'reply' => "Baik, nomor WhatsApp *{$waNumber}* telah dicatat.\n\n" .
-                "Pilih kategori pengaduan Anda:\n" .
-                "1️⃣ Pengaduan (Layanan Tidak Memadai)\n" .
-                "2️⃣ Aspirasi (Saran & Masukan)\n" .
-                "3️⃣ Permintaan (Butuh Layanan Khusus)\n\n" .
-                "Ketik angka *1*, *2*, atau *3*:",
+            'reply' => "Baik, nomor WhatsApp *{$waNumber}* telah dicatat.\n\n".
+                "Pilih kategori pengaduan Anda:\n".
+                "1️⃣ Pengaduan (Layanan Tidak Memadai)\n".
+                "2️⃣ Aspirasi (Saran & Masukan)\n".
+                "3️⃣ Permintaan (Butuh Layanan Khusus)\n\n".
+                'Ketik angka *1*, *2*, atau *3*:',
             'state_update' => 'WAITING_COMPLAINT_CATEGORY',
         ];
     }
@@ -168,17 +167,18 @@ class ComplaintHandler
         // Check for cancel
         if (in_array($messageLower, ['batal', 'cancel', 'stop', 'kembali', 'menu'])) {
             $session->clear();
+
             return [
                 'success' => true,
                 'intent' => 'complaint_cancelled',
-                'reply' => "👋 *Siaaap!* Pengaduan telah dibatalkan.\n\n" .
-                    "Ketik *MENU* untuk layanan lainnya. 😊",
+                'reply' => "👋 *Siaaap!* Pengaduan telah dibatalkan.\n\n".
+                    'Ketik *MENU* untuk layanan lainnya. 😊',
                 'state_update' => null,
             ];
         }
 
         $category = 'Pengaduan'; // default
-        
+
         if ($input === '1') {
             $category = 'Pengaduan';
         } elseif ($input === '2') {
@@ -189,7 +189,7 @@ class ComplaintHandler
             return [
                 'success' => true,
                 'intent' => 'complaint_category_invalid',
-                'reply' => "Pilihan tidak valid. Silakan ketik angka *1*, *2*, atau *3* sesuai kategori.",
+                'reply' => 'Pilihan tidak valid. Silakan ketik angka *1*, *2*, atau *3* sesuai kategori.',
                 'state_update' => 'WAITING_COMPLAINT_CATEGORY',
             ];
         } else {
@@ -210,22 +210,22 @@ class ComplaintHandler
         // Clear session after providing link
         $session->clear();
 
-        $reply = "✅ *Data Diterima!*\n\n" .
-            "Nama: *{$name}*\n" .
-            "WhatsApp: *{$waNumber}*\n" .
-            "Kategori: *{$category}*\n\n" .
-            "━━━━━━━━━━━━━━━━━━━━\n\n" .
-            "📝 *ISI FORM PENGADUAN*:\n{$formUrl}\n\n" .
-            "━━━━━━━━━━━━━━━━━━━━\n\n" .
-            "⚠️ *PERINGATAN & DISCLAIMER*:\n\n" .
-            "1. Informasi yang Anda berikan akan diverifikasi oleh petugas.\n\n" .
-            "2. Dilarang menyebarkan informasi bohong (hoax), fitnah, atau tuduhan tanpa bukti.\n\n" .
-            "3. Setiap laporan palsu/hoax adalah pelanggaran hukum dan dapat dipidana.\n\n" .
-            "4. Kami akan menindaklanjuti laporan Anda setelah verifikasi selesai.\n\n" .
-            "5. Jangan mudah percaya dengan informasi yang belum terverifikasi.\n\n" .
-            "━━━━━━━━━━━━━━━━━━━━\n\n" .
-            "Terima kasih atas partisipasi Anda membangun {@region}.\n" .
-            "Ketik *MENU* untuk kembali.";
+        $reply = "✅ *Data Diterima!*\n\n".
+            "Nama: *{$name}*\n".
+            "WhatsApp: *{$waNumber}*\n".
+            "Kategori: *{$category}*\n\n".
+            "━━━━━━━━━━━━━━━━━━━━\n\n".
+            "📝 *ISI FORM PENGADUAN*:\n{$formUrl}\n\n".
+            "━━━━━━━━━━━━━━━━━━━━\n\n".
+            "⚠️ *PERINGATAN & DISCLAIMER*:\n\n".
+            "1. Informasi yang Anda berikan akan diverifikasi oleh petugas.\n\n".
+            "2. Dilarang menyebarkan informasi bohong (hoax), fitnah, atau tuduhan tanpa bukti.\n\n".
+            "3. Setiap laporan palsu/hoax adalah pelanggaran hukum dan dapat dipidana.\n\n".
+            "4. Kami akan menindaklanjuti laporan Anda setelah verifikasi selesai.\n\n".
+            "5. Jangan mudah percaya dengan informasi yang belum terverifikasi.\n\n".
+            "━━━━━━━━━━━━━━━━━━━━\n\n".
+            "Terima kasih atas partisipasi Anda membangun {@region}.\n".
+            'Ketik *MENU* untuk kembali.';
 
         // Replace placeholder with region name
         $profile = appProfile();
@@ -239,5 +239,4 @@ class ComplaintHandler
             'state_update' => null,
         ];
     }
-
 }

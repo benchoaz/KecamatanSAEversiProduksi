@@ -4,43 +4,56 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         // 1. Personil Desa
         Schema::table('personil_desa', function (Blueprint $table) {
-            if (!Schema::hasColumn('personil_desa', 'status'))
+            if (! Schema::hasColumn('personil_desa', 'status')) {
                 $table->enum('status', ['draft', 'dikirim', 'dikembalikan', 'diterima'])->default('draft')->after('is_active');
-            if (!Schema::hasColumn('personil_desa', 'catatan'))
+            }
+            if (! Schema::hasColumn('personil_desa', 'catatan')) {
                 $table->text('catatan')->nullable()->after('status');
-            if (!Schema::hasColumn('personil_desa', 'tanggal_pengajuan'))
+            }
+            if (! Schema::hasColumn('personil_desa', 'tanggal_pengajuan')) {
                 $table->timestamp('tanggal_pengajuan')->nullable()->after('catatan');
-            if (!Schema::hasColumn('personil_desa', 'tanggal_verifikasi'))
+            }
+            if (! Schema::hasColumn('personil_desa', 'tanggal_verifikasi')) {
                 $table->timestamp('tanggal_verifikasi')->nullable()->after('tanggal_pengajuan');
+            }
         });
 
         // 2. Lembaga Desa
         Schema::table('lembaga_desa', function (Blueprint $table) {
-            if (!Schema::hasColumn('lembaga_desa', 'status'))
+            if (! Schema::hasColumn('lembaga_desa', 'status')) {
                 $table->enum('status', ['draft', 'dikirim', 'dikembalikan', 'diterima'])->default('draft')->after('file_sk');
-            if (!Schema::hasColumn('lembaga_desa', 'catatan'))
+            }
+            if (! Schema::hasColumn('lembaga_desa', 'catatan')) {
                 $table->text('catatan')->nullable()->after('status');
-            if (!Schema::hasColumn('lembaga_desa', 'tanggal_pengajuan'))
+            }
+            if (! Schema::hasColumn('lembaga_desa', 'tanggal_pengajuan')) {
                 $table->timestamp('tanggal_pengajuan')->nullable()->after('catatan');
-            if (!Schema::hasColumn('lembaga_desa', 'tanggal_verifikasi'))
+            }
+            if (! Schema::hasColumn('lembaga_desa', 'tanggal_verifikasi')) {
                 $table->timestamp('tanggal_verifikasi')->nullable()->after('tanggal_pengajuan');
+            }
         });
 
         // 3. Dokumen Desa
         Schema::table('dokumen_desa', function (Blueprint $table) {
-            if (!Schema::hasColumn('dokumen_desa', 'status'))
+            if (! Schema::hasColumn('dokumen_desa', 'status')) {
                 $table->enum('status', ['draft', 'dikirim', 'dikembalikan', 'diterima'])->default('draft')->after('file_path');
-            if (!Schema::hasColumn('dokumen_desa', 'catatan'))
+            }
+            if (! Schema::hasColumn('dokumen_desa', 'catatan')) {
                 $table->text('catatan')->nullable()->after('status');
-            if (!Schema::hasColumn('dokumen_desa', 'tanggal_pengajuan'))
+            }
+            if (! Schema::hasColumn('dokumen_desa', 'tanggal_pengajuan')) {
                 $table->timestamp('tanggal_pengajuan')->nullable()->after('catatan');
-            if (!Schema::hasColumn('dokumen_desa', 'tanggal_verifikasi'))
+            }
+            if (! Schema::hasColumn('dokumen_desa', 'tanggal_verifikasi')) {
                 $table->timestamp('tanggal_verifikasi')->nullable()->after('tanggal_pengajuan');
+            }
         });
 
         // 4. Riwayat Jabatan Personil

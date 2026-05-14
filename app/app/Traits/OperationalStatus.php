@@ -17,7 +17,7 @@ trait OperationalStatus
         }
 
         // 2. If no operating hours set, assume always open (default behavior)
-        if (!$this->operating_hours || trim($this->operating_hours) === '') {
+        if (! $this->operating_hours || trim($this->operating_hours) === '') {
             return true;
         }
 
@@ -55,7 +55,7 @@ trait OperationalStatus
                 'bg' => 'bg-rose-50',
                 'text' => 'text-rose-600',
                 'is_open' => false,
-                'icon' => 'fa-calendar-times'
+                'icon' => 'fa-calendar-times',
             ];
         }
 
@@ -66,7 +66,7 @@ trait OperationalStatus
                 'bg' => 'bg-emerald-50',
                 'text' => 'text-emerald-600',
                 'is_open' => true,
-                'icon' => 'fa-clock'
+                'icon' => 'fa-clock',
             ];
         }
 
@@ -76,7 +76,7 @@ trait OperationalStatus
             'bg' => 'bg-slate-50',
             'text' => 'text-slate-600',
             'is_open' => false,
-            'icon' => 'fa-moon'
+            'icon' => 'fa-moon',
         ];
     }
 }

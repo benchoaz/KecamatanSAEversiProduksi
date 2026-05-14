@@ -3,23 +3,22 @@
 namespace App\Http\Controllers\Kecamatan;
 
 use App\Http\Controllers\Controller;
-use App\Models\PublicService;
+use App\Models\Desa;
+use App\Models\JobVacancy;
+use App\Models\MasterLayanan;
 use App\Models\PelayananFaq;
 use App\Models\PengunjungKecamatan;
-use App\Models\MasterLayanan;
-use App\Models\Desa;
+use App\Models\PublicService;
 use App\Models\Umkm;
-
 use App\Models\WorkDirectory;
-use App\Models\JobVacancy;
+use App\Traits\HasWhatsAppNotifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
-use App\Traits\HasWhatsAppNotifications;
 
 class PelayananController extends Controller
 {
     use HasWhatsAppNotifications;
+
     /**
      * Inbox Pengaduan & Pelayanan
      */
@@ -42,12 +41,12 @@ class PelayananController extends Controller
 
         // Apply Search
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nama_pemohon', 'like', "%{$search}%")
-                  ->orWhere('uraian', 'like', "%{$search}%")
-                  ->orWhere('whatsapp', 'like', "%{$search}%")
-                  ->orWhere('uuid', 'like', "%{$search}%")
-                  ->orWhere('tracking_code', 'like', "%{$search}%");
+                    ->orWhere('uraian', 'like', "%{$search}%")
+                    ->orWhere('whatsapp', 'like', "%{$search}%")
+                    ->orWhere('uuid', 'like', "%{$search}%")
+                    ->orWhere('tracking_code', 'like', "%{$search}%");
             });
         }
 
@@ -74,6 +73,7 @@ class PelayananController extends Controller
                 ->where('display_name', $complaint->nama_pemohon)
                 ->latest()
                 ->first();
+
             return view('kecamatan.pelayanan.ekonomi_show', compact('complaint', 'workDir'));
         }
 
@@ -99,10 +99,10 @@ class PelayananController extends Controller
         ]);
 
         $complaint = PublicService::findOrFail($id);
-        
+
         // Custom backend validation for digital completion
         if ($request->status === PublicService::STATUS_SELESAI && $request->completion_type === 'digital') {
-            if (!$request->hasFile('result_file') && !$complaint->result_file_path) {
+            if (! $request->hasFile('result_file') && ! $complaint->result_file_path) {
                 return redirect()->back()->withErrors(['result_file' => 'Dokumen PDF hasil layanan wajib diunggah untuk diserahkan ke warga.'])->withInput();
             }
         }
@@ -120,15 +120,15 @@ class PelayananController extends Controller
             : $request->public_response;
 
         $updateData = [
-            'status'          => $request->status,
-            'internal_notes'  => $request->internal_notes,
+            'status' => $request->status,
+            'internal_notes' => $request->internal_notes,
             'public_response' => $publicResponse,
-            'handled_by'      => auth()->id(),
-            'handled_at'      => now(),
+            'handled_by' => auth()->id(),
+            'handled_at' => now(),
             'completion_type' => $request->completion_type ?? null,
-            'ready_at'        => $request->ready_at ?? null,
-            'pickup_person'   => $request->pickup_person ?? null,
-            'pickup_notes'    => $request->pickup_notes ?? null,
+            'ready_at' => $request->ready_at ?? null,
+            'pickup_person' => $request->pickup_person ?? null,
+            'pickup_notes' => $request->pickup_notes ?? null,
         ];
 
         // Handle PDF upload for digital completion
@@ -137,7 +137,7 @@ class PelayananController extends Controller
             $updateData['result_file_path'] = $path;
         }
 
-        if (!empty($publicResponse)) {
+        if (! empty($publicResponse)) {
             $updateData['responded_at'] = now();
         }
 
@@ -153,8 +153,8 @@ class PelayananController extends Controller
             'action_type' => 'status_update',
             'metadata' => [
                 'public_response' => $publicResponse,
-                'completion_type' => $request->completion_type
-            ]
+                'completion_type' => $request->completion_type,
+            ],
         ]);
 
         // EXTRA HOOK FOR UMKM & JASA: Activate the WorkDirectory record!
@@ -163,16 +163,16 @@ class PelayananController extends Controller
                 ->where('display_name', $complaint->nama_pemohon)
                 ->latest()
                 ->first();
-                
+
             if ($workDir && $request->status === PublicService::STATUS_SELESAI) {
                 $workDir->update([
-                    'status' => 'active', 
-                    'is_verified' => true
+                    'status' => 'active',
+                    'is_verified' => true,
                 ]);
             } elseif ($workDir && $request->status === PublicService::STATUS_DITOLAK) {
                 $workDir->update([
-                    'status' => 'inactive', 
-                    'is_verified' => false
+                    'status' => 'inactive',
+                    'is_verified' => false,
                 ]);
             }
         }
@@ -210,7 +210,6 @@ class PelayananController extends Controller
             'umkm_total' => Umkm::count(),
             'umkm_active' => Umkm::where('status', Umkm::STATUS_AKTIF)->count(),
 
-
             // Sectoral metrics (Jobs & Workers)
             'loker_total' => JobVacancy::count(),
             'loker_active' => JobVacancy::where('is_active', true)->count(),
@@ -241,6 +240,7 @@ class PelayananController extends Controller
             ->get();
 
         $desas = Desa::orderBy('nama_desa')->get();
+
         return view('kecamatan.pelayanan.visitor.index', compact('visitors', 'desas'));
     }
 
@@ -257,6 +257,7 @@ class PelayananController extends Controller
         ]);
 
         PengunjungKecamatan::create($validated);
+
         return back()->with('success', 'Pengunjung berhasil didaftarkan.');
     }
 
@@ -264,10 +265,11 @@ class PelayananController extends Controller
     {
         $visitor = PengunjungKecamatan::findOrFail($id);
         $validated = $request->validate([
-            'status' => 'required|in:menunggu,dilayani,selesai'
+            'status' => 'required|in:menunggu,dilayani,selesai',
         ]);
 
         $visitor->update($validated);
+
         return back()->with('success', 'Status pengunjung berhasil diperbarui.');
     }
 
@@ -276,7 +278,7 @@ class PelayananController extends Controller
      */
     public function visitorClear()
     {
-        if (!auth()->user()->hasRole('Super Admin')) {
+        if (! auth()->user()->hasRole('Super Admin')) {
             abort(403, 'Hanya Super Admin yang dapat menghapus seluruh data.');
         }
 
@@ -304,15 +306,15 @@ class PelayananController extends Controller
     public function faqStore(Request $request)
     {
         $validated = $request->validate([
-            'category'  => 'required|string|max:100',
-            'keywords'  => 'required|string|max:500',
-            'question'  => 'required|string|max:500',
-            'answer'    => 'required|string',
+            'category' => 'required|string|max:100',
+            'keywords' => 'required|string|max:500',
+            'question' => 'required|string|max:500',
+            'answer' => 'required|string',
         ]);
 
-        $validated['is_active']       = true;
-        $validated['priority']        = 0;
-        $validated['module']          = PelayananFaq::MODULE_PELAYANAN;
+        $validated['is_active'] = true;
+        $validated['priority'] = 0;
+        $validated['module'] = PelayananFaq::MODULE_PELAYANAN;
         $validated['last_updated_by'] = auth()->id();
 
         PelayananFaq::create($validated);
@@ -328,14 +330,15 @@ class PelayananController extends Controller
     {
         try {
             \Illuminate\Support\Facades\Artisan::call('faq:sync-services');
+
             return response()->json([
                 'status' => 'success',
-                'message' => 'FAQ berhasil disinkronkan dengan Daftar Layanan terbaru.'
+                'message' => 'FAQ berhasil disinkronkan dengan Daftar Layanan terbaru.',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Gagal sinkronisasi: ' . $e->getMessage()
+                'message' => 'Gagal sinkronisasi: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -345,10 +348,10 @@ class PelayananController extends Controller
         $faq = PelayananFaq::findOrFail($id);
 
         $validated = $request->validate([
-            'category'  => 'required|string|max:100',
-            'keywords'  => 'required|string|max:500',
-            'question'  => 'required|string|max:500',
-            'answer'    => 'required|string',
+            'category' => 'required|string|max:100',
+            'keywords' => 'required|string|max:500',
+            'question' => 'required|string|max:500',
+            'answer' => 'required|string',
             'is_active' => 'required|boolean',
         ]);
 
@@ -366,6 +369,7 @@ class PelayananController extends Controller
     public function layananIndex()
     {
         $layanan = MasterLayanan::orderBy('urutan')->get();
+
         return view('kecamatan.pelayanan.layanan.index', compact('layanan'));
     }
 
@@ -393,12 +397,14 @@ class PelayananController extends Controller
         ]);
 
         MasterLayanan::create($validated);
+
         return redirect()->route('kecamatan.pelayanan.layanan.index')->with('success', 'Layanan berhasil ditambahkan.');
     }
 
     public function layananEdit($id)
     {
         $layanan = MasterLayanan::findOrFail($id);
+
         return view('kecamatan.pelayanan.layanan.form', compact('layanan'));
     }
 
@@ -422,6 +428,7 @@ class PelayananController extends Controller
         ]);
 
         $layanan->update($validated);
+
         return redirect()->route('kecamatan.pelayanan.layanan.index')->with('success', 'Layanan berhasil diperbarui.');
     }
 
@@ -429,6 +436,7 @@ class PelayananController extends Controller
     {
         $layanan = MasterLayanan::findOrFail($id);
         $layanan->delete();
+
         return redirect()->route('kecamatan.pelayanan.layanan.index')->with('success', 'Layanan berhasil dihapus.');
     }
 
@@ -530,8 +538,8 @@ class PelayananController extends Controller
             'comment' => $request->internal_notes,
             'action_type' => 'status_update',
             'metadata' => [
-                'public_response' => $request->public_response
-            ]
+                'public_response' => $request->public_response,
+            ],
         ]);
 
         // Kirim notifikasi WhatsApp jika diminta dan status berubah
@@ -577,13 +585,14 @@ class PelayananController extends Controller
 
         return redirect()->back()->with('success', 'Catatan aktivitas berhasil ditambahkan.');
     }
+
     /**
      * Delete a single service record
      */
     public function destroy($id)
     {
         $service = PublicService::findOrFail($id);
-        
+
         // Delete related data
         $service->attachments()->delete();
         $service->histories()->delete();
@@ -602,13 +611,13 @@ class PelayananController extends Controller
             return redirect()->back()->with('error', 'Tidak ada data yang dipilih.');
         }
 
-        PublicService::whereIn('id', $ids)->each(function($service) {
+        PublicService::whereIn('id', $ids)->each(function ($service) {
             $service->attachments()->delete();
             $service->histories()->delete();
             $service->delete();
         });
 
-        return redirect()->back()->with('success', count($ids) . ' data berhasil dihapus.');
+        return redirect()->back()->with('success', count($ids).' data berhasil dihapus.');
     }
 
     /**
@@ -616,12 +625,12 @@ class PelayananController extends Controller
      */
     public function clearAll(Request $request)
     {
-        if (!auth()->user()->hasRole('Super Admin')) {
+        if (! auth()->user()->hasRole('Super Admin')) {
             abort(403, 'Hanya Super Admin yang dapat menghapus seluruh data.');
         }
 
         $category = $request->input('category'); // 'pelayanan', 'pengaduan', 'all'
-        
+
         $query = PublicService::query();
         if ($category === 'pelayanan') {
             $query->where('category', PublicService::CATEGORY_PELAYANAN);
@@ -632,8 +641,8 @@ class PelayananController extends Controller
         }
 
         $count = $query->count();
-        
-        $query->each(function($service) {
+
+        $query->each(function ($service) {
             $service->attachments()->delete();
             $service->histories()->delete();
             $service->delete();
@@ -650,17 +659,17 @@ class PelayananController extends Controller
         $attachment = \App\Models\PublicServiceAttachment::findOrFail($attachmentId);
         $profile = appProfile();
 
-        if (!$profile->is_document_ai_active || !$profile->document_ai_key) {
+        if (! $profile->is_document_ai_active || ! $profile->document_ai_key) {
             return response()->json(['success' => false, 'message' => 'Layanan AI belum dikonfigurasi atau sedang dinonaktifkan.']);
         }
 
         try {
             $apiKey = $profile->document_ai_key;
-            $filePath = storage_path('app/public/' . $attachment->file_path);
-            
-            if (!file_exists($filePath)) {
-                $filePath = public_path('storage/' . $attachment->file_path);
-                if (!file_exists($filePath)) {
+            $filePath = storage_path('app/public/'.$attachment->file_path);
+
+            if (! file_exists($filePath)) {
+                $filePath = public_path('storage/'.$attachment->file_path);
+                if (! file_exists($filePath)) {
                     return response()->json(['success' => false, 'message' => 'File tidak ditemukan di server.']);
                 }
             }
@@ -683,7 +692,7 @@ class PelayananController extends Controller
             }";
 
             $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
-            
+
             $payload = [
                 'contents' => [
                     [
@@ -692,15 +701,15 @@ class PelayananController extends Controller
                             [
                                 'inline_data' => [
                                     'mime_type' => $mimeType,
-                                    'data' => $fileData
-                                ]
-                            ]
-                        ]
-                    ]
+                                    'data' => $fileData,
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'generationConfig' => [
-                    'response_mime_type' => 'application/json'
-                ]
+                    'response_mime_type' => 'application/json',
+                ],
             ];
 
             $response = \Illuminate\Support\Facades\Http::timeout(30)->post($url, $payload);
@@ -713,13 +722,13 @@ class PelayananController extends Controller
                 if ($jsonResult) {
                     $attachment->update([
                         'ai_status' => $jsonResult['status'],
-                        'ai_analysis_result' => $jsonResult['reason']
+                        'ai_analysis_result' => $jsonResult['reason'],
                     ]);
 
                     return response()->json([
                         'success' => true,
                         'status' => $jsonResult['status'],
-                        'reason' => $jsonResult['reason']
+                        'reason' => $jsonResult['reason'],
                     ]);
                 }
             }
@@ -727,7 +736,7 @@ class PelayananController extends Controller
             return response()->json(['success' => false, 'message' => 'AI gagal menganalisis dokumen. Coba lagi nanti.']);
 
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan teknis: ' . $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan teknis: '.$e->getMessage()]);
         }
     }
 }

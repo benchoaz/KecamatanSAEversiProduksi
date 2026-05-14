@@ -10,6 +10,7 @@ class PembangunanDokumenSpj extends Model
     use HasFactory;
 
     protected $table = 'pembangunan_dokumen_spj';
+
     protected $guarded = ['id'];
 
     protected $casts = [

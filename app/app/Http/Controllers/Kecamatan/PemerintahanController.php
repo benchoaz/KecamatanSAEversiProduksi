@@ -7,7 +7,6 @@ use App\Models\Desa;
 use App\Models\DokumenDesa;
 use App\Models\InventarisDesa;
 use App\Models\LembagaDesa;
-use App\Models\PengunjungKecamatan;
 use App\Models\PerencanaanDesa;
 use App\Models\PersonilDesa;
 use App\Models\Submission;
@@ -21,6 +20,7 @@ class PemerintahanController extends Controller
     use \App\Traits\ImageOptimizer;
 
     protected $submissionRepo;
+
     protected $masterData;
 
     public function __construct(
@@ -52,7 +52,7 @@ class PemerintahanController extends Controller
 
         $healthMetrics = $desa_id ? $this->calculateHealth($desa_id) : null;
 
-        $recentSubmissions = Submission::when($desa_id, fn($q) => $q->where('desa_id', $desa_id))
+        $recentSubmissions = Submission::when($desa_id, fn ($q) => $q->where('desa_id', $desa_id))
             ->with(['menu', 'aspek'])
             ->latest()
             ->take(5)
@@ -87,7 +87,7 @@ class PemerintahanController extends Controller
         $user = auth()->user();
         $desa_id = $user->desa_id ?? $request->desa_id;
 
-        if (!$desa_id) {
+        if (! $desa_id) {
             return back()->with('error', 'Desa tidak teridentifikasi.');
         }
 
@@ -114,7 +114,7 @@ class PemerintahanController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:diterima,dikembalikan',
-            'catatan' => 'nullable|string'
+            'catatan' => 'nullable|string',
         ]);
 
         $personil = PersonilDesa::findOrFail($id);
@@ -131,13 +131,13 @@ class PemerintahanController extends Controller
     public function personilUnlock(Request $request, $id)
     {
         $personil = PersonilDesa::findOrFail($id);
-        
+
         // Hanya bisa dibuka jika statusnya 'permohonan_revisi'
         abort_unless($personil->status == 'permohonan_revisi', 403, 'Tidak ada permohonan revisi untuk data ini.');
 
         $personil->update([
             'status' => 'dikembalikan', // Kembali jadi editable
-            'catatan_revisi' => 'IZIN REVISI DIBERIKAN. Alasan Desa: ' . $personil->alasan_revisi
+            'catatan_revisi' => 'IZIN REVISI DIBERIKAN. Alasan Desa: '.$personil->alasan_revisi,
         ]);
 
         return back()->with('success', 'Kunci data berhasil dibuka. Desa sekarang dapat melakukan revisi.');
@@ -148,7 +148,7 @@ class PemerintahanController extends Controller
         $validated = $request->validate([
             'status_keaktifan' => 'required|in:meninggal,berhenti,diberhentikan',
             'tanggal_nonaktif' => 'required|date',
-            'alasan_nonaktif' => 'nullable|string'
+            'alasan_nonaktif' => 'nullable|string',
         ]);
 
         $personil = PersonilDesa::findOrFail($id);
@@ -159,7 +159,7 @@ class PemerintahanController extends Controller
             'alasan_nonaktif' => $validated['alasan_nonaktif'],
         ]);
 
-        return back()->with('success', 'Personil ' . $personil->nama . ' telah dinonaktifkan.');
+        return back()->with('success', 'Personil '.$personil->nama.' telah dinonaktifkan.');
     }
 
     public function personilIndex()
@@ -181,12 +181,12 @@ class PemerintahanController extends Controller
                 },
                 'personil as perangkat_count' => function ($query) {
                     $query->where('kategori', 'perangkat')->where('jabatan', 'not like', '%Kepala Desa%');
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
         return view('kecamatan.pemerintahan.personil.index', compact('personils', 'desa_id', 'desas') + [
-            'store_route' => route('kecamatan.pemerintahan.detail.personil.store')
+            'store_route' => route('kecamatan.pemerintahan.detail.personil.store'),
         ]);
     }
 
@@ -205,7 +205,7 @@ class PemerintahanController extends Controller
             $desas = Desa::withCount([
                 'personil as bpd_count' => function ($query) {
                     $query->where('kategori', 'bpd');
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
@@ -215,7 +215,7 @@ class PemerintahanController extends Controller
             'desas' => $desas,
             'title' => 'Struktur BPD',
             'kategori' => 'bpd',
-            'store_route' => route('kecamatan.pemerintahan.detail.personil.store')
+            'store_route' => route('kecamatan.pemerintahan.detail.personil.store'),
         ]);
     }
 
@@ -254,6 +254,7 @@ class PemerintahanController extends Controller
         ]);
 
         InventarisDesa::create($validated);
+
         return back()->with('success', 'Data inventaris berhasil disimpan.');
     }
 
@@ -279,6 +280,7 @@ class PemerintahanController extends Controller
     public function perencanaanShow($id)
     {
         $perencanaan = PerencanaanDesa::with(['usulan', 'desa'])->findOrFail($id);
+
         return view('kecamatan.pemerintahan.perencanaan.show', compact('perencanaan'));
     }
 
@@ -333,7 +335,7 @@ class PemerintahanController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:verified,revision',
-            'catatan' => 'nullable|string'
+            'catatan' => 'nullable|string',
         ]);
 
         $perencanaan = PerencanaanDesa::findOrFail($id);
@@ -365,7 +367,7 @@ class PemerintahanController extends Controller
             $desas = Desa::withCount([
                 'dokumens' => function ($q) use ($reportTypes) {
                     $q->whereIn('tipe_dokumen', $reportTypes);
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
@@ -376,7 +378,7 @@ class PemerintahanController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:diterima,dikembalikan',
-            'catatan' => 'nullable|string'
+            'catatan' => 'nullable|string',
         ]);
 
         $laporan = DokumenDesa::findOrFail($id);
@@ -411,7 +413,7 @@ class PemerintahanController extends Controller
             $desas = Desa::withCount([
                 'dokumens' => function ($q) {
                     $q->whereIn('tipe_dokumen', ['RPJMDes', 'RKPDes']);
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
@@ -422,7 +424,7 @@ class PemerintahanController extends Controller
             'title' => 'Arsip Dokumen Perencanaan',
             'tipe_filter' => 'RPJMDes & RKPDes',
             'desc' => 'Monitoring Dokumen RPJMDes (6 Tahunan) & RKPDes (Tahunan).',
-            'desc_pilih_desa' => 'Pilih Desa untuk Memantau Kelengkapan Dokumen Perencanaan (RPJMDes/RKPDes).'
+            'desc_pilih_desa' => 'Pilih Desa untuk Memantau Kelengkapan Dokumen Perencanaan (RPJMDes/RKPDes).',
         ]);
     }
 
@@ -441,7 +443,7 @@ class PemerintahanController extends Controller
             $desas = Desa::withCount([
                 'dokumens' => function ($q) {
                     $q->where('tipe_dokumen', 'Peraturan Desa');
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
@@ -452,7 +454,7 @@ class PemerintahanController extends Controller
             'title' => 'Inventaris Peraturan Desa',
             'tipe_filter' => 'Peraturan Desa',
             'desc' => 'Daftar produk hukum & peraturan desa yang telah ditetapkan.',
-            'desc_pilih_desa' => 'Pilih Desa untuk Memantau Kelengkapan Peraturan Desa.'
+            'desc_pilih_desa' => 'Pilih Desa untuk Memantau Kelengkapan Peraturan Desa.',
         ]);
     }
 
@@ -472,6 +474,7 @@ class PemerintahanController extends Controller
         }
 
         DokumenDesa::create($validated);
+
         return back()->with('success', 'Dokumen/Laporan berhasil diarsipkan.');
     }
 
@@ -489,7 +492,7 @@ class PemerintahanController extends Controller
             $desas = Desa::with([
                 'lembaga' => function ($q) {
                     $q->select('id', 'desa_id', 'nama_lembaga');
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
@@ -510,7 +513,7 @@ class PemerintahanController extends Controller
         $user = auth()->user();
         $desa_id = $user->desa_id ?? $request->desa_id;
 
-        if (!$desa_id) {
+        if (! $desa_id) {
             return back()->with('error', 'Desa tidak teridentifikasi. Pilih desa terlebih dahulu.');
         }
 
@@ -532,7 +535,7 @@ class PemerintahanController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:diterima,dikembalikan',
-            'catatan' => 'nullable|string'
+            'catatan' => 'nullable|string',
         ]);
 
         $lembaga = LembagaDesa::findOrFail($id);
@@ -546,36 +549,35 @@ class PemerintahanController extends Controller
         return back()->with('success', 'Status lembaga berhasil diperbarui.');
     }
 
-
     public function exportAudit()
     {
         $desa_id = request('desa_id');
         $desa = Desa::find($desa_id);
 
-        if (!$desa && auth()->user()->desa_id) {
+        if (! $desa && auth()->user()->desa_id) {
             $desa = auth()->user()->desa;
         }
 
         abort_unless($desa, 404, 'Desa tidak ditemukan.');
 
-        $zipFile = new ZipFile();
-        $zipName = "Paket_Audit_" . str_replace(' ', '_', $desa->nama_desa) . "_" . date('Ymd') . ".zip";
+        $zipFile = new ZipFile;
+        $zipName = 'Paket_Audit_'.str_replace(' ', '_', $desa->nama_desa).'_'.date('Ymd').'.zip';
 
         // 1. Perangkat & BPD SK
         $personils = PersonilDesa::where('desa_id', $desa->id)->whereNotNull('file_sk')->get();
         foreach ($personils as $p) {
-            $fullPath = storage_path('app/local/' . $p->file_sk);
+            $fullPath = storage_path('app/local/'.$p->file_sk);
             if (file_exists($fullPath)) {
-                $zipFile->addFile($fullPath, "A_B_Struktur_Organisasi/" . basename($p->file_sk));
+                $zipFile->addFile($fullPath, 'A_B_Struktur_Organisasi/'.basename($p->file_sk));
             }
         }
 
         // 2. Lembaga SK
         $lembagas = LembagaDesa::where('desa_id', $desa->id)->whereNotNull('file_sk')->get();
         foreach ($lembagas as $l) {
-            $fullPath = storage_path('app/local/' . $l->file_sk);
+            $fullPath = storage_path('app/local/'.$l->file_sk);
             if (file_exists($fullPath)) {
-                $zipFile->addFile($fullPath, "C_Lembaga_Desa/" . basename($l->file_sk));
+                $zipFile->addFile($fullPath, 'C_Lembaga_Desa/'.basename($l->file_sk));
             }
         }
 
@@ -584,26 +586,26 @@ class PemerintahanController extends Controller
         $reportTypes = ['LKPJ', 'LPPD', 'APBDes', 'LKPPD', 'LPJ_APBDes', 'IPPD', 'BUMDes', 'Rekap_Penduduk', 'LPPD_AMJ'];
 
         foreach ($dokumens as $d) {
-            $fullPath = storage_path('app/local/' . $d->file_path);
+            $fullPath = storage_path('app/local/'.$d->file_path);
             if (file_exists($fullPath)) {
-                $folder = in_array($d->tipe_dokumen, $reportTypes) ? "E_Laporan_Tahunan/" : "G_Dokumen_Inti/";
-                $zipFile->addFile($fullPath, $folder . basename($d->file_path));
+                $folder = in_array($d->tipe_dokumen, $reportTypes) ? 'E_Laporan_Tahunan/' : 'G_Dokumen_Inti/';
+                $zipFile->addFile($fullPath, $folder.basename($d->file_path));
             }
         }
 
         // 4. Perencanaan (Musrenbang BA)
         $perencanaans = PerencanaanDesa::where('desa_id', $desa->id)->whereNotNull('file_ba')->get();
         foreach ($perencanaans as $pr) {
-            $fullPath = storage_path('app/local/' . $pr->file_ba);
+            $fullPath = storage_path('app/local/'.$pr->file_ba);
             if (file_exists($fullPath)) {
-                $zipFile->addFile($fullPath, "D_Perencanaan/" . basename($pr->file_ba));
+                $zipFile->addFile($fullPath, 'D_Perencanaan/'.basename($pr->file_ba));
             }
         }
 
-        $zipFile->saveAsFile(storage_path('app/temp/' . $zipName));
+        $zipFile->saveAsFile(storage_path('app/temp/'.$zipName));
         $zipFile->close();
 
-        return response()->download(storage_path('app/temp/' . $zipName))->deleteFileAfterSend(true);
+        return response()->download(storage_path('app/temp/'.$zipName))->deleteFileAfterSend(true);
     }
 
     protected function calculateHealth($desa_id)
@@ -624,18 +626,21 @@ class PemerintahanController extends Controller
             'summary' => [
                 'has_kades' => $hasKades,
                 'has_sekdes' => $hasSekdes,
-                'last_asset' => $lastAssetUpdate ? $lastAssetUpdate->updated_at->format('d/m/Y') : '-'
-            ]
+                'last_asset' => $lastAssetUpdate ? $lastAssetUpdate->updated_at->format('d/m/Y') : '-',
+            ],
         ];
     }
 
     private function getCurrentPhase()
     {
         $month = (int) date('n');
-        if ($month >= 1 && $month <= 6)
+        if ($month >= 1 && $month <= 6) {
             return 'musdes';
-        if ($month >= 7 && $month <= 9)
+        }
+        if ($month >= 7 && $month <= 9) {
             return 'rkp';
+        }
+
         return 'apbdes';
     }
 
@@ -653,18 +658,19 @@ class PemerintahanController extends Controller
             },
             'personil as staff_count' => function ($query) {
                 $query->where('kategori', 'perangkat')
-                      ->where('jabatan', 'not like', '%Kepala Desa%')
-                      ->where('jabatan', 'not like', '%Sekretaris Desa%');
-            }
+                    ->where('jabatan', 'not like', '%Kepala Desa%')
+                    ->where('jabatan', 'not like', '%Sekretaris Desa%');
+            },
         ])
             ->orderBy('nama_desa')
             ->get();
 
         // Hitung total siltap berdasarkan standar kategori
-        $desas->map(function($desa) {
-            $desa->total_siltap = ($desa->kades_count * $desa->siltap_kades) + 
-                                 ($desa->sekdes_count * $desa->siltap_sekdes) + 
+        $desas->map(function ($desa) {
+            $desa->total_siltap = ($desa->kades_count * $desa->siltap_kades) +
+                                 ($desa->sekdes_count * $desa->siltap_sekdes) +
                                  ($desa->staff_count * $desa->siltap_perangkat);
+
             return $desa;
         });
 
@@ -685,25 +691,26 @@ class PemerintahanController extends Controller
             },
             'personil as staff_count' => function ($query) {
                 $query->where('kategori', 'perangkat')
-                      ->where('jabatan', 'not like', '%Kepala Desa%')
-                      ->where('jabatan', 'not like', '%Sekretaris Desa%');
-            }
+                    ->where('jabatan', 'not like', '%Kepala Desa%')
+                    ->where('jabatan', 'not like', '%Sekretaris Desa%');
+            },
         ])
             ->orderBy('nama_desa')
             ->get();
 
         // Hitung total siltap berdasarkan standar kategori
-        $desas->map(function($desa) {
-            $desa->total_siltap = ($desa->kades_count * $desa->siltap_kades) + 
-                                 ($desa->sekdes_count * $desa->siltap_sekdes) + 
+        $desas->map(function ($desa) {
+            $desa->total_siltap = ($desa->kades_count * $desa->siltap_kades) +
+                                 ($desa->sekdes_count * $desa->siltap_sekdes) +
                                  ($desa->staff_count * $desa->siltap_perangkat);
+
             return $desa;
         });
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kecamatan.pemerintahan.rekap-siltap.pdf', compact('desas'))
             ->setPaper('a4', 'portrait');
 
-        return $pdf->download('Rekapitulasi_Siltap_Kecamatan_' . date('Ymd_His') . '.pdf');
+        return $pdf->download('Rekapitulasi_Siltap_Kecamatan_'.date('Ymd_His').'.pdf');
     }
 
     public function updatePagu(\Illuminate\Http\Request $request, $id)
@@ -725,7 +732,7 @@ class PemerintahanController extends Controller
             'siltap_perangkat' => $request->siltap_perangkat,
         ]);
 
-        return back()->with('success', 'Data keuangan desa ' . $desa->nama_desa . ' berhasil diperbarui.');
+        return back()->with('success', 'Data keuangan desa '.$desa->nama_desa.' berhasil diperbarui.');
     }
 
     public function printRekap()
@@ -751,7 +758,7 @@ class PemerintahanController extends Controller
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kecamatan.pemerintahan.export.rekap_pdf', [
             'data' => $data,
             'title' => 'REKAPITULASI ADMINISTRASI DESA (MODUL A-I)',
-            'date' => now()->format('d/m/Y H:i')
+            'date' => now()->format('d/m/Y H:i'),
         ])->setPaper('a4', 'landscape');
 
         return $pdf->stream('Rekap_Administrasi_Kecamatan.pdf');
@@ -761,7 +768,7 @@ class PemerintahanController extends Controller
     {
         $desa_id = $request->desa_id;
         $desa = Desa::findOrFail($desa_id);
-        
+
         $personil = PersonilDesa::where('desa_id', $desa_id)->where('kategori', 'perangkat')->get();
         $bpd = PersonilDesa::where('desa_id', $desa_id)->where('kategori', 'bpd')->get();
         $lembaga = LembagaDesa::where('desa_id', $desa_id)->get();
@@ -777,10 +784,10 @@ class PemerintahanController extends Controller
             'perencanaan' => $perencanaan,
             'inventaris' => $inventaris,
             'dokumen' => $dokumen,
-            'title' => 'LAPORAN ADMINISTRASI DESA ' . strtoupper($desa->nama_desa),
-            'date' => now()->format('d/m/Y H:i')
+            'title' => 'LAPORAN ADMINISTRASI DESA '.strtoupper($desa->nama_desa),
+            'date' => now()->format('d/m/Y H:i'),
         ])->setPaper('a4', 'portrait');
 
-        return $pdf->stream('Laporan_Administrasi_' . $desa->nama_desa . '.pdf');
+        return $pdf->stream('Laporan_Administrasi_'.$desa->nama_desa.'.pdf');
     }
 }

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UmkmLocal;
-use App\Models\Loker;
-use App\Models\WorkDirectory;
 use App\Models\AppProfile;
+use App\Models\Loker;
 use App\Models\PelayananFaq;
+use App\Models\UmkmLocal;
+use App\Models\WorkDirectory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -32,6 +32,7 @@ class ExternalApiController extends Controller
     {
         return AppProfile::first(['region_name'])?->region_name ?? env('KECAMATAN_NAME', 'Kecamatan');
     }
+
     /**
      * Mask phone number for privacy
      * Format: 0812xxxx890
@@ -44,7 +45,7 @@ class ExternalApiController extends Controller
             return $phone;
         }
 
-        return substr($phone, 0, 4) . 'xxxx' . substr($phone, -3);
+        return substr($phone, 0, 4).'xxxx'.substr($phone, -3);
     }
 
     /**
@@ -56,10 +57,10 @@ class ExternalApiController extends Controller
 
         // Convert 08 to 628 for wa.me
         if (str_starts_with($phone, '08')) {
-            $phone = '62' . substr($phone, 1);
+            $phone = '62'.substr($phone, 1);
         }
 
-        return 'wa.me/' . $phone;
+        return 'wa.me/'.$phone;
     }
 
     /**
@@ -100,7 +101,7 @@ class ExternalApiController extends Controller
             'success' => true,
             'data' => $data,
             'count' => $data->count(),
-            'website_link' => $this->getBaseUrl() . '/umkm'
+            'website_link' => $this->getBaseUrl().'/umkm',
         ]);
     }
 
@@ -142,7 +143,7 @@ class ExternalApiController extends Controller
             'success' => true,
             'data' => $data,
             'count' => $data->count(),
-            'website_link' => $this->getBaseUrl() . '/jasa'
+            'website_link' => $this->getBaseUrl().'/jasa',
         ]);
     }
 
@@ -170,10 +171,11 @@ class ExternalApiController extends Controller
 
         $data = $lokers->map(function ($item) {
             $desaName = $item->nama_desa_manual ?? ($item->desa ? $item->desa->name : $this->getRegionName());
+
             return [
                 'title' => $item->title,
                 'job_category' => $item->job_category,
-                'company' => $item->description ? substr(strip_tags($item->description), 0, 50) . '...' : '-',
+                'company' => $item->description ? substr(strip_tags($item->description), 0, 50).'...' : '-',
                 'location' => $desaName,
                 'work_time' => $item->work_time ?? '-',
                 'contact_wa' => $this->maskPhone($item->contact_wa),
@@ -185,7 +187,7 @@ class ExternalApiController extends Controller
             'success' => true,
             'data' => $data,
             'count' => $data->count(),
-            'website_link' => $this->getBaseUrl() . '/loker'
+            'website_link' => $this->getBaseUrl().'/loker',
         ]);
     }
 
@@ -226,7 +228,7 @@ class ExternalApiController extends Controller
             'success' => true,
             'data' => $data,
             'count' => $data->count(),
-            'module' => $module
+            'module' => $module,
         ]);
     }
 
@@ -242,14 +244,14 @@ class ExternalApiController extends Controller
             'data' => [
                 'is_ai_active' => (bool) ($profile->is_ai_active ?? false),
                 'bot_number' => $profile->whatsapp_bot_number ?? '',
-                'ai_message' => 'admin bisa menggunakan ai untuk memori agar lebih sempurna'
-            ]
+                'ai_message' => 'admin bisa menggunakan ai untuk memori agar lebih sempurna',
+            ],
         ]);
     }
 
     /**
      * Verify owner PIN
-     * 
+     *
      * POST /api/v1/external/owner/verify-pin
      */
     public function verifyOwnerPin(Request $request)
@@ -275,7 +277,7 @@ class ExternalApiController extends Controller
                     'listing_id' => $umkm->id,
                     'listing_type' => $umkm->module ?? 'umkm',
                     'listing_name' => $umkm->name,
-                ]
+                ],
             ]);
         }
 
@@ -292,14 +294,14 @@ class ExternalApiController extends Controller
                     'listing_id' => $loker->id,
                     'listing_type' => 'loker',
                     'listing_name' => $loker->title,
-                ]
+                ],
             ]);
         }
 
         // Check Ekonomi/Jasa (WorkDirectory)
         $economy = WorkDirectory::whereIn('contact_phone', $phoneVariants)
             ->get()
-            ->first(fn($item) => $item->owner_pin && Hash::check($validated['pin'], $item->owner_pin));
+            ->first(fn ($item) => $item->owner_pin && Hash::check($validated['pin'], $item->owner_pin));
 
         if ($economy) {
             return response()->json([
@@ -309,19 +311,19 @@ class ExternalApiController extends Controller
                     'listing_id' => $economy->id,
                     'listing_type' => 'economy',
                     'listing_name' => $economy->job_title,
-                ]
+                ],
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'PIN salah atau tidak ditemukan'
+            'message' => 'PIN salah atau tidak ditemukan',
         ], 401);
     }
 
     /**
      * Get owner's listings by phone number
-     * 
+     *
      * GET /api/v1/external/owner/listings?phone=6281234567890
      */
     public function getOwnerListings(Request $request)
@@ -331,7 +333,7 @@ class ExternalApiController extends Controller
         if (empty($phone)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Parameter phone wajib diisi'
+                'message' => 'Parameter phone wajib diisi',
             ], 400);
         }
 
@@ -352,14 +354,14 @@ class ExternalApiController extends Controller
                 'name' => $umkm->name,
                 'product' => $umkm->product,
                 'is_listed' => (bool) $umkm->is_listed,
-                'is_active' => (bool) $umkm->is_active
+                'is_active' => (bool) $umkm->is_active,
             ];
         }
 
         if (empty($listings)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tidak ada listing ditemukan untuk nomor ini'
+                'message' => 'Tidak ada listing ditemukan untuk nomor ini',
             ], 404);
         }
 
@@ -367,14 +369,14 @@ class ExternalApiController extends Controller
             'success' => true,
             'data' => [
                 'owner_phone' => $phone,
-                'listings' => $listings
-            ]
+                'listings' => $listings,
+            ],
         ]);
     }
 
     /**
      * Toggle listing visibility with PIN verification
-     * 
+     *
      * POST /api/v1/external/owner/toggle-listing
      */
     public function toggleListing(Request $request)
@@ -397,18 +399,18 @@ class ExternalApiController extends Controller
             $listing = WorkDirectory::find($validated['listing_id']);
         }
 
-        if (!$listing) {
+        if (! $listing) {
             return response()->json([
                 'success' => false,
-                'message' => 'Listing tidak ditemukan'
+                'message' => 'Listing tidak ditemukan',
             ], 404);
         }
 
         // Verify PIN
-        if ($listing->owner_pin && !Hash::check($validated['pin'], $listing->owner_pin)) {
+        if ($listing->owner_pin && ! Hash::check($validated['pin'], $listing->owner_pin)) {
             return response()->json([
                 'success' => false,
-                'message' => 'PIN salah'
+                'message' => 'PIN salah',
             ], 401);
         }
 
@@ -417,10 +419,10 @@ class ExternalApiController extends Controller
         $phoneVariants = $this->getPhoneVariants($phone);
 
         $contactField = $validated['listing_type'] === 'economy' ? 'contact_phone' : 'contact_wa';
-        if ($listing->$contactField && !in_array($listing->$contactField, $phoneVariants)) {
+        if ($listing->$contactField && ! in_array($listing->$contactField, $phoneVariants)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Nomor tidak sesuai dengan listing'
+                'message' => 'Nomor tidak sesuai dengan listing',
             ], 403);
         }
 
@@ -443,7 +445,7 @@ class ExternalApiController extends Controller
             'listing_type' => $validated['listing_type'],
             'action' => $validated['action'],
             'new_status' => $newStatus,
-            'phone' => $phone
+            'phone' => $phone,
         ]);
 
         $listingName = $listing->name ?? $listing->title;
@@ -456,8 +458,8 @@ class ExternalApiController extends Controller
             'data' => [
                 'id' => $listing->id,
                 'type' => $validated['listing_type'],
-                'is_open' => $newStatus
-            ]
+                'is_open' => $newStatus,
+            ],
         ]);
     }
 
@@ -470,12 +472,12 @@ class ExternalApiController extends Controller
 
         // If starts with 08, add 628 variant
         if (str_starts_with($phone, '08')) {
-            $variants[] = '62' . substr($phone, 1);
+            $variants[] = '62'.substr($phone, 1);
         }
 
         // If starts with 628, add 08 variant
         if (str_starts_with($phone, '628')) {
-            $variants[] = '0' . substr($phone, 2);
+            $variants[] = '0'.substr($phone, 2);
         }
 
         // If starts with +62, add variants without +
@@ -483,7 +485,7 @@ class ExternalApiController extends Controller
             $withoutPlus = substr($phone, 1);
             $variants[] = $withoutPlus;
             if (str_starts_with($withoutPlus, '628')) {
-                $variants[] = '0' . substr($withoutPlus, 2);
+                $variants[] = '0'.substr($withoutPlus, 2);
             }
         }
 

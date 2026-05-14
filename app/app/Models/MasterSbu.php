@@ -10,6 +10,7 @@ class MasterSbu extends Model
     use HasFactory;
 
     protected $table = 'master_sbu';
+
     protected $guarded = ['id'];
 
     protected $casts = [

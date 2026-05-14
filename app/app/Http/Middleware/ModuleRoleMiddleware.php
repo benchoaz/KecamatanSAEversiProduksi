@@ -8,12 +8,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Module Role Middleware
- * 
+ *
  * Provides module-specific access control for isolated modules.
  * Each module has its own admin role, and Super Admin has access to all modules.
- * 
+ *
  * Usage: Route::middleware(['module.role:trantibum'])->group(...)
- * 
+ *
  * Module Role Mapping:
  * - trantibum -> trantibum_admin, Super Admin
  * - umkm -> umkm_admin, Super Admin
@@ -40,15 +40,16 @@ class ModuleRoleMiddleware
      */
     public function handle(Request $request, Closure $next, string $module): Response
     {
-        if (!$request->user()) {
+        if (! $request->user()) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Unauthenticated.'], 401);
             }
+
             return redirect()->route('login');
         }
 
         $user = $request->user();
-        
+
         // NUCLEAR BYPASS: Always allow the core 'admin' user or super_admin_kabupaten
         if ($user && ($user->username === 'admin' || $user->hasRole('super_admin_kabupaten'))) {
             return $next($request);
@@ -65,7 +66,7 @@ class ModuleRoleMiddleware
         }
 
         // Check if user has an allowed role
-        if (!$userRole || !in_array($userRole, $allowedRoles)) {
+        if (! $userRole || ! in_array($userRole, $allowedRoles)) {
             \Log::channel('daily')->warning('Module access denied', [
                 'user_id' => $user->id,
                 'user_role' => $userRole,
@@ -81,7 +82,7 @@ class ModuleRoleMiddleware
                 ], 403);
             }
 
-            abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengakses modul ' . ucfirst($module) . '.');
+            abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengakses modul '.ucfirst($module).'.');
         }
 
         // Log successful module access (optional, for audit trail)

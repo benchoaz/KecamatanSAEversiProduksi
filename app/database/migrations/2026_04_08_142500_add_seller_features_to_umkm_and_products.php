@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         // Tambah patokan_lokasi ke tabel umkm
-        if (Schema::hasTable('umkm') && !Schema::hasColumn('umkm', 'patokan_lokasi')) {
+        if (Schema::hasTable('umkm') && ! Schema::hasColumn('umkm', 'patokan_lokasi')) {
             Schema::table('umkm', function (Blueprint $table) {
                 $table->string('patokan_lokasi')->nullable()->after('desa')
                     ->comment('Ancer-ancer lokasi toko, contoh: 3 ruko dari timur Alfamart');
@@ -22,7 +22,7 @@ return new class extends Migration
         }
 
         // Tambah satuan_harga ke tabel umkm_products
-        if (Schema::hasTable('umkm_products') && !Schema::hasColumn('umkm_products', 'satuan_harga')) {
+        if (Schema::hasTable('umkm_products') && ! Schema::hasColumn('umkm_products', 'satuan_harga')) {
             Schema::table('umkm_products', function (Blueprint $table) {
                 $table->string('satuan_harga', 50)->nullable()->default('Pcs')->after('harga')
                     ->comment('Satuan harga produk: Pcs, Bungkus, Porsi, Kg, Liter, Lusin, dll');

@@ -3,21 +3,23 @@
 namespace App\Http\Controllers\Kecamatan;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Announcement;
 use App\Models\Desa;
+use Illuminate\Http\Request;
 
 class AnnouncementController extends Controller
 {
     public function index()
     {
         $announcements = Announcement::with('creator')->latest()->paginate(10);
+
         return view('kecamatan.announcements.index', compact('announcements'));
     }
 
     public function create()
     {
         $desa = Desa::all();
+
         return view('kecamatan.announcements.create', compact('desa'));
     }
 
@@ -52,6 +54,7 @@ class AnnouncementController extends Controller
     public function edit(Announcement $announcement)
     {
         $desa = Desa::all();
+
         return view('kecamatan.announcements.edit', compact('announcement', 'desa'));
     }
 
@@ -84,11 +87,12 @@ class AnnouncementController extends Controller
 
     public function destroy(Announcement $announcement)
     {
-        // Actually soft delete or archive as per objective? 
+        // Actually soft delete or archive as per objective?
         // Objective says "No permanent deletion (use archive / nonactive)".
         // I'll just set it to inactive instead of deleting or use a soft delete if available.
         // Let's stick to setting is_active = false for "Arsip".
         $announcement->update(['is_active' => false]);
+
         return redirect()->route('kecamatan.announcements.index')->with('success', 'Pengumuman telah diarsipkan.');
     }
 }

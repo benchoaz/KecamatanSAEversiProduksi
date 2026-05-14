@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\TrantibumKejadian;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TrantibumPolicy
@@ -94,6 +94,7 @@ class TrantibumPolicy
     protected function hasAllowedRole(User $user): bool
     {
         $userRole = $user->role->nama_role ?? null;
+
         return in_array($userRole, $this->allowedRoles);
     }
 }

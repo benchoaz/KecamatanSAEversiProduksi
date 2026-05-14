@@ -70,8 +70,10 @@ class DashboardController extends Controller
 
     private function getStatusLabel($status)
     {
-        if (!$status)
+        if (! $status) {
             return 'Belum Ada';
+        }
+
         return match ($status) {
             'draft' => 'Draft',
             'dikirim' => 'Verifikasi',

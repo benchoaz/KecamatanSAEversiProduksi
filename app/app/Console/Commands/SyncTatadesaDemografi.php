@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Desa;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
 class SyncTatadesaDemografi extends Command
@@ -35,7 +34,7 @@ class SyncTatadesaDemografi extends Command
         foreach ($desas as $desa) {
             // Priority: tatadesa_domain > website
             $domain = $desa->tatadesa_domain;
-            
+
             if (empty($domain) && $desa->website) {
                 // Strip https:// and trailing slashes from website column
                 $domain = preg_replace('/^https?:\/\//', '', rtrim($desa->website, '/'));
@@ -47,7 +46,7 @@ class SyncTatadesaDemografi extends Command
             if (empty($domain)) {
                 $subdomain = Str::slug(str_replace(' ', '', $desa->nama_desa), '');
                 $domain = "{$subdomain}.tatadesa.com";
-                
+
                 // Simpan domain
                 $desa->tatadesa_domain = $domain;
                 $desa->save();
@@ -59,7 +58,7 @@ class SyncTatadesaDemografi extends Command
                 // Ensure domain doesn't have internal protocol
                 $domain = preg_replace('/^https?:\/\//', '', $domain);
                 $baseUrl = "https://{$domain}/api/v1/public";
-                
+
                 $responses = \Illuminate\Support\Facades\Http::pool(fn (\Illuminate\Http\Client\Pool $pool) => [
                     $pool->as('demografi')->timeout(10)->get("{$baseUrl}/penduduk/statistik"),
                     $pool->as('pendidikan')->timeout(10)->get("{$baseUrl}/penduduk/statistik/pendidikan"),
@@ -83,17 +82,17 @@ class SyncTatadesaDemografi extends Command
                 if ($responses['pendidikan']->successful() && $responses['pendidikan']->json('data.pendidikan')) {
                     $desa->stat_pendidikan = $responses['pendidikan']->json('data.pendidikan');
                 }
-                
+
                 // Pekerjaan
                 if ($responses['pekerjaan']->successful() && $responses['pekerjaan']->json('data.pekerjaan')) {
                     $desa->stat_pekerjaan = $responses['pekerjaan']->json('data.pekerjaan');
                 }
-                
+
                 // Agama
                 if ($responses['agama']->successful() && $responses['agama']->json('data.agama')) {
                     $desa->stat_agama = $responses['agama']->json('data.agama');
                 }
-                
+
                 // Kesehatan
                 if ($responses['kesehatan']->successful() && $responses['kesehatan']->json('data')) {
                     // Cukup ambil data root nya seperti totalStunting, totalGiziNormal
@@ -103,22 +102,22 @@ class SyncTatadesaDemografi extends Command
                         'totalGiziNormal' => $hData['totalGiziNormal'] ?? 0,
                         'totalGiziBuruk' => $hData['totalGiziBuruk'] ?? 0,
                         'persentaseStunting' => $hData['persentaseStunting'] ?? 0,
-                        'persentaseGiziNormal' => $hData['persentaseGiziNormal'] ?? 0
+                        'persentaseGiziNormal' => $hData['persentaseGiziNormal'] ?? 0,
                     ];
                     $desa->stat_kesehatan = $kesehatanSubset;
                 }
-                
+
                 // Desil Kesejahteraan
                 if ($responses['desil']->successful() && $responses['desil']->json('data')) {
                     $desa->stat_desil = $responses['desil']->json('data');
                 }
 
                 $desa->save();
-                $this->line("  <info>✓</info> Data berhasil diupdate: Penduduk dkk + Statistik Lengkap.");
+                $this->line('  <info>✓</info> Data berhasil diupdate: Penduduk dkk + Statistik Lengkap.');
             } catch (\Exception $e) {
-                $this->line("  <error>✗</error> Error: " . $e->getMessage());
+                $this->line('  <error>✗</error> Error: '.$e->getMessage());
             }
-            
+
             // Beri jeda 1 detik untuk menghindari rate limit
             sleep(1);
         }

@@ -61,15 +61,15 @@ class WahaN8nSetting extends Model
     ];
 
     protected $casts = [
-        'is_waha_connected'                => 'boolean',
-        'is_n8n_connected'                 => 'boolean',
-        'bot_enabled'                      => 'boolean',
+        'is_waha_connected' => 'boolean',
+        'is_n8n_connected' => 'boolean',
+        'bot_enabled' => 'boolean',
         'is_operator_notification_enabled' => 'boolean',
-        'is_weather_alert_enabled'         => 'boolean',
-        'connection_details'      => 'array',
-        'last_connection_check'   => 'datetime',
+        'is_weather_alert_enabled' => 'boolean',
+        'connection_details' => 'array',
+        'last_connection_check' => 'datetime',
         'last_weather_alert_check' => 'datetime',
-        'generic_http_headers'    => 'array',
+        'generic_http_headers' => 'array',
         'generic_http_extra_body' => 'array',
     ];
 
@@ -101,7 +101,7 @@ class WahaN8nSetting extends Model
      */
     public function checkWahaConnection(): array
     {
-        if (!$this->waha_api_url) {
+        if (! $this->waha_api_url) {
             return [
                 'success' => false,
                 'message' => 'WAHA API URL tidak dikonfigurasi',
@@ -137,13 +137,13 @@ class WahaN8nSetting extends Model
 
             return [
                 'success' => false,
-                'message' => 'Gagal menghubungi WAHA: ' . $response->status(),
+                'message' => 'Gagal menghubungi WAHA: '.$response->status(),
                 'status' => 'error',
             ];
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage(),
+                'message' => 'Error: '.$e->getMessage(),
                 'status' => 'error',
             ];
         }
@@ -154,7 +154,7 @@ class WahaN8nSetting extends Model
      */
     public function checkN8nConnection(): array
     {
-        if (!$this->n8n_api_url) {
+        if (! $this->n8n_api_url) {
             return [
                 'success' => false,
                 'message' => 'n8n API URL tidak dikonfigurasi',
@@ -185,13 +185,13 @@ class WahaN8nSetting extends Model
 
             return [
                 'success' => false,
-                'message' => 'Gagal menghubungi n8n: ' . $response->status(),
+                'message' => 'Gagal menghubungi n8n: '.$response->status(),
                 'status' => 'error',
             ];
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage(),
+                'message' => 'Error: '.$e->getMessage(),
                 'status' => 'error',
             ];
         }
@@ -202,7 +202,7 @@ class WahaN8nSetting extends Model
      */
     public function getQrCode(): ?array
     {
-        if (!$this->waha_api_url) {
+        if (! $this->waha_api_url) {
             return null;
         }
 
@@ -234,7 +234,7 @@ class WahaN8nSetting extends Model
      */
     public function startSession(): array
     {
-        if (!$this->waha_api_url) {
+        if (! $this->waha_api_url) {
             return [
                 'success' => false,
                 'message' => 'WAHA API URL tidak dikonfigurasi',
@@ -258,12 +258,12 @@ class WahaN8nSetting extends Model
 
             return [
                 'success' => false,
-                'message' => 'Gagal memulai session: ' . $response->body(),
+                'message' => 'Gagal memulai session: '.$response->body(),
             ];
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage(),
+                'message' => 'Error: '.$e->getMessage(),
             ];
         }
     }
@@ -273,7 +273,7 @@ class WahaN8nSetting extends Model
      */
     public function logoutSession(): array
     {
-        if (!$this->waha_api_url) {
+        if (! $this->waha_api_url) {
             return [
                 'success' => false,
                 'message' => 'WAHA API URL tidak dikonfigurasi',
@@ -300,12 +300,12 @@ class WahaN8nSetting extends Model
 
             return [
                 'success' => false,
-                'message' => 'Gagal logout: ' . $response->body(),
+                'message' => 'Gagal logout: '.$response->body(),
             ];
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage(),
+                'message' => 'Error: '.$e->getMessage(),
             ];
         }
     }
@@ -349,7 +349,7 @@ class WahaN8nSetting extends Model
      */
     public function getFormattedBotNumber(): ?string
     {
-        if (!$this->bot_number) {
+        if (! $this->bot_number) {
             return null;
         }
 
@@ -360,14 +360,14 @@ class WahaN8nSetting extends Model
     /**
      * Get WhatsApp link for bot
      */
-    public function getWhatsappLink(string $text = "Halo, saya butuh informasi."): string
+    public function getWhatsappLink(string $text = 'Halo, saya butuh informasi.'): string
     {
         $number = $this->getFormattedBotNumber();
-        if (!$number) {
+        if (! $number) {
             return '#';
         }
 
-        return "https://wa.me/{$number}?text=" . urlencode($text);
+        return "https://wa.me/{$number}?text=".urlencode($text);
     }
 
     /**

@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * @var bool
      */
@@ -11,7 +12,7 @@ return new class extends Migration {
 
     /**
      * Run the migrations.
-     * 
+     *
      * View Agregat untuk Real-time Reporting Ekonomi & Pembangunan
      * Berdasarkan analisis struktur database
      */
@@ -22,21 +23,21 @@ return new class extends Migration {
         // ==================== VIEW EKONOMI ====================
 
         // Check which optional tables exist
-        $hasUmkmLocal   = \Illuminate\Support\Facades\Schema::hasTable('umkm_locals');  // correct plural name
-        $hasJobVacancy  = \Illuminate\Support\Facades\Schema::hasTable('job_vacancy');
-        $hasWorkDir     = \Illuminate\Support\Facades\Schema::hasTable('work_directory');
+        $hasUmkmLocal = \Illuminate\Support\Facades\Schema::hasTable('umkm_locals');  // correct plural name
+        $hasJobVacancy = \Illuminate\Support\Facades\Schema::hasTable('job_vacancy');
+        $hasWorkDir = \Illuminate\Support\Facades\Schema::hasTable('work_directory');
 
         // Build dynamic view SQL based on available tables
-        $umkmLocalJoin  = $hasUmkmLocal  ? "LEFT JOIN umkm_locals ul ON ul.desa_id = d.id" : "";
-        $jobVacancyJoin = $hasJobVacancy ? "LEFT JOIN job_vacancy jv ON jv.desa_id = d.id" : "";
-        $workDirJoin    = $hasWorkDir    ? "LEFT JOIN work_directory wd ON wd.desa_id = d.id" : "";
-        $umkmLocalCol   = $hasUmkmLocal  ? "COUNT(DISTINCT ul.id)" : "0";
-        $jobVacancyCol  = $hasJobVacancy ? "COUNT(DISTINCT jv.id)" : "0";
-        $workDirCol     = $hasWorkDir    ? "COUNT(DISTINCT wd.id)" : "0";
+        $umkmLocalJoin = $hasUmkmLocal ? 'LEFT JOIN umkm_locals ul ON ul.desa_id = d.id' : '';
+        $jobVacancyJoin = $hasJobVacancy ? 'LEFT JOIN job_vacancy jv ON jv.desa_id = d.id' : '';
+        $workDirJoin = $hasWorkDir ? 'LEFT JOIN work_directory wd ON wd.desa_id = d.id' : '';
+        $umkmLocalCol = $hasUmkmLocal ? 'COUNT(DISTINCT ul.id)' : '0';
+        $jobVacancyCol = $hasJobVacancy ? 'COUNT(DISTINCT jv.id)' : '0';
+        $workDirCol = $hasWorkDir ? 'COUNT(DISTINCT wd.id)' : '0';
 
         try {
-        // View: Ringkasan Ekonomi per Desa
-        DB::statement("
+            // View: Ringkasan Ekonomi per Desa
+            DB::statement("
             CREATE OR REPLACE VIEW v_ekonomi_desa_summary AS
             SELECT 
                 d.id AS desa_id,
@@ -59,12 +60,14 @@ return new class extends Migration {
             {$jobVacancyJoin}
             GROUP BY d.id, d.nama_desa, d.kode_desa
         ");
-        } catch (\Exception $e) { \Log::warning('Migration view v_ekonomi_desa_summary skipped: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            \Log::warning('Migration view v_ekonomi_desa_summary skipped: '.$e->getMessage());
+        }
 
         try {
-        // View: Ringkasan Ekonomi Kecamatan (Agregat)
-        $umkmLocalKec = $hasUmkmLocal ? "LEFT JOIN umkm_locals ul ON 1=1" : "";
-        DB::statement("
+            // View: Ringkasan Ekonomi Kecamatan (Agregat)
+            $umkmLocalKec = $hasUmkmLocal ? 'LEFT JOIN umkm_locals ul ON 1=1' : '';
+            DB::statement("
             CREATE OR REPLACE VIEW v_ekonomi_kecamatan_summary AS
             SELECT 
                 'KECAMATAN' AS level,
@@ -83,11 +86,13 @@ return new class extends Migration {
             {$umkmLocalKec}
             LEFT JOIN loker l ON 1=1
         ");
-        } catch (\Exception $e) { \Log::warning('Migration view v_ekonomi_kecamatan_summary skipped: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            \Log::warning('Migration view v_ekonomi_kecamatan_summary skipped: '.$e->getMessage());
+        }
 
         // View: Kategori Bisnis/Usaha
         try {
-        DB::statement("
+            DB::statement("
             CREATE OR REPLACE VIEW v_ekonomi_kategori_summary AS
             SELECT 
                 u.jenis_usaha AS kategori,
@@ -100,12 +105,14 @@ return new class extends Migration {
             GROUP BY u.jenis_usaha
             ORDER BY jumlah DESC
         ");
-        } catch (\Exception $e) { \Log::warning('View v_ekonomi_kategori_summary skipped: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            \Log::warning('View v_ekonomi_kategori_summary skipped: '.$e->getMessage());
+        }
 
         // ==================== VIEW PEMBANGUNAN ====================
 
         try {
-        DB::statement("
+            DB::statement('
             CREATE OR REPLACE VIEW v_pembangunan_desa_summary AS
             SELECT 
                 d.id AS desa_id,
@@ -119,11 +126,13 @@ return new class extends Migration {
             FROM desa d
             LEFT JOIN pembangunan_desa pd ON pd.desa_id = d.id
             GROUP BY d.id, d.nama_desa, d.kode_desa
-        ");
-        } catch (\Exception $e) { \Log::warning('View v_pembangunan_desa_summary skipped: ' . $e->getMessage()); }
+        ');
+        } catch (\Exception $e) {
+            \Log::warning('View v_pembangunan_desa_summary skipped: '.$e->getMessage());
+        }
 
         try {
-        DB::statement("
+            DB::statement('
             CREATE OR REPLACE VIEW v_pembangunan_anggaran_tahun AS
             SELECT 
                 pd.tahun_anggaran AS tahun,
@@ -134,11 +143,13 @@ return new class extends Migration {
             WHERE pd.tahun_anggaran IS NOT NULL
             GROUP BY pd.tahun_anggaran
             ORDER BY pd.tahun_anggaran DESC
-        ");
-        } catch (\Exception $e) { \Log::warning('View v_pembangunan_anggaran_tahun skipped: ' . $e->getMessage()); }
+        ');
+        } catch (\Exception $e) {
+            \Log::warning('View v_pembangunan_anggaran_tahun skipped: '.$e->getMessage());
+        }
 
         try {
-        DB::statement("
+            DB::statement('
             CREATE OR REPLACE VIEW v_pembangunan_spj_status AS
             SELECT 
                 pd.id AS pembangunan_id,
@@ -149,13 +160,15 @@ return new class extends Migration {
             LEFT JOIN pembangunan_dokumen_spj pds ON pds.pembangunan_desa_id = pd.id AND pds.is_wajib = 1
             LEFT JOIN desa d ON d.id = pd.desa_id
             GROUP BY pd.id, pd.nama_kegatan, d.nama_desa
-        ");
-        } catch (\Exception $e) { \Log::warning('View v_pembangunan_spj_status skipped: ' . $e->getMessage()); }
+        ');
+        } catch (\Exception $e) {
+            \Log::warning('View v_pembangunan_spj_status skipped: '.$e->getMessage());
+        }
 
         // ==================== VIEW EKBANG/LAPORAN ====================
 
         try {
-        DB::statement("
+            DB::statement("
             CREATE OR REPLACE VIEW v_ekbang_submission_summary AS
             SELECT 
                 d.id AS desa_id,
@@ -170,10 +183,12 @@ return new class extends Migration {
             WHERE m.kode_menu IN ('ekbang', 'pemerintah', 'kesra', 'pembangunan')
             GROUP BY d.id, d.nama_desa, m.kode_menu, m.nama_menu
         ");
-        } catch (\Exception $e) { \Log::warning('View v_ekbang_submission_summary skipped: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            \Log::warning('View v_ekbang_submission_summary skipped: '.$e->getMessage());
+        }
 
         try {
-        DB::statement("
+            DB::statement("
             CREATE OR REPLACE VIEW v_ekbang_aspek_summary AS
             SELECT 
                 d.id AS desa_id,
@@ -188,12 +203,14 @@ return new class extends Migration {
             WHERE a.kode_aspek LIKE 'ekb_%' OR a.kode_aspek LIKE '%monev%'
             GROUP BY d.id, d.nama_desa, a.kode_aspek, a.nama_aspek
         ");
-        } catch (\Exception $e) { \Log::warning('View v_ekbang_aspek_summary skipped: ' . $e->getMessage()); }
+        } catch (\Exception $e) {
+            \Log::warning('View v_ekbang_aspek_summary skipped: '.$e->getMessage());
+        }
 
         // ==================== VIEW MUSRENBANG ====================
 
         try {
-        DB::statement("
+            DB::statement('
             CREATE OR REPLACE VIEW v_musrenbang_status AS
             SELECT 
                 d.id AS desa_id,
@@ -205,13 +222,15 @@ return new class extends Migration {
             FROM desa d
             LEFT JOIN usulan_musrenbang um ON um.desa_id = d.id
             GROUP BY d.id, d.nama_desa, um.tahun, um.skala, um.status
-        ");
-        } catch (\Exception $e) { \Log::warning('View v_musrenbang_status skipped: ' . $e->getMessage()); }
+        ');
+        } catch (\Exception $e) {
+            \Log::warning('View v_musrenbang_status skipped: '.$e->getMessage());
+        }
 
         // ==================== VIEW BUKU TAMU ====================
 
         try {
-        DB::statement("
+            DB::statement('
             CREATE OR REPLACE VIEW v_buku_tamu_summary AS
             SELECT 
                 d.id AS desa_id,
@@ -223,8 +242,10 @@ return new class extends Migration {
             FROM desa d
             LEFT JOIN pengunjung_kecamatan pk ON pk.desa_asal_id = d.id
             GROUP BY d.id, d.nama_desa, pk.tujuan_bidang
-        ");
-        } catch (\Exception $e) { \Log::warning('View v_buku_tamu_summary skipped: ' . $e->getMessage()); }
+        ');
+        } catch (\Exception $e) {
+            \Log::warning('View v_buku_tamu_summary skipped: '.$e->getMessage());
+        }
     }
 
     /**

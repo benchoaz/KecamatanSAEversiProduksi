@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\PublicService;
-use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -19,7 +18,7 @@ class ReceiptController extends Controller
             ->firstOrFail();
 
         // Generate QR Code as SVG instead of PNG (removes imagick dependency)
-        $trackingUrl = route('public.tracking') . '?q=' . $service->uuid;
+        $trackingUrl = route('public.tracking').'?q='.$service->uuid;
         $qrCode = base64_encode(QrCode::format('svg')
             ->size(200)
             ->errorCorrection('H')
@@ -38,7 +37,7 @@ class ReceiptController extends Controller
             ->setPaper('a4', 'portrait');
 
         // Download filename
-        $filename = 'Struk_Pengajuan_' . $service->uuid . '.pdf';
+        $filename = 'Struk_Pengajuan_'.$service->uuid.'.pdf';
 
         return $pdf->download($filename);
     }
@@ -52,7 +51,7 @@ class ReceiptController extends Controller
             ->with(['desa', 'handler'])
             ->firstOrFail();
 
-        $trackingUrl = route('public.tracking') . '?q=' . $service->uuid;
+        $trackingUrl = route('public.tracking').'?q='.$service->uuid;
         $qrCode = base64_encode(QrCode::format('svg')
             ->size(200)
             ->errorCorrection('H')
@@ -74,7 +73,7 @@ class ReceiptController extends Controller
     public function generateQrCode($uuid)
     {
         $service = PublicService::where('uuid', $uuid)->firstOrFail();
-        $trackingUrl = route('public.tracking') . '?q=' . $service->uuid;
+        $trackingUrl = route('public.tracking').'?q='.$service->uuid;
 
         return QrCode::format('svg')
             ->size(300)

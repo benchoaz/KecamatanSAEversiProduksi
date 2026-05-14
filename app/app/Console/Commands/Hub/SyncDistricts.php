@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class SyncDistricts extends Command
 {
-    protected $signature   = 'hub:sync-districts
+    protected $signature = 'hub:sync-districts
                                 {--district= : Slug kecamatan tertentu (kosong = semua)}
                                 {--dry-run   : Cek koneksi saja tanpa menjalankan migrasi}';
 
@@ -21,7 +21,7 @@ class SyncDistricts extends Command
         $this->info('╚═══════════════════════════════════════╝');
 
         $targetSlug = $this->option('district');
-        $isDryRun   = $this->option('dry-run');
+        $isDryRun = $this->option('dry-run');
 
         $query = HubDistrict::where('is_active', true);
         if ($targetSlug) {
@@ -32,6 +32,7 @@ class SyncDistricts extends Command
 
         if ($districts->isEmpty()) {
             $this->warn('Tidak ada kecamatan aktif ditemukan.');
+
             return self::FAILURE;
         }
 
@@ -41,36 +42,38 @@ class SyncDistricts extends Command
         $this->line('');
 
         $success = 0;
-        $failed  = 0;
+        $failed = 0;
 
         foreach ($districts as $district) {
             $this->line("→ <info>{$district->name}</info> [{$district->slug}]");
 
             $conn = $connector->connect($district);
 
-            if (!$conn) {
+            if (! $conn) {
                 $this->line("  <error>✗ Gagal konek ke database '{$district->db_name}'</error>");
                 $failed++;
+
                 continue;
             }
 
             $this->line("  ✓ Koneksi berhasil ke '{$district->db_name}'");
 
             if ($isDryRun) {
-                $this->line("  [DRY-RUN] Lewati eksekusi migrasi.");
+                $this->line('  [DRY-RUN] Lewati eksekusi migrasi.');
                 $success++;
+
                 continue;
             }
 
             // Jalankan migrasi di database kecamatan ini
             try {
                 \Artisan::call('migrate', [
-                    '--database' => 'district_' . $district->slug,
-                    '--path'     => 'database/migrations', // Migrasi standar kecamatan
-                    '--force'    => true,
+                    '--database' => 'district_'.$district->slug,
+                    '--path' => 'database/migrations', // Migrasi standar kecamatan
+                    '--force' => true,
                 ], $this->output);
 
-                $this->line("  ✓ <comment>Migrasi selesai</comment>");
+                $this->line('  ✓ <comment>Migrasi selesai</comment>');
                 $success++;
             } catch (\Exception $e) {
                 $this->line("  <error>✗ Migrasi gagal: {$e->getMessage()}</error>");
@@ -81,10 +84,10 @@ class SyncDistricts extends Command
         }
 
         $this->line('');
-        $this->info("═══════════════════════════════");
+        $this->info('═══════════════════════════════');
         $this->info("✓ Berhasil : {$success} kecamatan");
         $failed > 0 && $this->error("✗ Gagal    : {$failed} kecamatan");
-        $this->info("═══════════════════════════════");
+        $this->info('═══════════════════════════════');
 
         return $failed > 0 ? self::FAILURE : self::SUCCESS;
     }

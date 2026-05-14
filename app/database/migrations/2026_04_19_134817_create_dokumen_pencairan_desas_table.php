@@ -19,7 +19,7 @@ return new class extends Migration
                 'apbdes_2026',
                 'perkades_penjabaran',
                 'lpj_2025',
-                'laporan_realisasi_tahap_sebelumnya'
+                'laporan_realisasi_tahap_sebelumnya',
             ]);
             $table->string('file_path');
             $table->timestamps();

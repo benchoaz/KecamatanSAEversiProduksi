@@ -13,11 +13,11 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('desa:sync-demografi')->dailyAt('00:00')->withoutOverlapping();
-        
+
         // Polling APIs & Scraping for news updates
         $schedule->command('scrape:desa-news')->everyTwoHours()->withoutOverlapping();
         $schedule->command('scrape:kecamatan-news')->cron('0 */6 * * *')->withoutOverlapping();
-        
+
         // Check BMKG weather alerts every 15 minutes
         $schedule->command('app:check-weather-alerts')->everyFifteenMinutes()->withoutOverlapping();
 
@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
             if ($profile && $profile->is_backup_active) {
                 // 1. Daily Database Backup (Fast & Critical) - 02:00 AM
                 $schedule->command('backup:run --only-db --disable-notifications')->dailyAt('02:00')->withoutOverlapping();
-                
+
                 // 2. Weekly Full Backup (Photos, PDFs, DB) - Sunday 03:00 AM
                 $schedule->command('backup:run --disable-notifications')->weeklyOn(0, '03:00')->withoutOverlapping();
 

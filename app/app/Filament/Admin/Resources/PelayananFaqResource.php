@@ -3,15 +3,12 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\PelayananFaqResource\Pages;
-use App\Filament\Admin\Resources\PelayananFaqResource\RelationManagers;
 use App\Models\PelayananFaq;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PelayananFaqResource extends Resource
 {
@@ -51,7 +48,7 @@ class PelayananFaqResource extends Resource
                         Forms\Components\RichEditor::make('answer')
                             ->required()
                             ->columnSpanFull(),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 

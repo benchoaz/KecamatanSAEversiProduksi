@@ -14,8 +14,8 @@ class DesaMasterController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('nama_desa', 'like', '%' . $request->search . '%')
-                    ->orWhere('kode_desa', 'like', '%' . $request->search . '%');
+                $q->where('nama_desa', 'like', '%'.$request->search.'%')
+                    ->orWhere('kode_desa', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -51,9 +51,9 @@ class DesaMasterController extends Controller
             'tatadesa_domain' => 'nullable|string|max:255',
         ]);
 
-        if ($validated['website'] && !filter_var($validated['website'], FILTER_VALIDATE_URL)) {
-            if (!preg_match("~^(?:f|ht)tps?://~i", $validated['website'])) {
-                $validated['website'] = "https://" . $validated['website'];
+        if ($validated['website'] && ! filter_var($validated['website'], FILTER_VALIDATE_URL)) {
+            if (! preg_match('~^(?:f|ht)tps?://~i', $validated['website'])) {
+                $validated['website'] = 'https://'.$validated['website'];
             }
         }
 
@@ -71,7 +71,7 @@ class DesaMasterController extends Controller
     public function update(Request $request, Desa $desa)
     {
         $validated = $request->validate([
-            'kode_desa' => 'required|string|max:20|unique:desa,kode_desa,' . $desa->id,
+            'kode_desa' => 'required|string|max:20|unique:desa,kode_desa,'.$desa->id,
             'nama_desa' => 'required|string|max:100',
             'status' => 'required|in:aktif,tidak_aktif',
             'alamat_kantor' => 'nullable|string',
@@ -81,9 +81,9 @@ class DesaMasterController extends Controller
             'tatadesa_domain' => 'nullable|string|max:255',
         ]);
 
-        if ($validated['website'] && !filter_var($validated['website'], FILTER_VALIDATE_URL)) {
-            if (!preg_match("~^(?:f|ht)tps?://~i", $validated['website'])) {
-                $validated['website'] = "https://" . $validated['website'];
+        if ($validated['website'] && ! filter_var($validated['website'], FILTER_VALIDATE_URL)) {
+            if (! preg_match('~^(?:f|ht)tps?://~i', $validated['website'])) {
+                $validated['website'] = 'https://'.$validated['website'];
             }
         }
 

@@ -3,19 +3,18 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
-use Filament\Models\Contracts\HasName;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasName
 {
-    use HasApiTokens, HasFactory, Notifiable, \App\Traits\Auditable, HasRoles;
+    use \App\Traits\Auditable, HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     /**
      * Determine if the user can access the given Filament panel.
@@ -23,9 +22,9 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
-            return $this->isSuperAdmin() || 
-                   $this->isOperatorKecamatan() || 
-                   $this->isVerifikator() || 
+            return $this->isSuperAdmin() ||
+                   $this->isOperatorKecamatan() ||
+                   $this->isVerifikator() ||
                    $this->isModuleAdmin();
         }
 
@@ -60,17 +59,26 @@ class User extends Authenticatable implements FilamentUser, HasName
     ];
 
     const STATUS_AKTIF = 'aktif';
+
     const STATUS_NONAKTIF = 'nonaktif';
 
     // Role Constants
     const ROLE_SUPER_ADMIN = 'Super Admin';
+
     const ROLE_OPERATOR_KECAMATAN = 'Operator Kecamatan';
+
     const ROLE_OPERATOR_DESA = 'Operator Desa';
+
     const ROLE_VERIFIKATOR = 'Verifikator';
+
     const ROLE_AUDITOR = 'Auditor';
+
     const ROLE_ADMIN_PELAYANAN = 'pelayanan_admin';
+
     const ROLE_TRANTIBUM_ADMIN = 'trantibum_admin';
+
     const ROLE_UMKM_ADMIN = 'umkm_admin';
+
     const ROLE_LOKER_ADMIN = 'loker_admin';
 
     public function isModuleAdmin()
@@ -80,7 +88,7 @@ class User extends Authenticatable implements FilamentUser, HasName
             self::ROLE_TRANTIBUM_ADMIN,
             self::ROLE_UMKM_ADMIN,
             self::ROLE_LOKER_ADMIN,
-            'Admin Pelayanan'
+            'Admin Pelayanan',
         ]);
     }
 

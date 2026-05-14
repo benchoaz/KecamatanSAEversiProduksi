@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Desa;
 
+use App\Helpers\AuditHelper;
 use App\Http\Controllers\Controller;
 use App\Models\DokumenDesa;
 use App\Models\LembagaDesa;
 use App\Models\PersonilDesa;
 use App\Models\RiwayatJabatanPersonil;
-use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -40,7 +40,7 @@ class AdministrasiController extends Controller
             'dokumen' => [
                 'total' => DokumenDesa::where('desa_id', $desaId)->count(),
                 'draft' => DokumenDesa::where('desa_id', $desaId)->where('status', 'draft')->count(),
-            ]
+            ],
         ];
 
         return view('desa.administrasi.index', compact('counts'));
@@ -66,6 +66,7 @@ class AdministrasiController extends Controller
     public function personilCreate(Request $request)
     {
         $kategori = $request->query('kategori', 'perangkat');
+
         return view('desa.administrasi.personil.create', compact('kategori'));
     }
 
@@ -112,7 +113,7 @@ class AdministrasiController extends Controller
         DB::transaction(function () use ($request) {
             $fotoPath = $request->hasFile('foto') ? $this->optimizeAndStore($request->file('foto'), 'foto_personil', 1200, 80, 'local') : null;
 
-            $personil = new PersonilDesa();
+            $personil = new PersonilDesa;
             $personil->desa_id = auth()->user()->desa_id;
             $personil->kategori = $request->kategori;
             $personil->nama = $request->nama;
@@ -143,7 +144,7 @@ class AdministrasiController extends Controller
                 'tmt_baru' => $request->masa_jabatan_mulai,
                 'sk_baru' => $request->nomor_sk,
                 'keterangan' => 'Pengangkatan Awal / Input Data Baru',
-                'created_by' => auth()->id()
+                'created_by' => auth()->id(),
             ]);
         });
 
@@ -159,7 +160,7 @@ class AdministrasiController extends Controller
         $oldValues = $personil->toArray();
         $personil->update([
             'status' => 'dikirim',
-            'tanggal_pengajuan' => now()
+            'tanggal_pengajuan' => now(),
         ]);
 
         AuditHelper::log('submit', 'personil_desa', $id, $oldValues, $personil->fresh()->toArray());
@@ -170,12 +171,12 @@ class AdministrasiController extends Controller
     public function personilRequestRevision(Request $request, $id)
     {
         $request->validate([
-            'alasan_revisi' => 'required|string|max:500'
+            'alasan_revisi' => 'required|string|max:500',
         ]);
 
         $personil = PersonilDesa::findOrFail($id);
         abort_unless($personil->desa_id == auth()->user()->desa_id, 403);
-        
+
         // Hanya bisa diajukan jika sudah diterima/terverifikasi
         abort_unless($personil->status == 'diterima', 403, 'Hanya data terverifikasi yang dapat diajukan revisi.');
 
@@ -183,7 +184,7 @@ class AdministrasiController extends Controller
         $personil->update([
             'status' => 'permohonan_revisi',
             'alasan_revisi' => $request->alasan_revisi,
-            'tanggal_permohonan_revisi' => now()
+            'tanggal_permohonan_revisi' => now(),
         ]);
 
         AuditHelper::log('update', 'personil_desa', $id, $oldValues, $personil->fresh()->toArray());
@@ -209,7 +210,7 @@ class AdministrasiController extends Controller
 
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nik' => 'required|digits:16|unique:personil_desa,nik,' . $id,
+            'nik' => 'required|digits:16|unique:personil_desa,nik,'.$id,
             'tempat_lahir' => 'required|string|max:255',
             'tanggal_lahir' => 'required|date',
             'jabatan' => 'required|string',
@@ -259,7 +260,7 @@ class AdministrasiController extends Controller
                     'sk_lama' => $personil->nomor_sk,
                     'sk_baru' => $request->nomor_sk,
                     'keterangan' => 'Perubahan Data / Edit',
-                    'created_by' => auth()->id()
+                    'created_by' => auth()->id(),
                 ]);
             }
 
@@ -277,7 +278,7 @@ class AdministrasiController extends Controller
             $personil->nama_bank = $request->nama_bank;
             $personil->rekening_bank = $request->rekening_bank;
             $personil->no_hp = $request->no_hp;
-            
+
             if ($request->hasFile('file_sk')) {
                 $personil->file_sk = $request->file('file_sk')->store('sk_personil', 'local');
             }
@@ -289,7 +290,7 @@ class AdministrasiController extends Controller
                 }
                 $personil->foto = $this->optimizeAndStore($request->file('foto'), 'foto_personil', 1200, 80, 'local');
             }
-            
+
             $oldValues = $personil->getRawOriginal(); // Since we are mid-transaction and some fields might be assigned
             // Actually better to get it before assignments
             // But personil update here is manual assignment
@@ -449,7 +450,7 @@ class AdministrasiController extends Controller
         $oldValues = $lembaga->toArray();
         $lembaga->update([
             'status' => 'dikirim',
-            'tanggal_pengajuan' => now()
+            'tanggal_pengajuan' => now(),
         ]);
 
         AuditHelper::log('submit', 'lembaga_desa', $id, $oldValues, $lembaga->fresh()->toArray());
@@ -482,6 +483,7 @@ class AdministrasiController extends Controller
     public function dokumenCreate(Request $request)
     {
         $tipe = $request->query('tipe', 'Perdes');
+
         return view('desa.administrasi.dokumen.create', compact('tipe'));
     }
 
@@ -508,6 +510,7 @@ class AdministrasiController extends Controller
         });
 
         $redirectTipe = in_array($request->tipe_dokumen, ['Perdes', 'Perkades', 'SK_Desa']) ? 'perdes' : 'laporan';
+
         return redirect()->route('desa.administrasi.dokumen.index', ['tipe' => $redirectTipe])
             ->with('success', 'Dokumen berhasil disimpan sebagai Draft.');
     }
@@ -547,6 +550,7 @@ class AdministrasiController extends Controller
         });
 
         $redirectTipe = in_array($dokumen->tipe_dokumen, ['Perdes', 'Perkades']) ? 'perdes' : 'laporan';
+
         return redirect()->route('desa.administrasi.dokumen.index', ['tipe' => $redirectTipe])
             ->with('success', 'Perubahan dokumen berhasil disimpan.');
     }
@@ -577,7 +581,7 @@ class AdministrasiController extends Controller
         $oldValues = $dokumen->toArray();
         $dokumen->update([
             'status' => 'dikirim',
-            'tanggal_pengajuan' => now()
+            'tanggal_pengajuan' => now(),
         ]);
 
         AuditHelper::log('submit', 'dokumen_desa', $id, $oldValues, $dokumen->fresh()->toArray());

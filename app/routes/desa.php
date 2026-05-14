@@ -1,13 +1,13 @@
 <?php
 
+use App\Http\Controllers\Desa\BltController;
 use App\Http\Controllers\Desa\DashboardController;
 use App\Http\Controllers\Desa\PembangunanController;
-use App\Http\Controllers\Desa\BltController;
 use App\Http\Controllers\Desa\PemerintahanController;
+use App\Http\Controllers\Desa\ProfileController;
 use App\Http\Controllers\Desa\SubmissionController;
 use App\Http\Controllers\Desa\TrantibumController;
 use App\Http\Controllers\Desa\TrantibumRelawanController;
-use App\Http\Controllers\Desa\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->name('desa.')->group(function () {

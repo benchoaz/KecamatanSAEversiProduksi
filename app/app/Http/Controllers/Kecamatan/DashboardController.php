@@ -30,11 +30,11 @@ class DashboardController extends Controller
             ->take(5)
             ->get()
             ->map(function ($log) {
-                return (object)[
+                return (object) [
                     'icon' => $this->getIconForAction($log->action),
                     'type' => $this->getTypeForAction($log->action),
-                    'message' => ($log->user->name ?? 'System') . ' ' . $log->action . ' ' . $log->table_name,
-                    'time' => $log->created_at->diffForHumans()
+                    'message' => ($log->user->name ?? 'System').' '.$log->action.' '.$log->table_name,
+                    'time' => $log->created_at->diffForHumans(),
                 ];
             });
 
@@ -78,8 +78,8 @@ class DashboardController extends Controller
             'trend' => [
                 'penduduk' => '+0.0%', // Bisa dikalkulasi jika ada data historis
                 'surat' => '+0.0%',
-                'umkm' => '+0.0%'
-            ]
+                'umkm' => '+0.0%',
+            ],
         ]);
     }
 
@@ -95,23 +95,23 @@ class DashboardController extends Controller
             'datasets' => [
                 [
                     'label' => 'Surat Masuk',
-                    'data' => [12, 19, 15, 25, 22, 8, 5]
+                    'data' => [12, 19, 15, 25, 22, 8, 5],
                 ],
                 [
                     'label' => 'Surat Keluar',
-                    'data' => [8, 15, 12, 18, 20, 6, 3]
-                ]
-            ]
+                    'data' => [8, 15, 12, 18, 20, 6, 3],
+                ],
+            ],
         ];
 
         $populationData = [
             'labels' => ['Sukamaju', 'Mekar Jaya', 'Harapan', 'Sejahtera', 'Makmur', 'Damai', 'Sentosa', 'Bahagia'],
-            'data' => [2150, 1890, 1650, 1420, 1780, 1350, 1280, 1327]
+            'data' => [2150, 1890, 1650, 1420, 1780, 1350, 1280, 1327],
         ];
 
         return response()->json([
             'service' => $serviceData,
-            'population' => $populationData
+            'population' => $populationData,
         ]);
     }
 }

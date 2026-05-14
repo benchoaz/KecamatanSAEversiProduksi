@@ -10,6 +10,7 @@ class RiwayatJabatanPersonil extends Model
     use HasFactory;
 
     protected $table = 'riwayat_jabatan_personil';
+
     protected $guarded = ['id'];
 
     protected $casts = [

@@ -39,7 +39,7 @@ class MasterLayanan extends Model
         'is_active' => 'boolean',
         'is_popular' => 'boolean',
         'urutan' => 'integer',
-        'attachment_requirements' => 'array'
+        'attachment_requirements' => 'array',
     ];
 
     /**
@@ -48,7 +48,7 @@ class MasterLayanan extends Model
     protected static function booted()
     {
         static::saving(function ($layanan) {
-            if (empty($layanan->slug) && !empty($layanan->nama_layanan)) {
+            if (empty($layanan->slug) && ! empty($layanan->nama_layanan)) {
                 $layanan->slug = \Illuminate\Support\Str::slug($layanan->nama_layanan);
             }
         });

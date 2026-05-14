@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Kecamatan;
 
 use App\Http\Controllers\Controller;
-use App\Models\Berita;
 use App\Models\AuditLog;
+use App\Models\Berita;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -20,7 +20,7 @@ class BeritaController extends Controller
     {
         $activeTab = $request->get('tab', 'news');
         $sourceFilter = $request->get('source', 'all');
-        
+
         $query = Berita::with(['author', 'desa'])->latest();
 
         if ($activeTab === 'news') {
@@ -33,7 +33,7 @@ class BeritaController extends Controller
 
         $berita = $query->paginate(10);
         $berita->appends(['tab' => $activeTab, 'source' => $sourceFilter]);
-        
+
         $banners = [];
         if ($activeTab === 'banners') {
             $banners = \App\Models\NewsBanner::with('creator')->latest()->get();
@@ -45,6 +45,7 @@ class BeritaController extends Controller
     public function create()
     {
         $this->authorize('create', Berita::class);
+
         return view('kecamatan.berita.create');
     }
 
@@ -70,9 +71,9 @@ class BeritaController extends Controller
         }
 
         $validated['author_id'] = auth()->id();
-        $validated['slug'] = Str::slug($validated['judul']) . '-' . Str::random(5);
+        $validated['slug'] = Str::slug($validated['judul']).'-'.Str::random(5);
 
-        if ($validated['status'] === 'published' && !$validated['published_at']) {
+        if ($validated['status'] === 'published' && ! $validated['published_at']) {
             $validated['published_at'] = now();
         }
 
@@ -90,6 +91,7 @@ class BeritaController extends Controller
     {
         $berita = Berita::findOrFail($id);
         $this->authorize('update', $berita);
+
         return view('kecamatan.berita.edit', compact('berita'));
     }
 
@@ -120,7 +122,7 @@ class BeritaController extends Controller
             $validated['thumbnail'] = $path;
         }
 
-        if ($validated['status'] === 'published' && !$berita->published_at && !$validated['published_at']) {
+        if ($validated['status'] === 'published' && ! $berita->published_at && ! $validated['published_at']) {
             $validated['published_at'] = now();
         }
 
@@ -154,14 +156,14 @@ class BeritaController extends Controller
     {
         $berita = Berita::withTrashed()->findOrFail($id);
         $this->authorize('forceDelete', $berita);
-        
+
         // Hapus file thumbnail jika ada
         if ($berita->thumbnail) {
             Storage::disk('public')->delete($berita->thumbnail);
         }
 
         $this->logAudit('permanent_delete', $berita);
-        
+
         $berita->forceDelete();
 
         return redirect()->route('kecamatan.berita.index')->with('success', 'Berita berhasil dihapus secara permanen.');
@@ -177,7 +179,7 @@ class BeritaController extends Controller
         $newStatus = $berita->status === 'published' ? 'draft' : 'published';
 
         $updateData = ['status' => $newStatus];
-        if ($newStatus === 'published' && !$berita->published_at) {
+        if ($newStatus === 'published' && ! $berita->published_at) {
             $updateData['published_at'] = now();
         }
 
@@ -201,15 +203,15 @@ class BeritaController extends Controller
                 'action' => $action,
                 'model_type' => get_class($model),
                 'model_id' => $model->id,
-                'details' => "Aksi $action pada modul Berita: " . $model->judul,
+                'details' => "Aksi $action pada modul Berita: ".$model->judul,
                 'old_values' => $oldValues,
                 'new_values' => $model->getAttributes(),
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
-                'domain' => 'kecamatan'
+                'domain' => 'kecamatan',
             ]);
         } catch (\Exception $e) {
-            \Log::error("Gagal mencatat Audit Log: " . $e->getMessage());
+            \Log::error('Gagal mencatat Audit Log: '.$e->getMessage());
         }
     }
 }

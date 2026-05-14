@@ -4,11 +4,8 @@ namespace App\Http\Controllers\Kecamatan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Desa;
-use App\Models\DokumenDesa;
-use App\Models\PerencanaanDesa;
 use App\Models\Submission;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
@@ -22,11 +19,11 @@ class LaporanController extends Controller
         // Stats for Rekap Umum
         $totalDesa = $desas->count();
         $totalSubmissions = Submission::whereYear('created_at', $year)
-            ->when($desaId, fn($q) => $q->where('desa_id', $desaId))
+            ->when($desaId, fn ($q) => $q->where('desa_id', $desaId))
             ->count();
 
         $statusCounts = Submission::whereYear('created_at', $year)
-            ->when($desaId, fn($q) => $q->where('desa_id', $desaId))
+            ->when($desaId, fn ($q) => $q->where('desa_id', $desaId))
             ->selectRaw('status, count(*) as count')
             ->groupBy('status')
             ->pluck('count', 'status');
@@ -52,7 +49,7 @@ class LaporanController extends Controller
         // For demonstration, we'll fetch related submissions
         $reports = Submission::where('menu_id', 2) // Assuming 2 is Ekbang
             ->whereYear('created_at', $year)
-            ->when($desaId, fn($q) => $q->where('desa_id', $desaId))
+            ->when($desaId, fn ($q) => $q->where('desa_id', $desaId))
             ->with(['desa', 'aspek'])
             ->latest()
             ->get();
@@ -67,26 +64,26 @@ class LaporanController extends Controller
 
         // Administrative documents status
         $desas = Desa::withCount([
-            'dokumens as rpjmdes_exists' => function ($q) use ($year) {
+            'dokumens as rpjmdes_exists' => function ($q) {
                 $q->where('tipe_dokumen', 'RPJMDes');
-            }
+            },
         ])
             ->withCount([
                 'dokumens as rkpdes_exists' => function ($q) use ($year) {
                     $q->where('tipe_dokumen', 'RKPDes')->where('tahun', $year);
-                }
+                },
             ])
             ->withCount([
                 'dokumens as lkpj_exists' => function ($q) use ($year) {
                     $q->where('tipe_dokumen', 'LKPJ')->where('tahun', $year);
-                }
+                },
             ])
             ->withCount([
                 'dokumens as lppd_exists' => function ($q) use ($year) {
                     $q->where('tipe_dokumen', 'LPPD')->where('tahun', $year);
-                }
+                },
             ])
-            ->when($desaId, fn($q) => $q->where('id', $desaId))
+            ->when($desaId, fn ($q) => $q->where('id', $desaId))
             ->orderBy('nama_desa')
             ->get();
 
@@ -100,7 +97,7 @@ class LaporanController extends Controller
 
         $reports = Submission::where('menu_id', 3) // Assuming 3 is Kesra
             ->whereYear('created_at', $year)
-            ->when($desaId, fn($q) => $q->where('desa_id', $desaId))
+            ->when($desaId, fn ($q) => $q->where('desa_id', $desaId))
             ->with(['desa', 'aspek'])
             ->get();
 
@@ -114,7 +111,7 @@ class LaporanController extends Controller
 
         $reports = Submission::where('menu_id', 4) // Assuming 4 is Trantibum
             ->whereYear('created_at', $year)
-            ->when($desaId, fn($q) => $q->where('desa_id', $desaId))
+            ->when($desaId, fn ($q) => $q->where('desa_id', $desaId))
             ->with(['desa', 'aspek'])
             ->get();
 
@@ -132,20 +129,20 @@ class LaporanController extends Controller
         // Total Stats
         $stats = [
             'total' => \App\Models\PublicService::whereYear('created_at', $year)
-                ->when($desaId, fn($q) => $q->where('desa_id', $desaId))
+                ->when($desaId, fn ($q) => $q->where('desa_id', $desaId))
                 ->count(),
             'by_status' => \App\Models\PublicService::whereYear('created_at', $year)
-                ->when($desaId, fn($q) => $q->where('desa_id', $desaId))
+                ->when($desaId, fn ($q) => $q->where('desa_id', $desaId))
                 ->select(\Illuminate\Support\Facades\DB::raw('status, count(*) as count'))
                 ->groupBy('status')
                 ->pluck('count', 'status'),
             'by_category' => \App\Models\PublicService::whereYear('created_at', $year)
-                ->when($desaId, fn($q) => $q->where('desa_id', $desaId))
+                ->when($desaId, fn ($q) => $q->where('desa_id', $desaId))
                 ->select(\Illuminate\Support\Facades\DB::raw('category, count(*) as count'))
                 ->groupBy('category')
                 ->pluck('count', 'category'),
             'by_village' => \App\Models\PublicService::whereYear('created_at', $year)
-                ->when($desaId, fn($q) => $q->where('desa_id', $desaId))
+                ->when($desaId, fn ($q) => $q->where('desa_id', $desaId))
                 ->select(\Illuminate\Support\Facades\DB::raw('desa_id, count(*) as count'))
                 ->with('desa')
                 ->groupBy('desa_id')
@@ -154,7 +151,7 @@ class LaporanController extends Controller
 
         // Monthly Trend
         $trend = \App\Models\PublicService::whereYear('created_at', $year)
-            ->when($desaId, fn($q) => $q->where('desa_id', $desaId))
+            ->when($desaId, fn ($q) => $q->where('desa_id', $desaId))
             ->select(\Illuminate\Support\Facades\DB::raw('MONTH(created_at) as month, count(*) as count'))
             ->groupBy('month')
             ->pluck('count', 'month');

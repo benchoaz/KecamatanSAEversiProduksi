@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class PublicService extends Model
 {
@@ -12,20 +11,29 @@ class PublicService extends Model
 
     // Categories
     public const CATEGORY_PELAYANAN = 'pelayanan';
+
     public const CATEGORY_PENGADUAN = 'pengaduan';
+
     public const CATEGORY_UMKM = 'umkm';
+
     public const CATEGORY_LOKER = 'loker';
+
     public const CATEGORY_PEKERJAAN = 'pekerjaan';
 
     // Statuses (Standardized Lowercase for API/n8n)
     public const STATUS_MENUNGGU = 'menunggu_verifikasi';
+
     public const STATUS_DIPROSES = 'diproses';
+
     public const STATUS_SELESAI = 'selesai';
+
     public const STATUS_DITOLAK = 'ditolak';
 
     // Privacy Types
     public const PRIVACY_NORMAL = 'normal';
+
     public const PRIVACY_RAHASIA = 'rahasia';
+
     public const PRIVACY_ANONIM = 'anonim';
 
     protected $guarded = [];
@@ -53,7 +61,6 @@ class PublicService extends Model
         return $this->nama_pemohon;
     }
 
-
     protected $casts = [
         'is_agreed' => 'boolean',
         'handled_at' => 'datetime',
@@ -74,7 +81,7 @@ class PublicService extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            if (!$model->tracking_code) {
+            if (! $model->tracking_code) {
                 $model->tracking_code = static::generateUniqueTrackingCode();
             }
             // Auto-generate whatsapp_suffix for faster lookups
@@ -97,6 +104,7 @@ class PublicService extends Model
     public static function generateWhatsAppSuffix(string $whatsapp): string
     {
         $clean = preg_replace('/[^0-9]/', '', $whatsapp);
+
         return substr($clean, -10);
     }
 
@@ -158,7 +166,7 @@ class PublicService extends Model
     public function getEffectivePublicResponseAttribute()
     {
         // Safe check: If tracking_code is missing for legacy records, generate it on the fly
-        if (!$this->tracking_code) {
+        if (! $this->tracking_code) {
             $this->tracking_code = static::generateUniqueTrackingCode();
             $this->save();
         }
@@ -168,7 +176,7 @@ class PublicService extends Model
         }
 
         if (in_array($this->status, [self::STATUS_MENUNGGU, self::STATUS_DIPROSES])) {
-            return "akan segera di tindak lanjuti 2 x24 jam anda akan mendapat laporan";
+            return 'akan segera di tindak lanjuti 2 x24 jam anda akan mendapat laporan';
         }
 
         return null;
@@ -192,7 +200,9 @@ class PublicService extends Model
      */
     public function getRecentSimilarServiceAttribute()
     {
-        if (!$this->nik) return null;
+        if (! $this->nik) {
+            return null;
+        }
 
         if ($this->relationLoaded('previousSimilarSuccess')) {
             return $this->previousSimilarSuccess;

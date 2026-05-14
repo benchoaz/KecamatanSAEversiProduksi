@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Kecamatan;
 
 use App\Http\Controllers\Controller;
-use App\Models\Umkm;
-use App\Models\UmkmAdminLog;
 use App\Models\Desa;
 use App\Models\PublicService;
+use App\Models\Umkm;
+use App\Models\UmkmAdminLog;
 use App\Models\WorkDirectory;
 use App\Traits\HasWhatsAppNotifications;
 use Illuminate\Http\Request;
@@ -15,11 +15,11 @@ use Illuminate\Support\Str;
 class LayananPublikController extends Controller
 {
     use HasWhatsAppNotifications;
+
     /**
      * --- UMKM RAKYAT FACILITATOR SECTION ---
      * Menggantikan fungsi UMKM lama dengan sistem UMKM Rakyat.
      */
-
     public function umkmIndex(Request $request)
     {
         $activeTab = $request->query('tab', 'umkm');
@@ -31,15 +31,15 @@ class LayananPublikController extends Controller
         if ($activeTab == 'umkm') {
             $query = Umkm::latest();
             if ($q) {
-                $query->where('nama_usaha', 'like', '%' . $q . '%')
-                    ->orWhere('nama_pemilik', 'like', '%' . $q . '%');
+                $query->where('nama_usaha', 'like', '%'.$q.'%')
+                    ->orWhere('nama_pemilik', 'like', '%'.$q.'%');
             }
             $umkm = $query->paginate(10)->appends($request->all());
         } else {
             $query = WorkDirectory::latest();
             if ($q) {
-                $query->where('display_name', 'like', '%' . $q . '%')
-                    ->orWhere('job_title', 'like', '%' . $q . '%');
+                $query->where('display_name', 'like', '%'.$q.'%')
+                    ->orWhere('job_title', 'like', '%'.$q.'%');
             }
             $jasa = $query->paginate(10)->appends($request->all());
         }
@@ -77,7 +77,7 @@ class LayananPublikController extends Controller
         ]);
 
         // Create UMKM
-        $umkm = new Umkm();
+        $umkm = new Umkm;
         $umkm->nama_usaha = $validated['nama_usaha'];
         $umkm->nama_pemilik = $validated['nama_pemilik'];
         $umkm->no_wa = $validated['no_wa'];
@@ -98,7 +98,7 @@ class LayananPublikController extends Controller
             'umkm_id' => $umkm->id,
             'action' => 'create',
             'actor' => 'admin', // Kecamatan
-            'notes' => 'Pendaftaran jalur bantuan (Fasilitator). ' . ($validated['notes'] ?? ''),
+            'notes' => 'Pendaftaran jalur bantuan (Fasilitator). '.($validated['notes'] ?? ''),
         ]);
 
         // Automate Inbox Sync
@@ -133,16 +133,16 @@ class LayananPublikController extends Controller
         $waMessage = "Halo {$umkm->nama_pemilik},\n\n";
         $waMessage .= "Berikut adalah link akses untuk mengelola Lapak UMKM Anda ({$umkm->nama_usaha}).\n\n";
         $waMessage .= "Silakan klik link ini untuk mulai melengkapi produk dan foto:\n";
-        $waMessage .= $manageLink . "\n\n";
-        $waMessage .= "Simpan link ini baik-baik. Jangan berikan kepada orang lain.";
+        $waMessage .= $manageLink."\n\n";
+        $waMessage .= 'Simpan link ini baik-baik. Jangan berikan kepada orang lain.';
 
         // Normalize number
         $cleanPhone = preg_replace('/[^0-9]/', '', $umkm->no_wa);
         if (str_starts_with($cleanPhone, '0')) {
-            $cleanPhone = '62' . substr($cleanPhone, 1);
+            $cleanPhone = '62'.substr($cleanPhone, 1);
         }
 
-        $waUrl = "https://wa.me/{$cleanPhone}?text=" . urlencode($waMessage);
+        $waUrl = "https://wa.me/{$cleanPhone}?text=".urlencode($waMessage);
 
         return view('kecamatan.layanan.umkm.handover', compact('umkm', 'manageLink', 'waUrl', 'waMessage'));
     }
@@ -151,6 +151,7 @@ class LayananPublikController extends Controller
     {
         $umkm = Umkm::findOrFail($id);
         $desas = Desa::orderBy('nama_desa')->get();
+
         return view('kecamatan.layanan.umkm.edit_admin', compact('umkm', 'desas'));
     }
 
@@ -209,12 +210,11 @@ class LayananPublikController extends Controller
     /**
      * --- JASA & TENAGA FACILITATOR SECTION ---
      */
-
     public function jasaCreate(Request $request)
     {
         $desas = Desa::orderBy('nama_desa')->get();
         $categories = WorkDirectory::getCategories();
-        
+
         $prefill = [
             'from_inbox' => $request->query('from_inbox'),
             'display_name' => $request->query('nama'),
@@ -271,15 +271,15 @@ class LayananPublikController extends Controller
         $waMessage = "Halo {$jasa->display_name},\n\n";
         $waMessage .= "Berikut adalah link akses untuk mengelola Jasa Anda ({$jasa->job_title}).\n\n";
         $waMessage .= "Silakan login menggunakan nomor WhatsApp Anda di:\n";
-        $waMessage .= $manageLink . "\n\n";
-        
+        $waMessage .= $manageLink."\n\n";
+
         // Normalize number
         $cleanPhone = preg_replace('/[^0-9]/', '', $jasa->contact_phone);
         if (str_starts_with($cleanPhone, '0')) {
-            $cleanPhone = '62' . substr($cleanPhone, 1);
+            $cleanPhone = '62'.substr($cleanPhone, 1);
         }
-        
-        $waUrl = "https://wa.me/{$cleanPhone}?text=" . urlencode($waMessage);
+
+        $waUrl = "https://wa.me/{$cleanPhone}?text=".urlencode($waMessage);
 
         return view('kecamatan.layanan.umkm.jasa_handover', compact('jasa', 'manageLink', 'waUrl', 'waMessage'));
     }
@@ -289,6 +289,7 @@ class LayananPublikController extends Controller
         $jasa = WorkDirectory::findOrFail($id);
         $desas = Desa::orderBy('nama_desa')->get();
         $categories = WorkDirectory::getCategories();
+
         return view('kecamatan.layanan.umkm.jasa_edit', compact('jasa', 'desas', 'categories'));
     }
 
@@ -330,7 +331,7 @@ class LayananPublikController extends Controller
     public function umkmToggleVerify($id)
     {
         $umkm = Umkm::findOrFail($id);
-        $umkm->is_verified = !$umkm->is_verified;
+        $umkm->is_verified = ! $umkm->is_verified;
         $umkm->save();
 
         $status = $umkm->is_verified ? 'diverifikasi (Centang Biru aktif)' : 'batal diverifikasi';
@@ -348,7 +349,7 @@ class LayananPublikController extends Controller
     public function jasaToggleVerify($id)
     {
         $jasa = WorkDirectory::findOrFail($id);
-        $jasa->is_verified = !$jasa->is_verified;
+        $jasa->is_verified = ! $jasa->is_verified;
         $jasa->save();
 
         $status = $jasa->is_verified ? 'diverifikasi (Centang Biru aktif)' : 'batal diverifikasi';

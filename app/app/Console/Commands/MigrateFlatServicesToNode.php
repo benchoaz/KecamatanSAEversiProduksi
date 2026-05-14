@@ -2,14 +2,15 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\MasterLayanan;
 use App\Models\ServiceNode;
 use App\Models\ServiceRequirement;
+use Illuminate\Console\Command;
 
 class MigrateFlatServicesToNode extends Command
 {
     protected $signature = 'layanan:migrate-tree';
+
     protected $description = 'Migrate flat MasterLayanan text requirements into Decision Tree Nodes';
 
     public function handle()
@@ -19,7 +20,8 @@ class MigrateFlatServicesToNode extends Command
             ->get();
 
         if ($layanans->isEmpty()) {
-            $this->info("Tidak ada layanan flat yang perlu dimigrasi.");
+            $this->info('Tidak ada layanan flat yang perlu dimigrasi.');
+
             return;
         }
 
@@ -31,14 +33,14 @@ class MigrateFlatServicesToNode extends Command
         foreach ($layanans as $layanan) {
             $node = ServiceNode::create([
                 'master_layanan_id' => $layanan->id,
-                'parent_id'   => null,
-                'depth'       => 0,
-                'name'        => 'Pengajuan ' . $layanan->nama_layanan,
+                'parent_id' => null,
+                'depth' => 0,
+                'name' => 'Pengajuan '.$layanan->nama_layanan,
                 'description' => $layanan->deskripsi_syarat ?? '',
-                'ikon'        => $layanan->ikon ?? 'fa-circle-check',
-                'urutan'      => 0,
-                'is_leaf'     => true,
-                'is_active'   => true,
+                'ikon' => $layanan->ikon ?? 'fa-circle-check',
+                'urutan' => 0,
+                'is_leaf' => true,
+                'is_active' => true,
             ]);
 
             $reqs = $layanan->attachment_requirements;
@@ -48,14 +50,14 @@ class MigrateFlatServicesToNode extends Command
 
             foreach ((array) $reqs as $idx => $label) {
                 ServiceRequirement::create([
-                    'node_id'        => $node->id,
-                    'type'           => 'file_upload',
-                    'label'          => $label,
-                    'description'    => '',
-                    'is_required'    => true,
+                    'node_id' => $node->id,
+                    'type' => 'file_upload',
+                    'label' => $label,
+                    'description' => '',
+                    'is_required' => true,
                     'accepted_types' => 'jpg,png,pdf',
-                    'max_size_mb'    => 5,
-                    'urutan'         => $idx,
+                    'max_size_mb' => 5,
+                    'urutan' => $idx,
                 ]);
             }
 
@@ -65,6 +67,6 @@ class MigrateFlatServicesToNode extends Command
 
         $bar->finish();
         $this->newLine(2);
-        $this->info("✅ Sukses! Semua layanan flat berhasil di-upgrade ke Sistem Decision Tree.");
+        $this->info('✅ Sukses! Semua layanan flat berhasil di-upgrade ke Sistem Decision Tree.');
     }
 }

@@ -27,7 +27,7 @@ class AuditActivityListener
 
     public function handleLogout(Logout $event)
     {
-        if (!$event->user) {
+        if (! $event->user) {
             return;
         }
 

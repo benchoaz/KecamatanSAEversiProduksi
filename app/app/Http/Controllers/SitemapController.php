@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Umkm;
-use App\Models\Desa;
 use App\Models\Berita;
+use App\Models\Desa;
+use App\Models\Umkm;
 use App\Models\WorkDirectory;
-use Illuminate\Http\Response;
 
 class SitemapController extends Controller
 {
@@ -28,7 +27,7 @@ class SitemapController extends Controller
             // Desa Pages
             $desas = Desa::all();
             foreach ($desas as $desa) {
-                $url = url('/desa/' . $desa->id); // Adjust based on your route
+                $url = url('/desa/'.$desa->id); // Adjust based on your route
                 $sitemap .= $this->addUrl($url, '0.7', 'weekly', $desa->updated_at);
             }
 
@@ -55,7 +54,7 @@ class SitemapController extends Controller
             }
 
             $sitemap .= '</urlset>';
-            
+
             return $sitemap;
         });
 
@@ -69,16 +68,16 @@ class SitemapController extends Controller
     private function addUrl($loc, $priority = '0.5', $changefreq = 'weekly', $lastmod = null)
     {
         $url = '<url>';
-        $url .= '<loc>' . htmlspecialchars($loc) . '</loc>';
+        $url .= '<loc>'.htmlspecialchars($loc).'</loc>';
 
         if ($lastmod) {
-            $url .= '<lastmod>' . $lastmod->format('Y-m-d') . '</lastmod>';
+            $url .= '<lastmod>'.$lastmod->format('Y-m-d').'</lastmod>';
         } else {
-            $url .= '<lastmod>' . date('Y-m-d') . '</lastmod>';
+            $url .= '<lastmod>'.date('Y-m-d').'</lastmod>';
         }
 
-        $url .= '<changefreq>' . $changefreq . '</changefreq>';
-        $url .= '<priority>' . $priority . '</priority>';
+        $url .= '<changefreq>'.$changefreq.'</changefreq>';
+        $url .= '<priority>'.$priority.'</priority>';
         $url .= '</url>';
 
         return $url;
@@ -94,7 +93,7 @@ class SitemapController extends Controller
         $robots .= "Disallow: /admin/\n";
         $robots .= "Disallow: /kecamatan/\n";
         $robots .= "Disallow: /api/\n\n";
-        $robots .= "Sitemap: " . url('/sitemap.xml') . "\n";
+        $robots .= 'Sitemap: '.url('/sitemap.xml')."\n";
 
         return response($robots, 200)
             ->header('Content-Type', 'text/plain');

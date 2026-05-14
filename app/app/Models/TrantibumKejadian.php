@@ -22,7 +22,7 @@ class TrantibumKejadian extends Model
         'upaya_penanganan',
         'pihak_terlibat',
         'status',
-        'foto_kejadian'
+        'foto_kejadian',
     ];
 
     protected $casts = [

@@ -7,11 +7,11 @@ use App\Models\Desa;
 use App\Models\Submission;
 use App\Repositories\Interfaces\SubmissionRepositoryInterface;
 use App\Services\MasterDataService;
-use Illuminate\Http\Request;
 
 class EkbangController extends Controller
 {
     protected $submissionRepo;
+
     protected $masterData;
 
     public function __construct(
@@ -60,7 +60,7 @@ class EkbangController extends Controller
                     $q->whereHas('aspek', function ($q) {
                         $q->where('kode_aspek', 'ekb_monev');
                     });
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
@@ -88,7 +88,7 @@ class EkbangController extends Controller
                     $q->whereHas('aspek', function ($q) {
                         $q->where('kode_aspek', 'ekb_fisik');
                     });
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
@@ -116,7 +116,7 @@ class EkbangController extends Controller
                     $q->whereHas('aspek', function ($q) {
                         $q->where('kode_aspek', 'ekb_realisasi');
                     });
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
@@ -144,7 +144,7 @@ class EkbangController extends Controller
                     $q->whereHas('aspek', function ($q) {
                         $q->where('kode_aspek', 'ekb_kepatuhan');
                     });
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
@@ -172,25 +172,26 @@ class EkbangController extends Controller
                     $q->whereHas('aspek', function ($q) {
                         $q->where('kode_aspek', 'ekb_audit');
                     });
-                }
+                },
             ])->orderBy('nama_desa')->get();
         }
 
         return view('kecamatan.ekbang.audit.index', compact('auditLogs', 'desa_id', 'isOperator', 'desas'));
     }
+
     public function exportAudit()
     {
         $desa_id = request('desa_id');
         $desa = Desa::find($desa_id);
 
-        if (!$desa && auth()->user()->desa_id) {
+        if (! $desa && auth()->user()->desa_id) {
             $desa = auth()->user()->desa;
         }
 
         abort_unless($desa, 404, 'Desa tidak ditemukan.');
 
-        $zipFile = new \PhpZip\ZipFile();
-        $zipName = "Paket_Audit_Ekbang_" . str_replace(' ', '_', $desa->nama_desa) . "_" . date('Ymd') . ".zip";
+        $zipFile = new \PhpZip\ZipFile;
+        $zipName = 'Paket_Audit_Ekbang_'.str_replace(' ', '_', $desa->nama_desa).'_'.date('Ymd').'.zip';
 
         // Get Submissions for Ekbang
         $submissions = Submission::where('desa_id', $desa->id)
@@ -205,16 +206,16 @@ class EkbangController extends Controller
             $folderName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $folderName); // Sanitize
 
             foreach ($sub->buktiDukung as $bukti) {
-                $fullPath = storage_path('app/local/' . $bukti->file_path);
+                $fullPath = storage_path('app/local/'.$bukti->file_path);
                 if (file_exists($fullPath)) {
-                    $zipFile->addFile($fullPath, $folderName . "/" . basename($bukti->file_path));
+                    $zipFile->addFile($fullPath, $folderName.'/'.basename($bukti->file_path));
                 }
             }
         }
 
-        $zipFile->saveAsFile(storage_path('app/temp/' . $zipName));
+        $zipFile->saveAsFile(storage_path('app/temp/'.$zipName));
         $zipFile->close();
 
-        return response()->download(storage_path('app/temp/' . $zipName))->deleteFileAfterSend(true);
+        return response()->download(storage_path('app/temp/'.$zipName))->deleteFileAfterSend(true);
     }
 }

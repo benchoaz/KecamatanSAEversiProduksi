@@ -8,14 +8,13 @@ class TaxAssistant
 {
     /**
      * Memberikan estimasi pajak berdasarkan kategori komponen.
-     * 
-     * @param MasterKomponenBelanja $komponen
-     * @param float $nilai
+     *
+     * @param  float  $nilai
      * @return array|null
      */
     public function getTaxEstimation(MasterKomponenBelanja $komponen, $nilai)
     {
-        if (!$komponen->objek_pajak) {
+        if (! $komponen->objek_pajak) {
             return null;
         }
 
@@ -26,7 +25,7 @@ class TaxAssistant
             'nilai_bruto' => $nilai,
             'estimasi_pajak' => $nilai * $rate,
             'rate_percent' => ($rate * 100),
-            'teks_edukasi' => "Silakan sesuaikan dengan ketentuan daerah (Perda/Perbup terkait Pajak & Retribusi)."
+            'teks_edukasi' => 'Silakan sesuaikan dengan ketentuan daerah (Perda/Perbup terkait Pajak & Retribusi).',
         ];
     }
 

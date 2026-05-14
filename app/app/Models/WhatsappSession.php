@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class WhatsappSession extends Model
 {
@@ -59,7 +59,7 @@ class WhatsappSession extends Model
      */
     public function isActive(): bool
     {
-        return !is_null($this->state);
+        return ! is_null($this->state);
     }
 
     /**
@@ -70,6 +70,7 @@ class WhatsappSession extends Model
         if ($this->isActive()) {
             return $this->updated_at->diffInSeconds(Carbon::now()) > 30;
         }
+
         return $this->updated_at->diffInMinutes(Carbon::now()) > 30;
     }
 

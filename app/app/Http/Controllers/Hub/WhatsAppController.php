@@ -13,21 +13,21 @@ class WhatsAppController extends Controller
 {
     public function index()
     {
-        $configs   = HubAiConfig::orderBy('key')->get();
+        $configs = HubAiConfig::orderBy('key')->get();
         $districts = HubDistrict::orderBy('name')->get();
 
         // Check WAHA Status
-        $waha_url  = config('services.waha.url', 'http://localhost:3000');
+        $waha_url = config('services.waha.url', 'http://localhost:3000');
         $is_online = false;
         try {
-            $response  = Http::timeout(2)->get($waha_url . '/api/health');
+            $response = Http::timeout(2)->get($waha_url.'/api/health');
             $is_online = $response->successful();
         } catch (\Exception $e) {
             $is_online = false;
         }
 
         // Statistik real dari hub_message_logs
-        $today       = now()->toDateString();
+        $today = now()->toDateString();
         $stats_today = DB::table('hub_message_logs')
             ->whereDate('created_at', $today)
             ->selectRaw("
@@ -67,12 +67,13 @@ class WhatsAppController extends Controller
     {
         $validated = $request->validate([
             'waha_session_name' => 'nullable|string|max:100',
-            'operator_phone'    => 'nullable|string|max:20',
-            'ai_enabled'        => 'boolean',
-            'n8n_webhook_url'   => 'nullable|url',
+            'operator_phone' => 'nullable|string|max:20',
+            'ai_enabled' => 'boolean',
+            'n8n_webhook_url' => 'nullable|url',
         ]);
 
         $district->update($validated);
+
         return redirect()->back()->with('success', "Konfigurasi {$district->name} berhasil disimpan.");
     }
 
@@ -82,12 +83,12 @@ class WhatsAppController extends Controller
     public function storeConfig(Request $request)
     {
         $validated = $request->validate([
-            'key'   => 'required|string',
+            'key' => 'required|string',
             'value' => 'required|string',
         ]);
 
         HubAiConfig::updateOrCreate(
-            ['key'   => $validated['key']],
+            ['key' => $validated['key']],
             ['value' => $validated['value']]
         );
 

@@ -37,8 +37,8 @@ class JasaHandler
             return [
                 'success' => true,
                 'intent' => 'jasa',
-                'reply' => "😔 *Maaf*, tidak ditemukan penyedia jasa dengan kata kunci \"*{$query}*\".\n\n" .
-                    "Silakan coba kata kunci lain atau ketik *MENU* atau *0* untuk kembali.",
+                'reply' => "😔 *Maaf*, tidak ditemukan penyedia jasa dengan kata kunci \"*{$query}*\".\n\n".
+                    'Silakan coba kata kunci lain atau ketik *MENU* atau *0* untuk kembali.',
                 'state_update' => 'MENU_JASA',
             ];
         }
@@ -63,7 +63,7 @@ class JasaHandler
         foreach ($jasaList as $index => $jasa) {
             $num = $index + 1;
             $opStatus = $jasa->operational_status;
-            $statusPrefix = $opStatus['is_open'] ? "🟢" : "🔴";
+            $statusPrefix = $opStatus['is_open'] ? '🟢' : '🔴';
 
             $message .= "{$num}. {$statusPrefix} *{$jasa->name}* [{$opStatus['label']}]\n";
             $message .= "   {$jasa->address}\n";
@@ -84,7 +84,7 @@ class JasaHandler
         }
 
         if ($jasaList->count() === 5) {
-            $message .= "_Menampilkan 5 hasil teratas._";
+            $message .= '_Menampilkan 5 hasil teratas._';
         }
 
         return $message;

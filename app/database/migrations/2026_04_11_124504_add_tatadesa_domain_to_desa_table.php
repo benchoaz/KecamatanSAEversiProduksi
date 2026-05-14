@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('desa', function (Blueprint $table) {
             $table->string('tatadesa_domain')->nullable(); // e.g. "alasnyiur.tatadesa.com"
-            $table->string('website_url')->nullable(); 
+            $table->string('website_url')->nullable();
         });
     }
 

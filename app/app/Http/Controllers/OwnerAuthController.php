@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UmkmLocal;
 use App\Models\Loker;
+use App\Models\UmkmLocal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -34,9 +34,9 @@ class OwnerAuthController extends Controller
         $umkm = UmkmLocal::where('contact_wa', 'LIKE', "%{$cleanPhone}%")->first();
         $loker = Loker::where('contact_wa', 'LIKE', "%{$cleanPhone}%")->first();
 
-        if (!$umkm && !$loker) {
+        if (! $umkm && ! $loker) {
             return back()->withErrors([
-                'phone' => 'Nomor WhatsApp tidak ditemukan. Pastikan nomor yang Anda masukkan sesuai dengan yang terdaftar.'
+                'phone' => 'Nomor WhatsApp tidak ditemukan. Pastikan nomor yang Anda masukkan sesuai dengan yang terdaftar.',
             ])->withInput();
         }
 
@@ -52,9 +52,9 @@ class OwnerAuthController extends Controller
             $verifiedLoker = $loker;
         }
 
-        if (!$verifiedUmkm && !$verifiedLoker) {
+        if (! $verifiedUmkm && ! $verifiedLoker) {
             return back()->withErrors([
-                'pin' => 'PIN yang Anda masukkan salah. Ketik LUPA PIN jika lupa.'
+                'pin' => 'PIN yang Anda masukkan salah. Ketik LUPA PIN jika lupa.',
             ])->withInput();
         }
 
@@ -74,7 +74,7 @@ class OwnerAuthController extends Controller
      */
     public function dashboard()
     {
-        if (!session('owner_logged_in')) {
+        if (! session('owner_logged_in')) {
             return redirect()->route('owner.login');
         }
 
@@ -97,7 +97,7 @@ class OwnerAuthController extends Controller
      */
     public function showResetPin()
     {
-        if (!session('owner_logged_in')) {
+        if (! session('owner_logged_in')) {
             return redirect()->route('owner.login');
         }
 
@@ -109,7 +109,7 @@ class OwnerAuthController extends Controller
      */
     public function resetPin(Request $request)
     {
-        if (!session('owner_logged_in')) {
+        if (! session('owner_logged_in')) {
             return redirect()->route('owner.login');
         }
 
@@ -150,16 +150,16 @@ class OwnerAuthController extends Controller
      */
     public function toggleUmkm(Request $request)
     {
-        if (!session('owner_logged_in') || !session('owner_umkm_id')) {
+        if (! session('owner_logged_in') || ! session('owner_umkm_id')) {
             return redirect()->route('owner.login');
         }
 
         $umkm = UmkmLocal::find(session('owner_umkm_id'));
-        if (!$umkm) {
+        if (! $umkm) {
             return redirect()->route('owner.dashboard');
         }
 
-        $newStatus = !$umkm->is_active;
+        $newStatus = ! $umkm->is_active;
         $umkm->update([
             'is_active' => $newStatus,
             'last_toggle_at' => now(),
@@ -176,12 +176,12 @@ class OwnerAuthController extends Controller
      */
     public function toggleLoker(Request $request)
     {
-        if (!session('owner_logged_in') || !session('owner_loker_id')) {
+        if (! session('owner_logged_in') || ! session('owner_loker_id')) {
             return redirect()->route('owner.login');
         }
 
         $loker = Loker::find(session('owner_loker_id'));
-        if (!$loker) {
+        if (! $loker) {
             return redirect()->route('owner.dashboard');
         }
 
@@ -236,9 +236,9 @@ class OwnerAuthController extends Controller
         $umkm = UmkmLocal::where('contact_wa', 'LIKE', "%{$cleanPhone}%")->first();
         $loker = Loker::where('contact_wa', 'LIKE', "%{$cleanPhone}%")->first();
 
-        if (!$umkm && !$loker) {
+        if (! $umkm && ! $loker) {
             return back()->withErrors([
-                'phone' => 'Nomor WhatsApp tidak ditemukan di sistem kami.'
+                'phone' => 'Nomor WhatsApp tidak ditemukan di sistem kami.',
             ])->withInput();
         }
 
@@ -248,15 +248,15 @@ class OwnerAuthController extends Controller
         $storedPhoneClean = preg_replace('/[^0-9]/', '', $storedPhone);
         // Normalize to 0-prefix for Indonesian display (0812xxx not 6282xxx)
         if (str_starts_with($storedPhoneClean, '62')) {
-            $storedPhoneClean = '0' . substr($storedPhoneClean, 2);
+            $storedPhoneClean = '0'.substr($storedPhoneClean, 2);
         }
         // Mask middle digits for privacy: 082345678901 → 0823****8901
         $maskedPhone = $storedPhoneClean;
         if (strlen($storedPhoneClean) >= 8) {
             $visible = 4;
             $maskedPhone = substr($storedPhoneClean, 0, $visible)
-                . str_repeat('*', max(0, strlen($storedPhoneClean) - ($visible + 4)))
-                . substr($storedPhoneClean, -4);
+                .str_repeat('*', max(0, strlen($storedPhoneClean) - ($visible + 4)))
+                .substr($storedPhoneClean, -4);
         }
 
         // For now, show instructions to contact admin

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Kecamatan;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 
 class GeospasialWilayahController extends Controller
 {
@@ -18,8 +17,8 @@ class GeospasialWilayahController extends Controller
             foreach (File::files($geoPath) as $file) {
                 $files[] = [
                     'name' => $file->getFilename(),
-                    'size' => number_format($file->getSize() / 1024, 2) . ' KB',
-                    'last_modified' => date('Y-m-d H:i:s', $file->getMTime())
+                    'size' => number_format($file->getSize() / 1024, 2).' KB',
+                    'last_modified' => date('Y-m-d H:i:s', $file->getMTime()),
                 ];
             }
         }
@@ -31,17 +30,17 @@ class GeospasialWilayahController extends Controller
     {
         $request->validate([
             'geojson_file' => 'required|file',
-            'type' => 'required|in:kecamatan,desa,poi'
+            'type' => 'required|in:kecamatan,desa,poi',
         ]);
 
         $geoPath = public_path('data/geo');
-        if (!File::exists($geoPath)) {
+        if (! File::exists($geoPath)) {
             File::makeDirectory($geoPath, 0755, true);
         }
 
-        $filename = 'layer_' . $request->type . '.geojson';
+        $filename = 'layer_'.$request->type.'.geojson';
         $request->file('geojson_file')->move($geoPath, $filename);
 
-        return redirect()->back()->with('success', 'File GeoJSON ' . $request->type . ' berhasil diperbarui.');
+        return redirect()->back()->with('success', 'File GeoJSON '.$request->type.' berhasil diperbarui.');
     }
 }

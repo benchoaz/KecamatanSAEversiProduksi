@@ -10,6 +10,7 @@ class BltDesa extends Model
     use HasFactory;
 
     protected $table = 'blt_desa';
+
     protected $guarded = ['id'];
 
     protected $casts = [

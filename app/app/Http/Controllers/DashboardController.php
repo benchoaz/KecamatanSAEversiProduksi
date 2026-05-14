@@ -15,6 +15,7 @@ class DashboardController extends Controller
         if (auth()->user()->desa_id !== null) {
             return redirect()->route('desa.dashboard');
         }
+
         return redirect()->route('kecamatan.dashboard');
     }
 
@@ -26,7 +27,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         if ($user->desa_id) {
-            // If Desa has specific stats AJAX, call it here. 
+            // If Desa has specific stats AJAX, call it here.
             // For now, Desa stats are loaded directly in the index view.
             return response()->json(['status' => 'success', 'domain' => 'desa']);
         }

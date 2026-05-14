@@ -10,7 +10,9 @@ class DesaSubmissionValue extends Model
     use HasFactory;
 
     protected $table = 'desa_submission_values';
+
     protected $guarded = ['id'];
+
     public $timestamps = false;
 
     protected $casts = [

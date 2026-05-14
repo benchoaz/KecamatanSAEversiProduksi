@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\NavMenu;
-use App\Models\NavSubMenu;
 use Illuminate\Support\Facades\Cache;
 
 class NavigationService
@@ -11,28 +10,30 @@ class NavigationService
     /**
      * Get allowed navigation menus for the current user and dashboard.
      *
-     * @param string $dashboard 'kecamatan' or 'desa'
+     * @param  string  $dashboard  'kecamatan' or 'desa'
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getMenus($dashboard = 'kecamatan')
     {
         $user = auth()->user();
-        if (!$user) return collect([]);
+        if (! $user) {
+            return collect([]);
+        }
 
         // DEBUG LOGGING
         \Log::info('NavigationService: Generating menus for user', [
             'username' => $user->username,
             'role' => $user->role->name ?? 'NONE',
-            'dashboard' => $dashboard
+            'dashboard' => $dashboard,
         ]);
 
         // Temporarily disabled cache for debugging
         $menus = NavMenu::where('target_dashboard', $dashboard)
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->where('is_active', true)->orWhere('is_active', 1);
             })
             ->with(['subMenus' => function ($query) {
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->where('is_active', true)->orWhere('is_active', 1);
                 });
             }])
@@ -41,48 +42,48 @@ class NavigationService
 
         \Log::info('NavigationService: Found raw menus', [
             'count' => $menus->count(),
-            'menu_ids' => $menus->pluck('id')->toArray()
+            'menu_ids' => $menus->pluck('id')->toArray(),
         ]);
 
-            return $menus->filter(function ($menu) use ($user) {
-                // Super Admin can see everything
+        return $menus->filter(function ($menu) use ($user) {
+            // Super Admin can see everything
+            if ($user->username === 'admin' || $user->hasRole('super_admin_kabupaten') || $user->hasRole('Super Admin')) {
+                return true;
+            }
+
+            // If menu has a specific permission, user must have it
+            if ($menu->permission_name && ! $user->can($menu->permission_name)) {
+                // Check if they at least have explicit access to one of the submenus
+                $hasAllowedSubMenu = $menu->subMenus->some(fn ($sub) => $sub->permission_name && $user->can($sub->permission_name)
+                );
+
+                if (! $hasAllowedSubMenu) {
+                    return false;
+                }
+            }
+
+            // Filter submenus based on permissions
+            $menu->setRelation('subMenus', $menu->subMenus->filter(function ($sub) use ($user, $menu) {
+                // Admin bypass for submenus
                 if ($user->username === 'admin' || $user->hasRole('super_admin_kabupaten') || $user->hasRole('Super Admin')) {
                     return true;
                 }
 
-                // If menu has a specific permission, user must have it
-                if ($menu->permission_name && !$user->can($menu->permission_name)) {
-                    // Check if they at least have explicit access to one of the submenus
-                    $hasAllowedSubMenu = $menu->subMenus->some(fn($sub) => 
-                        $sub->permission_name && $user->can($sub->permission_name)
-                    );
-                    
-                    if (!$hasAllowedSubMenu) {
-                        return false;
-                    }
+                // If submenu has specific permission, check it
+                if ($sub->permission_name) {
+                    return $user->can($sub->permission_name);
+                }
+                // If no specific permission, it MUST inherit parent's permission
+                if ($menu->permission_name) {
+                    return $user->can($menu->permission_name);
                 }
 
-                // Filter submenus based on permissions
-                $menu->setRelation('subMenus', $menu->subMenus->filter(function ($sub) use ($user, $menu) {
-                    // Admin bypass for submenus
-                    if ($user->username === 'admin' || $user->hasRole('super_admin_kabupaten') || $user->hasRole('Super Admin')) {
-                        return true;
-                    }
+                return true;
+            }));
 
-                    // If submenu has specific permission, check it
-                    if ($sub->permission_name) {
-                        return $user->can($sub->permission_name);
-                    }
-                    // If no specific permission, it MUST inherit parent's permission
-                    if ($menu->permission_name) {
-                        return $user->can($menu->permission_name);
-                    }
-                    return true;
-                }));
-
-                // Standalone menus (with permission) or folders with active submenus should stay
-                return $menu->permission_name || $menu->subMenus->count() > 0;
-            });
+            // Standalone menus (with permission) or folders with active submenus should stay
+            return $menu->permission_name || $menu->subMenus->count() > 0;
+        });
     }
 
     /**

@@ -23,7 +23,7 @@ class PembangunanController extends Controller
             'desa',
             'logbooks' => function ($q) {
                 $q->latest();
-            }
+            },
         ]);
 
         if ($request->desa_id) {
@@ -42,6 +42,7 @@ class PembangunanController extends Controller
     public function show($id)
     {
         $project = PembangunanDesa::with(['desa', 'logbooks.createdBy'])->findOrFail($id);
+
         return view('kecamatan.pembangunan.show', compact('project'));
     }
 }

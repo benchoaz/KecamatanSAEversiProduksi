@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 class EkbangController extends Controller
 {
     protected $submissionRepo;
+
     protected $masterData;
 
     public function __construct(
@@ -140,7 +141,7 @@ class EkbangController extends Controller
         return response()->json([
             'status' => 'success',
             'documents' => $docs,
-            'message' => 'Sistem menemukan ' . count($docs) . ' dokumen yang disarankan.'
+            'message' => 'Sistem menemukan '.count($docs).' dokumen yang disarankan.',
         ]);
     }
 
@@ -150,14 +151,15 @@ class EkbangController extends Controller
         $nilai = $request->input('nilai', 0);
 
         $komponen = \App\Models\MasterKomponenBelanja::find($komponenId);
-        if (!$komponen)
+        if (! $komponen) {
             return response()->json(['status' => 'error', 'message' => 'Komponen tidak ditemukan'], 404);
+        }
 
         $estimation = $assistant->getTaxEstimation($komponen, $nilai);
 
         return response()->json([
             'status' => 'success',
-            'estimation' => $estimation
+            'estimation' => $estimation,
         ]);
     }
 

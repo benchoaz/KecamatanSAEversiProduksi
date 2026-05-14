@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -53,7 +53,7 @@ return new class extends Migration
     public function down(): void
     {
         if (DB::getDriverName() === 'pgsql') {
-             Schema::table('umkm', function (Blueprint $table) {
+            Schema::table('umkm', function (Blueprint $table) {
                 $table->dropIndex(['nama_usaha']);
                 $table->dropIndex(['jenis_usaha']);
                 $table->dropIndex(['desa']);
@@ -66,7 +66,7 @@ return new class extends Migration
             });
         } else {
             DB::statement("ALTER TABLE umkm MODIFY COLUMN status ENUM('pending', 'aktif', 'nonaktif') DEFAULT 'pending'");
-             Schema::table('umkm', function (Blueprint $table) {
+            Schema::table('umkm', function (Blueprint $table) {
                 $table->dropIndex(['nama_usaha']);
                 $table->dropIndex(['jenis_usaha']);
                 $table->dropIndex(['desa']);

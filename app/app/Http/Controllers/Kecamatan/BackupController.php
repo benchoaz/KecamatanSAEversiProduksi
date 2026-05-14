@@ -11,6 +11,7 @@ class BackupController extends Controller
     public function index()
     {
         $gdrivePath = ModuleSetting::getValue('backup', 'gdrive_path', 'gdrive:backup/kecamatan-files/');
+
         return view('kecamatan.settings.backup', compact('gdrivePath'));
     }
 

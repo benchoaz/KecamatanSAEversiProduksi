@@ -7,15 +7,16 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Desa;
-use App\Models\User;
 use App\Models\Submission;
+use App\Models\User;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class CheckDuplicateDesa extends Command
 {
     protected $signature = 'check:duplicate-desa {--delete : Actually delete duplicates}';
+
     protected $description = 'Check for duplicate Desa entries and optionally remove them';
 
     public function handle()
@@ -32,6 +33,7 @@ class CheckDuplicateDesa extends Command
 
         if ($duplicates->isEmpty()) {
             $this->info('✅ No duplicate desa entries found!');
+
             return 0;
         }
 
@@ -75,7 +77,7 @@ class CheckDuplicateDesa extends Command
             'Submissions Linked',
         ], $table);
 
-        if (!$this->option('delete')) {
+        if (! $this->option('delete')) {
             $this->newLine();
             $this->warn('⚠️  This is a DRY RUN. No data will be deleted.');
             $this->info('To actually delete duplicates, run: php artisan check:duplicate-desa --delete');
@@ -83,12 +85,14 @@ class CheckDuplicateDesa extends Command
             $this->warn('⚠️  WARNING: Before deleting, make sure to:');
             $this->warn('1. Check if any Users or Submissions are linked to the duplicate IDs');
             $this->warn('2. If there are links, migrate them to the "Keep ID" first');
+
             return 0;
         }
 
         // Confirm deletion
-        if (!$this->confirm('Are you sure you want to delete ' . count($idsToDelete) . ' duplicate desa entries?')) {
+        if (! $this->confirm('Are you sure you want to delete '.count($idsToDelete).' duplicate desa entries?')) {
             $this->info('Deletion cancelled.');
+
             return 0;
         }
 
@@ -109,6 +113,7 @@ class CheckDuplicateDesa extends Command
 
         if ($hasLinkedData) {
             $this->error('⛔ Cannot proceed with deletion. Please migrate linked data first.');
+
             return 1;
         }
 
@@ -123,11 +128,12 @@ class CheckDuplicateDesa extends Command
             $this->info('Remaining desa entries:');
 
             $remaining = Desa::orderBy('nama_desa')->get(['id', 'nama_desa']);
-            $this->table(['ID', 'Nama Desa'], $remaining->map(fn($d) => [$d->id, $d->nama_desa])->toArray());
+            $this->table(['ID', 'Nama Desa'], $remaining->map(fn ($d) => [$d->id, $d->nama_desa])->toArray());
 
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->error('❌ Failed to delete duplicates: ' . $e->getMessage());
+            $this->error('❌ Failed to delete duplicates: '.$e->getMessage());
+
             return 1;
         }
 

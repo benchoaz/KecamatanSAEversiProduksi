@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Desa;
 
+use App\Helpers\AuditHelper;
 use App\Http\Controllers\Controller;
 use App\Models\BltDesa;
-use App\Helpers\AuditHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -88,14 +88,16 @@ class BltController extends Controller
         $data = $validated;
 
         if ($request->hasFile('dokumen_ba')) {
-            if ($item->dokumen_ba)
+            if ($item->dokumen_ba) {
                 Storage::disk('public')->delete($item->dokumen_ba);
+            }
             $data['dokumen_ba'] = $request->file('dokumen_ba')->store('blt/ba', 'public');
         }
 
         if ($request->hasFile('foto_penyaluran')) {
-            if ($item->foto_penyaluran)
+            if ($item->foto_penyaluran) {
                 Storage::disk('public')->delete($item->foto_penyaluran);
+            }
             $data['foto_penyaluran'] = $request->file('foto_penyaluran')->store('blt/foto', 'public');
         }
 
@@ -109,6 +111,7 @@ class BltController extends Controller
     public function show($id)
     {
         $item = BltDesa::where('desa_id', auth()->user()->desa_id)->findOrFail($id);
+
         return view('desa.blt.show', compact('item'));
     }
 
@@ -131,15 +134,21 @@ class BltController extends Controller
     public function destroy($id)
     {
         $item = BltDesa::where('desa_id', auth()->user()->desa_id)->findOrFail($id);
-        
+
         if ($item->status_laporan !== 'Draft' && $item->status_laporan !== 'Dikembalikan') {
             return back()->with('error', 'Laporan yang sudah dikirim tidak dapat dihapus.');
         }
 
         // Delete files
-        if ($item->dokumen_ba) Storage::disk('public')->delete($item->dokumen_ba);
-        if ($item->foto_penyaluran) Storage::disk('public')->delete($item->foto_penyaluran);
-        if ($item->daftar_kpm_file) Storage::disk('public')->delete($item->daftar_kpm_file);
+        if ($item->dokumen_ba) {
+            Storage::disk('public')->delete($item->dokumen_ba);
+        }
+        if ($item->foto_penyaluran) {
+            Storage::disk('public')->delete($item->foto_penyaluran);
+        }
+        if ($item->daftar_kpm_file) {
+            Storage::disk('public')->delete($item->daftar_kpm_file);
+        }
 
         $oldValues = $item->toArray();
         $item->delete();

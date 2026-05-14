@@ -21,6 +21,7 @@ class ApplicationProfileController extends Controller
     public function index()
     {
         $profile = $this->profileService->getProfile();
+
         return view('kecamatan.settings.profile', compact('profile'));
     }
 
@@ -85,7 +86,7 @@ class ApplicationProfileController extends Controller
             'backup_frequency' => 'nullable|in:daily,weekly,monthly',
         ]);
 
-        $profile = AppProfile::first() ?? new AppProfile();
+        $profile = AppProfile::first() ?? new AppProfile;
 
         $data = $request->only([
             'app_name',
@@ -143,8 +144,8 @@ class ApplicationProfileController extends Controller
         if ($request->has('whatsapp_bot_menu')) {
             $menuItems = $request->input('whatsapp_bot_menu', []);
             foreach ($menuItems as $i => $item) {
-                $menuItems[$i]['enabled'] = !empty($item['enabled']);
-                $menuItems[$i]['number']  = (string)($i + 1);
+                $menuItems[$i]['enabled'] = ! empty($item['enabled']);
+                $menuItems[$i]['number'] = (string) ($i + 1);
             }
             $data['whatsapp_bot_menu'] = $menuItems;
         }
@@ -156,7 +157,7 @@ class ApplicationProfileController extends Controller
             'image_pariwisata' => 'image_pariwisata',
             'image_festival' => 'image_festival',
             'hero_image_path' => 'hero_image_path',
-            'hero_bg_path' => 'hero_bg_path'
+            'hero_bg_path' => 'hero_bg_path',
         ];
 
         foreach ($fileFields as $requestKey => $dbColumn) {
@@ -180,12 +181,12 @@ class ApplicationProfileController extends Controller
         }
 
         // Clean Google Drive JSON before filling
-        if (isset($data['google_drive_json']) && !empty($data['google_drive_json'])) {
+        if (isset($data['google_drive_json']) && ! empty($data['google_drive_json'])) {
             $jsonContent = $data['google_drive_json'];
             $decoded = json_decode($jsonContent, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                $cleaned = str_replace(["\r", "\n"], ["", "\\n"], $jsonContent);
-                $cleaned = str_replace("\\\\n", "\\n", $cleaned);
+                $cleaned = str_replace(["\r", "\n"], ['', '\\n'], $jsonContent);
+                $cleaned = str_replace('\\\\n', '\\n', $cleaned);
                 $decoded = json_decode($cleaned, true);
             }
             if ($decoded && isset($decoded['private_key'])) {
@@ -204,6 +205,7 @@ class ApplicationProfileController extends Controller
     public function features()
     {
         $menus = \App\Models\Menu::orderBy('urutan')->get();
+
         return view('kecamatan.settings.features', compact('menus'));
     }
 
@@ -220,7 +222,7 @@ class ApplicationProfileController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Status fitur ' . $menu->nama_menu . ' berhasil diperbarui.'
+            'message' => 'Status fitur '.$menu->nama_menu.' berhasil diperbarui.',
         ]);
     }
 
@@ -237,46 +239,62 @@ class ApplicationProfileController extends Controller
             if ($provider === 'gemini') {
                 $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
                 $response = \Illuminate\Support\Facades\Http::timeout(10)->post($url, [
-                    'contents' => [['parts' => [['text' => 'Pesan percobaan uji koneksi. Balas OK.']]]]
+                    'contents' => [['parts' => [['text' => 'Pesan percobaan uji koneksi. Balas OK.']]]],
                 ]);
-                if ($response->successful()) return response()->json(['success' => true]);
+                if ($response->successful()) {
+                    return response()->json(['success' => true]);
+                }
+
                 return response()->json(['success' => false, 'message' => 'Kunci Gemini tidak valid.']);
-            } 
-            elseif ($provider === 'openai') {
+            } elseif ($provider === 'openai') {
                 $response = \Illuminate\Support\Facades\Http::withHeaders(['Authorization' => "Bearer {$apiKey}"])
                     ->timeout(10)->post('https://api.openai.com/v1/chat/completions', [
                         'model' => 'gpt-3.5-turbo',
-                        'messages' => [['role' => 'user', 'content' => 'Test']]
+                        'messages' => [['role' => 'user', 'content' => 'Test']],
                     ]);
-                if ($response->successful()) return response()->json(['success' => true]);
+                if ($response->successful()) {
+                    return response()->json(['success' => true]);
+                }
+
                 return response()->json(['success' => false, 'message' => 'Kunci OpenAI tidak valid.']);
             }
             // For Deepseek, xAI, OpenRouter, DashScope
             else {
                 $baseUrl = '';
-                if ($provider === 'deepseek') $baseUrl = 'https://api.deepseek.com/chat/completions';
-                elseif ($provider === 'xai') $baseUrl = 'https://api.x.ai/v1/chat/completions';
-                elseif ($provider === 'openrouter') $baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
-                elseif ($provider === 'dashscope') $baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
-                
-                if (!$baseUrl) return response()->json(['success' => false, 'message' => 'Provider tidak valid.']);
+                if ($provider === 'deepseek') {
+                    $baseUrl = 'https://api.deepseek.com/chat/completions';
+                } elseif ($provider === 'xai') {
+                    $baseUrl = 'https://api.x.ai/v1/chat/completions';
+                } elseif ($provider === 'openrouter') {
+                    $baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
+                } elseif ($provider === 'dashscope') {
+                    $baseUrl = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+                }
+
+                if (! $baseUrl) {
+                    return response()->json(['success' => false, 'message' => 'Provider tidak valid.']);
+                }
 
                 $response = \Illuminate\Support\Facades\Http::withHeaders(['Authorization' => "Bearer {$apiKey}"])
                     ->timeout(10)->post($baseUrl, [
                         'model' => $provider === 'deepseek' ? 'deepseek-chat' : 'grok-beta',
-                        'messages' => [['role' => 'user', 'content' => 'Test']]
+                        'messages' => [['role' => 'user', 'content' => 'Test']],
                     ]);
-                if ($response->successful()) return response()->json(['success' => true]);
+                if ($response->successful()) {
+                    return response()->json(['success' => true]);
+                }
+
                 return response()->json(['success' => false, 'message' => "Kunci {$provider} tidak valid."]);
             }
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal menghubungi server: ' . $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Gagal menghubungi server: '.$e->getMessage()]);
         }
     }
 
     public function pelayananSettings()
     {
         $profile = $this->profileService->getProfile();
+
         return view('kecamatan.settings.pelayanan', compact('profile'));
     }
 
@@ -289,14 +307,14 @@ class ApplicationProfileController extends Controller
             'validation_sop_text' => 'nullable|string',
         ]);
 
-        $profile = AppProfile::first() ?? new AppProfile();
-        
+        $profile = AppProfile::first() ?? new AppProfile;
+
         $data = $request->only([
             'document_ai_provider',
             'document_ai_key',
-            'validation_sop_text'
+            'validation_sop_text',
         ]);
-        
+
         $data['is_document_ai_active'] = $request->has('is_document_ai_active') ? true : false;
         $data['updated_by'] = auth()->id();
 

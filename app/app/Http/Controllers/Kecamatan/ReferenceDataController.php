@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Kecamatan;
 
 use App\Http\Controllers\Controller;
-use App\Models\MasterSsh;
-use App\Models\MasterSbu;
 use App\Models\MasterKomponenBelanja;
+use App\Models\MasterSbu;
+use App\Models\MasterSsh;
 use Illuminate\Http\Request;
 
 class ReferenceDataController extends Controller
@@ -17,6 +17,7 @@ class ReferenceDataController extends Controller
     {
         $ssh = MasterSsh::with('komponenBelanja')->latest()->paginate(20);
         $komponens = MasterKomponenBelanja::active()->orderBy('nama_komponen')->get();
+
         return view('kecamatan.referensi.ssh', compact('ssh', 'komponens'));
     }
 
@@ -36,6 +37,7 @@ class ReferenceDataController extends Controller
         ]);
 
         MasterSsh::create($validated);
+
         return back()->with('success', 'Data SSH berhasil ditambahkan.');
     }
 
@@ -56,6 +58,7 @@ class ReferenceDataController extends Controller
         ]);
 
         $ssh->update($validated);
+
         return back()->with('success', 'Data SSH berhasil diperbarui.');
     }
 
@@ -65,6 +68,7 @@ class ReferenceDataController extends Controller
     public function sshDestroy($id)
     {
         MasterSsh::findOrFail($id)->delete();
+
         return back()->with('success', 'Data SSH berhasil dihapus.');
     }
 
@@ -75,6 +79,7 @@ class ReferenceDataController extends Controller
     {
         $sbu = MasterSbu::with('komponenBelanja')->latest()->paginate(20);
         $komponens = MasterKomponenBelanja::active()->orderBy('nama_komponen')->get();
+
         return view('kecamatan.referensi.sbu', compact('sbu', 'komponens'));
     }
 
@@ -92,6 +97,7 @@ class ReferenceDataController extends Controller
         ]);
 
         MasterSbu::create($validated);
+
         return back()->with('success', 'Data SBU berhasil ditambahkan.');
     }
 
@@ -110,6 +116,7 @@ class ReferenceDataController extends Controller
         ]);
 
         $sbu->update($validated);
+
         return back()->with('success', 'Data SBU berhasil diperbarui.');
     }
 
@@ -119,6 +126,7 @@ class ReferenceDataController extends Controller
     public function sbuDestroy($id)
     {
         MasterSbu::findOrFail($id)->delete();
+
         return back()->with('success', 'Data SBU berhasil dihapus.');
     }
 }

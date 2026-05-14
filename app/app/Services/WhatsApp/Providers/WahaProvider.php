@@ -9,13 +9,15 @@ use Illuminate\Support\Facades\Log;
 class WahaProvider implements WhatsAppProviderInterface
 {
     protected string $apiUrl;
+
     protected ?string $apiKey;
+
     protected string $session;
 
     public function __construct(string $apiUrl, ?string $apiKey = null, string $session = 'default')
     {
-        $this->apiUrl  = rtrim($apiUrl, '/');
-        $this->apiKey  = $apiKey;
+        $this->apiUrl = rtrim($apiUrl, '/');
+        $this->apiKey = $apiKey;
         $this->session = $session ?: 'default';
     }
 
@@ -39,20 +41,23 @@ class WahaProvider implements WhatsAppProviderInterface
                 ->withHeaders($this->headers())
                 ->post("{$this->apiUrl}/api/sendText", [
                     'session' => $this->session,
-                    'chatId'  => str_contains($phone, '@') ? $phone : "{$phone}@c.us",
-                    'text'    => $message,
+                    'chatId' => str_contains($phone, '@') ? $phone : "{$phone}@c.us",
+                    'text' => $message,
                 ]);
 
             if ($response->successful()) {
                 Log::info('[WAHA] Message sent', ['phone' => $phone]);
+
                 return ['success' => true, 'message' => 'Pesan berhasil dikirim', 'data' => $response->json()];
             }
 
             Log::error('[WAHA] Send failed', ['status' => $response->status(), 'body' => $response->body()]);
-            return ['success' => false, 'message' => 'Gagal kirim: ' . $response->body()];
+
+            return ['success' => false, 'message' => 'Gagal kirim: '.$response->body()];
         } catch (\Exception $e) {
             Log::error('[WAHA] Exception', ['error' => $e->getMessage()]);
-            return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+
+            return ['success' => false, 'message' => 'Error: '.$e->getMessage()];
         }
     }
 
@@ -64,19 +69,19 @@ class WahaProvider implements WhatsAppProviderInterface
                 ->get("{$this->apiUrl}/api/sessions/{$this->session}");
 
             if ($response->successful()) {
-                $data   = $response->json();
+                $data = $response->json();
                 $status = $data['status'] ?? 'UNKNOWN';
-                $ok     = in_array($status, ['WORKING', 'CONNECTED', 'ONLINE']);
+                $ok = in_array($status, ['WORKING', 'CONNECTED', 'ONLINE']);
 
                 return [
                     'success' => $ok,
                     'message' => $ok ? 'WAHA terhubung' : "Status: {$status}",
-                    'status'  => $status,
-                    'data'    => $data,
+                    'status' => $status,
+                    'data' => $data,
                 ];
             }
 
-            return ['success' => false, 'message' => 'HTTP ' . $response->status(), 'status' => 'error'];
+            return ['success' => false, 'message' => 'HTTP '.$response->status(), 'status' => 'error'];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => $e->getMessage(), 'status' => 'error'];
         }
@@ -90,6 +95,7 @@ class WahaProvider implements WhatsAppProviderInterface
         if ($this->apiKey) {
             $h['X-Api-Key'] = $this->apiKey;
         }
+
         return $h;
     }
 
@@ -97,11 +103,12 @@ class WahaProvider implements WhatsAppProviderInterface
     {
         $clean = preg_replace('/[^0-9]/', '', $phone);
         if (str_starts_with($clean, '0')) {
-            return '62' . substr($clean, 1);
+            return '62'.substr($clean, 1);
         }
-        if (!str_starts_with($clean, '62')) {
-            return '62' . $clean;
+        if (! str_starts_with($clean, '62')) {
+            return '62'.$clean;
         }
+
         return $clean;
     }
 }

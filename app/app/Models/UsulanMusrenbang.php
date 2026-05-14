@@ -10,6 +10,7 @@ class UsulanMusrenbang extends Model
     use HasFactory;
 
     protected $table = 'usulan_musrenbang';
+
     protected $guarded = ['id'];
 
     public function perencanaan()

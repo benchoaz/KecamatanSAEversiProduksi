@@ -4,14 +4,12 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\AuditLogResource\Pages;
 use App\Models\AuditLog;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class AuditLogResource extends Resource
 {
@@ -81,7 +79,7 @@ class AuditLogResource extends Resource
                         Infolists\Components\KeyValueEntry::make('new_values')
                             ->label('Nilai Baru')
                             ->columnSpanFull(),
-                    ])->columns(2)
+                    ])->columns(2),
             ]);
     }
 
@@ -99,7 +97,7 @@ class AuditLogResource extends Resource
                 Tables\Columns\TextColumn::make('action')
                     ->label('Aksi')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'create' => 'success',
                         'update' => 'warning',
                         'delete' => 'danger',
@@ -109,7 +107,7 @@ class AuditLogResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('table_name')
                     ->label('Modul/Tabel')
-                    ->formatStateUsing(fn(string $state): string => ucfirst($state)),
+                    ->formatStateUsing(fn (string $state): string => ucfirst($state)),
                 Tables\Columns\TextColumn::make('ip_address')
                     ->label('IP'),
             ])

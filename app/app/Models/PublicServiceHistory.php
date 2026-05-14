@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PublicServiceHistory extends Model
 {
     protected $table = 'public_service_history';
+
     protected $guarded = [];
 
     protected $casts = [

@@ -49,13 +49,14 @@ class UmkmLocal extends Model
     // Auto-hash PIN when setting
     public function setOwnerPinAttribute($value)
     {
-        if (!empty($value)) {
+        if (! empty($value)) {
             $this->attributes['owner_pin'] = Hash::make($value);
         }
     }
 
     // Module Constants
     public const MODULE_UMKM = 'umkm';
+
     public const MODULE_JASA = 'jasa';
 
     /**

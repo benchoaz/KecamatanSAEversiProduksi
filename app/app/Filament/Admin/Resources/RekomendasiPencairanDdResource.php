@@ -7,19 +7,22 @@ use App\Models\RekomendasiPencairanDd;
 use App\Services\EvaluasiPencairanService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Notifications\Notification;
 
 class RekomendasiPencairanDdResource extends Resource
 {
     protected static ?string $model = RekomendasiPencairanDd::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+
     protected static ?string $navigationGroup = 'EKONOMI & PEMBANGUNAN';
+
     protected static ?string $navigationLabel = 'Validasi Rekomendasi DD';
+
     protected static ?int $navigationSort = -4;
 
     public static function canViewAny(): bool
@@ -30,12 +33,12 @@ class RekomendasiPencairanDdResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
-        
+
         $user = auth()->user();
         if ($user->desa_id) {
             $query->where('desa_id', $user->desa_id);
         }
-        
+
         return $query;
     }
 
@@ -73,10 +76,10 @@ class RekomendasiPencairanDdResource extends Resource
                         Forms\Components\Placeholder::make('view_documents')
                             ->label('')
                             ->content(fn ($record) => $record ? view('filament.forms.components.view-pencairan-docs', [
-                                'docs' => \App\Models\DokumenPencairanDesa::where('desa_id', $record->desa_id)->get()
+                                'docs' => \App\Models\DokumenPencairanDesa::where('desa_id', $record->desa_id)->get(),
                             ]) : 'Belum ada dokumen yang diunggah.'),
                     ])
-                    ->visible(!$isDesa && fn ($record) => $record !== null),
+                    ->visible(! $isDesa && fn ($record) => $record !== null),
 
                 Forms\Components\Section::make('Hasil Validasi Kecamatan')
                     ->schema([
@@ -124,7 +127,7 @@ class RekomendasiPencairanDdResource extends Resource
                 Tables\Columns\TextColumn::make('tahap_pencairan')
                     ->label('Tahap')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => 'Tahap ' . $state),
+                    ->formatStateUsing(fn ($state) => 'Tahap '.$state),
                 Tables\Columns\TextColumn::make('status_akhir')
                     ->label('Status Validasi')
                     ->badge()
@@ -145,25 +148,25 @@ class RekomendasiPencairanDdResource extends Resource
                 Tables\Filters\SelectFilter::make('desa_id')
                     ->relationship('desa', 'nama_desa')
                     ->label('Filter Desa')
-                    ->visible(!$isDesa),
+                    ->visible(! $isDesa),
             ])
             ->actions([
                 Tables\Actions\Action::make('cek_kelayakan')
                     ->label('Evaluasi Kelayakan')
                     ->icon('heroicon-o-magnifying-glass-circle')
                     ->color('info')
-                    ->visible(!$isDesa)
+                    ->visible(! $isDesa)
                     ->action(function (RekomendasiPencairanDd $record) {
-                        $service = new EvaluasiPencairanService();
+                        $service = new EvaluasiPencairanService;
                         $hasil = $service->evaluasiKesiapanPencairan($record->desa_id, $record->tahap_pencairan);
-                        
+
                         $record->status_akhir = $hasil['status'];
                         $record->catatan_revisi = $hasil['pesan'];
                         $record->save();
 
                         Notification::make()
                             ->title('Evaluasi Selesai')
-                            ->body('Status berubah menjadi: ' . $hasil['status'])
+                            ->body('Status berubah menjadi: '.$hasil['status'])
                             ->success()
                             ->send();
                     }),
@@ -171,14 +174,14 @@ class RekomendasiPencairanDdResource extends Resource
                     ->label('Unduh Rekomendasi')
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('success')
-                    ->url(fn (RekomendasiPencairanDd $record): string => asset('storage/' . $record->pdf_rekomendasi_camat))
+                    ->url(fn (RekomendasiPencairanDd $record): string => asset('storage/'.$record->pdf_rekomendasi_camat))
                     ->openUrlInNewTab()
                     ->visible(fn (RekomendasiPencairanDd $record) => $record->pdf_rekomendasi_camat !== null),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->visible(!$isDesa),
+                    Tables\Actions\DeleteBulkAction::make()->visible(! $isDesa),
                 ]),
             ]);
     }

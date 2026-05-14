@@ -22,7 +22,7 @@ class PembangunanLogbookController extends Controller
 
         return response()->json([
             'pembangunan' => $pembangunan,
-            'logbooks' => $logbooks
+            'logbooks' => $logbooks,
         ]);
     }
 
@@ -53,9 +53,9 @@ class PembangunanLogbookController extends Controller
 
         // Update main project progress
         $pembangunan->update([
-            'progres_fisik' => $validated['progres_fisik'] . '%',
-            // If progress is 100%, maybe update status? 
-            // allowing manual status update for now along with this if needed, 
+            'progres_fisik' => $validated['progres_fisik'].'%',
+            // If progress is 100%, maybe update status?
+            // allowing manual status update for now along with this if needed,
             // but for now just updating the physical progress field.
         ]);
 

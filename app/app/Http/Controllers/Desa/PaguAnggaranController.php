@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Desa;
 
 use App\Http\Controllers\Controller;
-use App\Models\DesaPaguAnggaran;
 use App\Models\AuditLog;
+use App\Models\DesaPaguAnggaran;
 use Illuminate\Http\Request;
 
 class PaguAnggaranController extends Controller
@@ -51,7 +51,7 @@ class PaguAnggaranController extends Controller
             'table_name' => 'desa_pagu_anggaran',
             'record_id' => $pagu->id,
             'new_values' => $pagu->toArray(),
-            'domain' => 'desa'
+            'domain' => 'desa',
         ]);
 
         return back()->with('success', 'Anggaran awal (Pagu) berhasil disimpan.');

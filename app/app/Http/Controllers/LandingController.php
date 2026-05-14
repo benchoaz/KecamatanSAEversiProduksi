@@ -4,17 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use App\Models\Berita;
+use App\Models\Desa;
+use App\Models\MasterLayanan;
 use App\Models\PelayananFaq;
 use App\Models\PublicService;
-use App\Models\UmkmLocal;
-use App\Models\JobVacancy;
-use App\Models\WorkDirectory;
-use App\Models\MasterLayanan;
 use App\Models\Umkm;
-use App\Models\Desa;
+use App\Models\UmkmLocal;
 use App\Services\ApplicationProfileService;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
 
 class LandingController extends Controller
 {
@@ -65,7 +61,7 @@ class LandingController extends Controller
             ->latest()
             ->take(4)
             ->get();
-            
+
         // Jika tidak ada featured_product, ambil yang terbaru saja
         if ($featuredProducts->isEmpty()) {
             $featuredProducts = UmkmLocal::where('is_active', true)->latest()->take(4)->get();
@@ -92,7 +88,7 @@ class LandingController extends Controller
             'appProfile'
         ));
     }
-    
+
     public function statistik()
     {
         $common = $this->prepareStatistikData();
@@ -100,24 +96,39 @@ class LandingController extends Controller
 
         // Calculate Overview Summary Safely
         $summary = [
-            'pendidikan_tinggi' => $desas->sum(function($d) {
+            'pendidikan_tinggi' => $desas->sum(function ($d) {
                 $stat = $d->stat_pendidikan;
-                if (is_string($stat)) $stat = json_decode($stat, true);
-                if (!is_array($stat)) return 0;
+                if (is_string($stat)) {
+                    $stat = json_decode($stat, true);
+                }
+                if (! is_array($stat)) {
+                    return 0;
+                }
                 $item = collect($stat)->firstWhere('nama', 'Sarjana') ?? collect($stat)->firstWhere('nama', 'S1');
+
                 return $item['jumlah'] ?? 0;
             }),
-            'stunting_cases' => $desas->sum(function($d) {
+            'stunting_cases' => $desas->sum(function ($d) {
                 $stat = $d->stat_kesehatan;
-                if (is_string($stat)) $stat = json_decode($stat, true);
-                if (!is_array($stat)) return 0;
+                if (is_string($stat)) {
+                    $stat = json_decode($stat, true);
+                }
+                if (! is_array($stat)) {
+                    return 0;
+                }
+
                 return $stat['totalStunting'] ?? 0;
             }),
             'kk_total' => $desas->sum('jumlah_kk'),
-            'poverty_avg' => $desas->avg(function($d) {
+            'poverty_avg' => $desas->avg(function ($d) {
                 $stat = $d->stat_desil;
-                if (is_string($stat)) $stat = json_decode($stat, true);
-                if (!is_array($stat)) return 0;
+                if (is_string($stat)) {
+                    $stat = json_decode($stat, true);
+                }
+                if (! is_array($stat)) {
+                    return 0;
+                }
+
                 return $stat['totalDesil1'] ?? 0;
             }),
         ];
@@ -133,12 +144,14 @@ class LandingController extends Controller
             $stats = $desa->stat_pendidikan ?? [];
             foreach ($stats as $item) {
                 $nama = $item['nama'] ?? '';
-                if ($nama) $statPendidikan[$nama] = ($statPendidikan[$nama] ?? 0) + ($item['jumlah'] ?? 0);
+                if ($nama) {
+                    $statPendidikan[$nama] = ($statPendidikan[$nama] ?? 0) + ($item['jumlah'] ?? 0);
+                }
             }
         }
         arsort($statPendidikan);
         $topPendidikan = array_keys(array_slice($statPendidikan, 0, 8));
-        
+
         return view('landing.statistik.pendidikan', array_merge($common, compact('statPendidikan', 'topPendidikan')));
     }
 
@@ -150,7 +163,9 @@ class LandingController extends Controller
             $stats = $desa->stat_pekerjaan ?? [];
             foreach ($stats as $item) {
                 $nama = $item['nama'] ?? '';
-                if ($nama) $statPekerjaan[$nama] = ($statPekerjaan[$nama] ?? 0) + ($item['jumlah'] ?? 0);
+                if ($nama) {
+                    $statPekerjaan[$nama] = ($statPekerjaan[$nama] ?? 0) + ($item['jumlah'] ?? 0);
+                }
             }
         }
         arsort($statPekerjaan);
@@ -167,7 +182,9 @@ class LandingController extends Controller
             $stats = $desa->stat_agama ?? [];
             foreach ($stats as $item) {
                 $nama = $item['nama'] ?? '';
-                if ($nama) $statAgama[$nama] = ($statAgama[$nama] ?? 0) + ($item['jumlah'] ?? 0);
+                if ($nama) {
+                    $statAgama[$nama] = ($statAgama[$nama] ?? 0) + ($item['jumlah'] ?? 0);
+                }
             }
         }
         arsort($statAgama);
@@ -187,6 +204,7 @@ class LandingController extends Controller
     public function statKesejahteraan()
     {
         $common = $this->prepareStatistikData();
+
         return view('landing.statistik.kesejahteraan', $common);
     }
 
@@ -196,13 +214,13 @@ class LandingController extends Controller
     private function prepareStatistikData()
     {
         $desas = Desa::orderBy('nama_desa', 'asc')->get();
-        
+
         $totalPenduduk = $desas->sum('jumlah_penduduk');
         $totalLaki = $desas->sum('jumlah_laki_laki');
         $totalPerempuan = $desas->sum('jumlah_perempuan');
         $totalKk = $desas->sum('jumlah_kk');
         $totalLuas = $desas->sum('luas_wilayah');
-        
+
         $demografiStats = [
             'total_penduduk' => $totalPenduduk,
             'total_laki' => $totalLaki,
@@ -261,6 +279,7 @@ class LandingController extends Controller
         $profileService = app(ApplicationProfileService::class);
         $appProfile = $profileService->getProfile();
         $berita = Berita::published()->latest()->paginate(9);
+
         return view('public.berita.index', compact('berita', 'appProfile'));
     }
 }

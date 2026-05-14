@@ -2,21 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Submission extends Model
 {
     protected $table = 'submission';
+
     protected $guarded = ['id'];
 
     // Status Constants
     // Status Constants
     const STATUS_DRAFT = 'draft';
+
     const STATUS_SUBMITTED = 'submitted';
+
     const STATUS_RETURNED = 'returned';
+
     const STATUS_REVIEWED = 'reviewed';
+
     const STATUS_APPROVED = 'approved';
+
     const STATUS_REJECTED = 'rejected';
 
     protected $casts = [

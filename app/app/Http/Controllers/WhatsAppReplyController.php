@@ -4,15 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class WhatsAppReplyController extends Controller
 {
     /**
      * Send reply to WhatsApp via n8n webhook
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function send(Request $request)
@@ -29,13 +28,13 @@ class WhatsAppReplyController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
             $phoneNormalized = $this->normalizePhoneNumber($request->phone);
-            
+
             // 1. PRIMARY: Active WhatsApp Provider (WAHA / Fonnte / UltraMsg / Generic HTTP)
             try {
                 $provider = \App\Services\WhatsApp\WhatsAppManager::driver();
@@ -56,17 +55,17 @@ class WhatsAppReplyController extends Controller
                         'data' => [
                             'phone' => $phoneNormalized,
                             'type' => $request->type,
-                            'sent_at' => now()->toISOString()
-                        ]
+                            'sent_at' => now()->toISOString(),
+                        ],
                     ]);
                 }
-                
+
                 Log::warning('WhatsApp provider failed, falling back to n8n', [
-                    'error' => $result['message'] ?? 'Unknown error'
+                    'error' => $result['message'] ?? 'Unknown error',
                 ]);
             } catch (\Exception $e) {
                 Log::warning('WhatsApp provider threw exception, falling back to n8n', [
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
 
@@ -75,16 +74,17 @@ class WhatsAppReplyController extends Controller
 
             if (empty($n8nWebhookUrl)) {
                 Log::error('N8N_REPLY_WEBHOOK_URL not configured and primary provider failed');
+
                 return response()->json([
                     'success' => false,
-                    'message' => 'WhatsApp service not configured or failed'
+                    'message' => 'WhatsApp service not configured or failed',
                 ], 500);
             }
 
             // Prepare payload for n8n with enhanced compatibility
             $payload = [
                 'phone' => $phoneNormalized,
-                'chatId' => $phoneNormalized . '@c.us',
+                'chatId' => $phoneNormalized.'@c.us',
                 'message' => $request->message,
                 'msg' => $request->message,
                 'replyText' => $request->message,
@@ -104,17 +104,17 @@ class WhatsAppReplyController extends Controller
             // Send to n8n webhook
             $response = Http::timeout(10)->post($n8nWebhookUrl, $payload);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('Failed to send WhatsApp reply via n8n (fallback)', [
                     'status' => $response->status(),
                     'body' => $response->body(),
-                    'payload' => $payload
+                    'payload' => $payload,
                 ]);
 
                 return response()->json([
                     'success' => false,
                     'message' => 'Failed to send reply via primary provider AND n8n fallback',
-                    'n8n_status' => $response->status()
+                    'n8n_status' => $response->status(),
                 ], 502);
             }
 
@@ -124,7 +124,7 @@ class WhatsAppReplyController extends Controller
                 'type' => $request->type,
                 'service_id' => $request->service_id,
                 'uuid' => $request->uuid,
-                'n8n_response' => $response->json()
+                'n8n_response' => $response->json(),
             ]);
 
             return response()->json([
@@ -133,40 +133,39 @@ class WhatsAppReplyController extends Controller
                 'data' => [
                     'phone' => $request->phone,
                     'type' => $request->type,
-                    'sent_at' => now()->toISOString()
-                ]
+                    'sent_at' => now()->toISOString(),
+                ],
             ]);
 
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             Log::error('Connection error sending WhatsApp reply', [
                 'error' => $e->getMessage(),
-                'data' => $request->all()
+                'data' => $request->all(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Connection error: Unable to reach n8n service'
+                'message' => 'Connection error: Unable to reach n8n service',
             ], 503);
 
         } catch (\Exception $e) {
             Log::error('Unexpected error sending WhatsApp reply', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'data' => $request->all()
+                'data' => $request->all(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Internal server error',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
 
     /**
      * Send bulk reply to multiple phone numbers
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function sendBulk(Request $request)
@@ -182,7 +181,7 @@ class WhatsAppReplyController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -195,12 +194,12 @@ class WhatsAppReplyController extends Controller
                 $response = $this->send(new Request([
                     'phone' => $phone,
                     'message' => $request->message,
-                    'type' => $request->type
+                    'type' => $request->type,
                 ]));
 
                 $results[$phone] = [
                     'success' => $response->getStatusCode() === 200,
-                    'status' => $response->getStatusCode()
+                    'status' => $response->getStatusCode(),
                 ];
 
                 if ($response->getStatusCode() === 200) {
@@ -212,7 +211,7 @@ class WhatsAppReplyController extends Controller
             } catch (\Exception $e) {
                 $results[$phone] = [
                     'success' => false,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ];
                 $failureCount++;
             }
@@ -224,16 +223,15 @@ class WhatsAppReplyController extends Controller
             'summary' => [
                 'total' => count($request->phones),
                 'success' => $successCount,
-                'failed' => $failureCount
+                'failed' => $failureCount,
             ],
-            'results' => $results
+            'results' => $results,
         ]);
     }
 
     /**
      * Test WhatsApp connection
-     * 
-     * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function testConnection(Request $request)
@@ -245,7 +243,7 @@ class WhatsAppReplyController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -253,28 +251,28 @@ class WhatsAppReplyController extends Controller
             $response = $this->send(new Request([
                 'phone' => $request->phone,
                 'message' => '🧪 Test pesan dari Dashboard Kecamatan. Jika Anda menerima pesan ini, koneksi WhatsApp berhasil!',
-                'type' => 'manual_reply'
+                'type' => 'manual_reply',
             ]));
 
             return response()->json([
                 'success' => $response->getStatusCode() === 200,
                 'message' => $response->getStatusCode() === 200
                     ? 'Test message sent successfully'
-                    : 'Failed to send test message'
+                    : 'Failed to send test message',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Test failed: ' . $e->getMessage()
+                'message' => 'Test failed: '.$e->getMessage(),
             ], 500);
         }
     }
 
     /**
      * Normalize phone number to international format
-     * 
-     * @param string $phone
+     *
+     * @param  string  $phone
      * @return string
      */
     private function normalizePhoneNumber($phone)
@@ -284,7 +282,7 @@ class WhatsAppReplyController extends Controller
 
         // If starts with 0, replace with 62 (Indonesia country code)
         if (str_starts_with($phone, '0')) {
-            $phone = '62' . substr($phone, 1);
+            $phone = '62'.substr($phone, 1);
         }
 
         return $phone;
@@ -292,7 +290,7 @@ class WhatsAppReplyController extends Controller
 
     /**
      * Get WhatsApp service status
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function getStatus()
@@ -302,9 +300,9 @@ class WhatsAppReplyController extends Controller
         return response()->json([
             'success' => true,
             'service' => 'whatsapp-reply',
-            'configured' => !empty($n8nWebhookUrl),
-            'webhook_url' => !empty($n8nWebhookUrl) ? '***configured***' : null,
-            'timestamp' => now()->toISOString()
+            'configured' => ! empty($n8nWebhookUrl),
+            'webhook_url' => ! empty($n8nWebhookUrl) ? '***configured***' : null,
+            'timestamp' => now()->toISOString(),
         ]);
     }
 }

@@ -13,9 +13,10 @@ class ApiTokenController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (!auth()->user()->isSuperAdmin()) {
+            if (! auth()->user()->isSuperAdmin()) {
                 abort(403, 'Unauthorized. Only Super Admin can manage API tokens.');
             }
+
             return $next($request);
         });
     }
@@ -38,6 +39,7 @@ class ApiTokenController extends Controller
     public function create()
     {
         $abilities = ApiToken::ABILITIES;
+
         return view('kecamatan.settings.api-tokens.create', compact('abilities'));
     }
 
@@ -49,7 +51,7 @@ class ApiTokenController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'abilities' => 'nullable|array',
-            'abilities.*' => 'string|in:' . implode(',', array_keys(ApiToken::ABILITIES)),
+            'abilities.*' => 'string|in:'.implode(',', array_keys(ApiToken::ABILITIES)),
             'expires_at' => 'nullable|date|after:now',
         ]);
 
@@ -79,6 +81,7 @@ class ApiTokenController extends Controller
     public function show(ApiToken $apiToken)
     {
         $plainToken = session('plain_token') ?? $apiToken->plain_token;
+
         return view('kecamatan.settings.api-tokens.show', compact('apiToken', 'plainToken'));
     }
 
@@ -91,7 +94,7 @@ class ApiTokenController extends Controller
 
         return redirect()
             ->route('kecamatan.settings.api-tokens.index')
-            ->with('success', 'Token "' . $apiToken->name . '" has been revoked successfully.');
+            ->with('success', 'Token "'.$apiToken->name.'" has been revoked successfully.');
     }
 
     /**
@@ -104,6 +107,6 @@ class ApiTokenController extends Controller
 
         return redirect()
             ->route('kecamatan.settings.api-tokens.index')
-            ->with('success', 'Token "' . $name . '" has been deleted permanently.');
+            ->with('success', 'Token "'.$name.'" has been deleted permanently.');
     }
 }

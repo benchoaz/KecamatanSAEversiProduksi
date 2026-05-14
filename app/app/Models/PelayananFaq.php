@@ -26,7 +26,9 @@ class PelayananFaq extends Model
 
     // Module Constants
     public const MODULE_PELAYANAN = 'pelayanan';
+
     public const MODULE_UMKM = 'umkm';
+
     public const MODULE_LOKER = 'loker';
 
     /**

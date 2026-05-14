@@ -3,27 +3,29 @@
 namespace App\Http\Controllers\Kecamatan;
 
 use App\Http\Controllers\Controller;
-use App\Models\PersonilDesa;
-use App\Models\LembagaDesa;
 use App\Models\DokumenDesa;
-use Illuminate\Http\Request;
+use App\Models\LembagaDesa;
+use App\Models\PersonilDesa;
 use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
     private function resolvePath($path)
     {
-        if (!$path) return null;
+        if (! $path) {
+            return null;
+        }
 
         $disks = ['local', 'public'];
         $prefixes = ['', 'local/', 'public/', 'app/', 'storage/app/'];
 
         foreach ($disks as $disk) {
             foreach ($prefixes as $prefix) {
-                $testPath = $prefix . $path;
+                $testPath = $prefix.$path;
                 if (Storage::disk($disk)->exists($testPath)) {
                     $root = ($disk === 'public') ? storage_path('app/public/') : storage_path('app/');
-                    return $root . $testPath;
+
+                    return $root.$testPath;
                 }
             }
         }
@@ -33,7 +35,8 @@ class FileController extends Controller
             return $path;
         }
 
-        \Illuminate\Support\Facades\Log::warning("File not found in any expected location: " . $path);
+        \Illuminate\Support\Facades\Log::warning('File not found in any expected location: '.$path);
+
         return null;
     }
 
@@ -42,7 +45,7 @@ class FileController extends Controller
         $personil = PersonilDesa::findOrFail($id);
         $fullPath = $this->resolvePath($personil->file_sk);
 
-        if (!$fullPath) {
+        if (! $fullPath) {
             abort(404, 'File SK not found.');
         }
 
@@ -54,15 +57,15 @@ class FileController extends Controller
         $personil = PersonilDesa::findOrFail($id);
         $fullPath = $this->resolvePath($personil->foto);
 
-        if (!$fullPath) {
+        if (! $fullPath) {
             // Return default placeholder if photo not found
             $defaultPath = public_path('assets/images/default-user.png');
             if (file_exists($defaultPath)) {
                 return response()->file($defaultPath);
             }
-            
+
             // Fallback to a remote placeholder if local one missing
-            return redirect('https://ui-avatars.com/api/?name=' . urlencode($personil->nama) . '&background=random&color=fff');
+            return redirect('https://ui-avatars.com/api/?name='.urlencode($personil->nama).'&background=random&color=fff');
         }
 
         return response()->file($fullPath);
@@ -73,7 +76,7 @@ class FileController extends Controller
         $lembaga = LembagaDesa::findOrFail($id);
         $fullPath = $this->resolvePath($lembaga->file_sk);
 
-        if (!$fullPath) {
+        if (! $fullPath) {
             abort(404, 'File SK not found.');
         }
 
@@ -85,7 +88,7 @@ class FileController extends Controller
         $dokumen = DokumenDesa::findOrFail($id);
         $fullPath = $this->resolvePath($dokumen->file_path);
 
-        if (!$fullPath) {
+        if (! $fullPath) {
             abort(404, 'Dokumen not found.');
         }
 
@@ -97,7 +100,7 @@ class FileController extends Controller
         $perencanaan = \App\Models\PerencanaanDesa::findOrFail($id);
         $fullPath = $this->resolvePath($perencanaan->file_ba);
 
-        if (!$fullPath) {
+        if (! $fullPath) {
             abort(404, 'File BA not found.');
         }
 
@@ -109,7 +112,7 @@ class FileController extends Controller
         $perencanaan = \App\Models\PerencanaanDesa::findOrFail($id);
         $fullPath = $this->resolvePath($perencanaan->file_absensi);
 
-        if (!$fullPath) {
+        if (! $fullPath) {
             abort(404, 'File Absensi not found.');
         }
 
@@ -121,7 +124,7 @@ class FileController extends Controller
         $perencanaan = \App\Models\PerencanaanDesa::findOrFail($id);
         $fullPath = $this->resolvePath($perencanaan->file_foto);
 
-        if (!$fullPath) {
+        if (! $fullPath) {
             abort(404, 'Foto Perencanaan not found.');
         }
 

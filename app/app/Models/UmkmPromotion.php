@@ -15,7 +15,7 @@ class UmkmPromotion extends Model
         'max_discount',
         'start_date',
         'end_date',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [

@@ -29,7 +29,7 @@ return new class extends Migration
                 'document_ai_provider',
                 'document_ai_key',
                 'is_document_ai_active',
-                'validation_sop_text'
+                'validation_sop_text',
             ]);
         });
     }

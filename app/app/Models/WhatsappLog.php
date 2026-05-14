@@ -52,6 +52,7 @@ class WhatsappLog extends Model
         }
 
         $successful = static::where('phone', $phone)->where('success', true)->count();
+
         return round(($successful / $total) * 100, 2);
     }
 

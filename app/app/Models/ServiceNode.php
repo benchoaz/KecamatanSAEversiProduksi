@@ -23,10 +23,10 @@ class ServiceNode extends Model
     ];
 
     protected $casts = [
-        'is_leaf'   => 'boolean',
+        'is_leaf' => 'boolean',
         'is_active' => 'boolean',
-        'depth'              => 'integer',
-        'urutan'             => 'integer',
+        'depth' => 'integer',
+        'urutan' => 'integer',
         'show_identity_form' => 'boolean',
     ];
 
@@ -45,21 +45,21 @@ class ServiceNode extends Model
     public function children(): HasMany
     {
         return $this->hasMany(ServiceNode::class, 'parent_id')
-                    ->where('is_active', true)
-                    ->orderBy('urutan');
+            ->where('is_active', true)
+            ->orderBy('urutan');
     }
 
     public function allChildren(): HasMany
     {
         return $this->hasMany(ServiceNode::class, 'parent_id')
-                    ->with('allChildren')
-                    ->orderBy('urutan');
+            ->with('allChildren')
+            ->orderBy('urutan');
     }
 
     public function requirements(): HasMany
     {
         return $this->hasMany(ServiceRequirement::class, 'node_id')
-                    ->orderBy('urutan');
+            ->orderBy('urutan');
     }
 
     // ─── Scopes ──────────────────────────────────────────

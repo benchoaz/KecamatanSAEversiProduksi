@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
 {
     protected $table = 'menu';
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -26,6 +26,7 @@ class Menu extends Model
     {
         return \Illuminate\Support\Facades\Cache::rememberForever("menu_active_{$kode}", function () use ($kode) {
             $menu = self::where('kode_menu', $kode)->first();
+
             return $menu ? $menu->is_active : true;
         });
     }

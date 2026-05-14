@@ -70,7 +70,7 @@ class ApiToken extends Model
      */
     public function isRevoked(): bool
     {
-        return !is_null($this->revoked_at);
+        return ! is_null($this->revoked_at);
     }
 
     /**
@@ -78,7 +78,7 @@ class ApiToken extends Model
      */
     public function isExpired(): bool
     {
-        return !is_null($this->expires_at) && $this->expires_at->isPast();
+        return ! is_null($this->expires_at) && $this->expires_at->isPast();
     }
 
     /**
@@ -86,7 +86,7 @@ class ApiToken extends Model
      */
     public function isValid(): bool
     {
-        return !$this->isRevoked() && !$this->isExpired();
+        return ! $this->isRevoked() && ! $this->isExpired();
     }
 
     /**
@@ -97,6 +97,7 @@ class ApiToken extends Model
         if (is_null($this->abilities)) {
             return true; // No restrictions = full access
         }
+
         return in_array($ability, $this->abilities) || in_array('*', $this->abilities);
     }
 
@@ -122,6 +123,7 @@ class ApiToken extends Model
     public static function findByToken(string $plainToken): ?self
     {
         $hashedToken = self::hashToken($plainToken);
+
         return self::where('token', $hashedToken)->first();
     }
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\PembangunanDokumenSpj;
 use App\Services\SpjTemplateService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
 class SpjTemplateController extends Controller
@@ -31,7 +30,7 @@ class SpjTemplateController extends Controller
 
         return Response::make($preview, 200, [
             'Content-Type' => 'text/plain',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 

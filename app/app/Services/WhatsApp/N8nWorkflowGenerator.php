@@ -11,11 +11,12 @@ use App\Models\WahaN8nSetting;
 class N8nWorkflowGenerator
 {
     protected WahaN8nSetting $settings;
+
     protected string $dashboardUrl;
 
     public function __construct(WahaN8nSetting $settings)
     {
-        $this->settings     = $settings;
+        $this->settings = $settings;
         $this->dashboardUrl = rtrim(config('app.url', 'http://localhost'), '/');
     }
 
@@ -28,11 +29,11 @@ class N8nWorkflowGenerator
         $sendNode = $this->buildSendNode($provider);
 
         return [
-            'name'        => '🤖 Kecamatan SAE WhatsApp Bot (' . strtoupper($provider) . ')',
-            'nodes'       => $this->buildNodes($sendNode),
+            'name' => '🤖 Kecamatan SAE WhatsApp Bot ('.strtoupper($provider).')',
+            'nodes' => $this->buildNodes($sendNode),
             'connections' => $this->buildConnections(),
-            'settings'    => ['saveManualExecutions' => true],
-            'tags'        => [['name' => 'whatsapp'], ['name' => 'kecamatan']],
+            'settings' => ['saveManualExecutions' => true],
+            'tags' => [['name' => 'whatsapp'], ['name' => 'kecamatan']],
         ];
     }
 
@@ -51,10 +52,10 @@ class N8nWorkflowGenerator
     private function buildSendNode(string $provider): array
     {
         return match ($provider) {
-            'fonnte'       => $this->fonnteNode(),
-            'ultramsg'     => $this->ultraMsgNode(),
+            'fonnte' => $this->fonnteNode(),
+            'ultramsg' => $this->ultraMsgNode(),
             'generic_http' => $this->genericHttpNode(),
-            default        => $this->wahaNode(),
+            default => $this->wahaNode(),
         };
     }
 
@@ -62,15 +63,15 @@ class N8nWorkflowGenerator
     private function wahaNode(): array
     {
         $wahaUrl = rtrim($this->settings->waha_api_url ?? 'http://waha:3000', '/');
-        $apiKey  = $this->settings->waha_api_key ?? '';
+        $apiKey = $this->settings->waha_api_key ?? '';
         $session = $this->settings->waha_session_name ?? 'default';
 
         return [
             'parameters' => [
-                'method'           => 'POST',
-                'url'              => "{$wahaUrl}/api/sendText",
-                'sendBody'         => true,
-                'sendHeaders'      => (bool) $apiKey,
+                'method' => 'POST',
+                'url' => "{$wahaUrl}/api/sendText",
+                'sendBody' => true,
+                'sendHeaders' => (bool) $apiKey,
                 'headerParameters' => $apiKey ? [
                     'parameters' => [['name' => 'X-Api-Key', 'value' => $apiKey]],
                 ] : [],
@@ -82,11 +83,11 @@ class N8nWorkflowGenerator
                     ],
                 ],
             ],
-            'id'          => 'send-message',
-            'name'        => 'SendMessage',
-            'type'        => 'n8n-nodes-base.httpRequest',
+            'id' => 'send-message',
+            'name' => 'SendMessage',
+            'type' => 'n8n-nodes-base.httpRequest',
             'typeVersion' => 4.1,
-            'position'    => [1400, 300],
+            'position' => [1400, 300],
         ];
     }
 
@@ -97,10 +98,10 @@ class N8nWorkflowGenerator
 
         return [
             'parameters' => [
-                'method'           => 'POST',
-                'url'              => 'https://api.fonnte.com/send',
-                'sendBody'         => true,
-                'sendHeaders'      => true,
+                'method' => 'POST',
+                'url' => 'https://api.fonnte.com/send',
+                'sendBody' => true,
+                'sendHeaders' => true,
                 'headerParameters' => [
                     'parameters' => [['name' => 'Authorization', 'value' => $token]],
                 ],
@@ -112,11 +113,11 @@ class N8nWorkflowGenerator
                     ],
                 ],
             ],
-            'id'          => 'send-message',
-            'name'        => 'SendMessage',
-            'type'        => 'n8n-nodes-base.httpRequest',
+            'id' => 'send-message',
+            'name' => 'SendMessage',
+            'type' => 'n8n-nodes-base.httpRequest',
             'typeVersion' => 4.1,
-            'position'    => [1400, 300],
+            'position' => [1400, 300],
         ];
     }
 
@@ -124,13 +125,13 @@ class N8nWorkflowGenerator
     private function ultraMsgNode(): array
     {
         $instanceId = $this->settings->ultramsg_instance_id ?? 'YOUR_INSTANCE';
-        $token      = $this->settings->ultramsg_token ?? '';
+        $token = $this->settings->ultramsg_token ?? '';
 
         return [
             'parameters' => [
-                'method'      => 'POST',
-                'url'         => "https://api.ultramsg.com/{$instanceId}/messages/chat",
-                'sendBody'    => true,
+                'method' => 'POST',
+                'url' => "https://api.ultramsg.com/{$instanceId}/messages/chat",
+                'sendBody' => true,
                 'bodyParameters' => [
                     'parameters' => [
                         ['name' => 'token',   'value' => $token],
@@ -140,22 +141,22 @@ class N8nWorkflowGenerator
                     ],
                 ],
             ],
-            'id'          => 'send-message',
-            'name'        => 'SendMessage',
-            'type'        => 'n8n-nodes-base.httpRequest',
+            'id' => 'send-message',
+            'name' => 'SendMessage',
+            'type' => 'n8n-nodes-base.httpRequest',
             'typeVersion' => 4.1,
-            'position'    => [1400, 300],
+            'position' => [1400, 300],
         ];
     }
 
     // ── Generic HTTP ──────────────────────────────────────────────────────────
     private function genericHttpNode(): array
     {
-        $url          = $this->settings->generic_http_url ?? '';
-        $phoneField   = $this->settings->generic_http_phone_field ?? 'target';
-        $msgField     = $this->settings->generic_http_message_field ?? 'message';
-        $headers      = $this->settings->generic_http_headers ?? [];
-        $extra        = $this->settings->generic_http_extra_body ?? [];
+        $url = $this->settings->generic_http_url ?? '';
+        $phoneField = $this->settings->generic_http_phone_field ?? 'target';
+        $msgField = $this->settings->generic_http_message_field ?? 'message';
+        $headers = $this->settings->generic_http_headers ?? [];
+        $extra = $this->settings->generic_http_extra_body ?? [];
 
         $headerParams = [];
         foreach ($headers as $key => $value) {
@@ -172,18 +173,18 @@ class N8nWorkflowGenerator
 
         return [
             'parameters' => [
-                'method'           => 'POST',
-                'url'              => $url,
-                'sendBody'         => true,
-                'sendHeaders'      => ! empty($headerParams),
+                'method' => 'POST',
+                'url' => $url,
+                'sendBody' => true,
+                'sendHeaders' => ! empty($headerParams),
                 'headerParameters' => ! empty($headerParams) ? ['parameters' => $headerParams] : [],
-                'bodyParameters'   => ['parameters' => $bodyParams],
+                'bodyParameters' => ['parameters' => $bodyParams],
             ],
-            'id'          => 'send-message',
-            'name'        => 'SendMessage',
-            'type'        => 'n8n-nodes-base.httpRequest',
+            'id' => 'send-message',
+            'name' => 'SendMessage',
+            'type' => 'n8n-nodes-base.httpRequest',
             'typeVersion' => 4.1,
-            'position'    => [1400, 300],
+            'position' => [1400, 300],
         ];
     }
 
@@ -193,24 +194,24 @@ class N8nWorkflowGenerator
 
     private function buildNodes(array $sendNode): array
     {
-        $webhookUrl  = $this->settings->n8n_webhook_url ?? 'http://localhost:5678/webhook/whatsapp';
-        $dashUrl     = $this->dashboardUrl;
+        $webhookUrl = $this->settings->n8n_webhook_url ?? 'http://localhost:5678/webhook/whatsapp';
+        $dashUrl = $this->dashboardUrl;
 
         return [
             // ── 1. Webhook Trigger ─────────────────────────────────────────────
             [
-                'parameters'  => [
-                    'path'           => 'whatsapp-primary',
-                    'responseMode'   => 'responseNode',
-                    'responseData'   => '',
-                    'options'        => [],
+                'parameters' => [
+                    'path' => 'whatsapp-primary',
+                    'responseMode' => 'responseNode',
+                    'responseData' => '',
+                    'options' => [],
                 ],
-                'id'          => 'webhook-trigger',
-                'name'        => 'WebhookTrigger',
-                'type'        => 'n8n-nodes-base.webhook',
+                'id' => 'webhook-trigger',
+                'name' => 'WebhookTrigger',
+                'type' => 'n8n-nodes-base.webhook',
                 'typeVersion' => 1,
-                'position'    => [200, 300],
-                'webhookId'   => 'whatsapp-primary',
+                'position' => [200, 300],
+                'webhookId' => 'whatsapp-primary',
             ],
 
             // ── 2. Filter broadcast & non-message events ───────────────────────
@@ -219,30 +220,30 @@ class N8nWorkflowGenerator
                     'conditions' => [
                         'string' => [
                             ['value1' => '={{ $json.body.event }}',              'operation' => 'equals',     'value2' => 'message'],
-                            ['value1' => '={{ $json.body.payload.from ?? "" }}', 'operation' => 'notContains','value2' => 'status@broadcast'],
+                            ['value1' => '={{ $json.body.payload.from ?? "" }}', 'operation' => 'notContains', 'value2' => 'status@broadcast'],
                         ],
                     ],
                     'combineOperation' => 'all',
                 ],
-                'id'          => 'filter-valid',
-                'name'        => 'FilterValid',
-                'type'        => 'n8n-nodes-base.if',
+                'id' => 'filter-valid',
+                'name' => 'FilterValid',
+                'type' => 'n8n-nodes-base.if',
                 'typeVersion' => 1,
-                'position'    => [400, 300],
+                'position' => [400, 300],
             ],
 
             // ── 3. Respond to webhook immediately (avoid timeout) ──────────────
             [
-                'parameters'  => [
-                    'respondWith'    => 'json',
-                    'responseBody'   => '{"ok":true}',
-                    'options'        => [],
+                'parameters' => [
+                    'respondWith' => 'json',
+                    'responseBody' => '{"ok":true}',
+                    'options' => [],
                 ],
-                'id'          => 'respond-ok',
-                'name'        => 'RespondOK',
-                'type'        => 'n8n-nodes-base.respondToWebhook',
+                'id' => 'respond-ok',
+                'name' => 'RespondOK',
+                'type' => 'n8n-nodes-base.respondToWebhook',
                 'typeVersion' => 1,
-                'position'    => [600, 500],
+                'position' => [600, 500],
             ],
 
             // ── 4. Extract chatId & message text ──────────────────────────────
@@ -256,19 +257,19 @@ class N8nWorkflowGenerator
                     ],
                     'options' => [],
                 ],
-                'id'          => 'prepare-data',
-                'name'        => 'PrepareData',
-                'type'        => 'n8n-nodes-base.set',
+                'id' => 'prepare-data',
+                'name' => 'PrepareData',
+                'type' => 'n8n-nodes-base.set',
                 'typeVersion' => 2,
-                'position'    => [600, 300],
+                'position' => [600, 300],
             ],
 
             // ── 5. Route message to Dashboard API ─────────────────────────────
             [
                 'parameters' => [
-                    'method'      => 'POST',
-                    'url'         => ($this->settings->n8n_dashboard_internal_url ?? $dashUrl) . "/api/whatsapp/handle",
-                    'sendBody'    => true,
+                    'method' => 'POST',
+                    'url' => ($this->settings->n8n_dashboard_internal_url ?? $dashUrl).'/api/whatsapp/handle',
+                    'sendBody' => true,
                     'sendHeaders' => (bool) ($this->settings->n8n_token),
                     'headerParameters' => $this->settings->n8n_token ? [
                         'parameters' => [['name' => 'X-API-TOKEN', 'value' => $this->settings->n8n_token]],
@@ -280,11 +281,11 @@ class N8nWorkflowGenerator
                         ],
                     ],
                 ],
-                'id'          => 'dashboard-api',
-                'name'        => 'DashboardAPI',
-                'type'        => 'n8n-nodes-base.httpRequest',
+                'id' => 'dashboard-api',
+                'name' => 'DashboardAPI',
+                'type' => 'n8n-nodes-base.httpRequest',
                 'typeVersion' => 4.1,
-                'position'    => [800, 300],
+                'position' => [800, 300],
             ],
 
             // ── 6. Check if dashboard wants a reply ───────────────────────────
@@ -296,11 +297,11 @@ class N8nWorkflowGenerator
                         ],
                     ],
                 ],
-                'id'          => 'check-reply',
-                'name'        => 'ShouldReply',
-                'type'        => 'n8n-nodes-base.if',
+                'id' => 'check-reply',
+                'name' => 'ShouldReply',
+                'type' => 'n8n-nodes-base.if',
                 'typeVersion' => 1,
-                'position'    => [1000, 300],
+                'position' => [1000, 300],
             ],
 
             // ── 7. Prepare reply text ─────────────────────────────────────────
@@ -314,11 +315,11 @@ class N8nWorkflowGenerator
                     ],
                     'options' => [],
                 ],
-                'id'          => 'prepare-reply',
-                'name'        => 'PrepareReply',
-                'type'        => 'n8n-nodes-base.set',
+                'id' => 'prepare-reply',
+                'name' => 'PrepareReply',
+                'type' => 'n8n-nodes-base.set',
                 'typeVersion' => 2,
-                'position'    => [1200, 300],
+                'position' => [1200, 300],
             ],
 
             // ── 8. SEND MESSAGE (provider-specific node) ──────────────────────

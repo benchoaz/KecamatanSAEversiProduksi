@@ -41,10 +41,10 @@ class AuditLogController extends Controller
         // Search by IP address
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('ip_address', 'like', '%' . $request->search . '%')
+                $q->where('ip_address', 'like', '%'.$request->search.'%')
                     ->orWhereHas('user', function ($userQuery) use ($request) {
-                        $userQuery->where('nama_lengkap', 'like', '%' . $request->search . '%')
-                            ->orWhere('username', 'like', '%' . $request->search . '%');
+                        $userQuery->where('nama_lengkap', 'like', '%'.$request->search.'%')
+                            ->orWhere('username', 'like', '%'.$request->search.'%');
                     });
             });
         }
@@ -66,6 +66,7 @@ class AuditLogController extends Controller
     public function show(AuditLog $auditLog)
     {
         $auditLog->load('user');
+
         return view('kecamatan.audit-logs.show', compact('auditLog'));
     }
 
@@ -89,7 +90,7 @@ class AuditLogController extends Controller
 
         $logs = $query->latest()->limit(1000)->get();
 
-        $filename = 'audit_logs_' . date('Y-m-d_His') . '.csv';
+        $filename = 'audit_logs_'.date('Y-m-d_His').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',

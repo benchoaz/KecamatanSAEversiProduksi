@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class JawabanIndikator extends Model
 {
     protected $table = 'jawaban_indikator';
+
     protected $guarded = ['id'];
 
     protected $casts = [

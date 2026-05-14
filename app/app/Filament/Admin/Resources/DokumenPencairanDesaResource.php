@@ -16,8 +16,11 @@ class DokumenPencairanDesaResource extends Resource
     protected static ?string $model = DokumenPencairanDesa::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-plus';
+
     protected static ?string $navigationGroup = 'EKONOMI & PEMBANGUNAN';
+
     protected static ?string $navigationLabel = 'Syarat Pencairan DD';
+
     protected static ?int $navigationSort = -5;
 
     public static function canViewAny(): bool
@@ -28,19 +31,20 @@ class DokumenPencairanDesaResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
-        
+
         // Scope for Operator Desa
         $user = auth()->user();
         if ($user->desa_id) {
             $query->where('desa_id', $user->desa_id);
         }
-        
+
         return $query;
     }
 
     public static function form(Form $form): Form
     {
         $user = auth()->user();
+
         return $form
             ->schema([
                 Forms\Components\Select::make('desa_id')
@@ -119,7 +123,7 @@ class DokumenPencairanDesaResource extends Resource
                 Tables\Actions\Action::make('download')
                     ->label('Download PDF')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (DokumenPencairanDesa $record): string => asset('storage/' . $record->file_path))
+                    ->url(fn (DokumenPencairanDesa $record): string => asset('storage/'.$record->file_path))
                     ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

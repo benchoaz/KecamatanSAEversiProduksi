@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BuktiDukung extends Model
 {
     protected $table = 'bukti_dukung';
+
     protected $guarded = ['id'];
 
     protected $casts = [

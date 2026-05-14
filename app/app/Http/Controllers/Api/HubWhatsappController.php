@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\Hub\GatewayRouterService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class HubWhatsappController extends Controller
@@ -26,7 +25,7 @@ class HubWhatsappController extends Controller
         $from = $payload['from'] ?? null;
         $text = $payload['text'] ?? '';
 
-        if (!$from) {
+        if (! $from) {
             return response()->json(['status' => 'error', 'message' => 'No sender info'], 400);
         }
 
@@ -44,18 +43,20 @@ class HubWhatsappController extends Controller
         foreach ($activeDistricts as $d) {
             if (stripos($text, $d->name) !== false || stripos($text, $d->slug) !== false) {
                 $this->router->setPhoneDistrict($from, $d->id);
+
                 return response()->json([
                     'status' => 'success',
-                    'reply' => "Selamat Datang! Anda kini terhubung dengan Layanan Digital {$d->name}. Silakan sampaikan keperluan Anda."
+                    'reply' => "Selamat Datang! Anda kini terhubung dengan Layanan Digital {$d->name}. Silakan sampaikan keperluan Anda.",
                 ]);
             }
         }
 
         // 3. Jika tidak ada konteks, berikan pilihan kecamatan
-        $list = $activeDistricts->map(fn($d) => "- {$d->name}")->implode("\n");
+        $list = $activeDistricts->map(fn ($d) => "- {$d->name}")->implode("\n");
+
         return response()->json([
             'status' => 'success',
-            'reply' => "Halo! Ini adalah Layanan Digital Kabupaten Probolinggo. \n\nSilakan ketik nama kecamatan Anda untuk melanjutkan:\n\n{$list}"
+            'reply' => "Halo! Ini adalah Layanan Digital Kabupaten Probolinggo. \n\nSilakan ketik nama kecamatan Anda untuk melanjutkan:\n\n{$list}",
         ]);
     }
 
@@ -67,14 +68,14 @@ class HubWhatsappController extends Controller
         // Di sini kita bisa memanggil URL internal kecamatan
         // Untuk local dev, kita bisa menggunakan routing internal Laravel
         // atau memanggil endpoint API kecamatan yang bersangkutan.
-        
+
         Log::info("Gateway Hub: Forwarding message from {$payload['from']} to district {$district->name}");
 
         // Simulasi forward (nanti bisa dihubungkan ke WhatsappController kecamatan)
         return response()->json([
             'status' => 'forwarded',
             'target' => $district->slug,
-            'payload' => $payload
+            'payload' => $payload,
         ]);
     }
 }
