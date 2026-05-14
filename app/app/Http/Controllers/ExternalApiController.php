@@ -15,11 +15,12 @@ class ExternalApiController extends Controller
 {
     /**
      * Get base URL from AppProfile (dynamic per kecamatan)
+     * Menggunakan field 'public_url' yang sudah ada di AppProfile
      */
     private function getBaseUrl(): string
     {
         return rtrim(
-            AppProfile::first(['website_url'])?->website_url ?? env('PUBLIC_BASE_URL', config('app.url')),
+            AppProfile::first(['public_url'])?->public_url ?? env('PUBLIC_BASE_URL', config('app.url')),
             '/'
         );
     }

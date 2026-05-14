@@ -155,7 +155,7 @@ class PublicServiceController extends Controller
                 'nama' => $request->nama_pemohon ?? 'Warga (Bot)',
                 'nik' => $request->nik,
                 'desa_asal_id' => $desaId,
-                'alamat_luar' => ($request->desa_id == '999') ? 'Luar Wilayah Kecamatan Besuk' : null,
+                'alamat_luar' => ($request->desa_id == '999') ? 'Luar Wilayah ' . appProfile()->full_region_name : null,
                 'no_hp' => $request->whatsapp,
                 'tujuan_bidang' => 'Pelayanan Umum', // Aligned with visitor dropdown
                 'keperluan' => '[' . $request->jenis_layanan . '] ' . $request->uraian,

@@ -14,17 +14,17 @@ class ApplicationProfileService
         return Cache::rememberForever($this->cacheKey, function () {
             try {
                 return AppProfile::first() ?? new AppProfile([
-                    'app_name' => 'Kecamatan SAE',
-                    'region_name' => 'Kecamatan Besuk',
-                    'region_level' => 'kecamatan',
-                    'tagline' => 'Solusi Administrasi Terpadu',
+                    'app_name'      => env('APP_NAME', 'Kecamatan SAE'),
+                    'region_name'   => env('KECAMATAN_NAME', 'Kecamatan'),
+                    'region_level'  => 'kecamatan',
+                    'tagline'       => 'Solusi Administrasi Terpadu',
                 ]);
             } catch (\Exception $e) {
                 return new AppProfile([
-                    'app_name' => 'Kecamatan SAE',
-                    'region_name' => 'Kecamatan Besuk',
-                    'region_level' => 'kecamatan',
-                    'tagline' => 'Solusi Administrasi Terpadu',
+                    'app_name'      => env('APP_NAME', 'Kecamatan SAE'),
+                    'region_name'   => env('KECAMATAN_NAME', 'Kecamatan'),
+                    'region_level'  => 'kecamatan',
+                    'tagline'       => 'Solusi Administrasi Terpadu',
                 ]);
             }
         });
@@ -159,9 +159,9 @@ class ApplicationProfileService
             }
         }
         
-        // Absolute fallback for Besuk region if everything fails
+        // Absolute fallback: baca dari env agar tidak hardcode nama kecamatan
         if (empty($url) || str_contains($url, 'localhost')) {
-            $url = 'https://kecamatanbesuk.my.id';
+            $url = env('PUBLIC_BASE_URL', config('app.url', ''));
         }
 
         return rtrim($url, '/');

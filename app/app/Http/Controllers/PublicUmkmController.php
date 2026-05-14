@@ -29,7 +29,8 @@ class PublicUmkmController extends Controller
         $umkm = UmkmLocal::where('is_active', true)->findOrFail($id);
 
         // WhatsApp message formatting
-        $message = "Halo " . $umkm->name . ", saya tertarik dengan produk " . $umkm->product . " yang saya lihat di Website Kecamatan Besuk.";
+        $regionName = appProfile()->full_region_name;
+        $message = "Halo " . $umkm->name . ", saya tertarik dengan produk " . $umkm->product . " yang saya lihat di Website {$regionName}.";
         if ($umkm->price) {
             $message .= " Apakah stok seharga Rp " . number_format((float) $umkm->price, 0, ',', '.') . " masih tersedia?";
         }
