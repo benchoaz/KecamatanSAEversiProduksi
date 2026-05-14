@@ -14,6 +14,24 @@ use Illuminate\Support\Facades\Log;
 class ExternalApiController extends Controller
 {
     /**
+     * Get base URL from AppProfile (dynamic per kecamatan)
+     */
+    private function getBaseUrl(): string
+    {
+        return rtrim(
+            AppProfile::first(['website_url'])?->website_url ?? env('PUBLIC_BASE_URL', config('app.url')),
+            '/'
+        );
+    }
+
+    /**
+     * Get region name from AppProfile
+     */
+    private function getRegionName(): string
+    {
+        return AppProfile::first(['region_name'])?->region_name ?? env('KECAMATAN_NAME', 'Kecamatan');
+    }
+    /**
      * Mask phone number for privacy
      * Format: 0812xxxx890
      */
@@ -71,7 +89,7 @@ class ExternalApiController extends Controller
             return [
                 'name' => $item->name,
                 'product' => $item->product,
-                'address' => $item->address ?? 'Kecamatan Besuk',
+                'address' => $item->address ?? $this->getRegionName(),
                 'contact_wa' => $this->maskPhone($item->contact_wa),
                 'contact_link' => $this->getWaLink($item->contact_wa),
             ];
@@ -81,7 +99,7 @@ class ExternalApiController extends Controller
             'success' => true,
             'data' => $data,
             'count' => $data->count(),
-            'website_link' => 'https://besuk.probolinggokab.go.id/umkm'
+            'website_link' => $this->getBaseUrl() . '/umkm'
         ]);
     }
 
@@ -113,7 +131,7 @@ class ExternalApiController extends Controller
             return [
                 'name' => $item->name,
                 'product' => $item->product,
-                'address' => $item->address ?? 'Kecamatan Besuk',
+                'address' => $item->address ?? $this->getRegionName(),
                 'contact_wa' => $this->maskPhone($item->contact_wa),
                 'contact_link' => $this->getWaLink($item->contact_wa),
             ];
@@ -123,7 +141,7 @@ class ExternalApiController extends Controller
             'success' => true,
             'data' => $data,
             'count' => $data->count(),
-            'website_link' => 'https://besuk.probolinggokab.go.id/jasa'
+            'website_link' => $this->getBaseUrl() . '/jasa'
         ]);
     }
 
@@ -150,7 +168,7 @@ class ExternalApiController extends Controller
             ->get();
 
         $data = $lokers->map(function ($item) {
-            $desaName = $item->nama_desa_manual ?? ($item->desa ? $item->desa->name : 'Kecamatan Besuk');
+            $desaName = $item->nama_desa_manual ?? ($item->desa ? $item->desa->name : $this->getRegionName());
             return [
                 'title' => $item->title,
                 'job_category' => $item->job_category,
@@ -166,7 +184,7 @@ class ExternalApiController extends Controller
             'success' => true,
             'data' => $data,
             'count' => $data->count(),
-            'website_link' => 'https://besuk.probolinggokab.go.id/loker'
+            'website_link' => $this->getBaseUrl() . '/loker'
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\PembangunanDokumenSpj;
+use App\Models\AppProfile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -23,9 +24,15 @@ class SpjTemplateService
         $desa = $pembangunan->desa;
 
         // Data yang akan di-inject ke template
+        $regionName = strtoupper(
+            AppProfile::first(['region_name'])->region_name ?? env('KECAMATAN_NAME', 'KECAMATAN')
+        );
+        // Strip prefix 'KECAMATAN' jika sudah ada di region_name
+        $regionName = preg_replace('/^KECAMATAN\s+/i', '', $regionName);
+
         $data = [
             'NAMA_DESA' => strtoupper($desa->nama_desa),
-            'KECAMATAN' => 'BESUK', // Hardcoded for now based on project context
+            'KECAMATAN' => $regionName, // Dinamis dari AppProfile
             'NAMA_KEGIATAN' => $pembangunan->nama_kegiatan,
             'LOKASI' => $pembangunan->lokasi,
             'TAHUN_ANGGARAN' => $pembangunan->tahun_anggaran,

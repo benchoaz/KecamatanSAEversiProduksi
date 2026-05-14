@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Berita;
+use App\Models\AppProfile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -25,7 +26,7 @@ class ScrapeKecamatanNews extends Command
      *
      * @var string
      */
-    protected $description = 'Scrape news directly from Kecamatan Besuk official website';
+    protected $description = 'Scrape news from Kecamatan official website (configured in AppProfile)';
 
     /**
      * Execute the console command.
@@ -34,8 +35,18 @@ class ScrapeKecamatanNews extends Command
     {
         $this->info('Starting Kecamatan News Aggregation...');
 
-        $targetUrl = 'https://besuk.probolinggokab.go.id/berita';
-        $baseUrl = 'https://besuk.probolinggokab.go.id';
+        // Baca URL dari AppProfile agar dinamis untuk semua kecamatan
+        $profile = AppProfile::first(['website_url', 'region_name']);
+        $baseUrl = rtrim($profile->website_url ?? env('GOV_WEBSITE_URL', ''), '/');
+
+        if (empty($baseUrl)) {
+            $this->error('Website URL belum dikonfigurasi di AppProfile atau GOV_WEBSITE_URL di .env');
+            return;
+        }
+
+        $targetUrl = $baseUrl . '/berita';
+        $regionName = $profile->region_name ?? 'Kecamatan';
+        $this->info("Scraping berita dari: {$targetUrl} ({$regionName})");
 
         try {
             // Non-verifying SSL for local/governmental websites sometimes is needed
