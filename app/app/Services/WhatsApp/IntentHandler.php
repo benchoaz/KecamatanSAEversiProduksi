@@ -85,7 +85,7 @@ class IntentHandler
             return [
                 'success' => true,
                 'intent' => 'greeting',
-                'reply' => '👋 *Halo! Selamat datang di Layanan Digital '.$this->getRegionName()."*.\n\n".
+                'reply' => '👋 *Halo! Selamat datang di '.$this->getRegionName()."*.\n\n".
                     'Ada yang bisa saya bantu hari ini? Silakan ketik pertanyaan Anda (contoh: *syarat ktp*) atau ketik *MENU* untuk melihat daftar layanan lengkap kami. 😊',
                 'state_update' => null,
             ];
@@ -231,6 +231,22 @@ class IntentHandler
                     "Temukan tukang, tenaga harian, dan penyedia jasa lokal:\n".
                     "{$baseUrl}/ekonomi?tab=jasa\n\n".
                     'Ketik *MENU* untuk kembali.',
+                'state_update' => null,
+            ];
+        }
+
+        // KTP Online & POS Delivery Intent
+        if ($this->matchesIntent($messageLower, ['ktp online', 'ktp pos', 'kirim ktp', 'ktp rumah', 'ktp paket'])) {
+            return [
+                'success' => true,
+                'intent' => 'ktp_pos_online',
+                'reply' => "📯 *PENGIRIMAN KTP-el ONLINE & POS*\n\n".
+                    "Untuk pengajuan cetak KTP-el secara online dan dikirim langsung ke rumah via Pos, silakan daftar melalui link resmi Disdukcapil Kabupaten Probolinggo berikut:\n".
+                    "👉 https://godigital-disdukcapil.probolinggokab.go.id/daftar_ktp\n\n".
+                    "📎 *Dokumen Persyaratan (Maksimal 2MB):*\n".
+                    "1. Foto Bukti Perekaman / Surat Keterangan / Surat Kehilangan dari Kepolisian / KTP Rusak\n".
+                    "2. Foto Kartu Keluarga (KK) Asli\n\n".
+                    "Ketik *MENU* untuk kembali.",
                 'state_update' => null,
             ];
         }
@@ -510,8 +526,10 @@ class IntentHandler
 
     protected function getUnknownIntentMessage(): string
     {
-        return "🙏 *Mohon maaf*, saya belum mengenali pesan tersebut.\n\n".
-            "Agar kami dapat melayani dengan baik, silakan:\n".
+        return "🙏 *Mohon maaf*, saya belum menemukan data yang sesuai untuk pertanyaan Anda.\n\n".
+            "Untuk dibantu secara langsung oleh petugas kami, silakan datang langsung ke:\n".
+            "🏛️ *Kantor Kecamatan Besuk*\n\n".
+            "Atau silakan:\n".
             "• Ketik *MENU* untuk melihat layanan utama\n".
             "• Ketik apa yang ingin Anda cari (Contoh: *syarat KK* atau *cek status*)\n\n".
             'Terima kasih atas pengertiannya! 😊';
