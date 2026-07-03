@@ -286,6 +286,16 @@
                                                 title="Nonaktifkan" data-bs-toggle="modal" data-bs-target="#terminateModal{{ $p->id }}">
                                                 <i class="fas fa-power-off"></i>
                                             </button>
+
+                                            <!-- Hapus Permanen -->
+                                            <form action="{{ route('kecamatan.pemerintahan.detail.personil.destroy', $p->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-icon btn-light rounded-circle shadow-sm text-danger" 
+                                                    title="Hapus Data Selamanya" onclick="return confirm('Hapus data personil ini selamanya?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         @else
                                             {{-- Aksi untuk Desa --}}
                                             <div class="d-flex align-items-center gap-1">

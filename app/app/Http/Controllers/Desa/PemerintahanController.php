@@ -499,4 +499,12 @@ class PemerintahanController extends Controller
 
         return 'apbdes';
     }
+
+    public function personilDestroy($id)
+    {
+        $personil = PersonilDesa::findOrFail($id);
+        $personil->delete();
+
+        return back()->with('success', 'Data personil berhasil dihapus.');
+    }
 }

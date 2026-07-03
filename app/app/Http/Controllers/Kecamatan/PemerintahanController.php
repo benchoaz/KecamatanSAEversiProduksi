@@ -865,4 +865,12 @@ class PemerintahanController extends Controller
 
         return $pdf->stream('Laporan_Administrasi_'.$desa->nama_desa.'.pdf');
     }
+
+    public function personilDestroy($id)
+    {
+        $personil = \App\Models\PersonilDesa::findOrFail($id);
+        $personil->delete();
+
+        return back()->with('success', 'Data personil berhasil dihapus.');
+    }
 }

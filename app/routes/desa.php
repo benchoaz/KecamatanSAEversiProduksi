@@ -171,6 +171,7 @@ Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->n
             Route::get('/peraturan', [PemerintahanController::class, 'peraturanIndex'])->name('peraturan.index');
 
             Route::post('/personil', [PemerintahanController::class, 'personilStore'])->name('personil.store');
+            Route::delete('/personil/{id}', [PemerintahanController::class, 'personilDestroy'])->name('personil.destroy');
             Route::post('/inventaris', [PemerintahanController::class, 'inventarisStore'])->name('inventaris.store');
             Route::post('/lembaga', [PemerintahanController::class, 'lembagaStore'])->name('lembaga.store');
             Route::post('/dokumen', [PemerintahanController::class, 'dokumenStore'])->name('dokumen.store');
