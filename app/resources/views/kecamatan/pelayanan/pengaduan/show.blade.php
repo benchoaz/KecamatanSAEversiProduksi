@@ -57,6 +57,22 @@
         </div>
     </div>
 
+    @if($pengaduan->privacy_type === 'anonim')
+    <div class="alert alert-danger border-0 bg-rose-50 text-rose-700 rounded-4 p-3 mb-4 shadow-sm">
+        <div class="d-flex gap-3 align-items-center">
+            <div class="bg-rose-500 text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                <i class="fas fa-exclamation-triangle fs-5"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-1 text-slate-800">ATURAN VERIFIKASI ADUAN ANONIM</h6>
+                <p class="mb-0 text-slate-600 text-xs">
+                    Laporan ini dikirim secara <strong>ANONIM</strong>. Untuk menjaga integritas sistem, <strong>HANYA tindak lanjuti (TL) laporan ini jika lampiran bukti yang disediakan pelapor benar-benar kuat, valid, dan konkrit.</strong> Identitas pengirim dilindungi sepenuhnya.
+                </p>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="row g-4">
         <!-- Left Column - Pengaduan Info -->
         <div class="col-lg-8">
@@ -93,22 +109,29 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="text-[10px] text-slate-700 uppercase tracking-wider fw-black mb-1 d-block">Nama Lengkap</label>
-                            <input type="text" name="nama_pemohon" class="form-control form-control-sm" value="{{ $pengaduan->nama ?? '' }}" placeholder="Belum disebutkan">
+                            <input type="text" name="nama_pemohon" class="form-control form-control-sm" value="{{ $pengaduan->nama ?? '' }}" placeholder="Belum disebutkan" {{ $pengaduan->privacy_type === 'anonim' ? 'readonly' : '' }}>
                         </div>
                         <div class="col-md-6">
                             <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-1 d-block">No. WhatsApp</label>
-                            <input type="text" name="whatsapp" class="form-control form-control-sm" value="{{ $pengaduan->whatsapp ?? '' }}" placeholder="Belum disebutkan">
-                            @if($pengaduan->whatsapp)
-                            <div class="mt-1">
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pengaduan->whatsapp) }}" target="_blank" class="text-success text-[11px] text-decoration-none">
-                                    <i class="fab fa-whatsapp me-1"></i> Chat WhatsApp
-                                </a>
-                            </div>
+                            @if($pengaduan->privacy_type === 'anonim')
+                                <input type="text" name="whatsapp" class="form-control form-control-sm bg-light" value="{{ $pengaduan->whatsapp ? (substr($pengaduan->whatsapp, 0, 5) . '*****' . substr($pengaduan->whatsapp, -3)) : '' }}" placeholder="Belum disebutkan" readonly>
+                                <div class="mt-1 text-slate-400 text-[11px]">
+                                    <i class="fas fa-lock me-1"></i> Nomor HP Pelapor Disembunyikan (Anonim)
+                                </div>
+                            @else
+                                <input type="text" name="whatsapp" class="form-control form-control-sm" value="{{ $pengaduan->whatsapp ?? '' }}" placeholder="Belum disebutkan">
+                                @if($pengaduan->whatsapp)
+                                <div class="mt-1">
+                                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pengaduan->whatsapp) }}" target="_blank" class="text-success text-[11px] text-decoration-none">
+                                        <i class="fab fa-whatsapp me-1"></i> Chat WhatsApp
+                                    </a>
+                                </div>
+                                @endif
                             @endif
                         </div>
                         <div class="col-md-6">
                             <label class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-1 d-block">NIK KTP <span class="text-danger">*</span></label>
-                            <input type="text" name="nik" class="form-control form-control-sm" value="{{ $pengaduan->nik ?? '' }}" placeholder="Masukkan 16 digit NIK">
+                            <input type="text" name="nik" class="form-control form-control-sm" value="{{ $pengaduan->privacy_type === 'anonim' ? 'ANONIM' : ($pengaduan->nik ?? '') }}" placeholder="Masukkan 16 digit NIK" {{ $pengaduan->privacy_type === 'anonim' ? 'readonly' : '' }}>
                         </div>
                         <div class="col-md-6">
                             <label class="text-[10px] text-slate-700 uppercase tracking-wider fw-black mb-1 d-block">Desa/Kelurahan</label>
@@ -301,7 +324,7 @@
                     </h6>
                 </div>
                 <div class="card-body">
-                    @if($pengaduan->whatsapp)
+                    @if($pengaduan->whatsapp && $pengaduan->privacy_type !== 'anonim')
                     <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pengaduan->whatsapp) }}" 
                        target="_blank" class="btn btn-outline-success btn-sm w-100 rounded-3 mb-2">
                         <i class="fab fa-whatsapp me-1"></i> Hubungi via WhatsApp

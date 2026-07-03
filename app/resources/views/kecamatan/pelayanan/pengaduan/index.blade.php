@@ -170,7 +170,11 @@
                                                         {{ $pengaduan->nama ?? 'Anonim' }}
                                                     </div>
                                                     <div class="text-[10px] text-slate-500 fw-bold">
-                                                        {{ $pengaduan->whatsapp ?? '-' }}
+                                                        @if($pengaduan->privacy_type === 'anonim')
+                                                            {{ $pengaduan->whatsapp ? (substr($pengaduan->whatsapp, 0, 5) . '*****' . substr($pengaduan->whatsapp, -3)) : '-' }}
+                                                        @else
+                                                            {{ $pengaduan->whatsapp ?? '-' }}
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
