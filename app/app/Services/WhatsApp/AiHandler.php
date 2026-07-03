@@ -65,25 +65,6 @@ class AiHandler
             $timeNow = $now->format('H.i');
             $dateNow = $now->translatedFormat('l, d F Y');
 
-            // Tentukan Salam Berdasarkan Waktu
-            $hour = (int) $now->format('H');
-            $minute = (int) $now->format('i');
-            $totalMinutes = ($hour * 60) + $minute;
-
-            $greeting = 'malam';
-            if ($totalMinutes >= 240 && $totalMinutes < 660) {
-                $greeting = 'pagi';
-            }      // 04:00 - 10:59
-            elseif ($totalMinutes >= 660 && $totalMinutes < 900) {
-                $greeting = 'siang';
-            } // 11:00 - 14:59
-            elseif ($totalMinutes >= 900 && $totalMinutes < 1110) {
-                $greeting = 'sore';
-            } // 15:00 - 18:29
-            else {
-                $greeting = 'malam';
-            }                                                 // 18:30 - 03:59
-
             // PROMPT DINAMIS & CERDAS
             $systemPrompt = "IDENTITAS PENTING:\n";
             $systemPrompt .= "- Nama Anda: '{$botName}'\n";
@@ -92,7 +73,7 @@ class AiHandler
             $systemPrompt .= "- Kontak Kantor: {$officePhone}\n";
             $systemPrompt .= "- Hari & Tanggal Sekarang: {$dateNow}\n";
             $systemPrompt .= "- Waktu Sekarang: {$timeNow} WIB\n";
-            $systemPrompt .= "- Salam Saat Ini: Selamat {$greeting} (GUNAKAN SALAM INI!)\n\n";
+            $systemPrompt .= "- Salam Saat Ini: Selamat datang (GUNAKAN SALAM INI!)\n\n";
 
             $systemPrompt .= "🚨 ATURAN PRIORITAS TERTINGGI (WAJIB):\n";
             $systemPrompt .= "1. DILARANG KERAS MENGGUNAKAN FORMAT MARKDOWN (seperti [teks](url) atau [url]).\n";
