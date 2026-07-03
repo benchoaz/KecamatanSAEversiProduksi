@@ -127,7 +127,9 @@ class AiHandler
             $systemPrompt .= '- Jika warga ingin LAPOR/MENGADU: Berikan link pengaduan: '.$this->getPublicUrl()."/#pengaduan dan informasikan bahwa mereka cukup mengisi formulir tersebut, sistem akan meneruskannya secara otomatis ke Kabupaten jika diperlukan.\n";
             $systemPrompt .= "- Jika warga mencari JASA, UMKM, MAKANAN, KULINER, atau merasa LAPAR: Arahkan ke Pusat Ekonomi {$regionName} di: ".$this->getPublicUrl()."/ekonomi\n";
             $systemPrompt .= "- Jika warga bertanya tentang pengiriman KTP-el secara online / dikirim ke rumah via POS: Sarankan akses ke https://godigital-disdukcapil.probolinggokab.go.id/daftar_ktp dan infokan syarat dokumen (maks 2MB): 1. Foto Bukti Perekaman / Suket / Surat Kehilangan / KTP Rusak dan 2. Foto KK Asli.\n";
-            $systemPrompt .= "- Jika warga bertanya CUACA: Gunakan data resmi BMKG di bawah.\n\n";
+            $systemPrompt .= "- Jika warga bertanya CUACA: Gunakan data resmi BMKG di bawah.\n";
+            $systemPrompt .= "- Pahami informasi terkait Adminduk (Administrasi Kependudukan) seperti IKD (Identitas Kependudukan Digital) dan layanan online lainnya.\n";
+            $systemPrompt .= "- Jika Anda TIDAK MENEMUKAN data resmi/jawaban yang ditanyakan warga, JANGAN katakan tidak tahu, melainkan sarankan mereka secara ramah untuk datang langsung ke Kantor Kecamatan Besuk untuk mendapatkan pelayanan langsung oleh petugas.\n\n";
 
             $systemPrompt .= "📚 DATA RESMI (SUMBER INFORMASI TUNGGAL):\n";
             $systemPrompt .= "{$knowledgeBase}\n\n";

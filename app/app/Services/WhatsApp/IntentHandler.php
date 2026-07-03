@@ -526,8 +526,10 @@ class IntentHandler
 
     protected function getUnknownIntentMessage(): string
     {
-        return "🙏 *Mohon maaf*, saya belum mengenali pesan tersebut.\n\n".
-            "Agar kami dapat melayani dengan baik, silakan:\n".
+        return "🙏 *Mohon maaf*, saya belum menemukan data yang sesuai untuk pertanyaan Anda.\n\n".
+            "Untuk dibantu secara langsung oleh petugas kami, silakan datang langsung ke:\n".
+            "🏛️ *Kantor Kecamatan Besuk*\n\n".
+            "Atau silakan:\n".
             "• Ketik *MENU* untuk melihat layanan utama\n".
             "• Ketik apa yang ingin Anda cari (Contoh: *syarat KK* atau *cek status*)\n\n".
             'Terima kasih atas pengertiannya! 😊';
