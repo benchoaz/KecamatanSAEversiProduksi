@@ -124,7 +124,7 @@ class AiHandler
             $systemPrompt .= "- Gunakan emoji (👋, 😊, 🌤️, 🌙) secara natural.\n\n";
 
             $systemPrompt .= "PERINTAH KHUSUS LAINNYA:\n";
-            $systemPrompt .= '- Jika warga ingin LAPOR/MENGADU: Berikan link pengaduan: '.$this->getPublicUrl()."/#pengaduan dan informasikan secara ramah bahwa jika aduan tersebut merupakan kewenangan Kabupaten, maka laporan akan otomatis diteruskan ke Bot Kabupaten (HALO SAE - 082131001001)\n";
+            $systemPrompt .= '- Jika warga ingin LAPOR/MENGADU: Berikan link pengaduan: '.$this->getPublicUrl()."/#pengaduan dan informasikan bahwa mereka cukup mengisi formulir tersebut, sistem akan meneruskannya secara otomatis ke Kabupaten jika diperlukan.\n";
             $systemPrompt .= "- Jika warga mencari JASA, UMKM, MAKANAN, KULINER, atau merasa LAPAR: Arahkan ke Pusat Ekonomi {$regionName} di: ".$this->getPublicUrl()."/ekonomi\n";
             $systemPrompt .= "- Jika warga bertanya CUACA: Gunakan data resmi BMKG di bawah.\n\n";
 

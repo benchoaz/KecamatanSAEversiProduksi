@@ -218,7 +218,7 @@ class ComplaintHandler
             "📝 *ISI FORM PENGADUAN*:\n{$formUrl}\n\n".
             "━━━━━━━━━━━━━━━━━━━━\n\n".
             "ℹ️ *INFO INTEGRASI*:\n".
-            "Laporan aduan Anda akan diteruskan secara otomatis ke sistem layanan Kabupaten (HALO SAE - 082131001001) jika materi aduan merupakan kewenangan Kabupaten.\n\n".
+            "Cukup isi formulir di atas, sistem kami akan meneruskan laporan Anda secara otomatis ke Kabupaten jika diperlukan.\n\n".
             "━━━━━━━━━━━━━━━━━━━━\n\n".
             "⚠️ *PERINGATAN & DISCLAIMER*:\n\n".
             "1. Informasi yang Anda berikan akan diverifikasi oleh petugas.\n\n".
