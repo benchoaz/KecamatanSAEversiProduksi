@@ -14,10 +14,13 @@ use App\Repositories\Interfaces\SubmissionRepositoryInterface;
 use App\Services\MasterDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Traits\ImageOptimizer;
 use PhpZip\ZipFile;
 
 class PemerintahanController extends Controller
 {
+    use ImageOptimizer;
+
     protected $submissionRepo;
 
     protected $masterData;
@@ -168,23 +171,49 @@ class PemerintahanController extends Controller
     public function personilStore(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string',
+            'nama' => 'required|string|max:255',
             'nik' => 'required|digits:16',
+            'tempat_lahir' => 'nullable|string|max:255',
+            'tanggal_lahir' => 'required|date',
             'jabatan' => 'required|string',
             'kategori' => 'required|in:perangkat,bpd',
             'nomor_sk' => 'nullable|string',
+            'tanggal_sk' => 'nullable|date',
             'masa_jabatan_mulai' => 'nullable|date',
+            'masa_jabatan_selesai' => 'nullable|date',
             'file_sk' => 'nullable|file|mimes:pdf|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            'siltap_pokok' => 'nullable|numeric|min:0',
+            'tunjangan_jabatan' => 'nullable|numeric|min:0',
+            'nama_bank' => 'nullable|string|max:255',
+            'rekening_bank' => 'nullable|string|max:50',
+            'no_hp' => 'nullable|string|max:20',
         ]);
 
-        $validated['desa_id'] = auth()->user()->desa_id;
-
-        if ($request->hasFile('file_sk')) {
-            $path = $request->file('file_sk')->store('perangkat_sk', 'local');
-            $validated['file_sk'] = $path;
+        $desa_id = auth()->user()->desa_id;
+        if (!$desa_id) {
+            return back()->with('error', 'Desa tidak teridentifikasi.');
         }
 
-        $personil = PersonilDesa::create($validated);
+        $fotoPath = $request->hasFile('foto') ? $this->optimizeAndStore($request->file('foto'), 'foto_personil', 1200, 80, 'local') : null;
+
+        $personil = new PersonilDesa(\Illuminate\Support\Arr::except($validated, ['file_sk', 'foto']));
+        $personil->desa_id = $desa_id;
+        $personil->is_active = true;
+        if ($fotoPath) {
+            $personil->foto = $fotoPath;
+        }
+
+        if ($request->hasFile('file_sk')) {
+            $path = $request->file('file_sk')->store('sk_personil', 'local');
+            $personil->file_sk = $path;
+        }
+
+        $personil->siltap_pokok = $request->siltap_pokok ?? 0;
+        $personil->tunjangan_jabatan = $request->tunjangan_jabatan ?? 0;
+        $personil->status = 'draft';
+        $personil->save();
+
         AuditHelper::log('create', 'personil_desa', $personil->id, null, $personil->toArray());
 
         return back()->with('success', 'Data personil berhasil ditambahkan.');
