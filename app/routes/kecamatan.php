@@ -39,6 +39,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
         Route::get('/pengaduan', [PelayananController::class, 'pengaduanIndex'])->name('pengaduan');
         Route::get('/pengaduan/{id}', [PelayananController::class, 'pengaduanShow'])->name('pengaduan.show');
         Route::put('/pengaduan/{id}', [PelayananController::class, 'pengaduanUpdateStatus'])->name('pengaduan.update-status');
+        Route::post('/pengaduan/{id}/forward', [PelayananController::class, 'pengaduanForwardKabupaten'])->name('pengaduan.forward');
         Route::put('/pengaduan/{id}/sender', [PelayananController::class, 'pengaduanUpdateSender'])->name('pengaduan.update-sender');
         Route::get('/statistics', [PelayananController::class, 'statistics'])->name('statistics');
 

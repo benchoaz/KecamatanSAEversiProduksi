@@ -551,6 +551,55 @@ class PelayananController extends Controller
     }
 
     /**
+     * Meneruskan aduan ke WhatsApp Bot HALO SAE Kabupaten
+     */
+    public function pengaduanForwardKabupaten($id)
+    {
+        $pengaduan = PublicService::findOrFail($id);
+
+        $kabupatenNumber = env('KABUPATEN_BOT_WA_NUMBER');
+        if (!$kabupatenNumber) {
+            return redirect()->back()->with('error', 'Nomor WA Bot Kabupaten belum dikonfigurasi di file .env.');
+        }
+
+        $portalService = app(\App\Services\PortalService::class);
+
+        // 1. Format & kirim pesan aduan ke Bot Kabupaten
+        $aduanMsg = "*ADUAN DARI KECAMATAN BESUK*\n\n";
+        $aduanMsg .= "Nama Pelapor: *{$pengaduan->nama_pemohon}*\n";
+        $aduanMsg .= "No. HP Pelapor: *{$pengaduan->whatsapp}*\n";
+        $aduanMsg .= "PIN Lacak: *{$pengaduan->tracking_code}*\n";
+        $aduanMsg .= "Isi Laporan:\n\"{$pengaduan->uraian}\"\n\n";
+        $aduanMsg .= "_Pesan diteruskan otomatis dari Dashboard Kecamatan._";
+
+        $forwardSuccess = $portalService->sendWhatsApp($kabupatenNumber, $aduanMsg);
+
+        if (!$forwardSuccess) {
+            return redirect()->back()->with('error', 'Gagal mengirim laporan ke Bot Kabupaten. Pastikan WhatsApp Service aktif.');
+        }
+
+        // 2. Kirim notifikasi konfirmasi ke Warga Pelapor
+        $wargaMsg = "📢 *Laporan Diteruskan ke Kabupaten*\n\n";
+        $wargaMsg .= "Halo *{$pengaduan->nama_pemohon}*, laporan Anda dengan PIN *{$pengaduan->tracking_code}* telah kami teruskan secara otomatis ke layanan Kabupaten (HALO SAE) untuk penanganan lebih lanjut.\n\n";
+        $wargaMsg .= "Kami akan terus memperbarui status laporan Anda di sini jika ada perkembangan terbaru.\n\n";
+        $wargaMsg .= "_Pesan ini dikirim otomatis oleh sistem._";
+
+        $portalService->sendWhatsApp($pengaduan->whatsapp, $wargaMsg);
+
+        // 3. Catat di riwayat pengaduan
+        \App\Models\PublicServiceHistory::create([
+            'public_service_id' => $pengaduan->id,
+            'user_id' => auth()->id(),
+            'status_from' => $pengaduan->status,
+            'status_to' => $pengaduan->status,
+            'comment' => 'Laporan aduan berhasil diteruskan ke WhatsApp Bot HALO SAE Kabupaten.',
+            'action_type' => 'forward_kabupaten',
+        ]);
+
+        return redirect()->back()->with('success', 'Laporan pengaduan berhasil diteruskan ke HALO SAE Kabupaten dan warga telah dinotifikasi.');
+    }
+
+    /**
      * Feedback & Survey Results
      */
     public function feedbackIndex(Request $request)

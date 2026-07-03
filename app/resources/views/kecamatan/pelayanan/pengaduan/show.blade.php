@@ -307,6 +307,15 @@
                         <i class="fab fa-whatsapp me-1"></i> Hubungi via WhatsApp
                     </a>
                     @endif
+
+                    <form action="{{ route('kecamatan.pelayanan.pengaduan.forward', $pengaduan->id) }}" method="POST" class="mb-2">
+                        @csrf
+                        <button type="submit" class="btn btn-warning btn-sm w-100 rounded-3 text-white fw-semibold" 
+                                onclick="return confirm('Apakah Anda yakin ingin meneruskan aduan ini ke Bot Kabupaten (HALO SAE) dan mengirim notifikasi konfirmasi ke warga?')">
+                            <i class="fas fa-share me-1"></i> Teruskan ke Kabupaten (HALO SAE)
+                        </button>
+                    </form>
+
                     <a href="{{ route('receipt.preview', $pengaduan->uuid) }}" 
                        class="btn btn-outline-slate btn-sm w-100 rounded-3">
                         <i class="fas fa-receipt me-1"></i> Lihat Struk
