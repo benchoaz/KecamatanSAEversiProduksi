@@ -19,9 +19,12 @@ RUN apk add --no-cache \
     shadow \
     mysql-client \
     postgresql-client
+# Fix for rootless podman tar permission issues
+ENV TAR_OPTIONS="--no-same-owner --no-same-permissions"
 
 # Install PHP extensions
 RUN apk add --no-cache --virtual .build-deps \
+    tar \
     $PHPIZE_DEPS \
     libzip-dev \
     libpng-dev \

@@ -45,6 +45,7 @@ class PemerintahanController extends Controller
             'E' => ['title' => 'Monitoring LKPJ & LPPD', 'icon' => 'fa-file-signature', 'route' => 'desa.pemerintahan.laporan.index', 'desc' => 'Pemantauan status penyampaian & kelengkapan laporan tahunan.'],
             'F' => ['title' => 'Administrasi Inventaris', 'icon' => 'fa-boxes-stacked', 'route' => 'desa.pemerintahan.inventaris.index', 'desc' => 'Pendataan status administrasi aset barang & tanah milik desa.'],
             'G' => ['title' => 'Arsip Dokumen Perencanaan', 'icon' => 'fa-folder-open', 'route' => 'desa.pemerintahan.dokumen.index', 'desc' => 'Penyimpanan referensi dokumen RPJMDes & RKPDes (Tanpa APBDes).'],
+            'H' => ['title' => 'Inventaris Peraturan Desa', 'icon' => 'fa-gavel', 'route' => 'desa.pemerintahan.peraturan.index', 'desc' => 'Daftar produk hukum & peraturan desa yang telah ditetapkan.'],
         ];
 
         $healthMetrics = $this->calculateHealth($desa_id);
@@ -89,6 +90,79 @@ class PemerintahanController extends Controller
             'kategori' => 'bpd',
             'store_route' => route('desa.pemerintahan.detail.personil.store'),
         ]);
+    }
+
+    public function personilDownload(Request $request)
+    {
+        $desa_id = auth()->user()->desa_id;
+        $kategori = $request->query('kategori', 'perangkat');
+        $format = $request->query('format', 'excel');
+
+        if (!$desa_id) {
+            return back()->with('error', 'Desa tidak teridentifikasi.');
+        }
+
+        $desa = auth()->user()->desa;
+        $personils = PersonilDesa::where('desa_id', $desa_id)
+            ->where('kategori', $kategori)
+            ->orderBy('jabatan')
+            ->get();
+
+        $title = 'Data ' . ($kategori === 'bpd' ? 'BPD' : 'Perangkat Desa & Kades') . ' ' . $desa->nama_desa;
+        $date = date('d/m/Y');
+
+        if ($format === 'pdf') {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kecamatan.pemerintahan.export.personil_pdf', compact('desa', 'personils', 'kategori', 'title', 'date'));
+            return $pdf->download(str_replace(' ', '_', $title) . '_' . date('Ymd') . '.pdf');
+        }
+
+        if ($format === 'excel') {
+            $fileName = str_replace(' ', '_', $title) . '_' . date('Ymd') . '.xls';
+            $headers = [
+                "Content-type"        => "application/vnd.ms-excel; charset=UTF-8",
+                "Content-Disposition" => "attachment; filename=$fileName",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            ];
+
+            return response()->view('kecamatan.pemerintahan.export.personil_excel', compact('desa', 'personils', 'kategori', 'title', 'date'), 200, $headers);
+        }
+
+        // Default: CSV
+        $fileName = 'Data_Personil_Desa_' . str_replace(' ', '_', $desa->nama_desa) . '_' . date('Ymd') . '.csv';
+        $headers = [
+            "Content-type"        => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['Nama', 'NIK', 'Jabatan', 'Masa Jabatan', 'Nomor SK', 'Tanggal SK', 'Status'];
+
+        $callback = function() use($personils, $columns) {
+            $file = fopen('php://output', 'w');
+            fputs($file, "\xEF\xBB\xBF");
+            fputcsv($file, $columns);
+
+            foreach ($personils as $personil) {
+                $masa_mulai = $personil->masa_jabatan_mulai ? $personil->masa_jabatan_mulai : '-';
+                fputcsv($file, [
+                    $personil->nama,
+                    "'" . $personil->nik,
+                    $personil->jabatan,
+                    $masa_mulai,
+                    $personil->nomor_sk ?? '-',
+                    $personil->tanggal_sk ?? '-',
+                    $personil->is_active ? 'Aktif' : 'Non-Aktif',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function personilStore(Request $request)
@@ -239,6 +313,23 @@ class PemerintahanController extends Controller
             ->get();
 
         return view('kecamatan.pemerintahan.dokumen.index', compact('dokumens', 'desa_id'));
+    }
+
+    public function peraturanIndex()
+    {
+        $desa_id = auth()->user()->desa_id;
+        $dokumens = DokumenDesa::where('desa_id', $desa_id)
+            ->whereIn('tipe_dokumen', ['Peraturan Desa', 'Peraturan Kepala Desa'])
+            ->orderBy('tahun', 'desc')
+            ->get();
+
+        return view('kecamatan.pemerintahan.dokumen.index', [
+            'dokumens' => $dokumens,
+            'desa_id' => $desa_id,
+            'title' => 'Arsip Peraturan Desa',
+            'desc' => 'Daftar produk hukum desa (Perdes & Perkades) yang telah ditetapkan.',
+            'tipe_filter' => 'Peraturan Desa'
+        ]);
     }
 
     public function dokumenStore(Request $request)

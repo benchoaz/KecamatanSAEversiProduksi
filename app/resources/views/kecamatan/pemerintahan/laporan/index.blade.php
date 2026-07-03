@@ -1,4 +1,4 @@
-@extends('layouts.kecamatan')
+@extends(auth()->user()->desa_id ? 'layouts.desa' : 'layouts.kecamatan')
 
 @section('title', 'Monitoring Laporan Penyelenggaraan Desa')
 
@@ -101,7 +101,11 @@
                                             <span class="badge {{ $statusClass }} text-uppercase">{{ $l->status_label }}</span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('kecamatan.file.dokumen', $l->id) }}" target="_blank"
+                                            @php
+                                                $isDesaUser = auth()->user()->desa_id !== null;
+                                                $fileRoute = $isDesaUser ? route('desa.file.dokumen', $l->id) : route('kecamatan.file.dokumen', $l->id);
+                                            @endphp
+                                            <a href="{{ $fileRoute }}" target="_blank"
                                                 class="btn btn-xs btn-outline-primary">
                                                 <i class="fas fa-file-pdf"></i> Lihat PDF
                                             </a>
@@ -241,7 +245,11 @@
                 <h5 class="modal-title">Arsip Laporan Tahunan</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('kecamatan.pemerintahan.detail.dokumen.store') }}" method="POST"
+            @php
+                $isDesaUser = auth()->user()->desa_id !== null;
+                $storeRoute = $isDesaUser ? route('desa.pemerintahan.detail.dokumen.store') : route('kecamatan.pemerintahan.detail.dokumen.store');
+            @endphp
+            <form action="{{ $storeRoute }}" method="POST"
                 enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="desa_id" value="{{ $desa_id }}">

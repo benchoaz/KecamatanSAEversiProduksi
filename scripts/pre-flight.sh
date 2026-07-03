@@ -47,8 +47,8 @@ if [ ! -f app/.env ]; then
 fi
 
 # 5. Check Docker & Docker Compose
-if ! command -v docker &> /dev/null; then
-    echo "❌ ERROR: Docker not installed."
+if ! command -v podman &> /dev/null; then
+    echo "❌ ERROR: Podman not installed."
     exit 1
 fi
 

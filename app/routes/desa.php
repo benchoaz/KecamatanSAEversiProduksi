@@ -157,6 +157,7 @@ Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->n
 
         Route::prefix('detail')->name('detail.')->group(function () {
             Route::get('/personil', [PemerintahanController::class, 'personilIndex'])->name('personil.index');
+            Route::get('/personil/download', [PemerintahanController::class, 'personilDownload'])->name('personil.download');
             Route::get('/bpd', [PemerintahanController::class, 'bpdIndex'])->name('bpd.index');
             Route::get('/lembaga', [PemerintahanController::class, 'lembagaIndex'])->name('lembaga.index');
             Route::get('/perencanaan', [\App\Http\Controllers\Desa\PerencanaanController::class, 'index'])->name('perencanaan.index');
@@ -167,6 +168,7 @@ Route::middleware(['auth', 'role:Operator Desa,Super Admin'])->prefix('desa')->n
             Route::get('/laporan', [PemerintahanController::class, 'laporanIndex'])->name('laporan.index');
             Route::get('/inventaris', [PemerintahanController::class, 'inventarisIndex'])->name('inventaris.index');
             Route::get('/dokumen', [PemerintahanController::class, 'dokumenIndex'])->name('dokumen.index');
+            Route::get('/peraturan', [PemerintahanController::class, 'peraturanIndex'])->name('peraturan.index');
 
             Route::post('/personil', [PemerintahanController::class, 'personilStore'])->name('personil.store');
             Route::post('/inventaris', [PemerintahanController::class, 'inventarisStore'])->name('inventaris.store');

@@ -121,8 +121,9 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
 });
 
-// Sitemap
+// Sitemap & Robots
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
+Route::get('/robots.txt', [SitemapController::class, 'robots']);
 
 // Internal API: Service Decision Tree (AJAX — auth protected)
 Route::middleware(['auth'])->prefix('api/layanan')->name('api.layanan.')->group(function () {

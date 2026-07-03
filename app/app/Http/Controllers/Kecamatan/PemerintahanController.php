@@ -190,6 +190,80 @@ class PemerintahanController extends Controller
         ]);
     }
 
+    public function personilDownload(Request $request)
+    {
+        $desa_id = $request->query('desa_id');
+        $kategori = $request->query('kategori', 'perangkat');
+        $format = $request->query('format', 'excel');
+
+        if (!$desa_id) {
+            return back()->with('error', 'Desa tidak teridentifikasi.');
+        }
+
+        $desa = Desa::findOrFail($desa_id);
+        $personils = PersonilDesa::where('desa_id', $desa_id)
+            ->where('kategori', $kategori)
+            ->orderBy('jabatan')
+            ->get();
+
+        $title = 'Data ' . ($kategori === 'bpd' ? 'BPD' : 'Perangkat Desa & Kades') . ' ' . $desa->nama_desa;
+        $date = date('d/m/Y');
+
+        if ($format === 'pdf') {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kecamatan.pemerintahan.export.personil_pdf', compact('desa', 'personils', 'kategori', 'title', 'date'));
+            return $pdf->download(str_replace(' ', '_', $title) . '_' . date('Ymd') . '.pdf');
+        }
+
+        if ($format === 'excel') {
+            $fileName = str_replace(' ', '_', $title) . '_' . date('Ymd') . '.xls';
+            $headers = [
+                "Content-type"        => "application/vnd.ms-excel; charset=UTF-8",
+                "Content-Disposition" => "attachment; filename=$fileName",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            ];
+
+            return response()->view('kecamatan.pemerintahan.export.personil_excel', compact('desa', 'personils', 'kategori', 'title', 'date'), 200, $headers);
+        }
+
+        // Default: CSV (Raw data for upload)
+        $fileName = 'Data_Personil_Desa_' . str_replace(' ', '_', $desa->nama_desa) . '_' . date('Ymd') . '.csv';
+        $headers = [
+            "Content-type"        => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['Nama', 'NIK', 'Jabatan', 'Masa Jabatan', 'Nomor SK', 'Tanggal SK', 'Status'];
+
+        $callback = function() use($personils, $columns) {
+            $file = fopen('php://output', 'w');
+            // Add BOM to fix UTF-8 display in Excel
+            fputs($file, "\xEF\xBB\xBF");
+            fputcsv($file, $columns);
+
+            foreach ($personils as $personil) {
+                $masa_mulai = $personil->masa_jabatan_mulai ? $personil->masa_jabatan_mulai : '-';
+                fputcsv($file, [
+                    $personil->nama,
+                    "'" . $personil->nik, // apostrophe prevents Excel from converting NIK to scientific notation
+                    $personil->jabatan,
+                    $masa_mulai,
+                    $personil->nomor_sk ?? '-',
+                    $personil->tanggal_sk ?? '-',
+                    $personil->is_active ? 'Aktif' : 'Non-Aktif',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function bpdIndex()
     {
         $desa_id = request('desa_id');

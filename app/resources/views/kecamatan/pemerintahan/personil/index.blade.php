@@ -23,10 +23,28 @@
                 </p>
             </div>
             @if($desa_id)
-                <button class="btn btn-brand-600 text-white rounded-pill px-4 shadow-premium" data-bs-toggle="modal"
-                    data-bs-target="#addPersonilModal">
-                    <i class="fas fa-plus-circle me-2"></i> Tambah Data Personil
-                </button>
+                @php
+                    $isDesaUser = auth()->user()->desa_id !== null;
+                    $routePrefix = $isDesaUser ? 'desa.pemerintahan.detail.personil.download' : 'kecamatan.pemerintahan.detail.personil.download';
+                @endphp
+                <div class="d-flex gap-2">
+                    <a href="{{ route($routePrefix, ['desa_id' => $desa_id, 'kategori' => $kategori ?? 'perangkat', 'format' => 'csv']) }}" 
+                       class="btn btn-outline-secondary rounded-pill px-3">
+                        <i class="fas fa-file-csv me-2"></i> Download CSV (Raw)
+                    </a>
+                    <a href="{{ route($routePrefix, ['desa_id' => $desa_id, 'kategori' => $kategori ?? 'perangkat', 'format' => 'excel']) }}" 
+                       class="btn btn-outline-success rounded-pill px-3">
+                        <i class="fas fa-file-excel me-2"></i> Download Excel
+                    </a>
+                    <a href="{{ route($routePrefix, ['desa_id' => $desa_id, 'kategori' => $kategori ?? 'perangkat', 'format' => 'pdf']) }}" 
+                       class="btn btn-outline-danger rounded-pill px-3">
+                        <i class="fas fa-file-pdf me-2"></i> Download PDF
+                    </a>
+                    <button class="btn btn-brand-600 text-white rounded-pill px-4 shadow-premium" data-bs-toggle="modal"
+                        data-bs-target="#addPersonilModal">
+                        <i class="fas fa-plus-circle me-2"></i> Tambah Data Personil
+                    </button>
+                </div>
             @endif
         </div>
     </div>

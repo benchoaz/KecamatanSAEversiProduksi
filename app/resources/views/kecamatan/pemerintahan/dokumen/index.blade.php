@@ -1,4 +1,4 @@
-@extends('layouts.kecamatan')
+@extends(auth()->user()->desa_id ? 'layouts.desa' : 'layouts.kecamatan')
 
 @section('title', $title ?? 'Arsip Dokumen Perencanaan Desa')
 
@@ -127,7 +127,11 @@
                                         </td>
                                         <td class="text-slate-600">{{ $d->created_at->format('d M Y') }}</td>
                                         <td class="text-center">
-                                            <a href="{{ route('kecamatan.file.dokumen', $d->id) }}" target="_blank"
+                                            @php
+                                                $isDesaUser = auth()->user()->desa_id !== null;
+                                                $fileRoute = $isDesaUser ? route('desa.file.dokumen', $d->id) : route('kecamatan.file.dokumen', $d->id);
+                                            @endphp
+                                            <a href="{{ $fileRoute }}" target="_blank"
                                                 class="btn btn-sm btn-light border text-indigo-600 px-3 rounded-pill shadow-sm">
                                                 <i class="fas fa-file-pdf me-1"></i> Lihat PDF
                                             </a>
@@ -192,6 +196,14 @@
                                             <label class="btn btn-outline-primary w-100 py-3 rounded-4" for="type_perdes">
                                                 <i class="fas fa-gavel mb-1 d-block opacity-50"></i>
                                                 Peraturan Desa
+                                            </label>
+                                        </div>
+                                        <div class="flex-fill">
+                                            <input type="radio" class="btn-check" name="tipe_dokumen" id="type_perkades"
+                                                value="Peraturan Kepala Desa">
+                                            <label class="btn btn-outline-info w-100 py-3 rounded-4" for="type_perkades">
+                                                <i class="fas fa-gavel mb-1 d-block opacity-50"></i>
+                                                Perkades
                                             </label>
                                         </div>
                                     @else

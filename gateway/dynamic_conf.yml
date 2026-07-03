@@ -32,3 +32,22 @@ http:
     kecamatan-buffer:
       buffering:
         retryExpression: "IsNetworkError() && Attempts() <= 2"
+
+  routers:
+    kecamatan:
+      rule: "Host(`kecamatanbesuk.web.id`) || Host(`localhost`) || Host(`localhost:8447`) || Host(`localhost:8086`)"
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: myresolver
+      service: kecamatan
+      middlewares:
+        - kecamatan-compress
+        - kecamatan-headers
+        - kecamatan-rate
+
+  services:
+    kecamatan:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8081"

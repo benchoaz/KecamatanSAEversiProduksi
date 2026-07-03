@@ -9,16 +9,16 @@ echo "🚀 Initializing SILAP Application Environment..."
 
 # 1. Wait for Database
 echo "⏳ Waiting for Database (Postgres)..."
-until nc -z db 5432; do
-  echo "Still waiting for postgres at db:5432..."
+until nc -z 127.0.0.1 5432; do
+  echo "Still waiting for postgres at 127.0.0.1:5432..."
   sleep 2
 done
 echo "✅ Database is reachable."
 
 # 2. Wait for Redis
 echo "⏳ Waiting for Redis..."
-until nc -z redis 6379; do
-  echo "Still waiting for redis at redis:6379..."
+until nc -z 127.0.0.1 6379; do
+  echo "Still waiting for redis at 127.0.0.1:6379..."
   sleep 2
 done
 echo "✅ Redis is reachable."
@@ -28,8 +28,8 @@ echo "📁 Checking storage permissions..."
 mkdir -p storage/framework/{cache,sessions,views}
 mkdir -p storage/app/public
 mkdir -p bootstrap/cache
-chown -R www-data:www-data storage bootstrap/cache
-chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache || true
+chmod -R 775 storage bootstrap/cache || true
 
 # 4. Handle APP_KEY if missing
 if [ -z "$APP_KEY" ]; then

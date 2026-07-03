@@ -146,6 +146,7 @@ Route::middleware(['auth'])->prefix('kecamatan')->name('kecamatan.')->group(func
             // Administrative Governance Modules (Detailed Monitoring)
             Route::prefix('detail')->name('detail.')->group(function () {
                 Route::get('/personil', [PemerintahanController::class, 'personilIndex'])->name('personil.index');
+                Route::get('/personil/download', [PemerintahanController::class, 'personilDownload'])->name('personil.download');
                 Route::post('/personil', [PemerintahanController::class, 'personilStore'])->name('personil.store');
                 Route::post('/personil/{id}/verify', [PemerintahanController::class, 'personilVerify'])->name('personil.verify');
                 Route::post('/personil/{id}/unlock', [PemerintahanController::class, 'personilUnlock'])->name('personil.unlock');
