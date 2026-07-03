@@ -235,6 +235,22 @@ class IntentHandler
             ];
         }
 
+        // KTP Online & POS Delivery Intent
+        if ($this->matchesIntent($messageLower, ['ktp online', 'ktp pos', 'kirim ktp', 'ktp rumah', 'ktp paket'])) {
+            return [
+                'success' => true,
+                'intent' => 'ktp_pos_online',
+                'reply' => "📯 *PENGIRIMAN KTP-el ONLINE & POS*\n\n".
+                    "Untuk pengajuan cetak KTP-el secara online dan dikirim langsung ke rumah via Pos, silakan daftar melalui link resmi Disdukcapil Kabupaten Probolinggo berikut:\n".
+                    "👉 https://godigital-disdukcapil.probolinggokab.go.id/daftar_ktp\n\n".
+                    "📎 *Dokumen Persyaratan (Maksimal 2MB):*\n".
+                    "1. Foto Bukti Perekaman / Surat Keterangan / Surat Kehilangan dari Kepolisian / KTP Rusak\n".
+                    "2. Foto Kartu Keluarga (KK) Asli\n\n".
+                    "Ketik *MENU* untuk kembali.",
+                'state_update' => null,
+            ];
+        }
+
         // Complaint submission intent
         if ($this->matchesIntent($messageLower, ['pengaduan', 'lapor', 'aduan', 'complaint'])) {
             return $this->complaintHandler->initiate($phone);
