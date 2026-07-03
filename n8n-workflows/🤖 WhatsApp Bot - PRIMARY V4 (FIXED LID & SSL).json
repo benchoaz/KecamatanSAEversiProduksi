@@ -1,0 +1,314 @@
+{
+  "name": "🤖 WhatsApp Bot - PRIMARY V4 (FIXED LID & SSL)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-primary",
+        "options": {}
+      },
+      "id": "cadc08b1-fb92-4a78-9256-6fd636b8eaf3",
+      "name": "WAHA Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        2032
+      ],
+      "webhookId": "whatsapp-primary"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\": true}",
+        "options": {}
+      },
+      "id": "56aed221-fcad-4565-812b-b397a46e096a",
+      "name": "Respond 200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.event }}",
+              "value2": "message"
+            }
+          ],
+          "boolean": [
+            {
+              "value1": "={{ !$json.body.payload.from.includes('status@broadcast') }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "83b7e598-12cb-4f98-b760-5fbe52bddb3d",
+      "name": "Event Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = items[0].json.body;\nconst payload = body.payload || {};\n\n// Normalize phone (LID Fix)\nreturn [{\n  json: {\n    chatId: payload.from,\n    author: payload.author || payload.from,\n    message: payload.body || payload.text || '',\n    raw_payload: body\n  }\n}];"
+      },
+      "id": "357d1615-af0f-4838-8868-60f6f52363eb",
+      "name": "Normalize & Validate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2224,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://kecamatanbesuk.web.id/api/whatsapp/handle",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-TOKEN",
+              "value": "JEalbL50Ysu8MCKVS1q9j38BPpNBorzj"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chatId",
+              "value": "={{ $json.chatId }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.raw_payload }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "82012153-afc4-4bd3-ad3e-3423669a8a55",
+      "name": "Call Dashboard API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2416,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://waha-ohiqijryhkzp.boba.sumopod.my.id/api/sendText",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "tq4ZqP4Ck40WENkfk5Aah4tCF4u5DBtg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "session",
+              "value": "session_01kqepctxvfe6jx212f0b4h48t"
+            },
+            {
+              "name": "chatId",
+              "value": "={{ $node[\"Normalize & Validate\"].json.chatId }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $node[\"Call Dashboard API\"].json.reply }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "677d3aae-c8e0-4e3f-99c7-cf0e644373f5",
+      "name": "SendText WAHA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2900,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.forward?.should_forward }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "forward-check-if-node",
+      "name": "Check If Forward Needed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2580,
+        2200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://waha-ohiqijryhkzp.boba.sumopod.my.id/api/sendText",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "tq4ZqP4Ck40WENkfk5Aah4tCF4u5DBtg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "session",
+              "value": "session_01kqepctxvfe6jx212f0b4h48t"
+            },
+            {
+              "name": "chatId",
+              "value": "={{ $node[\"Call Dashboard API\"].json.forward.target_phone }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $node[\"Call Dashboard API\"].json.forward.message }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "forward-to-kabupaten-waha-node",
+      "name": "Forward to Kabupaten WAHA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2780,
+        2300
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WAHA Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Event Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event Filter": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Validate": {
+      "main": [
+        [
+          {
+            "node": "Call Dashboard API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Dashboard API": {
+      "main": [
+        [
+          {
+            "node": "Check If Forward Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Forward Needed": {
+      "main": [
+        [
+          {
+            "node": "Forward to Kabupaten WAHA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SendText WAHA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Forward to Kabupaten WAHA": {
+      "main": [
+        [
+          {
+            "node": "SendText WAHA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b4b9d4b5-cbb0-4697-89a6-3212a60ce745",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1987e2c7f8710290f50392959a2f75765a39ebd20b809b3def9a280272ef0117"
+  },
+  "nodeGroups": [],
+  "id": "4I0lQhxyXNUnoJFM",
+  "tags": []
+}
