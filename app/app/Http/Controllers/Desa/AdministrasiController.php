@@ -80,12 +80,14 @@ class AdministrasiController extends Controller
             'jabatan' => 'required|string',
             'nama_dusun' => 'nullable|required_if:jabatan,Kepala Dusun|string|max:255',
             'masa_jabatan_mulai' => $request->kategori == 'perangkat' ? 'required|date' : 'nullable|date',
+            'masa_jabatan_selesai' => 'nullable|date',
             'nomor_sk' => 'required|string',
             'tanggal_sk' => 'required|date',
             'file_sk' => 'required|file|mimes:pdf|max:2048',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
             'kategori' => 'required|in:perangkat,bpd',
             'siltap_pokok' => 'nullable|numeric|min:0',
+            'tunjangan_jabatan' => 'nullable|numeric|min:0',
             'rekening_bank' => 'nullable|string|max:50',
             'nama_bank' => 'nullable|string|max:100',
             'no_hp' => 'nullable|string|max:20',
@@ -124,11 +126,13 @@ class AdministrasiController extends Controller
             $personil->jabatan = $request->jabatan;
             $personil->nama_dusun = $request->nama_dusun;
             $personil->masa_jabatan_mulai = $request->masa_jabatan_mulai;
+            $personil->masa_jabatan_selesai = $request->masa_jabatan_selesai;
             $personil->nomor_sk = $request->nomor_sk;
             $personil->tanggal_sk = $request->tanggal_sk;
             $path = $request->file('file_sk')->store('sk_personil', 'local');
             $personil->file_sk = $path;
             $personil->siltap_pokok = $request->siltap_pokok ?? 0;
+            $personil->tunjangan_jabatan = $request->tunjangan_jabatan ?? 0;
             $personil->nama_bank = $request->nama_bank;
             $personil->rekening_bank = $request->rekening_bank;
             $personil->no_hp = $request->no_hp;

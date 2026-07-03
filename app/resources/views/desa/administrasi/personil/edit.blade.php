@@ -151,6 +151,29 @@
                                             type="date" :value="$personil->masa_jabatan_mulai ? $personil->masa_jabatan_mulai->format('Y-m-d') : ''" 
                                             :readonly="$readonly" required="true" />
                                     </div>
+                                    @if($personil->kategori == 'perangkat')
+                                        <div class="col-md-6">
+                                            <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok"
+                                                type="number" :value="(int)$personil->siltap_pokok"
+                                                :readonly="$readonly" placeholder="0" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <x-desa.form.input label="Tunjangan Jabatan (Rp)" name="tunjangan_jabatan"
+                                                type="number" :value="(int)$personil->tunjangan_jabatan"
+                                                :readonly="$readonly" placeholder="0" />
+                                        </div>
+                                    @else
+                                        <div class="col-md-6">
+                                            <x-desa.form.input label="Tunjangan BPD (Rp)" name="tunjangan_jabatan"
+                                                type="number" :value="(int)$personil->tunjangan_jabatan"
+                                                :readonly="$readonly" placeholder="0" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <x-desa.form.input label="Selesai Jabatan" name="masa_jabatan_selesai"
+                                                type="date" :value="$personil->masa_jabatan_selesai ? $personil->masa_jabatan_selesai->format('Y-m-d') : ''"
+                                                :readonly="$readonly" required="true" />
+                                        </div>
+                                    @endif
                                     <div class="col-md-6">
                                         <x-desa.form.input label="Nama Bank" name="nama_bank" :value="$personil->nama_bank"
                                             :readonly="$readonly" placeholder="Contoh: Bank Jatim" />

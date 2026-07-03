@@ -132,16 +132,25 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
+                                 <div class="row">
                                     <div class="col-md-4">
                                         <x-desa.form.input label="Mulai Menjabat (TMT)" name="masa_jabatan_mulai"
                                             type="date" required="true" />
                                     </div>
-                                    <div class="col-md-4">
-                                        <x-desa.form.input label="Siltap/Tunjangan (Rp)" name="siltap_pokok"
-                                            type="number" placeholder="Contoh: 2400000" />
-                                    </div>
-                                    @if($kategori == 'bpd')
+                                    @if($kategori == 'perangkat')
+                                        <div class="col-md-4">
+                                            <x-desa.form.input label="Siltap Pokok (Rp)" name="siltap_pokok"
+                                                type="number" placeholder="Contoh: 2426640" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <x-desa.form.input label="Tunjangan Jabatan (Rp)" name="tunjangan_jabatan"
+                                                type="number" placeholder="Contoh: 375000" />
+                                        </div>
+                                    @else
+                                        <div class="col-md-4">
+                                            <x-desa.form.input label="Tunjangan BPD (Rp)" name="tunjangan_jabatan"
+                                                type="number" placeholder="Contoh: 325000" />
+                                        </div>
                                         <div class="col-md-4">
                                             <x-desa.form.input label="Selesai Jabatan" name="masa_jabatan_selesai"
                                                 type="date" required="true" />
