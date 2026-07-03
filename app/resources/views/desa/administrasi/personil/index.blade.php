@@ -41,7 +41,7 @@
                         <tr>
                             <th class="ps-4 py-3">Nama Lengkap</th>
                             <th class="py-3">Jabatan / Kontak</th>
-                            <th class="py-3">Siltap</th>
+                            <th class="py-3">{{ ($kategori ?? 'perangkat') === 'bpd' ? 'Tunjangan' : 'Siltap' }}</th>
                             <th class="py-3">Masa Jabatan</th>
                             <th class="py-3 text-center">Status</th>
                             <th class="py-3 text-end pe-4">Aksi</th>
@@ -77,7 +77,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="small fw-bold text-brand-600">Rp {{ number_format($p->siltap_pokok ?? 0, 0, ',', '.') }}</div>
+                                    <div class="small fw-bold text-brand-600">Rp {{ number_format((($kategori ?? 'perangkat') === 'bpd' ? $p->tunjangan_jabatan : $p->siltap_pokok) ?? 0, 0, ',', '.') }}</div>
                                 </td>
                                 <td>
                                     @php
