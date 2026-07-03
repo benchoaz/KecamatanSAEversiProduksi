@@ -438,16 +438,28 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-primary-900">Siltap Pokok (Rp)</label>
-                                    <input type="number" name="siltap_pokok" class="form-control rounded-3 border-gray-200"
-                                        placeholder="0" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-primary-900">Tunjangan Jabatan (Rp)</label>
-                                    <input type="number" name="tunjangan_jabatan" class="form-control rounded-3 border-gray-200"
-                                        placeholder="0">
-                                </div>
+                                @if(($kategori ?? 'perangkat') == 'perangkat')
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-primary-900">Siltap Pokok (Rp)</label>
+                                        <input type="number" name="siltap_pokok" class="form-control rounded-3 border-gray-200"
+                                            placeholder="0" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-primary-900">Tunjangan Jabatan (Rp)</label>
+                                        <input type="number" name="tunjangan_jabatan" class="form-control rounded-3 border-gray-200"
+                                            placeholder="0">
+                                    </div>
+                                @else
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-primary-900">Tunjangan BPD (Rp)</label>
+                                        <input type="number" name="tunjangan_jabatan" class="form-control rounded-3 border-gray-200"
+                                            placeholder="0">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-primary-900">Selesai Jabatan</label>
+                                        <input type="date" name="masa_jabatan_selesai" class="form-control rounded-3 border-gray-200" required>
+                                    </div>
+                                @endif
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold text-primary-900">Nama Bank</label>
                                     <input type="text" name="nama_bank" class="form-control rounded-3 border-gray-200"

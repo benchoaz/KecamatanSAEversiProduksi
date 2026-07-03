@@ -80,6 +80,7 @@ class PemerintahanController extends Controller
             'nomor_sk' => 'nullable|string|max:255',
             'tanggal_sk' => 'nullable|date',
             'masa_jabatan_mulai' => 'nullable|date',
+            'masa_jabatan_selesai' => 'nullable|date',
             'file_sk' => 'nullable|file|mimes:pdf|max:2048',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
         ]);
